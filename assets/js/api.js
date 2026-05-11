@@ -84,8 +84,7 @@ function repoPath(p) {
 export async function readFile(path) {
   try {
     const data = await ghFetch(
-      `${repoPath(path)}?ref=${CONFIG.repo.branch}&t=${Date.now()}`,
-      { headers: { 'Cache-Control': 'no-cache' } }
+      `${repoPath(path)}?ref=${CONFIG.repo.branch}&t=${Date.now()}`
     );
     if (Array.isArray(data)) return null;
     return {
