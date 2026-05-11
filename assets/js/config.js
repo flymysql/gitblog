@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260511143558';
+export const VERSION = '20260511144209';
 
 export const CONFIG = {
   repo: {
@@ -13,9 +13,9 @@ export const CONFIG = {
   },
   authorizedUsers: ["flymysql"],
   site: {
-    title: "春日野鬼",
+    title: "小红鸡",
     subtitle: "记录想法与代码",
-    author: "小红鸡",
+    author: "Jimmy",
     logo: "",
     favicon: "../assets/uploads/2026/05/1778481325586-x3zzx9-blog.svg",
     avatar: "https://avatars.githubusercontent.com/u/37113068?s=400&u=cf2b8a258ad1de5e9a23e3c72da6ca04e058dd46&v=4",
