@@ -2,7 +2,32 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://flymysql.github.io/gitblog/</loc>
+    <lastmod>2026-05-11T04:12:31.217Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://flymysql.github.io/gitblog/tags.html</loc>
+    <lastmod>2026-05-11T04:12:31.217Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://flymysql.github.io/gitblog/archives.html</loc>
+    <lastmod>2026-05-11T04:12:31.217Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://flymysql.github.io/gitblog/post.html?slug=welcome</loc>
+    <lastmod>2026-05-11T10:00:00.000Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://flymysql.github.io/gitblog/post.html?slug=%E6%96%B0%E6%96%87%E7%AB%A0%E6%B5%8B%E8%AF%95</loc>
+    <lastmod>2026-05-11T03:50:32.864Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>
