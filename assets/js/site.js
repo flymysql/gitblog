@@ -9,6 +9,62 @@ import { fetchIndexPublic } from './api.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
+// ============================================================================
+// 图片懒加载（IntersectionObserver）
+// 与原生 loading="lazy" 相比，浏览器一进页面不会预排队下载非首屏图，
+// 进入视口前 300px 才注入真实 src，对长文章 / 多图首页效果显著
+// ============================================================================
+const LAZY_PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E';
+let _lazyObs = null;
+function getLazyObserver() {
+  if (_lazyObs) return _lazyObs;
+  if (typeof IntersectionObserver === 'undefined') return null;
+  _lazyObs = new IntersectionObserver(entries => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      const img = e.target;
+      const real = img.dataset.src;
+      if (real) {
+        img.src = real;
+        img.removeAttribute('data-src');
+      }
+      img.classList.remove('lazy-pending');
+      _lazyObs.unobserve(img);
+    }
+  }, { rootMargin: '300px 0px', threshold: 0.01 });
+  return _lazyObs;
+}
+
+export function lazyImage(img, { eager = false } = {}) {
+  if (!img || img.dataset.lazied) return;
+  img.dataset.lazied = '1';
+  img.decoding = img.decoding || 'async';
+  if (eager) {
+    img.loading = 'eager';
+    if (!img.getAttribute('fetchpriority')) img.setAttribute('fetchpriority', 'high');
+    return;
+  }
+  const realSrc = img.getAttribute('src');
+  if (!realSrc || realSrc.startsWith('data:')) {
+    img.loading = 'lazy';
+    return;
+  }
+  img.dataset.src = realSrc;
+  img.setAttribute('src', LAZY_PLACEHOLDER);
+  img.loading = 'lazy';
+  if (!img.getAttribute('fetchpriority')) img.setAttribute('fetchpriority', 'low');
+  img.classList.add('lazy-pending');
+  const io = getLazyObserver();
+  if (io) io.observe(img);
+  else { img.src = realSrc; img.removeAttribute('data-src'); img.classList.remove('lazy-pending'); }
+}
+
+// 给 root 内所有 img 设置懒加载；前 eagerCount 张保持立即加载（首屏 LCP 友好）
+export function bindLazyImages(root = document, { eagerCount = 1, selector = 'img' } = {}) {
+  const imgs = [...root.querySelectorAll(selector)].filter(img => !img.dataset.lazied);
+  imgs.forEach((img, i) => lazyImage(img, { eager: i < eagerCount }));
+}
+
 export function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])

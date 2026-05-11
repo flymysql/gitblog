@@ -243,6 +243,12 @@ html, body {
 }
 html, body { overflow-x: clip; max-width: 100vw; }
 
+/* 图片懒加载占位：未注入真实 src 时显示浅灰底，避免空白闪烁与布局抖动 */
+img.lazy-pending {
+  background: var(--bg-soft, #f3f3f3);
+  min-height: 60px;
+}
+
 a { color: inherit; text-decoration: none; transition: color 0.15s; }
 a:hover { color: var(--primary); }
 img { max-width: 100%; display: block; }

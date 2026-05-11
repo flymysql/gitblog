@@ -4,7 +4,7 @@
 
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
-import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml } from './site.js';
+import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages } from './site.js';
 import { setMeta, setJsonLd } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -84,6 +84,9 @@ function renderCarousel(posts) {
     dots.forEach((dot, i) => dot.classList.toggle('active', i === current));
   };
 
+  // 轮播图：第一张立即加载（LCP 关键），其它走视口懒加载
+  bindLazyImages(root, { eagerCount: 1 });
+
   root.querySelector('.prev').addEventListener('click', () => setActive(current - 1));
   root.querySelector('.next').addEventListener('click', () => setActive(current + 1));
   dots.forEach((dot, i) => dot.addEventListener('click', () => setActive(i)));
@@ -147,6 +150,8 @@ function renderList(posts) {
            <span class="load-more-text">加载更多</span>
          </li>`
       : `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`);
+  // 列表缩略图全部走视口懒加载（首屏前几张视口可见时会立刻加载）
+  bindLazyImages(ul, { eagerCount: 0 });
 
   let loaded = firstChunk.length;
   const sentinel = document.getElementById('loadMoreSentinel');
@@ -156,7 +161,9 @@ function renderList(posts) {
     if (!nextChunk.length) return;
     const frag = document.createElement('div');
     frag.innerHTML = nextChunk.map(p => postItemHtml(p, author, avatar)).join('');
-    [...frag.children].forEach(node => ul.insertBefore(node, sentinel));
+    const inserted = [...frag.children];
+    inserted.forEach(node => ul.insertBefore(node, sentinel));
+    inserted.forEach(node => bindLazyImages(node, { eagerCount: 0 }));
     loaded += nextChunk.length;
     if (loaded >= posts.length) {
       // 全部加载完，把 sentinel 替换成"到底"提示

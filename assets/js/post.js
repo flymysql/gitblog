@@ -6,7 +6,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic, fetchPostMarkdownPublic } from './api.js';
 import { renderMarkdown, parseFrontmatter } from './markdown.js';
-import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml } from './site.js';
+import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages } from './site.js';
 import { setMeta, setJsonLd } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -207,11 +207,11 @@ function enhanceImages(article) {
     if (img.hasAttribute('height')) img.removeAttribute('height');
     if (img.style && img.style.width) img.style.width = '';
     if (img.style && img.style.height) img.style.height = '';
-    img.loading = img.loading || 'lazy';
-    img.decoding = img.decoding || 'async';
     img.style.cursor = 'zoom-in';
-    img.addEventListener('click', () => openLightbox(img.src, img.alt));
+    img.addEventListener('click', () => openLightbox(img.dataset.src || img.src, img.alt));
   });
+  // 真正的懒加载：第一张图首屏 eager（LCP 友好），其它图视口附近才下载
+  bindLazyImages(article, { eagerCount: 1 });
 
   function openLightbox(src, alt) {
     if (!lightbox) return;
