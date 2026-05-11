@@ -6,7 +6,7 @@
 export const CONFIG = {
   // 你的 GitHub 仓库（也是 GitHub Pages 部署的仓库）
   repo: {
-    owner: 'your-username',
+    owner: 'flymysql',
     name: 'blog',
     branch: 'main',
   },
@@ -14,14 +14,14 @@ export const CONFIG = {
   // 允许进入后台的 GitHub 账号白名单（lowercase）
   // 真正的写权限由 GitHub 仓库本身的 collaborator 设置控制，
   // 这里只是前端 UI 的额外校验
-  authorizedUsers: ['your-username'],
+  authorizedUsers: ['flymysql'],
 
   // 站点信息
   site: {
     title: '我的博客',
     subtitle: '记录想法与代码',
     author: '你的名字',
-    avatar: 'https://avatars.githubusercontent.com/u/1?v=4',
+    avatar: 'https://avatars.githubusercontent.com/u/37113068?s=400&u=cf2b8a258ad1de5e9a23e3c72da6ca04e058dd46&v=4',
     description: '一个用 GitHub Pages 托管、可在线编辑的简书风格博客',
   },
 
