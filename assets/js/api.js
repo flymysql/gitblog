@@ -181,13 +181,46 @@ export async function writeIndex(data, message, sha) {
   return writeFile(CONFIG.paths.index, json, message, sha);
 }
 
+// ---------- 图片 / 二进制上传 ----------
+// blob 直接 PUT 到指定路径，返回相对路径用于插入 Markdown
+export async function uploadImage(blob, suggestedName) {
+  const ext = (suggestedName && suggestedName.match(/\.([a-z0-9]+)$/i) || ['', 'png'])[1].toLowerCase();
+  const safeExt = /^[a-z0-9]+$/i.test(ext) ? ext : 'png';
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const random = Math.random().toString(36).slice(2, 8);
+  const stem = (suggestedName || 'image').replace(/\.[^.]+$/, '').replace(/[^\w\u4e00-\u9fa5\-]/g, '-').slice(0, 24) || 'image';
+  const path = `${CONFIG.paths.uploads}/${yyyy}/${mm}/${now.getTime()}-${random}-${stem}.${safeExt}`;
+  const b64 = await blobToBase64(blob);
+  const body = {
+    message: `upload: ${path.split('/').pop()}`,
+    content: b64,
+    branch: CONFIG.repo.branch,
+  };
+  await ghFetch(repoPath(path), { method: 'PUT', body });
+  return path;
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || '');
+      const idx = result.indexOf(',');
+      resolve(idx >= 0 ? result.slice(idx + 1) : result);
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
 // ---------- 一些 base64 utf8 工具 ----------
 function b64EncodeUtf8(str) {
   return btoa(unescape(encodeURIComponent(str)));
 }
 
 function b64DecodeUtf8(b64) {
-  // GitHub 返回的 content 带换行
   const clean = b64.replace(/\s/g, '');
   return decodeURIComponent(escape(atob(clean)));
 }

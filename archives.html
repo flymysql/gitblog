@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>归档 · 加载中…</title>
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
+  <link rel="stylesheet" href="assets/css/common.css?v=20260511">
+  <link rel="stylesheet" href="assets/css/home.css?v=20260511">
+  <script>(function(){var t=localStorage.getItem('blog_theme')||'auto';var d=t==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t;document.documentElement.setAttribute('data-theme',d);document.documentElement.dataset.themeChoice=t;})();</script>
+  <style>
+    .archive-page { max-width: var(--content-max); margin: 28px auto; padding: 0 24px; }
+    .archive-page h1 { font-size: 24px; margin-bottom: 8px; font-weight: 700; }
+    .archive-page .desc { color: var(--text-secondary); font-size: 14px; margin-bottom: 28px; }
+    .year-group { margin-bottom: 36px; }
+    .year-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--primary);
+    }
+    .archive-list { list-style: none; }
+    .archive-item {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .archive-item .date {
+      flex-shrink: 0;
+      width: 60px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+    .archive-item .title { font-size: 14.5px; color: var(--text-main); flex: 1; min-width: 0; }
+    .archive-item:hover .title { color: var(--primary); }
+    .archive-item .tags { color: var(--text-tertiary); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main class="archive-page">
+    <h1>归档</h1>
+    <p class="desc" id="archiveDesc">所有文章按时间倒序排列</p>
+    <div id="archiveList"></div>
+  </main>
+
+  <div id="site-footer"></div>
+  <div id="site-overlays"></div>
+
+  <script type="module" src="assets/js/archives.js?v=20260511"></script>
+</body>
+</html>

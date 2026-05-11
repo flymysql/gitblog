@@ -5,30 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>加载中…</title>
   <meta name="description" content="">
-  <link rel="stylesheet" href="assets/css/common.css">
-  <link rel="stylesheet" href="assets/css/home.css">
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
+  <link rel="stylesheet" href="assets/css/common.css?v=20260511">
+  <link rel="stylesheet" href="assets/css/home.css?v=20260511">
+  <script>(function(){var t=localStorage.getItem('blog_theme')||'auto';var d=t==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t;document.documentElement.setAttribute('data-theme',d);document.documentElement.dataset.themeChoice=t;})();</script>
 </head>
 <body>
-  <header class="nav">
-    <div class="nav-inner">
-      <a class="nav-logo" href="./">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L19.82 8 12 11.82 4.18 8 12 4.18zM4 9.27l7 3.5v7.46l-7-3.5V9.27zm9 10.96v-7.46l7-3.5v7.46l-7 3.5z"/></svg>
-        <span data-bind="site.title">博客</span>
-      </a>
-      <div class="nav-search">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input id="searchInput" type="text" placeholder="搜索文章">
-      </div>
-      <div class="nav-spacer"></div>
-      <div class="nav-actions">
-        <a class="btn-write" href="admin/editor.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-          写文章
-        </a>
-        <a class="btn-ghost" href="admin/">后台</a>
-      </div>
-    </div>
-  </header>
+  <div id="site-nav"></div>
+
+  <section class="hero" id="hero" hidden></section>
 
   <main class="layout">
     <section>
@@ -43,25 +28,29 @@
     </section>
     <aside class="sidebar">
       <div class="sidebar-card">
+        <h3>关于站长</h3>
         <div class="sidebar-author">
-          <div class="avatar" data-bind-style="site.avatar"></div>
+          <div class="avatar" id="sidebarAvatar"></div>
           <div>
-            <div class="name" data-bind="site.author">作者</div>
-            <div class="desc" data-bind="site.description">介绍</div>
+            <div class="name" id="sidebarName"></div>
+            <div class="desc" id="sidebarDesc"></div>
           </div>
         </div>
       </div>
       <div class="sidebar-card">
-        <h3>标签</h3>
+        <h3>热门标签</h3>
         <div class="tag-cloud" id="tagCloud"></div>
+      </div>
+      <div class="sidebar-card">
+        <h3>最近更新</h3>
+        <ul class="recent-list" id="recentList"></ul>
       </div>
     </aside>
   </main>
 
-  <footer class="footer">
-    <p>© <span id="year"></span> <span data-bind="site.title"></span> · 由 <a href="https://pages.github.com/" target="_blank">GitHub Pages</a> 托管 · <a href="admin/">后台编辑</a></p>
-  </footer>
+  <div id="site-footer"></div>
+  <div id="site-overlays"></div>
 
-  <script type="module" src="assets/js/home.js"></script>
+  <script type="module" src="assets/js/home.js?v=20260511"></script>
 </body>
 </html>

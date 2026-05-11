@@ -1,242 +1,151 @@
-# 简书风格 GitHub Pages 博客 · 在线后台编辑（零后端版）
+# GitHub Pages 静态博客 · 在线后台编辑
 
-完全静态、托管在 GitHub Pages 的博客，但带一个**可在线编辑的伪后台**：在浏览器里写文章，点发布按钮就把 Markdown commit 到 GitHub 仓库，触发 Pages 自动重新部署。
+完全静态、托管在 GitHub Pages，但带一个**在线后台**：在浏览器里写文章，发布按钮一点就把 Markdown 文件 commit 到仓库，触发 Pages 自动重新部署。**没有任何后端服务**，使用 GitHub Personal Access Token 直接调用 GitHub API。
 
-**没有任何后端服务**：不需要 Cloudflare Worker，不需要 Vercel / Netlify Functions，不需要服务器。整套项目就是一组静态文件 + 你浏览器里的一段 token。
+## 功能一览
 
-- 前台：仿简书风格的列表页 + 阅读页（纯 HTML/CSS/JS，无构建步骤）
-- 后台：`/admin` 路径下，粘贴 GitHub Personal Access Token 即可登录
-- 写仓库：直接调用 [GitHub Contents API](https://docs.github.com/rest/repos/contents)
+读者侧：
 
----
+- 简洁的首页（Hero + 文章列表 + 标签云 + 最近更新）
+- 文章阅读页支持 TOC 目录、giscus 评论、封面、Open Graph / Twitter Card
+- 标签聚合页 `/tags.html`、归档页 `/archives.html`
+- 站内搜索（顶部按钮 / `Ctrl+K` / `/`）
+- 浅色 / 深色 / 跟随系统三态主题
+- RSS（`rss.xml`）+ sitemap（`sitemap.xml`）
 
-## 工作原理
+后台侧：
 
-```
-[浏览器]                                         [GitHub]
-   │  访问 /admin                                   │
-   │  粘贴 fine-grained PAT                         │
-   │                                                │
-   │  GET /user  (Authorization: Bearer <token>) ──>│
-   │<── { login, name, avatar_url, ... }            │
-   │                                                │
-   │  写文章 → 点发布                                │
-   │  PUT /repos/<owner>/<repo>/contents/posts/x.md ─>│
-   │<── { commit, content }                         │
-   │                                                │  Pages 重新构建
-   │                                                │  几十秒后线上更新
-```
+- GitHub PAT 登录（无后端、无 OAuth）
+- 文章管理：全部 / 已发布 / 草稿三 tab，搜索、删除
+- Markdown 编辑器（EasyMDE）：工具栏、快捷键、实时预览
+- 拖拽 / 粘贴 上传图片（自动写入 `assets/uploads/yyyy/mm/`）
+- 草稿模式（`draft: true` 不进首页）
+- 置顶（`pinned: true` 在首页置顶）
+- 发布前校验（标题/正文/slug/标签/摘要）
+- `Ctrl+S` 一键发布
+- 版本冲突自动重新加载
+- 一键诊断页：检查 token / 仓库 / 分支 / 写权限 / 索引文件 / Pages
 
-token 只存在你浏览器的 `localStorage` 或 `sessionStorage`，不会上传到任何第三方。
+运维：
 
----
+- GitHub Actions 自动重新生成 `data/posts.json` / `sitemap.xml` / `rss.xml`
+- 校验 Markdown frontmatter
+- 所有 HTML 静态资源带版本号缓存破坏
 
 ## 目录结构
 
 ```
 blog/
-├── index.html                # 首页（文章列表，简书风格）
-├── post.html                 # 文章阅读页
+├── index.html / post.html / tags.html / archives.html
 ├── admin/
-│   ├── index.html            # 后台（登录 + 文章管理）
-│   └── editor.html           # Markdown 编辑器
+│   ├── index.html        # 登录 + 文章管理
+│   ├── editor.html       # Markdown 编辑器
+│   └── diagnose.html     # 一键诊断
 ├── assets/
-│   ├── css/
-│   │   ├── common.css
-│   │   ├── home.css
-│   │   ├── post.css
-│   │   └── admin.css
-│   └── js/
-│       ├── config.js         # 公共配置（仓库信息、白名单、站点信息）
-│       ├── api.js            # GitHub API 封装
-│       ├── auth.js           # PAT 验证
-│       ├── markdown.js       # Markdown / frontmatter
-│       ├── home.js
-│       ├── post.js
-│       ├── admin.js
-│       └── editor.js
-├── data/
-│   └── posts.json            # 文章索引（后台自动维护）
-├── posts/
-│   └── *.md                  # 文章源文件
-├── .nojekyll
-├── .gitignore
+│   ├── css/              # common / home / post / admin
+│   └── js/               # 各页面入口 + site / theme / seo / api / auth / markdown
+├── data/posts.json       # 文章索引（Action 自动生成）
+├── posts/                # Markdown 源
+├── assets/uploads/       # 图片上传目录（按 yyyy/mm 自动归类）
+├── scripts/build.mjs     # sitemap / rss / posts.json 生成器
+├── .github/workflows/build.yml  # 自动构建
+├── sitemap.xml / rss.xml
 └── README.md
 ```
 
----
+## 部署
 
-## 快速开始
+### 1. 推到 GitHub 并启用 Pages
 
-### 1. 创建仓库并启用 GitHub Pages
+```bash
+git init
+git add .
+git commit -m "init blog"
+git branch -M main
+git remote add origin https://github.com/<your-username>/<repo>.git
+git push -u origin main
+```
 
-把这个目录推到一个 GitHub 仓库（公开或私有都行），然后在仓库 Settings → Pages 启用：
-
-- Source: `Deploy from a branch`
-- Branch: `main`，目录 `/ (root)`
-
-等几十秒，访问 `https://<your-username>.github.io/<repo>/` 就能看到博客。
+仓库 → Settings → Pages → Source: `Deploy from a branch`，分支 `main` 根目录。
 
 ### 2. 修改 `assets/js/config.js`
 
-只有这一处配置需要改：
-
 ```js
-export const CONFIG = {
-  repo: {
-    owner: 'your-username',
-    name: 'blog',
-    branch: 'main',
-  },
-  authorizedUsers: ['your-username'],
-  site: {
-    title: '我的博客',
-    subtitle: '记录想法与代码',
-    author: '你的名字',
-    avatar: 'https://avatars.githubusercontent.com/u/1?v=4',
-    description: '一个用 GitHub Pages 托管、可在线编辑的博客',
-  },
-  paths: {
-    posts: 'posts',
-    index: 'data/posts.json',
-    uploads: 'assets/uploads',
-  },
-};
+repo: { owner, name, branch },
+authorizedUsers: [...],
+site: { title, subtitle, author, avatar, description, url, social, nav },
+giscus: { enabled, repo, repoId, category, categoryId, ... },
 ```
 
-> 这个文件**可以提交**到仓库，里面没有任何敏感信息。
+`site.url` 写你 Pages 站点地址，例如 `https://flymysql.github.io/gitblog`，**末尾不要 `/`**。SEO 元数据、sitemap、rss 都会用到。
 
-### 3. 生成 GitHub Personal Access Token（PAT）
+### 3. 生成 PAT
 
-强烈推荐 **fine-grained** PAT，权限最小化：
+[Fine-grained Token](https://github.com/settings/personal-access-tokens/new)：
 
-1. 打开 [GitHub Settings → Developer settings → Personal access tokens → Fine-grained tokens](https://github.com/settings/personal-access-tokens/new)
-2. **Token name**：随便填，比如 `Blog Admin`
-3. **Expiration**：建议设短一点，例如 90 天，到期再换
-4. **Repository access** → `Only select repositories` → 只勾选你这个博客仓库
-5. **Repository permissions**：
-   - **Contents**: `Read and write` （必须，提交 commit 用）
-   - **Metadata**: `Read-only`（默认会自动选上）
-6. 创建后复制 token，形如 `github_pat_xxx`，**只会显示一次，离开页面就拿不到了**
-
-> ⚠️ 不要用 classic PAT 也行，但 classic 的权限粒度很粗。
+- Repository access：`Only select repositories` → 勾选你的博客仓库
+- Repository permissions：
+  - **Contents**: `Read and write`
+  - Metadata: `Read-only`（自动）
+- 其他 `No access`
 
 ### 4. 登录后台
 
-访问 `https://<your-username>.github.io/<repo>/admin/`，粘贴你刚生成的 token，点"验证并登录"。
+访问 `https://<your-username>.github.io/<repo>/admin/`，粘贴 token 登录。
 
-后台会调一次 `GET /user` 验证：
+如果遇到问题，去 `/admin/diagnose.html` 一键诊断。
 
-- 如果 token 无效或过期 → 报错，token 会被立即清除
-- 如果通过验证但你的账号不在 `authorizedUsers` 里 → 报错
-- 都通过 → 进入文章管理界面，可以新建 / 编辑 / 删除文章
+### 5. （可选）配置 giscus 评论
 
----
-
-## 安全说明
-
-### 哪些东西可以推送到仓库
-
-| 文件 | 是否可推送 | 备注 |
-|---|---|---|
-| `assets/js/config.js` | ✅ 可以 | 只有公开配置 |
-| `assets/js/*.js` | ✅ 可以 | 全部前端代码 |
-| `posts/*.md` | ✅ 可以 | 文章本身 |
-| `data/posts.json` | ✅ 可以 | 文章索引 |
-| 你的 PAT | ❌ 千万不要 | 只粘贴到登录框，不写进任何文件 |
-| `.env`、`token.txt` | ❌ 已加 .gitignore | 防止误提交 |
-
-### token 存哪儿了
-
-- 勾选"在此设备保持登录" → 存在 `localStorage`，跨标签页持久
-- 不勾选 → 存在 `sessionStorage`，关掉标签页就没了
-
-可以随时点后台右上角的"退出"按钮清掉 token。token 也可以在 GitHub 设置里随时手动 revoke。
-
-### `authorizedUsers` 不是安全边界
-
-它只是前端 UI 的额外校验，防止不小心给外人 token 后被 UI 直接用。**真正决定能不能写仓库的是 GitHub 仓库本身的 collaborator / push 权限**。
-
-### token 风险面
-
-如果你的 token 泄露：
-
-- 攻击者最多能做你 fine-grained PAT 授权的事（即在你这一个仓库里 read/write contents）
-- 不能改你账号设置、不能动其他仓库
-- 你随时可以在 [Token 设置页](https://github.com/settings/tokens) revoke
-
-所以建议：
-
-1. 一定使用 fine-grained PAT
-2. 只授予 **该博客仓库** 的 **Contents: Read and write**
-3. 设置过期时间（90 天 / 1 年）
-4. 不要在公共电脑勾选"保持登录"
-
----
+去 [giscus.app](https://giscus.app) 完成配置（需要先在 GitHub 仓库启用 Discussions），把 `repo / repoId / category / categoryId` 填回 `config.js` 的 `giscus` 段，并设 `enabled: true`。
 
 ## 文章格式
 
-每篇文章是一个带 YAML frontmatter 的 Markdown 文件，例如 `posts/2026-05-11-hello.md`：
-
 ```markdown
 ---
-title: Hello World
+title: 文章标题
 date: 2026-05-11T10:00:00.000Z
 updated: 2026-05-11T10:00:00.000Z
-author: 你的名字
-tags: [随笔, 介绍]
-summary: 这是我的第一篇文章
+author: 作者名
+tags: [标签1, 标签2]
+summary: 摘要，会出现在列表和 OG meta 中
 cover: https://example.com/cover.jpg
+draft: false
+pinned: false
 ---
 
-# 正文
-
-正文内容…
+正文 Markdown…
 ```
 
-后台编辑器会自动生成、解析这些字段，不用你手写。
+## 工作流程
 
-`data/posts.json` 是文章索引：
-
-```json
-{
-  "posts": [
-    {
-      "slug": "welcome",
-      "title": "欢迎来到我的博客",
-      "date": "2026-05-11T10:00:00.000Z",
-      "author": "你的名字",
-      "summary": "...",
-      "tags": ["介绍"],
-      "path": "posts/welcome.md"
-    }
-  ]
-}
+```
+浏览器：写文章 → 点发布
+   ↓ GitHub Contents API
+GitHub 仓库：commit posts/<slug>.md + 更新 data/posts.json
+   ↓ push 触发
+GitHub Actions：重新生成 sitemap.xml / rss.xml / posts.json
+   ↓ 自动 commit
+GitHub Pages：重新部署
+   ↓
+线上博客更新
 ```
 
-每次后台保存文章时，编辑器都会自动重新拉一次最新版本的索引、修改、写回。
+## 安全说明
 
----
+- `config.js` 是公开的，只放公开信息
+- token 只放浏览器 `localStorage` 或 `sessionStorage`
+- 使用 fine-grained PAT、最小权限、设置过期
+- 一旦怀疑泄露，[Token 设置页](https://github.com/settings/tokens?type=beta) 一键 revoke
 
 ## 常见问题
 
-**Q: 为什么不用 OAuth？**
-A: OAuth 必须有 `client_secret`，不能放在浏览器，所以一定需要一个后端中转（哪怕是 Cloudflare Worker）。你说"想要纯无后台"，所以这版用 PAT。如果你后续想升级 OAuth 体验，再加一个 Worker 也可以，前端代码改动不大。
+**A. 登录后无法发布（404 / 403）**：去 `/admin/diagnose.html`，按提示修复。
 
-**Q: 我可以把仓库设成私有吗？**
-A: 公共账号下的私有仓库不能用 GitHub Pages（除非升级到 Pro）。所以一般做法是**仓库 public，但写文章前的隐私内容不要写进来**。后台 token 仍然是必需的，因为是写操作。
+**B. 缓存导致改动不生效**：所有 HTML 引用 CSS/JS 时带 `?v=20260511`。需要时把这个值改一下。
 
-**Q: 多人协作？**
-A: 把多个 GitHub 账号加进 `authorizedUsers`，每个人各自生成 PAT 登录即可。同一篇文章如果两人同时编辑，后保存的会因为 sha 冲突报错，刷新重试即可。
+**C. Action 没自动跑**：仓库 → Settings → Actions → General，确保允许写权限。
 
-**Q: 图片怎么办？**
-A: 当前编辑器还没做拖拽上传，可以先把图片放进 `assets/uploads/yyyy/mm/` 然后用 `![](assets/uploads/2026/05/x.png)` 引用。后续可以加自动上传到这个目录。
+**D. giscus 不显示**：检查仓库是否启用 Discussions，以及 repoId / categoryId 是否填对。
 
-**Q: GitHub API 有 rate limit 怎么办？**
-A: 带 token 的请求每小时 5000 次，个人博客远远够用。前台读文章不走 API，直接走 Pages 静态资源，不消耗配额。
-
-**Q: 文章发布后多久能看到？**
-A: 提交完 commit，GitHub Pages 通常 30~120 秒内重建并生效。有时偶尔会久一点。
-
-**Q: 我能改成所见即所得编辑器吗？**
-A: 可以。编辑器是一个普通 textarea，可以替换为 [Vditor](https://b3log.org/vditor/)、[EasyMDE](https://github.com/Ionaru/easy-markdown-editor) 或 [Toast UI Editor](https://ui.toast.com/tui-editor)，只要保证最终拿到的是 Markdown 字符串即可。
+**E. 不要照搬简书 UI**：本项目是"受简书启发的清爽博客风格"，不复制其品牌 / logo。

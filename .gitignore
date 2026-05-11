@@ -5,3 +5,7 @@ node_modules/
 .idea/
 .vscode/
 .env
+
+# 诊断时残留的写入测试文件
+.diagnose-*
+.diagnose/
