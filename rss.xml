@@ -5,7 +5,7 @@
     <link>https://flymysql.github.io/gitblog/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 11 May 2026 07:27:13 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 11 May 2026 07:40:56 GMT</lastBuildDate>
     <atom:link href="https://flymysql.github.io/gitblog/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>欢迎来到我的博客</title>
@@ -89,22 +89,193 @@
       <description><![CDATA[最终我还是选择放弃考研了。感到无比的轻松。 01 准备考研的大学生好多，我也是其中之一，准备了大半年，数学快复习完了，专业课也复习一半了。一切都进行地井然有序，如果我没有放弃考研的…]]></description>
     </item>
     <item>
-      <title>Flybook-用node.js从零开始搭一个简约而不简单的博客站点</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=Flybook-%E7%94%A8node.js%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E4%B8%80%E4%B8%AA%E7%AE%80%E7%BA%A6%E8%80%8C%E4%B8%8D%E7%AE%80%E5%8D%95%E7%9A%84%E5%8D%9A%E5%AE%A2%E7%AB%99%E7%82%B9-15995676</link>
-      <guid isPermaLink="false">Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676</guid>
-      <pubDate>Sun, 31 Dec 2017 16:00:00 GMT</pubDate>
+      <title>模仿知乎的链接卡片</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%A8%A1%E4%BB%BF%E7%9F%A5%E4%B9%8E%E7%9A%84%E9%93%BE%E6%8E%A5%E5%8D%A1%E7%89%87-a714f04b</link>
+      <guid isPermaLink="false">模仿知乎的链接卡片-a714f04b</guid>
+      <pubDate>Sun, 16 Dec 2018 09:13:47 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>杂七杂八</category>
-      <description><![CDATA[前言：玩了快一年博客了，一直用的第三方框架，比如WordPress，typecho，hexo等。其中hexo用的最久，期间把nex主题改得乱七八糟。上周看完node的文档后，决定自…]]></description>
+      <category>教程</category><category>javascript</category><category>html</category><category>css</category>
+      <description><![CDATA[今天逛知乎发现他们的链接卡片挺好看，就想写一个自己拿来博客用（扒下来知乎的代码），效果如下。 源码放在github，感兴趣的朋友可以自己拿。 $1 $1 $1 如何使用 在需要把链…]]></description>
     </item>
     <item>
-      <title>用python做一个C类编译器——语法翻译器</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E7%94%A8python%E5%81%9A%E4%B8%80%E4%B8%AAC%E7%B1%BB%E7%BC%96%E8%AF%91%E5%99%A8%E2%80%94%E2%80%94%E8%AF%AD%E6%B3%95%E7%BF%BB%E8%AF%91%E5%99%A8-15995704</link>
-      <guid isPermaLink="false">用python做一个C类编译器——语法翻译器-15995704</guid>
-      <pubDate>Sat, 31 Dec 2016 16:00:00 GMT</pubDate>
+      <title>Windows下的终端折腾——弃坑msys2，开始用wsl</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=Windows%E4%B8%8B%E7%9A%84%E7%BB%88%E7%AB%AF%E6%8A%98%E8%85%BE%E2%80%94%E2%80%94%E5%BC%83%E5%9D%91msys2%E5%BC%80%E5%A7%8B%E7%94%A8wsl-d6b124c4</link>
+      <guid isPermaLink="false">Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4</guid>
+      <pubDate>Fri, 14 Dec 2018 02:50:18 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>杂七杂八</category>
-      <description><![CDATA[编程语言:Python 3.7 项目地址：python做编译器——语法翻译器 编程平台:manjaro 编程环境:vscode 完成的内容:承接上次的词法分析器，将其输出的字符表转…]]></description>
+      <category>教程</category>
+      <description><![CDATA[之前用了半年Linux，后来因为平常一些软件需要，只能在Windows下玩，就换回Windows了。 但还是万分想念Linux，然而Windows下的终端一直用的不爽，就一直在尝试…]]></description>
+    </item>
+    <item>
+      <title>12月6日杂谈</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=12%E6%9C%886%E6%97%A5%E6%9D%82%E8%B0%88-5027c817</link>
+      <guid isPermaLink="false">12月6日杂谈-5027c817</guid>
+      <pubDate>Thu, 06 Dec 2018 09:13:48 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>水文</category><category>日记</category>
+      <description><![CDATA[今天是12月6日，周四，没课 小雪，温度零下好多度 早上去了会儿图书馆，没看下书，下午在宿舍荒废了一下午，满满的罪恶感。 18年就剩下20多天了，这学期开学前立下的目标，慢慢丢失的…]]></description>
+    </item>
+    <item>
+      <title>小程序开发之接入Bmob后端云作为后端数据库</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91%E4%B9%8B%E6%8E%A5%E5%85%A5Bmob%E5%90%8E%E7%AB%AF%E4%BA%91%E4%BD%9C%E4%B8%BA%E5%90%8E%E7%AB%AF%E6%95%B0%E6%8D%AE%E5%BA%93-93621394</link>
+      <guid isPermaLink="false">小程序开发之接入Bmob后端云作为后端数据库-93621394</guid>
+      <pubDate>Sun, 02 Dec 2018 23:37:40 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>教程</category><category>微信小程序</category>
+      <description><![CDATA[前几天在网络课的项目汇报中，我展示了一个背单词的微信小程序，后端使用的是bmob的数据库。 今天有同学来问我怎么用那个数据库，我当时可能没讲清楚，索性写篇博客来说一下。 接入 Bm…]]></description>
+    </item>
+    <item>
+      <title>使用vue.js制作carousel跑马灯组件</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E4%BD%BF%E7%94%A8vue.js%E5%88%B6%E4%BD%9Ccarousel%E8%B7%91%E9%A9%AC%E7%81%AF%E7%BB%84%E4%BB%B6-456bc465</link>
+      <guid isPermaLink="false">使用vue.js制作carousel跑马灯组件-456bc465</guid>
+      <pubDate>Sun, 02 Dec 2018 07:53:59 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>javascript</category><category>html</category><category>vue.js</category>
+      <description><![CDATA[前几天在掘金上看到一个开源项目(PyUI)在招人，一个基于vue.js的UI库，想着反正页闲着，就硬着头皮加入了（其实我都还没学vue.js) 两天速成了一下，学了点皮毛，就开始撸…]]></description>
+    </item>
+    <item>
+      <title>Dijkstra单源最短路径算法</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95-15e41f53</link>
+      <guid isPermaLink="false">Dijkstra单源最短路径算法-15e41f53</guid>
+      <pubDate>Fri, 23 Nov 2018 09:32:33 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>前端</category><category>javascript</category><category>html</category><category>算法</category><category>C++</category>
+      <description><![CDATA[$1 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 $1问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。另外，还给…]]></description>
+    </item>
+    <item>
+      <title>使用腾讯云cdn加速博客</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E4%BD%BF%E7%94%A8%E8%85%BE%E8%AE%AF%E4%BA%91cdn%E5%8A%A0%E9%80%9F%E5%8D%9A%E5%AE%A2-1609338289</link>
+      <guid isPermaLink="false">使用腾讯云cdn加速博客-1609338289</guid>
+      <pubDate>Thu, 22 Nov 2018 11:41:45 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>教程</category><category>博客</category>
+      <description><![CDATA[最近把博客搬到腾讯云后，使用腾讯云的COS存储 免费50G的存储空间，放个小博客还是够用的 而且，还可以使用免费的CDN加速 国内访问博客速度比放在GitHub上要快多了 申请腾讯…]]></description>
+    </item>
+    <item>
+      <title>hexo建站笔记之首页文章轮播图</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=hexo%E5%BB%BA%E7%AB%99%E7%AC%94%E8%AE%B0%E4%B9%8B%E9%A6%96%E9%A1%B5%E6%96%87%E7%AB%A0%E8%BD%AE%E6%92%AD%E5%9B%BE-6bf81741</link>
+      <guid isPermaLink="false">hexo建站笔记之首页文章轮播图-6bf81741</guid>
+      <pubDate>Wed, 14 Nov 2018 07:25:40 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>教程</category><category>前端</category><category>html</category><category>博客</category>
+      <description><![CDATA[$1设计特点 轮播图UI：模仿简书 可以直接在每篇文章的md文件里设置是否要设为轮播图的文章 就是我们每次新写一篇文章，用hexo生成一个md文件，我们只要在头部注明是否要作为轮播…]]></description>
+    </item>
+    <item>
+      <title>将公众号文章爬到hexo博客</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E5%B0%86%E5%85%AC%E4%BC%97%E5%8F%B7%E6%96%87%E7%AB%A0%E7%88%AC%E5%88%B0hexo%E5%8D%9A%E5%AE%A2-fb598031</link>
+      <guid isPermaLink="false">将公众号文章爬到hexo博客-fb598031</guid>
+      <pubDate>Sun, 11 Nov 2018 14:00:15 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      
+      <description><![CDATA[由于以前公众号发了挺多分享资源的文章，索性写个python爬虫来爬取 特点： 1.保留公众号排版样式（就是把div样式全拷下来了） 2.写成md格式，并且加了hexo渲染需要的头部…]]></description>
+    </item>
+    <item>
+      <title>hexo建站笔记之彩色标签云</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=hexo%E5%BB%BA%E7%AB%99%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%BD%A9%E8%89%B2%E6%A0%87%E7%AD%BE%E4%BA%91-d6caa003</link>
+      <guid isPermaLink="false">hexo建站笔记之彩色标签云-d6caa003</guid>
+      <pubDate>Wed, 07 Nov 2018 12:08:34 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>教程</category><category>前端</category><category>javascript</category><category>博客</category>
+      <description><![CDATA[方法比较简单，加个js脚本就好了，至于加载哪里都无所谓了，就放在标签云的页面。 就加在标签的那个页面好了。 1. 打开themes\\\\next\\\\layout\\\\page.swig…]]></description>
+    </item>
+    <item>
+      <title>用回valine评论系统,valine评论框样式美化</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E7%94%A8%E5%9B%9Evaline%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9Fvaline%E8%AF%84%E8%AE%BA%E6%A1%86%E6%A0%B7%E5%BC%8F%E7%BE%8E%E5%8C%96-2d5da13e</link>
+      <guid isPermaLink="false">用回valine评论系统valine评论框样式美化-2d5da13e</guid>
+      <pubDate>Thu, 01 Nov 2018 00:52:05 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>教程</category><category>博客</category>
+      <description><![CDATA[我感觉我一个处女座的就不应该搞前端，太吹毛求疵追求完美了，哪里有一点点觉得不漂亮就想改 博客的评论系统用过好几家（虽然都没有人评论 比如gitalk，来必力 之前用的来必力，加载慢…]]></description>
+    </item>
+    <item>
+      <title>sql学习笔记2</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=sql%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B02-5f5ec841</link>
+      <guid isPermaLink="false">sql学习笔记2-5f5ec841</guid>
+      <pubDate>Tue, 30 Oct 2018 09:21:21 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>sql</category>
+      <description><![CDATA[今天继续做了会儿练习语句 都是比较基本的sql查询语句 需要熟练掌握的 1. 查询选修毛概的学生的姓名成绩，并且升序输出 <table <tbody <tr <td class=\"…]]></description>
+    </item>
+    <item>
+      <title>手动修改博客css样式，打造属于自己的博客样式</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%89%8B%E5%8A%A8%E4%BF%AE%E6%94%B9%E5%8D%9A%E5%AE%A2css%E6%A0%B7%E5%BC%8F%E6%89%93%E9%80%A0%E5%B1%9E%E4%BA%8E%E8%87%AA%E5%B7%B1%E7%9A%84%E5%8D%9A%E5%AE%A2%E6%A0%B7%E5%BC%8F-e17f6e4c</link>
+      <guid isPermaLink="false">手动修改博客css样式打造属于自己的博客样式-e17f6e4c</guid>
+      <pubDate>Sun, 28 Oct 2018 22:39:31 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>教程</category><category>博客</category>
+      <description><![CDATA[这两天花了点时间修改了下自己的next主题的博客 样式表放在了GitHub上喜欢的话可以直接使用 $1 使用方法 直接下载$1，然后复制到自己主题的themes\\\\next\\\\so…]]></description>
+    </item>
+    <item>
+      <title>服务端搭建ssr教程</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%90%AD%E5%BB%BAssr%E6%95%99%E7%A8%8B-651cfd47</link>
+      <guid isPermaLink="false">服务端搭建ssr教程-651cfd47</guid>
+      <pubDate>Thu, 25 Oct 2018 13:32:17 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>教程</category><category>ssr</category>
+      <description><![CDATA[教程很简单，整个教程分三步： 第一步：购买VPS服务器 第二步：一键部署VPS服务器 第三步：一键加速VPS服务器 （谷歌BBR加速；对速度要求不高的话，此步骤可省略） $1第一步…]]></description>
+    </item>
+    <item>
+      <title>解决来必力评论系统加载慢的问题</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E8%A7%A3%E5%86%B3%E6%9D%A5%E5%BF%85%E5%8A%9B%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F%E5%8A%A0%E8%BD%BD%E6%85%A2%E7%9A%84%E9%97%AE%E9%A2%98-3453c710</link>
+      <guid isPermaLink="false">解决来必力评论系统加载慢的问题-3453c710</guid>
+      <pubDate>Sat, 13 Oct 2018 00:06:23 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>教程</category><category>博客</category>
+      <description><![CDATA[解决来必力评论系统加载慢的方法 必力评论加载慢如何解决? 灵感：大家平常说的加载慢，其实是因为来必力这个框架它是等读者把滚动条拉到文末评论的位置的时候才开始加载。 如果是让他从我们…]]></description>
+    </item>
+    <item>
+      <title>hexo博客搭建以及next美化教程</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E4%BB%A5%E5%8F%8Anext%E7%BE%8E%E5%8C%96%E6%95%99%E7%A8%8B-e8d13fc</link>
+      <guid isPermaLink="false">hexo博客搭建以及next美化教程-e8d13fc</guid>
+      <pubDate>Wed, 10 Oct 2018 00:41:50 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>教程</category><category>博客</category>
+      <description><![CDATA[$1前言 本文虽然是非常详细的小白教程 但是也需要一点点的姿势，额，知识储量 $1知识储量 了解css和html，会写一点html基础语句 用过GitHub，知道建仓库过程以及在命…]]></description>
+    </item>
+    <item>
+      <title>sql语言学习笔记</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=sql%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1406270f</link>
+      <guid isPermaLink="false">sql语言学习笔记-1406270f</guid>
+      <pubDate>Mon, 08 Oct 2018 13:16:09 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>sql</category>
+      <description><![CDATA[$1创建数据库 主要是今天第一次上了数据库实验课 就随便记记 新手上路，见笑了 以下是创建数据库userdb1的SQL语句， <table <tbody <tr <td class…]]></description>
+    </item>
+    <item>
+      <title>假期最后一天</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E5%81%87%E6%9C%9F%E6%9C%80%E5%90%8E%E4%B8%80%E5%A4%A9-1bde1150</link>
+      <guid isPermaLink="false">假期最后一天-1bde1150</guid>
+      <pubDate>Sun, 07 Oct 2018 09:02:47 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>随想</category><category>日记</category>
+      <description><![CDATA[啊啊啊啊，十天长假到了最后一天 明天还要交数值分析作业，然而我还没动，虽然只有三题… 这十天的计划都没有完成 高数没看完，甚至只看了一单元 英语也没做。。。 所有的考研复习都没有进…]]></description>
+    </item>
+    <item>
+      <title>MarkDown的用法学习笔记</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=MarkDown%E7%9A%84%E7%94%A8%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-93e22221</link>
+      <guid isPermaLink="false">MarkDown的用法学习笔记-93e22221</guid>
+      <pubDate>Sat, 06 Oct 2018 05:12:16 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>前端</category>
+      <description><![CDATA[标题 <table <tbody <tr <td class=\"gutter\" <pre <span class=\"line\" 1</span <br <span class=\"l…]]></description>
+    </item>
+    <item>
+      <title>windows上的vim配置，打造超级舒心又有逼格的编辑器</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=windows%E4%B8%8A%E7%9A%84vim%E9%85%8D%E7%BD%AE%E6%89%93%E9%80%A0%E8%B6%85%E7%BA%A7%E8%88%92%E5%BF%83%E5%8F%88%E6%9C%89%E9%80%BC%E6%A0%BC%E7%9A%84%E7%BC%96%E8%BE%91%E5%99%A8-1a3fd97</link>
+      <guid isPermaLink="false">windows上的vim配置打造超级舒心又有逼格的编辑器-1a3fd97</guid>
+      <pubDate>Thu, 21 Jun 2018 01:03:49 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>教程</category><category>前端</category>
+      <description><![CDATA[之前用的是spf13的方案 不过自己也删删减减了好多 就修改成比较适合自己的 其中vim scripts是vim的一些基本插件，包括语法高亮的支持、缩进等等。 当然我也可以使用其他…]]></description>
+    </item>
+    <item>
+      <title>挣钱要比想象的难</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%8C%A3%E9%92%B1%E8%A6%81%E6%AF%94%E6%83%B3%E8%B1%A1%E7%9A%84%E9%9A%BE-79ade34d</link>
+      <guid isPermaLink="false">挣钱要比想象的难-79ade34d</guid>
+      <pubDate>Mon, 14 May 2018 08:33:24 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>随想</category>
+      <description><![CDATA[1 五一长假飞到南京和女朋友玩了三天，回学校已经只剩几百块钱。没和家里说，也不太想再找家里要钱。 我想，我可以挣钱养活自己的。 公众号重新做了，荔枝微课开了专栏卖资源，一切又和想象…]]></description>
     </item>
   </channel>
 </rss>

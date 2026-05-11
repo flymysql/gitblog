@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "migrate:cnblogs": "node scripts/migrate-cnblogs.mjs"
+    "migrate:cnblogs": "node scripts/migrate-cnblogs.mjs",
+    "migrate:hexo": "node scripts/migrate-hexo.mjs"
   },
   "devDependencies": {
     "cheerio": "^1.0.0",
