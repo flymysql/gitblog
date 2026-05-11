@@ -128,6 +128,7 @@ if (existsSync(POSTS_DIR)) {
       draft: !!data.draft,
       pinned: !!data.pinned,
       pinnedOrder: data.pinnedOrder || old.pinnedOrder || undefined,
+      carousel: !!data.carousel,
       path: `${POSTS_DIR}/${f}`,
       content,
     };
@@ -156,6 +157,7 @@ const indexJson = {
     if (!rest.draft) delete rest.draft;
     if (!rest.pinned) delete rest.pinned;
     if (!rest.pinnedOrder) delete rest.pinnedOrder;
+    if (!rest.carousel) delete rest.carousel;
     return rest;
   }),
 };
