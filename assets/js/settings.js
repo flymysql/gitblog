@@ -436,7 +436,10 @@ function settingsContentHtml() {
           <label>repoId <input name="giscus.repoId"></label>
           <label>category <input name="giscus.category"></label>
           <label>categoryId <input name="giscus.categoryId"></label>
-          <label>mapping <input name="giscus.mapping" placeholder="pathname"></label>
+          <label>mapping
+            <input name="giscus.mapping" placeholder="specific">
+            <span class="settings-hint">推荐 <code>specific</code>：每篇文章按 slug 独立绑定一个 Discussion；本站不要用 <code>pathname</code>/<code>url</code>，会让所有文章共用同一条评论流。</span>
+          </label>
           <label>language <input name="giscus.lang" placeholder="zh-CN"></label>
         </div>
       </section>

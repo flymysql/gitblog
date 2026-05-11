@@ -36,6 +36,15 @@ const TAG_MAP = new Map([
 
   // → 图计算
   ['nebula', '图计算'],
+
+  // → 前端（追加）
+  ['ssr', '前端'],
+  ['vue.js', '前端'],
+  ['vuejs', '前端'],
+  ['vue', '前端'],
+
+  // → 算法（pat 是 OJ 名，归到算法更合适）
+  ['pat', '算法'],
 ]);
 
 function normalizeTag(t) {

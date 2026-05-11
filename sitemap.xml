@@ -2,19 +2,19 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://flymysql.github.io/gitblog/</loc>
-    <lastmod>2026-05-11T08:27:23.510Z</lastmod>
+    <lastmod>2026-05-11T08:38:45.034Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://flymysql.github.io/gitblog/tags.html</loc>
-    <lastmod>2026-05-11T08:27:23.510Z</lastmod>
+    <lastmod>2026-05-11T08:38:45.034Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://flymysql.github.io/gitblog/archives.html</loc>
-    <lastmod>2026-05-11T08:27:23.510Z</lastmod>
+    <lastmod>2026-05-11T08:38:45.034Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -194,12 +194,6 @@
   </url>
   <url>
     <loc>https://flymysql.github.io/gitblog/post.html?slug=%E6%8C%A3%E9%92%B1%E8%A6%81%E6%AF%94%E6%83%B3%E8%B1%A1%E7%9A%84%E9%9A%BE-79ade34d</loc>
-    <lastmod>2018-05-14T08:33:24.000Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://flymysql.github.io/gitblog/post.html?slug=Adobe-CC-2018%E5%85%A8%E5%A5%97%E5%AE%89%E8%A3%85%E5%8C%85%E5%8F%8A%E6%95%99%E7%A8%8B%E9%80%81%E7%BB%99%E4%BD%A0-aee00b94</loc>
     <lastmod>2018-05-14T08:33:24.000Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

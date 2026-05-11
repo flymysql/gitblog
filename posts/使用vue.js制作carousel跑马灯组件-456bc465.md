@@ -5,7 +5,6 @@ updated: 2018-12-02T15:53:59+08:00
 author: "兰州小红鸡"
 tags:
   - 前端
-  - vue.js
 summary: "前几天在掘金上看到一个开源项目(PyUI)在招人，一个基于vue.js的UI库，想着反正页闲着，就硬着头皮加入了（其实我都还没学vue.js) 两天速成了一下，学了点皮毛，就开始撸…"
 origin:
   from: hexo

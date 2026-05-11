@@ -180,8 +180,7 @@
       "author": "兰州小红鸡",
       "summary": "前几天在掘金上看到一个开源项目(PyUI)在招人，一个基于vue.js的UI库，想着反正页闲着，就硬着头皮加入了（其实我都还没学vue.js) 两天速成了一下，学了点皮毛，就开始撸…",
       "tags": [
-        "前端",
-        "vue.js"
+        "前端"
       ],
       "path": "posts/使用vue.js制作carousel跑马灯组件-456bc465.md"
     },
@@ -303,7 +302,7 @@
       "summary": "教程很简单，整个教程分三步： 第一步：购买VPS服务器 第二步：一键部署VPS服务器 第三步：一键加速VPS服务器 （谷歌BBR加速；对速度要求不高的话，此步骤可省略） ¶第一步：…",
       "tags": [
         "教程",
-        "ssr"
+        "前端"
       ],
       "cover": "assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.png",
       "path": "posts/服务端搭建ssr教程-651cfd47.md"
@@ -396,18 +395,6 @@
         "随想"
       ],
       "path": "posts/挣钱要比想象的难-79ade34d.md"
-    },
-    {
-      "slug": "Adobe-CC-2018全套安装包及教程送给你-aee00b94",
-      "title": "Adobe CC 2018全套安装包及教程送给你",
-      "date": "2018-05-05T11:39:39+08:00",
-      "updated": "2018-05-14T16:33:24+08:00",
-      "author": "兰州小红鸡",
-      "summary": "不得不说Adobe的效率还是很高的，追着2017的尾巴就放出来2018的新款软件，还一股脑的把存货全部吐出来了。 此次更新的2018全新版本 \\\\ \\\\ ， 包括 Photoshop、…",
-      "tags": [
-        "资源"
-      ],
-      "path": "posts/Adobe-CC-2018全套安装包及教程送给你-aee00b94.md"
     },
     {
       "slug": "微信小程序加载游戏排名好友全球-6d6da729",
@@ -505,8 +492,7 @@
       "summary": "¶ 素数 ¶ 题目描述 令Pi表示第i个素数。现任给两个正整数M include include using namespace std; class prime { int pr…",
       "tags": [
         "算法",
-        "C++",
-        "pat"
+        "C++"
       ],
       "path": "posts/pat乙级试题C算法题训练-dedc9755.md"
     },
