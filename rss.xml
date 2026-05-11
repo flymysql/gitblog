@@ -5,7 +5,7 @@
     <link>https://flymysql.github.io/gitblog/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 11 May 2026 09:17:30 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 11 May 2026 09:22:03 GMT</lastBuildDate>
     <atom:link href="https://flymysql.github.io/gitblog/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GitBlog：一个带伪后台的博客站点</title>
@@ -17,7 +17,7 @@
       <description><![CDATA[一个完全静态、托管在 GitHub Pages 上的博客，但带有可以在浏览器里直接写、直接发的'伪后台'。这篇文章记录它能做什么，相比传统方案为什么这样设计，以及如果你也想搭一个，要怎么开始。]]></description>
     </item>
     <item>
-      <title>关于</title>
+      <title>关于小红鸡</title>
       <link>https://flymysql.github.io/gitblog/post.html?slug=about</link>
       <guid isPermaLink="false">about</guid>
       <pubDate>Mon, 11 May 2026 08:40:00 GMT</pubDate>
