@@ -5,7 +5,7 @@
     <link>https://flymysql.github.io/gitblog/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 11 May 2026 09:14:36 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 11 May 2026 09:17:30 GMT</lastBuildDate>
     <atom:link href="https://flymysql.github.io/gitblog/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GitBlog：一个带伪后台的博客站点</title>
@@ -22,7 +22,7 @@
       <guid isPermaLink="false">about</guid>
       <pubDate>Mon, 11 May 2026 08:40:00 GMT</pubDate>
       <author>Jimmy</author>
-      
+      <category>杂七杂八</category>
       <description><![CDATA[关于这个博客和写它的人 —— 一名做系统软件与数据库系统的程序员，业余写点代码、读点书、记点流水账。]]></description>
     </item>
     <item>
