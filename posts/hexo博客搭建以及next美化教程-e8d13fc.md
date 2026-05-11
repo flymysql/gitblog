@@ -4,9 +4,10 @@ date: 2018-10-10T08:41:50+08:00
 updated: 2018-11-07T08:41:50+08:00
 author: "兰州小红鸡"
 tags:
-  - "教程"
-  - "博客"
+  - 教程
+  - 博客建站
 summary: "¶前言 本文虽然是非常详细的小白教程 但是也需要一点点的姿势，额，知识储量 ¶知识储量 了解css和html，会写一点html基础语句 用过GitHub，知道建仓库过程以及在命令行…"
+cover: assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-04.png
 origin:
   from: hexo
   url: https://flymysql.github.io/post/e8d13fc.html

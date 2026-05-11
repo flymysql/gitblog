@@ -6,6 +6,7 @@ author: "兰州小红鸡"
 tags:
   - "杂七杂八"
 summary: "前言：玩了快一年博客了，一直用的第三方框架，比如WordPress，typecho，hexo等。其中hexo用的最久，期间把nex主题改得乱七八糟。上周看完node的文档后，决定自…"
+cover: assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-01.png
 origin:
   from: cnblogs
   url: https://www.cnblogs.com/gitpull/p/15995676.html

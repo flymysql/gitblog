@@ -4,9 +4,10 @@ date: 2018-10-29T06:39:31+08:00
 updated: 2018-11-04T06:39:31+08:00
 author: "兰州小红鸡"
 tags:
-  - "教程"
-  - "博客"
+  - 教程
+  - 博客建站
 summary: "这两天花了点时间修改了下自己的next主题的博客 样式表放在了GitHub上喜欢的话可以直接使用 next博客主题样式修改 使用方法 直接下载样式表，然后复制到自己主题的theme…"
+cover: assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-06.png
 origin:
   from: hexo
   url: https://flymysql.github.io/post/e17f6e4c.html

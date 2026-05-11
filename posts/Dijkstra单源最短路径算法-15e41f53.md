@@ -4,12 +4,11 @@ date: 2018-11-23T17:32:33+08:00
 updated: 2018-11-23T17:32:33+08:00
 author: "兰州小红鸡"
 tags:
-  - "前端"
-  - javascript
-  - html
-  - "算法"
+  - 前端
+  - 算法
   - C++
 summary: "算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。…"
+cover: assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.png
 origin:
   from: hexo
   url: https://flymysql.github.io/post/15e41f53.html
