@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260511144209';
+export const VERSION = '20260511144415';
 
 export const CONFIG = {
   repo: {
@@ -19,7 +19,7 @@ export const CONFIG = {
     logo: "",
     favicon: "../assets/uploads/2026/05/1778481325586-x3zzx9-blog.svg",
     avatar: "https://avatars.githubusercontent.com/u/37113068?s=400&u=cf2b8a258ad1de5e9a23e3c72da6ca04e058dd46&v=4",
-    description: "一个用 GitHub Pages 托管、可在线编辑的极简博客",
+    description: "桃李春风一杯酒，江湖夜雨十年灯。",
     url: "https://flymysql.github.io/gitblog",
     locale: "zh-CN",
     nav: [
@@ -43,7 +43,7 @@ export const CONFIG = {
     social: {
       github: "https://github.com/flymysql",
       twitter: "",
-      email: "",
+      email: "flyphp@outlook.com",
       rss: "rss.xml"
     }
   },
