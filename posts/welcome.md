@@ -1,16 +1,16 @@
 ---
-title: "欢迎 · 这个博客是怎么搭起来的"
-date: 2026-05-11T16:50:00+08:00
-updated: 2026-05-11T16:50:00+08:00
-author: "Jimmy"
-tags:
-  - 博客建站
-  - 项目介绍
-pinned: true
-pinnedOrder: 1
-cover: ../assets/uploads/2026/05/1778478312725-mrx0in-image.png
+title: GitBlog：一个带伪后台的博客站点
+date: "2026-05-11T16:50:00+08:00"
+updated: "2026-05-11T09:11:44.875Z"
+author: Jimmy
+tags: [博客建站, 教程, 项目介绍]
+cover: ../assets/uploads/2026/05/1778490605877-blwjij-image.png
 summary: "一个完全静态、托管在 GitHub Pages 上的博客，但带有可以在浏览器里直接写、直接发的'伪后台'。这篇文章记录它能做什么，相比传统方案为什么这样设计，以及如果你也想搭一个，要怎么开始。"
+pinned: true
 ---
+
+
+![image.png](../assets/uploads/2026/05/1778490605877-blwjij-image.png)
 
 如果把"写博客"这件事抽象一下，无非三步：**写一篇 → 发到网上 → 有人来读**。
 
