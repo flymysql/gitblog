@@ -160,14 +160,20 @@ function shellHtml({ active, title, actions = '' }) {
 
   return `
     <div class="admin-shell">
-      <aside class="admin-sidebar">
-        <a class="admin-brand" href="../">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L19.82 8 12 11.82 4.18 8 12 4.18zM4 9.27l7 3.5v7.46l-7-3.5V9.27zm9 10.96v-7.46l7-3.5v7.46l-7 3.5z"/></svg>
-          <div class="admin-brand-text">
-            <span class="admin-brand-title">${escapeHtml(CONFIG.site.title || '创作后台')}</span>
-            <span class="admin-brand-sub">创作后台</span>
-          </div>
-        </a>
+      <div id="adminSidebarBackdrop" class="admin-sidebar-backdrop" hidden></div>
+      <aside class="admin-sidebar" id="adminSidebar">
+        <div class="admin-sidebar-top">
+          <a class="admin-brand" href="../">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L19.82 8 12 11.82 4.18 8 12 4.18zM4 9.27l7 3.5v7.46l-7-3.5V9.27zm9 10.96v-7.46l7-3.5v7.46l-7 3.5z"/></svg>
+            <div class="admin-brand-text">
+              <span class="admin-brand-title">${escapeHtml(CONFIG.site.title || '创作后台')}</span>
+              <span class="admin-brand-sub">创作后台</span>
+            </div>
+          </a>
+          <button id="adminSidebarClose" class="icon-btn admin-sidebar-close" type="button" aria-label="关闭菜单">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
 
         <nav class="admin-nav">${navItems}</nav>
 
@@ -185,6 +191,9 @@ function shellHtml({ active, title, actions = '' }) {
 
       <div class="admin-main">
         <header class="admin-topbar">
+          <button id="adminMenuBtn" class="icon-btn admin-menu-btn" type="button" aria-label="菜单">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
           <div class="admin-topbar-title">
             <h1>${escapeHtml(title || '')}</h1>
           </div>
@@ -229,6 +238,28 @@ export async function mountAdminShell({ active = 'posts', title = '', actions = 
   }
 
   $('#adminLogoutBtn').addEventListener('click', () => logout(window.location.href));
+
+  // 移动端 sidebar 抽屉
+  const sidebar = $('#adminSidebar');
+  const backdrop = $('#adminSidebarBackdrop');
+  const menuBtn = $('#adminMenuBtn');
+  const closeBtn = $('#adminSidebarClose');
+  const openSide = () => {
+    sidebar.classList.add('is-open');
+    backdrop.hidden = false;
+    document.body.style.overflow = 'hidden';
+  };
+  const closeSide = () => {
+    sidebar.classList.remove('is-open');
+    backdrop.hidden = true;
+    document.body.style.overflow = '';
+  };
+  if (menuBtn) menuBtn.addEventListener('click', openSide);
+  if (closeBtn) closeBtn.addEventListener('click', closeSide);
+  if (backdrop) backdrop.addEventListener('click', closeSide);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) closeSide();
+  });
 
   return {
     content: $('#adminContent'),
