@@ -5,16 +5,16 @@
     <link>https://flymysql.github.io/gitblog/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 11 May 2026 08:45:36 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 11 May 2026 08:57:51 GMT</lastBuildDate>
     <atom:link href="https://flymysql.github.io/gitblog/rss.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>欢迎来到我的博客</title>
+      <title>欢迎 · 这个博客是怎么搭起来的</title>
       <link>https://flymysql.github.io/gitblog/post.html?slug=welcome</link>
       <guid isPermaLink="false">welcome</guid>
-      <pubDate>Mon, 11 May 2026 10:00:00 GMT</pubDate>
-      <author>你的名字</author>
-      <category>随想</category><category>博客建站</category>
-      <description><![CDATA[这是一个完全静态、托管在 GitHub Pages 的博客，但带有可在线编辑的伪后台。]]></description>
+      <pubDate>Mon, 11 May 2026 08:50:00 GMT</pubDate>
+      <author>Jimmy</author>
+      <category>博客建站</category><category>项目介绍</category>
+      <description><![CDATA[一个完全静态、托管在 GitHub Pages 上的博客，但带有可以在浏览器里直接写、直接发的'伪后台'。这篇文章记录它能做什么，相比传统方案为什么这样设计，以及如果你也想搭一个，要怎么开始。]]></description>
     </item>
     <item>
       <title>多维数组的索引方案与内存设计</title>
