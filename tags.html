@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>标签 · 加载中…</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
-  <link rel="stylesheet" href="assets/css/common.css?v=20260517">
-  <link rel="stylesheet" href="assets/css/home.css?v=20260517">
+  <link rel="stylesheet" href="assets/css/common.css?v=20260518">
+  <link rel="stylesheet" href="assets/css/home.css?v=20260518">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
   <style>
     .tag-page { max-width: var(--content-max); margin: 28px auto; padding: 0 24px; }
@@ -26,10 +26,11 @@
     }
     .tag-cloud-big .tag .count {
       font-size: 11px;
-      color: var(--text-tertiary);
+      color: currentColor;
+      opacity: 0.68;
       margin-left: 4px;
     }
-    .tag-cloud-big .tag.active .count { color: rgba(255,255,255,0.8); }
+    .tag-cloud-big .tag.active .count { color: inherit; opacity: 0.82; }
     .group-block { margin-bottom: 32px; }
     .group-title {
       font-size: 16px;
@@ -39,6 +40,21 @@
       border-bottom: 1px solid var(--border);
     }
     .group-title .count { color: var(--text-tertiary); font-weight: 400; margin-left: 8px; font-size: 13px; }
+    .group-tag-title {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      border: 1px solid var(--tag-border);
+    }
+    [data-mode="dark"] .group-tag-title,
+    [data-theme="dark"] .group-tag-title {
+      background: var(--tag-dark-bg);
+      color: var(--tag-dark-text);
+      border-color: var(--tag-dark-border);
+    }
     @media (max-width: 720px) {
       .tag-page { margin: 16px auto; padding: 0 14px; }
       .tag-page h1 { font-size: 20px; }
@@ -64,6 +80,6 @@
   <div id="site-footer"></div>
   <div id="site-overlays"></div>
 
-  <script type="module" src="assets/js/tags.js?v=20260517"></script>
+  <script type="module" src="assets/js/tags.js?v=20260518"></script>
 </body>
 </html>

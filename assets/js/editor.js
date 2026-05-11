@@ -50,6 +50,8 @@ const state = {
   data: {},
   loading: false,
   mde: null,
+  selectedTags: [],
+  availableTags: [],
 };
 
 function getContent() {
@@ -93,7 +95,7 @@ async function loadPost(slug) {
     state.data = data;
     $('#title').value = data.title || '';
     $('#author').value = data.author || (getUser() && getUser().name) || CONFIG.site.author || '';
-    $('#tags').value = (data.tags || []).join(', ');
+    setEditorTags(data.tags || []);
     $('#cover').value = data.cover || '';
     $('#slug').value = slug;
     $('#draftToggle').checked = !!data.draft;
@@ -126,6 +128,111 @@ function toCommaList(s) {
   return String(s || '').split(/[,，]/).map(x => x.trim()).filter(Boolean);
 }
 
+function uniqueTags(tags) {
+  const seen = new Set();
+  const list = [];
+  for (const raw of tags || []) {
+    const tag = String(raw || '').trim();
+    if (!tag || seen.has(tag)) continue;
+    seen.add(tag);
+    list.push(tag);
+  }
+  return list;
+}
+
+function syncTagsInput() {
+  $('#tags').value = state.selectedTags.join(', ');
+}
+
+function renderTagPicker() {
+  const selected = $('#selectedTags');
+  const suggestions = $('#tagSuggestions');
+  if (!selected || !suggestions) return;
+
+  selected.innerHTML = state.selectedTags.length
+    ? state.selectedTags.map(t => `
+        <button class="editor-tag-chip selected" type="button" data-remove-tag="${escapeHtml(t)}" title="点击移除">
+          ${escapeHtml(t)}<span>×</span>
+        </button>
+      `).join('')
+    : '<span class="editor-tag-empty">还没有选择标签</span>';
+
+  const q = ($('#tagInput') && $('#tagInput').value.trim().toLowerCase()) || '';
+  const tags = state.availableTags
+    .filter(t => !state.selectedTags.includes(t))
+    .filter(t => !q || t.toLowerCase().includes(q))
+    .slice(0, 30);
+
+  suggestions.innerHTML = tags.length
+    ? tags.map(t => `<button class="editor-tag-chip" type="button" data-add-tag="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('')
+    : '<span class="editor-tag-empty">没有可选标签，可直接输入新的</span>';
+}
+
+function setEditorTags(tags) {
+  state.selectedTags = uniqueTags(tags);
+  state.availableTags = uniqueTags([...state.availableTags, ...state.selectedTags]).sort((a, b) => a.localeCompare(b, 'zh-CN'));
+  syncTagsInput();
+  renderTagPicker();
+}
+
+function addEditorTag(tag) {
+  const [clean] = uniqueTags([tag]);
+  if (!clean) return;
+  if (!state.selectedTags.includes(clean)) state.selectedTags.push(clean);
+  if (!state.availableTags.includes(clean)) {
+    state.availableTags.push(clean);
+    state.availableTags.sort((a, b) => a.localeCompare(b, 'zh-CN'));
+  }
+  $('#tagInput').value = '';
+  syncTagsInput();
+  renderTagPicker();
+}
+
+function removeEditorTag(tag) {
+  state.selectedTags = state.selectedTags.filter(t => t !== tag);
+  syncTagsInput();
+  renderTagPicker();
+}
+
+async function loadAvailableTags() {
+  try {
+    const idx = await readIndex();
+    const tags = [];
+    for (const p of ((idx && idx.data && idx.data.posts) || [])) {
+      tags.push(...(p.tags || []));
+    }
+    state.availableTags = uniqueTags([...state.availableTags, ...tags]).sort((a, b) => a.localeCompare(b, 'zh-CN'));
+    renderTagPicker();
+  } catch (e) {
+    console.warn('标签列表加载失败', e);
+  }
+}
+
+function bindTagPicker() {
+  const input = $('#tagInput');
+  const addBtn = $('#addTagBtn');
+  const selected = $('#selectedTags');
+  const suggestions = $('#tagSuggestions');
+  if (!input || !addBtn || !selected || !suggestions) return;
+
+  addBtn.addEventListener('click', () => addEditorTag(input.value));
+  input.addEventListener('input', renderTagPicker);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === 'Tab' || e.key === ',' || e.key === '，') {
+      e.preventDefault();
+      addEditorTag(input.value);
+    }
+  });
+  suggestions.addEventListener('click', e => {
+    const btn = e.target.closest('[data-add-tag]');
+    if (btn) addEditorTag(btn.dataset.addTag);
+  });
+  selected.addEventListener('click', e => {
+    const btn = e.target.closest('[data-remove-tag]');
+    if (btn) removeEditorTag(btn.dataset.removeTag);
+  });
+}
+
 function validateBeforePublish({ title, slug, content, tags, summary, allPosts, isUpdate }) {
   const errs = [];
   if (!title.trim()) errs.push('标题不能为空');
@@ -145,7 +252,7 @@ async function publish() {
   let slug = $('#slug').value.trim() || slugify(title);
   $('#slug').value = slug;
 
-  const tags = toCommaList($('#tags').value);
+  const tags = uniqueTags(state.selectedTags.length ? state.selectedTags : toCommaList($('#tags').value));
   const author = $('#author').value.trim() || (getUser() && getUser().name) || CONFIG.site.author || '';
   const cover = $('#cover').value.trim();
   const draft = $('#draftToggle').checked;
@@ -450,6 +557,8 @@ function setupEasyMDE() {
 
   setupEasyMDE();
   setupDragAndPaste();
+  bindTagPicker();
+  loadAvailableTags();
 
   ['title'].forEach(id => {
     $('#' + id).addEventListener('input', updatePreview);
@@ -477,7 +586,7 @@ function setupEasyMDE() {
       if ((d.title || d.content) && confirm('检测到本地未发布的草稿，是否恢复？')) {
         $('#title').value = d.title || '';
         setContent(d.content || '');
-        $('#tags').value = d.tags || '';
+        setEditorTags(toCommaList(d.tags || ''));
         $('#cover').value = d.cover || '';
         $('#slug').value = d.slug || '';
       } else {

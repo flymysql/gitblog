@@ -6,7 +6,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic, fetchPostMarkdownPublic } from './api.js';
 import { renderMarkdown, parseFrontmatter } from './markdown.js';
-import { initSite, escapeHtml, fmtDate, readingMinutes } from './site.js';
+import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml } from './site.js';
 import { setMeta, setJsonLd } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -394,7 +394,7 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
 
   article.innerHTML = `
     <header class="article-header">
-      ${tags.length ? `<div class="article-tags-top">${tags.map(t => `<a class="tag" href="tags.html#${encodeURIComponent(t)}">${escapeHtml(t)}</a>`).join('')}</div>` : ''}
+      ${tags.length ? `<div class="article-tags-top">${tags.map(t => tagHtml(t, { href: `tags.html#${encodeURIComponent(t)}` })).join('')}</div>` : ''}
       <h1 class="article-title">${escapeHtml(title)}</h1>
       <div class="article-author">
         <div class="avatar" style="background-image:url(${escapeHtml(avatar || '')})"></div>
@@ -414,7 +414,7 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
     </header>
     <div class="article-body">${html}</div>
     ${tags.length ? `<footer class="article-footer">
-      <div class="article-tags">${tags.map(t => `<a class="tag" href="tags.html#${encodeURIComponent(t)}">${escapeHtml(t)}</a>`).join('')}</div>
+      <div class="article-tags">${tags.map(t => tagHtml(t, { href: `tags.html#${encodeURIComponent(t)}` })).join('')}</div>
     </footer>` : ''}
   `;
 

@@ -509,6 +509,50 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
 }
 .social-link:hover { background: var(--primary); color: #fff; }
 
+/* ---------- 通用标签 ---------- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-soft);
+  color: var(--text-secondary);
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.tag:hover,
+.tag.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.tag.tag-colored {
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  border-color: var(--tag-border);
+}
+[data-mode="dark"] .tag.tag-colored,
+[data-theme="dark"] .tag.tag-colored {
+  background: var(--tag-dark-bg);
+  color: var(--tag-dark-text);
+  border-color: var(--tag-dark-border);
+}
+.tag.tag-colored:hover,
+.tag.tag-colored.active {
+  background: var(--tag-text);
+  color: #fff;
+  border-color: var(--tag-text);
+}
+[data-mode="dark"] .tag.tag-colored:hover,
+[data-mode="dark"] .tag.tag-colored.active,
+[data-theme="dark"] .tag.tag-colored:hover,
+[data-theme="dark"] .tag.tag-colored.active {
+  background: var(--tag-dark-text);
+  color: #151515;
+  border-color: var(--tag-dark-text);
+}
+
 /* ---------- 加载/空状态 ---------- */
 .loading, .empty, .error {
   text-align: center;

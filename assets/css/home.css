@@ -370,6 +370,31 @@
   color: #fff;
   border-color: var(--primary);
 }
+.tag.tag-colored {
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  border-color: var(--tag-border);
+}
+[data-mode="dark"] .tag.tag-colored,
+[data-theme="dark"] .tag.tag-colored {
+  background: var(--tag-dark-bg);
+  color: var(--tag-dark-text);
+  border-color: var(--tag-dark-border);
+}
+.tag.tag-colored:hover,
+.tag.tag-colored.active {
+  background: var(--tag-text);
+  color: #fff;
+  border-color: var(--tag-text);
+}
+[data-mode="dark"] .tag.tag-colored:hover,
+[data-mode="dark"] .tag.tag-colored.active,
+[data-theme="dark"] .tag.tag-colored:hover,
+[data-theme="dark"] .tag.tag-colored.active {
+  background: var(--tag-dark-text);
+  color: #151515;
+  border-color: var(--tag-dark-text);
+}
 
 .post-thumbnail {
   width: 160px;

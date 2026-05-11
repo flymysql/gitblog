@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>编辑文章</title>
-  <link rel="stylesheet" href="../assets/css/common.css?v=20260517">
-  <link rel="stylesheet" href="../assets/css/admin.css?v=20260517">
-  <link rel="stylesheet" href="../assets/css/post.css?v=20260517">
+  <link rel="stylesheet" href="../assets/css/common.css?v=20260518">
+  <link rel="stylesheet" href="../assets/css/admin.css?v=20260518">
+  <link rel="stylesheet" href="../assets/css/post.css?v=20260518">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
 </head>
@@ -36,7 +36,16 @@
       <input class="editor-title" id="title" placeholder="输入文章标题">
       <div class="editor-meta">
         <label>作者 <input id="author" placeholder="作者"></label>
-        <label>标签 <input id="tags" placeholder="用逗号分隔"></label>
+        <div class="editor-tag-field">
+          <span class="editor-meta-label">标签</span>
+          <input id="tags" type="hidden">
+          <div class="editor-selected-tags" id="selectedTags" aria-live="polite"></div>
+          <div class="editor-tag-input-row">
+            <input id="tagInput" placeholder="输入新标签后回车">
+            <button class="btn btn-secondary" id="addTagBtn" type="button">添加</button>
+          </div>
+          <div class="editor-tag-suggestions" id="tagSuggestions"></div>
+        </div>
         <label>封面 <input id="cover" placeholder="封面图 URL，可选"></label>
         <label>slug <input id="slug" placeholder="自动生成"></label>
       </div>
@@ -52,6 +61,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
-  <script type="module" src="../assets/js/editor.js?v=20260517"></script>
+  <script type="module" src="../assets/js/editor.js?v=20260518"></script>
 </body>
 </html>
