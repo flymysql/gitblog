@@ -91,16 +91,30 @@ function renderGiscus(slug, title) {
     ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
     : choice;
 
+  // 决定 mapping 与 term：
+  // 由于所有文章页的 pathname 都是 /post.html（只是 ?slug=xxx 不同，giscus 不读 query），
+  // 'pathname' / 'url' 在本站会让所有文章共享同一个 Discussion → 评论看起来全一样。
+  // 这里强制：'specific' 走 slug；'pathname'/'url' 也回退到 specific+slug，确保每篇文章独立。
+  let mapping = (g.mapping || 'specific').toLowerCase();
+  let term = '';
+  if (mapping === 'pathname' || mapping === 'url' || mapping === '') {
+    mapping = 'specific';
+    term = slug;
+    console.warn('[giscus] mapping=pathname/url 在本站会让所有文章共用同一条 Discussion，已自动切换为 specific + slug');
+  } else if (mapping === 'specific') {
+    term = slug;
+  }
+
   const s = document.createElement('script');
   s.src = 'https://giscus.app/client.js';
   s.crossOrigin = 'anonymous';
   s.async = true;
-  Object.entries({
+  const attrs = {
     'data-repo': g.repo,
     'data-repo-id': g.repoId,
     'data-category': g.category,
     'data-category-id': g.categoryId,
-    'data-mapping': g.mapping || 'pathname',
+    'data-mapping': mapping,
     'data-strict': g.strict || '0',
     'data-reactions-enabled': g.reactionsEnabled || '1',
     'data-emit-metadata': g.emitMetadata || '0',
@@ -108,7 +122,9 @@ function renderGiscus(slug, title) {
     'data-theme': resolved,
     'data-lang': g.lang || 'zh-CN',
     'data-loading': 'lazy',
-  }).forEach(([k, v]) => s.setAttribute(k, v));
+  };
+  if (term) attrs['data-term'] = term;
+  Object.entries(attrs).forEach(([k, v]) => s.setAttribute(k, v));
   $('#giscusBox').appendChild(s);
 }
 

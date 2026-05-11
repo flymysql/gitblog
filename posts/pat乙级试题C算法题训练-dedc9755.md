@@ -4,9 +4,8 @@ date: 2018-04-23T14:58:12+08:00
 updated: 2018-05-14T16:33:24+08:00
 author: "兰州小红鸡"
 tags:
-  - "算法"
+  - 算法
   - C++
-  - pat
 summary: "¶ 素数 ¶ 题目描述 令Pi表示第i个素数。现任给两个正整数M include include using namespace std; class prime { int pr…"
 origin:
   from: hexo
