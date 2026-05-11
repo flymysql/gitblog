@@ -89,6 +89,21 @@ blog/
 
 ## 部署 · 五步上线
 
+> **如果你只是想用这套博客模板，不想克隆我现有的所有文章，请直接基于 [`release` 分支](https://github.com/flymysql/gitblog/tree/release) 起步。**
+>
+> `release` 分支是一份**干净模板**：没有任何已发布的文章、没有上传的图、`config.js` 全部是占位符——你 fork 后立即就是一个空白站点，可以直接开始写自己的内容。
+>
+> ```bash
+> # 方式 1：clone release 分支（推荐）
+> git clone -b release https://github.com/flymysql/gitblog.git my-blog
+> cd my-blog
+> git remote set-url origin https://github.com/<your-username>/<repo>.git
+> git checkout -b main         # 把 release 内容作为你自己的 main 起点
+> git push -u origin main
+>
+> # 方式 2：fork 后切到 release 分支，再合并到自己的 main
+> ```
+
 ### 1. Fork 或克隆推到自己仓库
 
 ```bash
@@ -209,6 +224,30 @@ GitHub Pages：重新部署
 **Q. 公众号 / 老 hexo 迁移过来的文章排版乱**：用 `npm run strip:wechat`（剥离推广 / 装饰图）、`npm run fix:hexo-codeblocks`（修代码块）、`npm run normalize`（合标签 / 选封面）。脚本都做了幂等，可以反复跑。
 
 ---
+
+## 维护者：如何更新 release 模板
+
+`release` 分支不是手工维护的，而是从 main 自动派生的"干净模板"。当 main 上有新功能 / 修复，跑一次 release 脚本就能基于最新 main 重建：
+
+```bash
+# 干跑（产物在 ../gitblog-release/，不会推到远端）
+npm run release
+
+# 验证 OK 后推送
+npm run release:push
+```
+
+脚本会做这些事：
+
+- 在仓库外（默认 `../gitblog-release/`）建一个 `git worktree`，分支为 `release`
+- 删除所有 `posts/*.md`，写入一份"刚 fork 完"风格的 `welcome.md` 模板
+- 清空 `assets/uploads/`、`assets/og/`，留 `.gitkeep`
+- 重置 `assets/js/config.js` 为占位模板（owner / repo / authorizedUsers / site.url 全是 `YOUR_USERNAME`）
+- 重置 `data/posts.json`，跑一遍 `build` 重建 `sitemap.xml` / `rss.xml` / OG 图
+- commit `release: clean template based on main@<sha>`
+- 加 `--push` 时自动 `git push --force-with-lease origin release`
+
+模板内容在 `scripts/release-template/`（welcome.md / config.js）下，可以按需调整。
 
 ## 致谢与说明
 
