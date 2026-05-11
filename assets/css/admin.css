@@ -1,0 +1,341 @@
+/* ============================================================================
+   后台 admin 样式
+   ============================================================================ */
+
+.admin-page {
+  background: var(--bg-soft);
+  min-height: 100vh;
+}
+
+/* ---------- 登录卡片 ---------- */
+.login-wrap {
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 36px 32px;
+  box-shadow: var(--shadow-strong);
+  text-align: center;
+}
+
+.login-card .logo {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 20px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.login-card h1 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.login-card p {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin-bottom: 28px;
+}
+
+.btn-github {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 44px;
+  border-radius: 6px;
+  background: #24292F;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.btn-github:hover {
+  background: #1B1F23;
+  color: #fff;
+}
+
+.btn-github svg {
+  width: 18px;
+  height: 18px;
+}
+
+.login-warn {
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.7;
+}
+
+/* ---------- 后台主界面 ---------- */
+.admin-layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 14px 18px;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.admin-toolbar h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-right: auto;
+}
+
+.search-input {
+  background: var(--bg-soft);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  width: 220px;
+}
+
+/* ---------- 文章管理列表 ---------- */
+.admin-list {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.admin-row {
+  display: grid;
+  grid-template-columns: 1fr 160px 100px 200px;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.admin-row:last-child { border-bottom: none; }
+.admin-row:hover { background: var(--bg-soft); }
+
+.admin-row.head {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg-soft);
+  font-weight: 500;
+}
+
+.admin-row.head:hover { background: var(--bg-soft); }
+
+.admin-row .title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-row .meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.admin-row .actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.admin-row .actions a,
+.admin-row .actions button {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.admin-row .actions a:hover { color: var(--primary); }
+.admin-row .actions .danger:hover { color: #d9534f; }
+
+@media (max-width: 720px) {
+  .admin-row { grid-template-columns: 1fr auto; }
+  .admin-row .meta:not(:last-child) { display: none; }
+  .admin-row.head { display: none; }
+}
+
+/* ---------- 编辑器 ---------- */
+.editor-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+.editor-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 56px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.editor-bar .back {
+  font-size: 14px;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.editor-bar .back:hover { color: var(--primary); }
+
+.editor-status {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.editor-status.saving { color: var(--text-secondary); }
+.editor-status.saved { color: #67C23A; }
+.editor-status.error { color: #d9534f; }
+
+.editor-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex: 1;
+  overflow: hidden;
+}
+
+.editor-pane {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+
+.editor-pane:last-child { border-right: none; }
+
+.editor-title {
+  padding: 24px 32px 8px;
+  font-size: 28px;
+  font-weight: 700;
+  border: none;
+  width: 100%;
+  outline: none;
+  color: var(--text-main);
+}
+
+.editor-title::placeholder {
+  color: var(--text-tertiary);
+}
+
+.editor-meta {
+  padding: 0 32px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+}
+
+.editor-meta input {
+  background: var(--bg-soft);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  min-width: 140px;
+}
+
+.editor-meta label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editor-textarea {
+  flex: 1;
+  padding: 18px 32px 32px;
+  font-family: 'SF Mono', Monaco, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  resize: none;
+  border: none;
+  outline: none;
+  background: #fff;
+}
+
+.editor-preview {
+  padding: 24px 32px;
+  overflow-y: auto;
+}
+
+.editor-preview .article-title {
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.editor-preview .article-body {
+  font-size: 15px;
+}
+
+@media (max-width: 880px) {
+  .editor-body { grid-template-columns: 1fr; }
+  .editor-pane { border-right: none; }
+  .editor-preview { display: none; }
+  .editor-pane.preview-mode .editor-textarea { display: none; }
+  .editor-pane.preview-mode .editor-preview { display: block; }
+}
+
+/* ---------- 模态框 ---------- */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-mask);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px 28px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--shadow-strong);
+}
+
+.modal h3 { font-size: 16px; margin-bottom: 12px; }
+.modal p { color: var(--text-secondary); font-size: 14px; margin-bottom: 18px; }
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>编辑文章</title>
+  <link rel="stylesheet" href="../assets/css/common.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+  <link rel="stylesheet" href="../assets/css/post.css">
+</head>
+<body class="editor-page">
+  <div class="editor-bar">
+    <a class="back" href="./">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      返回
+    </a>
+    <span class="editor-status" id="status">未登录</span>
+    <button class="btn btn-secondary" id="btnPreview">预览</button>
+    <button class="btn btn-secondary" id="btnDelete" style="display:none">删除</button>
+    <button class="btn btn-primary" id="btnPublish">发布</button>
+  </div>
+
+  <div class="editor-body">
+    <div class="editor-pane">
+      <input class="editor-title" id="title" placeholder="输入文章标题">
+      <div class="editor-meta">
+        <label>作者 <input id="author" placeholder="作者"></label>
+        <label>标签 <input id="tags" placeholder="用逗号分隔，例如：随笔,Go"></label>
+        <label>封面 <input id="cover" placeholder="可选，封面图 URL"></label>
+        <label>slug <input id="slug" placeholder="可选，自动从标题生成"></label>
+      </div>
+      <textarea class="editor-textarea" id="content" placeholder="开始用 Markdown 写作…"></textarea>
+    </div>
+    <div class="editor-pane">
+      <div class="editor-preview">
+        <h1 class="article-title" id="previewTitle">预览</h1>
+        <div class="article-body" id="preview"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../assets/js/editor.js"></script>
+</body>
+</html>

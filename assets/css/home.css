@@ -1,0 +1,250 @@
+/* ============================================================================
+   首页（文章列表）—— 简书风格
+   ============================================================================ */
+
+.layout {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 250px;
+  gap: 30px;
+}
+
+@media (max-width: 880px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+}
+
+/* ---------- 顶部 tab（简书的 "推荐 / 热门 / 新上榜"） ---------- */
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  padding-top: 14px;
+  margin-bottom: 8px;
+}
+
+.tab {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  position: relative;
+  transition: color 0.15s;
+}
+
+.tab.active {
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 16px;
+  right: 16px;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px;
+}
+
+.tab:hover {
+  color: var(--primary);
+}
+
+/* ---------- 文章列表 ---------- */
+.post-list {
+  list-style: none;
+}
+
+.post-item {
+  display: flex;
+  gap: 24px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.post-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.post-author-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.post-author-row .avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #eee;
+  background-size: cover;
+}
+
+.post-author-row .name {
+  color: var(--text-secondary);
+}
+
+.post-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.5;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.post-item:hover .post-title {
+  color: var(--primary);
+}
+
+.post-summary {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  margin-bottom: 10px;
+}
+
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.post-meta .meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.post-meta .meta-item svg {
+  width: 12px;
+  height: 12px;
+}
+
+.post-meta .tag {
+  background: #F0F2F5;
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.post-meta .tag:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.post-thumbnail {
+  width: 150px;
+  height: 100px;
+  flex-shrink: 0;
+  background: var(--bg-soft);
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--radius);
+}
+
+@media (max-width: 720px) {
+  .post-thumbnail { width: 100px; height: 70px; }
+  .post-title { font-size: 16px; }
+}
+
+/* ---------- 侧栏 ---------- */
+.sidebar {
+  padding-top: 14px;
+}
+
+.sidebar-card {
+  padding: 16px;
+  background: var(--bg-soft);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+
+.sidebar-card h3 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: 12px;
+}
+
+.sidebar-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-author .avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #eee;
+  background-size: cover;
+}
+
+.sidebar-author .name {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.sidebar-author .desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-cloud .tag {
+  background: #fff;
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tag-cloud .tag:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* ---------- 加载更多 ---------- */
+.load-more {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.load-more:hover { color: var(--primary); }

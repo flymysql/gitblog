@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>加载中…</title>
+  <link rel="stylesheet" href="assets/css/common.css">
+  <link rel="stylesheet" href="assets/css/post.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="./">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L19.82 8 12 11.82 4.18 8 12 4.18zM4 9.27l7 3.5v7.46l-7-3.5V9.27zm9 10.96v-7.46l7-3.5v7.46l-7 3.5z"/></svg>
+        <span data-bind="site.title">博客</span>
+      </a>
+      <div class="nav-spacer"></div>
+      <div class="nav-actions">
+        <a class="btn-ghost" href="./">返回首页</a>
+        <a class="btn-write" id="editBtn" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          编辑
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <article class="article" id="article">
+    <div class="loading">加载中…</div>
+  </article>
+
+  <footer class="footer">
+    <p>© <span id="year"></span> <span data-bind="site.title"></span> · 由 <a href="https://pages.github.com/" target="_blank">GitHub Pages</a> 托管</p>
+  </footer>
+
+  <script type="module" src="assets/js/post.js"></script>
+</body>
+</html>
