@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>标签 · 加载中…</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
-  <link rel="stylesheet" href="assets/css/common.css?v=20260513">
-  <link rel="stylesheet" href="assets/css/home.css?v=20260513">
+  <link rel="stylesheet" href="assets/css/common.css?v=20260514">
+  <link rel="stylesheet" href="assets/css/home.css?v=20260514">
   <script>(function(){var t=localStorage.getItem('blog_theme')||'auto';var d=t==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t;document.documentElement.setAttribute('data-theme',d);document.documentElement.dataset.themeChoice=t;})();</script>
   <style>
     .tag-page { max-width: var(--content-max); margin: 28px auto; padding: 0 24px; }
@@ -39,6 +39,15 @@
       border-bottom: 1px solid var(--border);
     }
     .group-title .count { color: var(--text-tertiary); font-weight: 400; margin-left: 8px; font-size: 13px; }
+    @media (max-width: 720px) {
+      .tag-page { margin: 16px auto; padding: 0 14px; }
+      .tag-page h1 { font-size: 20px; }
+      .tag-page .desc { font-size: 13px; margin-bottom: 16px; }
+      .tag-cloud-big { padding: 14px; gap: 8px; margin-bottom: 22px; border-radius: 10px; }
+      .tag-cloud-big .tag { font-size: 12.5px; padding: 4px 11px; }
+      .group-block { margin-bottom: 22px; }
+      .group-title { font-size: 14.5px; margin-bottom: 10px; }
+    }
   </style>
 </head>
 <body>
@@ -55,6 +64,6 @@
   <div id="site-footer"></div>
   <div id="site-overlays"></div>
 
-  <script type="module" src="assets/js/tags.js?v=20260513"></script>
+  <script type="module" src="assets/js/tags.js?v=20260514"></script>
 </body>
 </html>

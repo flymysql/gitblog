@@ -58,13 +58,21 @@ function applyFavicon() {
 }
 
 function navHtml(active) {
-  const links = (CONFIG.site.nav || []).map(n => {
+  const navItems = CONFIG.site.nav || [];
+  const links = navItems.map(n => {
     const isActive = active && (n.href === active || (active === 'home' && (n.href === './' || n.href === 'index.html')));
     return `<a class="nav-link${isActive ? ' active' : ''}" href="${escapeHtml(n.href)}">${escapeHtml(n.name)}</a>`;
+  }).join('');
+  const drawerLinks = navItems.map(n => {
+    const isActive = active && (n.href === active || (active === 'home' && (n.href === './' || n.href === 'index.html')));
+    return `<a class="nav-drawer-link${isActive ? ' active' : ''}" href="${escapeHtml(n.href)}">${escapeHtml(n.name)}</a>`;
   }).join('');
   return `
     <nav class="nav">
       <div class="nav-inner">
+        <button id="navMenuBtn" class="icon-btn nav-menu-btn" type="button" aria-label="菜单">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
         <a class="nav-logo" href="./">
           ${logoSvg()}
           <span>${escapeHtml(CONFIG.site.title)}</span>
@@ -77,10 +85,25 @@ function navHtml(active) {
         ${themeToggleHtml()}
         <a class="btn-write" href="admin/" title="进入创作后台">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-          创作
+          <span class="btn-write-label">创作</span>
         </a>
       </div>
     </nav>
+    <div id="navDrawer" class="nav-drawer is-hidden" aria-hidden="true">
+      <div class="nav-drawer-panel">
+        <div class="nav-drawer-header">
+          <span>导航</span>
+          <button id="navDrawerClose" class="icon-btn" type="button" aria-label="关闭">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="nav-drawer-links">${drawerLinks}</div>
+        <a class="nav-drawer-cta" href="admin/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          进入创作后台
+        </a>
+      </div>
+    </div>
   `;
 }
 
@@ -230,10 +253,32 @@ function bindSearchOverlay() {
   });
 }
 
+function bindNavDrawer() {
+  const drawer = $('#navDrawer');
+  const btn = $('#navMenuBtn');
+  const closeBtn = $('#navDrawerClose');
+  if (!drawer || !btn) return;
+  const open = () => {
+    drawer.classList.remove('is-hidden');
+    drawer.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+  const close = () => {
+    drawer.classList.add('is-hidden');
+    drawer.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+  btn.addEventListener('click', open);
+  if (closeBtn) closeBtn.addEventListener('click', close);
+  drawer.addEventListener('click', e => { if (e.target === drawer) close(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !drawer.classList.contains('is-hidden')) close();
+  });
+}
+
 export function initSite({ active = '' } = {}) {
   initTheme();
   applyFavicon();
-  // 渲染骨架
   const navHost = $('#site-nav');
   if (navHost) navHost.innerHTML = navHtml(active);
   const footerHost = $('#site-footer');
@@ -242,6 +287,7 @@ export function initSite({ active = '' } = {}) {
   if (overlayHost) overlayHost.innerHTML = searchOverlayHtml();
 
   bindThemeToggle();
+  bindNavDrawer();
   if ($('#searchBtn')) bindSearchOverlay();
   if ($('#year')) $('#year').textContent = new Date().getFullYear();
 }

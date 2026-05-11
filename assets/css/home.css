@@ -37,9 +37,19 @@
 .hero-stats .stat strong { font-size: 16px; color: var(--text-main); margin-right: 4px; }
 
 @media (max-width: 720px) {
-  .hero { flex-direction: column; align-items: flex-start; padding: 22px 18px; gap: 16px; margin-top: 14px; }
-  .hero-avatar { width: 60px; height: 60px; }
-  .hero-title { font-size: 18px; }
+  .hero {
+    flex-direction: row;
+    align-items: center;
+    padding: 18px 16px;
+    gap: 14px;
+    margin: 12px 14px 0;
+    border-radius: 12px;
+  }
+  .hero-avatar { width: 56px; height: 56px; border-width: 2px; }
+  .hero-title { font-size: 17px; margin-bottom: 4px; }
+  .hero-subtitle { font-size: 13px; margin-bottom: 8px; }
+  .hero-stats { gap: 14px; font-size: 12px; }
+  .hero-stats .stat strong { font-size: 14px; }
 }
 
 /* ---------- 主体布局 ---------- */
@@ -54,6 +64,12 @@
 @media (max-width: 880px) {
   .layout { grid-template-columns: 1fr; }
   .sidebar { display: none; }
+}
+@media (max-width: 720px) {
+  .layout { padding: 0 14px; }
+  .tabs { padding-top: 12px; gap: 0; }
+  .tab { padding: 10px 12px; font-size: 13.5px; }
+  .tab.active::after { left: 12px; right: 12px; }
 }
 
 /* ---------- tab ---------- */
@@ -200,9 +216,19 @@
 }
 
 @media (max-width: 720px) {
-  .post-thumbnail { width: 100px; aspect-ratio: 4 / 3; }
-  .post-title { font-size: 16px; }
-  .post-item { gap: 14px; padding: 16px 4px; }
+  .post-thumbnail { width: 96px; aspect-ratio: 4 / 3; border-radius: 8px; }
+  .post-title { font-size: 15.5px; line-height: 1.45; margin-bottom: 6px; -webkit-line-clamp: 3; line-clamp: 3; }
+  .post-summary { -webkit-line-clamp: 2; line-clamp: 2; font-size: 12.5px; margin-bottom: 8px; }
+  .post-item { gap: 12px; padding: 14px 4px; }
+  .post-item:hover { padding: 14px 4px; background: transparent; }
+  .post-author-row { font-size: 11px; gap: 6px; margin-bottom: 6px; }
+  .post-author-row .avatar { width: 16px; height: 16px; }
+  .post-meta { font-size: 11px; gap: 8px; }
+  .tag { padding: 1px 7px; font-size: 11px; }
+}
+
+@media (max-width: 420px) {
+  .post-thumbnail { width: 84px; }
 }
 
 /* ---------- 侧栏 ---------- */

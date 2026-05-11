@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>归档 · 加载中…</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
-  <link rel="stylesheet" href="assets/css/common.css?v=20260513">
-  <link rel="stylesheet" href="assets/css/home.css?v=20260513">
+  <link rel="stylesheet" href="assets/css/common.css?v=20260514">
+  <link rel="stylesheet" href="assets/css/home.css?v=20260514">
   <script>(function(){var t=localStorage.getItem('blog_theme')||'auto';var d=t==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t;document.documentElement.setAttribute('data-theme',d);document.documentElement.dataset.themeChoice=t;})();</script>
   <style>
     .archive-page { max-width: var(--content-max); margin: 28px auto; padding: 0 24px; }
@@ -37,6 +37,20 @@
     .archive-item .title { font-size: 14.5px; color: var(--text-main); flex: 1; min-width: 0; }
     .archive-item:hover .title { color: var(--primary); }
     .archive-item .tags { color: var(--text-tertiary); font-size: 12px; }
+    @media (max-width: 720px) {
+      .archive-page { margin: 16px auto; padding: 0 14px; }
+      .archive-page h1 { font-size: 20px; }
+      .archive-page .desc { font-size: 13px; margin-bottom: 18px; }
+      .year-group { margin-bottom: 24px; }
+      .year-title { font-size: 18px; margin-bottom: 12px; }
+      .archive-item { gap: 10px; padding: 8px 0; flex-wrap: wrap; }
+      .archive-item .date { width: 56px; font-size: 12px; }
+      .archive-item .title { font-size: 13.5px; }
+      .archive-item .tags { width: 100%; font-size: 11.5px; padding-left: 66px; margin-top: 2px; }
+    }
+    @media (max-width: 420px) {
+      .archive-item .tags { padding-left: 0; }
+    }
   </style>
 </head>
 <body>
@@ -51,6 +65,6 @@
   <div id="site-footer"></div>
   <div id="site-overlays"></div>
 
-  <script type="module" src="assets/js/archives.js?v=20260513"></script>
+  <script type="module" src="assets/js/archives.js?v=20260514"></script>
 </body>
 </html>

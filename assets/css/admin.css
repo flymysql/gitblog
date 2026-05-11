@@ -26,13 +26,23 @@
   gap: 8px;
 }
 
+.admin-sidebar-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.admin-sidebar-close { display: none; }
+
 .admin-brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 6px 10px 18px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 12px;
+  padding: 6px 10px;
+  flex: 1;
+  min-width: 0;
   color: var(--text-main);
 }
 .admin-brand:hover { color: var(--primary); }
@@ -123,6 +133,12 @@
   min-width: 0;
 }
 
+.admin-menu-btn { display: none; }
+
+.admin-sidebar-backdrop {
+  display: none;
+}
+
 .admin-topbar {
   position: sticky;
   top: 0;
@@ -195,7 +211,7 @@
   padding: 24px 28px 60px;
   max-width: 1200px;
   width: 100%;
-  align-self: flex-start;
+  margin: 0 auto;
 }
 
 /* 全屏页（未登录 / 未授权） */
@@ -208,60 +224,52 @@
 }
 
 @media (max-width: 880px) {
-  .admin-shell {
-    grid-template-columns: 1fr;
-  }
+  .admin-shell { grid-template-columns: 1fr; }
   .admin-sidebar {
-    position: static;
-    height: auto;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    padding: 12px 14px;
-    gap: 6px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    width: min(280px, 82vw);
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease-out;
+    box-shadow: var(--shadow-strong);
+    padding: 18px 12px 14px;
   }
-  .admin-brand {
-    border-bottom: none;
-    padding: 0 6px;
-    margin-bottom: 0;
-    margin-right: auto;
+  .admin-sidebar.is-open { transform: translateX(0); }
+  .admin-sidebar-close { display: inline-flex; }
+  .admin-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: var(--bg-mask);
+    z-index: 199;
+    animation: overlayIn 0.18s ease-out;
   }
-  .admin-brand-sub { display: none; }
-  .admin-nav {
-    flex-direction: row;
-    flex: none;
-    overflow-x: auto;
-    width: 100%;
-    order: 3;
-    padding-top: 8px;
-    border-top: 1px solid var(--border);
-    margin-top: 4px;
-  }
-  .admin-nav-item {
-    flex-shrink: 0;
-    padding: 6px 12px;
-    font-size: 13px;
-  }
-  .admin-nav-item span:not(.admin-nav-icon) { display: inline; }
-  .admin-sidebar-footer {
-    border: none;
-    padding: 0;
-    flex-direction: row;
-  }
-  .admin-sidebar-footer .admin-nav-item {
-    padding: 6px 10px;
-  }
-  .admin-sidebar-footer .admin-nav-item span:not(.admin-nav-icon) {
-    display: none;
+  .admin-menu-btn {
+    display: inline-flex !important;
+    width: 36px;
+    height: 36px;
   }
   .admin-topbar {
-    padding: 12px 16px;
-    flex-wrap: wrap;
+    padding: 10px 14px;
+    gap: 10px;
+    min-height: 56px;
   }
-  .admin-content {
-    padding: 16px;
-  }
+  .admin-topbar-title h1 { font-size: 16px; }
+  .admin-content { padding: 18px 16px 60px; }
   .admin-user-name { display: none; }
+  .admin-user { padding: 0; background: transparent; }
+}
+
+@media (max-width: 540px) {
+  .admin-topbar { gap: 6px; padding: 8px 12px; }
+  .admin-topbar-title h1 { font-size: 15px; }
+  .admin-topbar-actions .btn { padding: 6px 10px; font-size: 12.5px; }
+  .admin-topbar-actions .btn svg { width: 13px; height: 13px; }
+  .admin-content { padding: 14px 14px 50px; }
 }
 
 /* ---------- 登录卡片 ---------- */
@@ -281,6 +289,20 @@
   padding: 40px 36px;
   box-shadow: var(--shadow-strong);
   text-align: center;
+}
+
+@media (max-width: 480px) {
+  .login-wrap { padding: 16px; }
+  .login-card { padding: 28px 22px; border-radius: 10px; }
+  .login-card h1 { font-size: 19px; }
+  .login-card p { font-size: 13px; margin-bottom: 22px; }
+  .login-card .logo { width: 48px; height: 48px; margin-bottom: 16px; }
+  .login-card input[type="password"], .login-card input[type="text"] {
+    height: 44px;
+    font-size: 13.5px;
+  }
+  .btn-github { height: 44px; font-size: 14px; }
+  .login-warn { font-size: 11.5px; }
 }
 
 .login-card .logo {
@@ -468,9 +490,44 @@
 .admin-row .actions .danger:hover { color: #d9534f; background: var(--bg-soft); }
 
 @media (max-width: 720px) {
-  .admin-row { grid-template-columns: 1fr auto; }
+  .admin-toolbar {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  .admin-tabs { width: 100%; margin-right: 0; flex: 1 1 100%; order: 1; }
+  .admin-tabs button { flex: 1; padding: 6px 10px; font-size: 12.5px; }
+  .admin-toolbar-spacer { display: none; }
+  .search-input { width: 100%; flex: 1; min-width: 0; order: 2; }
+  .admin-toolbar .btn { order: 3; }
+
+  .admin-row {
+    grid-template-columns: 1fr auto;
+    padding: 12px 14px;
+    gap: 8px;
+  }
   .admin-row .meta:not(:last-child) { display: none; }
   .admin-row.head { display: none; }
+  .admin-row .title { font-size: 13.5px; white-space: normal; }
+  .admin-row .actions { gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+  .admin-row .actions a, .admin-row .actions button { padding: 4px 8px; font-size: 12px; }
+
+  .admin-list { border-radius: 8px; }
+}
+
+@media (max-width: 720px) {
+  .settings-form { gap: 12px; }
+  .settings-card { padding: 16px 14px; border-radius: 8px; }
+  .settings-card h3 { font-size: 15px; margin-bottom: 12px; }
+  .settings-help { font-size: 12px; margin-bottom: 12px; }
+  .settings-grid { grid-template-columns: 1fr; gap: 12px; }
+  .settings-grid input, .settings-grid textarea, .settings-grid select {
+    font-size: 14px;
+    padding: 9px 11px;
+  }
+
+  .diagnose-row { padding: 12px 14px; gap: 10px; }
+  .diagnose-title { font-size: 13px; }
+  .diagnose-detail { font-size: 11.5px; }
 }
 
 /* ---------- 编辑器 ---------- */
@@ -638,6 +695,50 @@
   .editor-preview { display: none; }
   .editor-pane.preview-mode .editor-textarea { display: none; }
   .editor-pane.preview-mode .editor-preview { display: block; }
+}
+
+@media (max-width: 720px) {
+  .editor-bar {
+    height: auto;
+    padding: 10px 14px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .editor-bar .back { font-size: 13px; order: 1; }
+  .editor-status {
+    flex: 1 0 100%;
+    order: 2;
+    text-align: left;
+    padding: 0;
+    font-size: 11px;
+  }
+  .editor-toggle-row {
+    order: 3;
+    font-size: 12px;
+    gap: 10px;
+  }
+  .editor-bar #themeToggle { order: 4; }
+  .editor-bar .btn {
+    order: 5;
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+  .editor-title { padding: 16px 18px 6px; font-size: 22px; }
+  .editor-meta { padding: 0 18px 10px; gap: 8px; }
+  .editor-meta input { min-width: 0; flex: 1; font-size: 13px; }
+  .editor-meta label { flex: 1 1 calc(50% - 4px); }
+  .editor-textarea { padding: 14px 18px 24px; font-size: 13.5px; }
+  .EasyMDEContainer { padding: 8px 14px 24px; }
+}
+
+@media (max-width: 480px) {
+  .editor-bar { padding: 8px 12px; gap: 6px; }
+  .editor-bar .back svg { width: 13px; height: 13px; }
+  .editor-bar .btn { padding: 6px 10px; font-size: 12px; }
+  .editor-toggle-row label { gap: 3px; }
+  .editor-meta { font-size: 11px; }
+  .editor-meta label { flex: 1 1 100%; }
+  .editor-meta input { padding: 6px 10px; }
 }
 
 /* ---------- 模态框 ---------- */
