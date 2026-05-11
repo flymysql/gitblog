@@ -20,28 +20,69 @@ const OG_DIR = 'assets/og';
 console.log('Site URL:', SITE_URL);
 
 // ---------- 解析 frontmatter ----------
+function coerceScalar(v) {
+  if (v == null) return '';
+  v = String(v).replace(/\s+$/, '');
+  if (v.startsWith('[') && v.endsWith(']')) {
+    return v.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, '')).filter(Boolean);
+  }
+  if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+    return v.slice(1, -1);
+  }
+  if (v === 'true' || v === 'false') return v === 'true';
+  if (v !== '' && !isNaN(Number(v))) return Number(v);
+  return v;
+}
+
 function parseFM(text) {
   const m = text.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
   if (!m) return { data: {}, content: text };
   const yaml = m[1];
   const content = text.slice(m[0].length);
   const data = {};
-  for (const raw of yaml.split(/\r?\n/)) {
+  const lines = yaml.split(/\r?\n/);
+  let i = 0;
+  while (i < lines.length) {
+    const raw = lines[i];
     const line = raw.replace(/\s+$/, '');
-    if (!line || /^\s*#/.test(line)) continue;
+    if (!line || /^\s*#/.test(line)) { i++; continue; }
     const mm = line.match(/^([A-Za-z0-9_\-]+)\s*:\s*(.*)$/);
-    if (!mm) continue;
-    let v = mm[2];
-    if (v.startsWith('[') && v.endsWith(']')) {
-      v = v.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, '')).filter(Boolean);
-    } else if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
-      v = v.slice(1, -1);
-    } else if (v === 'true' || v === 'false') {
-      v = v === 'true';
-    } else if (!isNaN(Number(v)) && v.trim() !== '') {
-      v = Number(v);
+    if (!mm) { i++; continue; }
+    const key = mm[1];
+    const value = mm[2];
+
+    if (value === '') {
+      // 多行：可能是 - 数组或缩进对象
+      const arr = [];
+      const obj = {};
+      let mode = '';
+      let j = i + 1;
+      while (j < lines.length) {
+        const sub = lines[j];
+        if (!sub.trim()) { j++; continue; }
+        const itemM = sub.match(/^\s+-\s+(.*)$/);
+        const kvM = sub.match(/^\s+([A-Za-z0-9_\-]+)\s*:\s*(.*)$/);
+        if (itemM && mode !== 'obj') {
+          mode = 'arr';
+          arr.push(coerceScalar(itemM[1]));
+          j++;
+        } else if (kvM && mode !== 'arr') {
+          mode = 'obj';
+          obj[kvM[1]] = coerceScalar(kvM[2]);
+          j++;
+        } else {
+          break;
+        }
+      }
+      if (mode === 'arr') data[key] = arr;
+      else if (mode === 'obj') data[key] = obj;
+      else data[key] = '';
+      i = j;
+      continue;
     }
-    data[mm[1]] = v;
+
+    data[key] = coerceScalar(value);
+    i++;
   }
   return { data, content };
 }
