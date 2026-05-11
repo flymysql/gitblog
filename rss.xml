@@ -5,7 +5,7 @@
     <link>https://flymysql.github.io/gitblog/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 11 May 2026 09:29:45 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 11 May 2026 09:32:41 GMT</lastBuildDate>
     <atom:link href="https://flymysql.github.io/gitblog/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GitBlog：一个带伪后台的博客站点</title>
@@ -31,7 +31,7 @@
       <guid isPermaLink="false">多维数组的索引方案与内存设计-16000038</guid>
       <pubDate>Sun, 13 Mar 2022 04:08:00 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>杂七杂八</category><category>数据结构</category>
+      
       <description><![CDATA[多维数组的内存结构 类似ndarray之类的多维数组，实际上是一个连续的内存地址+一种索引方案。我们可以将一个多维数组对象分为两部分，一部分是实际存储数组数据的连续内存段，另一部分…]]></description>
     </item>
     <item>
@@ -40,7 +40,7 @@
       <guid isPermaLink="false">推荐系统——推荐引擎的架构-15996742</guid>
       <pubDate>Sat, 12 Mar 2022 03:31:00 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>推荐</category><category>推荐算法</category>
+      
       <description><![CDATA[什么是推荐系统 谈推荐系统之前我们先聊一下搜索系统，推荐系统和搜索系统都是为了解决互联网信息过载的问题，互联网信息的数量远超过人类可以逐一浏览的程度，而搜索引擎便是解决这一问题的代…]]></description>
     </item>
     <item>
@@ -49,7 +49,7 @@
       <guid isPermaLink="false">置顶-nebula-graph-图计算数据库-15993772</guid>
       <pubDate>Fri, 11 Mar 2022 07:03:00 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>图数据库</category><category>图计算</category>
+      
       <description><![CDATA[更新历史 在学习过程中，本文持续更新 2021 12 13：更新nebula官方介绍 2021 12 14：更新编译与部署方式，总结importer导入方式 2021 12 15：…]]></description>
     </item>
     <item>
