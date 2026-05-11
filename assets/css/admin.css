@@ -509,7 +509,9 @@
 }
 .badge.draft { background: #FEF3C7; color: #92400E; }
 .badge.pinned { background: var(--primary); color: #fff; }
+.badge.carousel { background: #DBEAFE; color: #1E40AF; }
 [data-theme="dark"] .badge.draft { background: #4D3F1F; color: #FBBF24; }
+[data-theme="dark"] .badge.carousel { background: #1E3A5F; color: #93C5FD; }
 
 .drag-handle,
 .nav-row-handle {
@@ -794,10 +796,37 @@
   margin: 8px;
 }
 
-/* EasyMDE 集成时的样式（可选） */
-.EasyMDEContainer { flex: 1; display: flex; flex-direction: column; padding: 12px 32px 32px; }
-.EasyMDEContainer .CodeMirror { background: transparent; color: var(--text-main); border: none; padding: 12px 0; }
+/* EasyMDE 集成时的样式 —— 必须形成 flex 高度链路：
+   .editor-pane(overflow:hidden) → .EasyMDEContainer(flex:1, min-height:0)
+   → .CodeMirror(flex:1, min-height:0) → .CodeMirror-scroll(overflow:auto)
+   否则 CodeMirror 会被内容撑大并被外层裁掉，滚动条消失 */
+.EasyMDEContainer {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 32px 32px;
+  overflow: hidden;
+}
+.EasyMDEContainer .CodeMirror {
+  flex: 1;
+  min-height: 0;
+  height: auto !important;       /* 抵消 EasyMDE 写入的 inline height */
+  background: transparent;
+  color: var(--text-main);
+  border: none;
+  padding: 12px 0;
+}
+.EasyMDEContainer .CodeMirror-scroll {
+  height: 100% !important;
+  max-height: none !important;
+  min-height: 0;
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+.EasyMDEContainer .CodeMirror-sizer { min-height: 0 !important; }
 .EasyMDEContainer .editor-toolbar {
+  flex-shrink: 0;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg-elev);

@@ -37,16 +37,20 @@ function renderCarousel(posts) {
   const root = $('#homeCarousel');
   if (!root) return;
 
-  const items = [...posts]
-    .filter(p => p.cover)
-    .sort((a, b) => {
-      if ((b.pinned ? 1 : 0) !== (a.pinned ? 1 : 0)) return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
-      if (a.pinned && b.pinned && Number(a.pinnedOrder || 0) !== Number(b.pinnedOrder || 0)) {
-        return Number(a.pinnedOrder || 9999) - Number(b.pinnedOrder || 9999);
-      }
-      return new Date(b.date || 0) - new Date(a.date || 0);
-    })
-    .slice(0, 5);
+  // 轮播策略：
+  // 1. 如果有任何文章在后台被勾选 carousel=true，只展示这些（按 pinned + date 排，最多 8 张）
+  // 2. 否则回退到「按 pinned + cover + date 取前 5 张」的旧行为，保证未配置时也有内容
+  const sortFn = (a, b) => {
+    if ((b.pinned ? 1 : 0) !== (a.pinned ? 1 : 0)) return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+    if (a.pinned && b.pinned && Number(a.pinnedOrder || 0) !== Number(b.pinnedOrder || 0)) {
+      return Number(a.pinnedOrder || 9999) - Number(b.pinnedOrder || 9999);
+    }
+    return new Date(b.date || 0) - new Date(a.date || 0);
+  };
+  const picked = posts.filter(p => p.carousel && p.cover);
+  const items = picked.length
+    ? [...picked].sort(sortFn).slice(0, 8)
+    : [...posts].filter(p => p.cover).sort(sortFn).slice(0, 5);
 
   if (!items.length) {
     root.hidden = true;

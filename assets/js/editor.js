@@ -100,6 +100,7 @@ async function loadPost(slug) {
     $('#slug').value = slug;
     $('#draftToggle').checked = !!data.draft;
     $('#pinnedToggle').checked = !!data.pinned;
+    $('#carouselToggle').checked = !!data.carousel;
     setContent(content);
     document.title = `编辑：${data.title || slug}`;
     setStatus('已加载', 'saved');
@@ -257,7 +258,11 @@ async function publish() {
   const cover = $('#cover').value.trim();
   const draft = $('#draftToggle').checked;
   const pinned = $('#pinnedToggle').checked;
+  const carousel = $('#carouselToggle').checked;
   const summary = state.data.summary || extractSummary(content, 80);
+  if (carousel && !cover) {
+    if (!confirm('当前文章没有封面图，无法进入首页轮播。\n\n继续发布会取消「轮播」勾选。是否继续？')) return;
+  }
 
   // 拉一次最新索引用于查重
   let curIndex = null;
@@ -288,6 +293,7 @@ async function publish() {
   if (summary) data.summary = summary;
   if (draft) data.draft = true;
   if (pinned) data.pinned = true;
+  if (carousel && cover) data.carousel = true;
 
   const md = stringifyFrontmatter(data, content);
   const path = `${CONFIG.paths.posts}/${slug}.md`;
@@ -347,6 +353,7 @@ async function publish() {
       cover: cover || undefined,
       draft,
       pinned,
+      carousel: carousel && !!cover,
       path: state.loadedPath,
       removeSlug: isRename ? state.loadedSlug : null,
     });
@@ -375,7 +382,7 @@ async function publish() {
   }
 }
 
-async function updateIndex({ slug, title, date, updated, author, summary, tags, cover, draft, pinned, path, removeSlug }) {
+async function updateIndex({ slug, title, date, updated, author, summary, tags, cover, draft, pinned, carousel, path, removeSlug }) {
   const idx = await readIndex();
   const data = idx ? idx.data : { posts: [] };
   if (!Array.isArray(data.posts)) data.posts = [];
@@ -389,6 +396,7 @@ async function updateIndex({ slug, title, date, updated, author, summary, tags, 
   if (cover) entry.cover = cover;
   if (draft) entry.draft = true;
   if (pinned) entry.pinned = true;
+  if (carousel && cover) entry.carousel = true;
   if (pinned && existing >= 0 && data.posts[existing].pinnedOrder) entry.pinnedOrder = data.posts[existing].pinnedOrder;
 
   if (existing >= 0) data.posts[existing] = entry;
@@ -510,7 +518,7 @@ function setupEasyMDE() {
     autoDownloadFontAwesome: true,
     spellChecker: false,
     status: false,
-    minHeight: '100%',
+    minHeight: '300px',
     placeholder: '开始用 Markdown 写作。支持拖拽 / 粘贴上传图片',
     toolbar: [
       'bold', 'italic', 'heading', '|',

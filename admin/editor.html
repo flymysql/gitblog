@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>编辑文章</title>
-  <link rel="stylesheet" href="../assets/css/common.css?v=20260522">
-  <link rel="stylesheet" href="../assets/css/admin.css?v=20260522">
-  <link rel="stylesheet" href="../assets/css/post.css?v=20260522">
+  <link rel="stylesheet" href="../assets/css/common.css?v=20260524">
+  <link rel="stylesheet" href="../assets/css/admin.css?v=20260524">
+  <link rel="stylesheet" href="../assets/css/post.css?v=20260524">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
 </head>
@@ -20,6 +20,7 @@
     <div class="editor-toggle-row">
       <label><input type="checkbox" id="draftToggle"> 草稿</label>
       <label><input type="checkbox" id="pinnedToggle"> 置顶</label>
+      <label title="勾选后将出现在首页轮播图（需有封面）"><input type="checkbox" id="carouselToggle"> 轮播</label>
     </div>
     <button id="themeToggle" class="icon-btn" title="切换主题">
       <svg class="icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -61,6 +62,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
-  <script type="module" src="../assets/js/editor.js?v=20260522"></script>
+  <script type="module" src="../assets/js/editor.js?v=20260524"></script>
 </body>
 </html>

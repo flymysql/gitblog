@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260522';
+export const VERSION = '20260524';
 
 export const CONFIG = {
   repo: {

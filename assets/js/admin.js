@@ -4,8 +4,9 @@
 // ============================================================================
 
 import { CONFIG } from './config.js';
-import { readIndex, fetchIndexPublic, deleteFile, readFile, writeIndex } from './api.js';
+import { readIndex, fetchIndexPublic, deleteFile, readFile, writeFile, writeIndex } from './api.js';
 import { mountAdminShell, escapeHtml, showToast } from './admin-shell.js';
+import { parseFrontmatter, stringifyFrontmatter } from './markdown.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -97,6 +98,7 @@ async function renderDashboard(content) {
           <div class="title">
             ${p.pinned ? '<span class="drag-handle" title="拖拽调整置顶顺序">☰</span>' : ''}
             ${p.pinned ? '<span class="badge pinned">置顶</span>' : ''}
+            ${p.carousel ? '<span class="badge carousel">轮播</span>' : ''}
             ${escapeHtml(p.title || '无标题')}
           </div>
           <div class="meta">${fmtDate(p.updated || p.date)}</div>
@@ -105,6 +107,9 @@ async function renderDashboard(content) {
           <div class="actions">
             ${p.draft ? '' : `<a href="../post.html?slug=${encodeURIComponent(p.slug)}" target="_blank">查看</a>`}
             <a href="editor.html?slug=${encodeURIComponent(p.slug)}">编辑</a>
+            ${p.cover
+              ? `<button data-action="toggle-carousel" data-slug="${escapeHtml(p.slug)}" title="${p.carousel ? '从首页轮播移除' : '加入首页轮播'}">${p.carousel ? '取消轮播' : '加入轮播'}</button>`
+              : `<button disabled title="缺少封面图，无法加入轮播">加入轮播</button>`}
             <button class="danger" data-action="delete" data-slug="${escapeHtml(p.slug)}">删除</button>
           </div>
         </div>
@@ -187,6 +192,11 @@ async function renderDashboard(content) {
   });
 
   $('#list').addEventListener('click', async e => {
+    const carouselBtn = e.target.closest('button[data-action="toggle-carousel"]');
+    if (carouselBtn) {
+      await toggleCarousel(carouselBtn);
+      return;
+    }
     const btn = e.target.closest('button[data-action="delete"]');
     if (!btn) return;
     const slug = btn.dataset.slug;
@@ -215,6 +225,48 @@ async function renderDashboard(content) {
       btn.textContent = '删除';
     }
   });
+
+  // 一键切换：是否加入首页轮播。改 frontmatter + 同步索引
+  async function toggleCarousel(btn) {
+    const slug = btn.dataset.slug;
+    const item = posts.find(p => p.slug === slug);
+    if (!item) return;
+    if (!item.cover) {
+      showToast('该文章没有封面图，无法加入轮播', 'error');
+      return;
+    }
+    const next = !item.carousel;
+    btn.disabled = true;
+    btn.textContent = next ? '加入中…' : '取消中…';
+    try {
+      const path = item.path || `${CONFIG.paths.posts}/${slug}.md`;
+      const file = await readFile(path);
+      if (!file) throw new Error('文章不存在');
+      const { data, content } = parseFrontmatter(file.content);
+      if (next) data.carousel = true;
+      else delete data.carousel;
+      const newRaw = stringifyFrontmatter(data, content);
+      await writeFile(path, newRaw, `post: ${next ? '加入' : '移出'}首页轮播 ${item.title || slug}`, file.sha);
+
+      const idx = await readIndex();
+      const idxData = idx ? idx.data : { posts };
+      idxData.posts = (idxData.posts || []).map(p => {
+        if (p.slug !== slug) return p;
+        if (next) return { ...p, carousel: true };
+        const { carousel, ...rest } = p;
+        return rest;
+      });
+      await writeIndex(idxData, `index: ${next ? '加入' : '移出'}轮播 ${slug}`, idx && idx.sha);
+      posts = idxData.posts;
+      showToast(next ? '已加入首页轮播' : '已从首页轮播移除');
+      refresh();
+    } catch (err) {
+      console.error(err);
+      showToast((next ? '加入' : '取消') + '失败：' + err.message, 'error');
+      btn.disabled = false;
+      btn.textContent = next ? '加入轮播' : '取消轮播';
+    }
+  }
 }
 
 (async function init() {
