@@ -154,11 +154,6 @@ function renderRecent(posts) {
   `).join('');
 }
 
-function renderSidebarAuthor() {
-  $('#sidebarAvatar').style.backgroundImage = `url(${CONFIG.site.avatar || ''})`;
-  $('#sidebarName').textContent = CONFIG.site.author || '';
-}
-
 function applyFilter(posts, tab, q, tag) {
   let r = [...posts];
   if (q) {
@@ -219,7 +214,6 @@ function applyFilter(posts, tab, q, tag) {
 
   renderHero(allPosts);
   renderCarousel(allPosts);
-  renderSidebarAuthor();
   renderTags(allPosts);
   renderRecent(allPosts);
 
