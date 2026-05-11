@@ -15,8 +15,8 @@
       "cover": "../assets/uploads/2026/05/1778490605877-blwjij-image.png",
       "pinned": true,
       "pinnedOrder": 1,
-      "path": "posts/welcome.md",
-      "carousel": true
+      "carousel": true,
+      "path": "posts/welcome.md"
     },
     {
       "slug": "about",
@@ -39,13 +39,10 @@
       "updated": "2022-03-13T12:08:00+08:00",
       "author": "兰州小红鸡",
       "summary": "多维数组的内存结构 类似ndarray之类的多维数组，实际上是一个连续的内存地址+一种索引方案。我们可以将一个多维数组对象分为两部分，一部分是实际存储数组数据的连续内存段，另一部分…",
-      "tags": [
-        "杂七杂八",
-        "数据结构"
-      ],
+      "tags": [],
       "cover": "assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.png",
-      "path": "posts/多维数组的索引方案与内存设计-16000038.md",
-      "carousel": true
+      "carousel": true,
+      "path": "posts/多维数组的索引方案与内存设计-16000038.md"
     },
     {
       "slug": "推荐系统——推荐引擎的架构-15996742",
@@ -54,11 +51,9 @@
       "updated": "2022-03-12T11:31:00+08:00",
       "author": "兰州小红鸡",
       "summary": "什么是推荐系统 谈推荐系统之前我们先聊一下搜索系统，推荐系统和搜索系统都是为了解决互联网信息过载的问题，互联网信息的数量远超过人类可以逐一浏览的程度，而搜索引擎便是解决这一问题的代…",
-      "tags": [
-        "推荐",
-        "推荐算法"
-      ],
+      "tags": [],
       "cover": "assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.jpg",
+      "carousel": true,
       "path": "posts/推荐系统——推荐引擎的架构-15996742.md"
     },
     {
@@ -68,13 +63,10 @@
       "updated": "2022-03-11T15:03:00+08:00",
       "author": "兰州小红鸡",
       "summary": "更新历史 在学习过程中，本文持续更新 2021 12 13：更新nebula官方介绍 2021 12 14：更新编译与部署方式，总结importer导入方式 2021 12 15：…",
-      "tags": [
-        "图数据库",
-        "图计算"
-      ],
+      "tags": [],
       "cover": "assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.png",
-      "path": "posts/置顶-nebula-graph-图计算数据库-15993772.md",
-      "carousel": true
+      "carousel": true,
+      "path": "posts/置顶-nebula-graph-图计算数据库-15993772.md"
     },
     {
       "slug": "nebula代码走读——从Validator到Executor-15988828",
