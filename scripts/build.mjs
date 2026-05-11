@@ -106,6 +106,7 @@ try {
   existingIndex = JSON.parse(readFileSync(INDEX_FILE, 'utf8'));
 } catch {}
 const existingBySlug = new Map((existingIndex.posts || []).map(p => [p.slug, p]));
+const pages = [];
 if (existsSync(POSTS_DIR)) {
   const files = readdirSync(POSTS_DIR).filter(f => f.endsWith('.md'));
   for (const f of files) {
@@ -115,7 +116,7 @@ if (existsSync(POSTS_DIR)) {
     const old = existingBySlug.get(slug) || {};
     if (!data.title) errors.push(`[${f}] frontmatter 缺少 title`);
     if (!data.date) errors.push(`[${f}] frontmatter 缺少 date`);
-    posts.push({
+    const item = {
       slug,
       title: data.title || slug,
       date: data.date || '',
@@ -129,7 +130,15 @@ if (existsSync(POSTS_DIR)) {
       pinnedOrder: data.pinnedOrder || old.pinnedOrder || undefined,
       path: `${POSTS_DIR}/${f}`,
       content,
-    });
+    };
+    // page: true 是独立页面（如 关于 / 友链），不进入文章流（首页 / 归档 / 标签 / RSS）
+    // 但仍对外可访问、进 sitemap、生成 OG 图
+    if (data.page) {
+      item.page = true;
+      pages.push(item);
+    } else {
+      posts.push(item);
+    }
   }
 }
 
@@ -164,6 +173,12 @@ const urls = [
   { loc: baseUrl + '/', lastmod: today, changefreq: 'daily', priority: '1.0' },
   { loc: baseUrl + '/tags.html', lastmod: today, changefreq: 'weekly', priority: '0.8' },
   { loc: baseUrl + '/archives.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
+  ...pages.filter(p => !p.draft).map(p => ({
+    loc: `${baseUrl}/post.html?slug=${encodeURIComponent(p.slug)}`,
+    lastmod: new Date(p.updated || p.date || today).toISOString(),
+    changefreq: 'monthly',
+    priority: '0.7',
+  })),
   ...visiblePosts.map(p => ({
     loc: `${baseUrl}/post.html?slug=${encodeURIComponent(p.slug)}`,
     lastmod: new Date(p.updated || p.date || today).toISOString(),
@@ -287,7 +302,7 @@ function ogSvg(post) {
   <text x="1080" y="500" text-anchor="end" fill="#999" font-size="24" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${svgEsc(SITE_AUTHOR)}</text>
 </svg>`;
 }
-for (const post of visiblePosts) {
+for (const post of [...visiblePosts, ...pages.filter(p => !p.draft)]) {
   writeFileSync(join(OG_DIR, `${post.slug}.svg`), ogSvg(post));
 }
-console.log(`OG 分享图已生成：${visiblePosts.length} 张`);
+console.log(`OG 分享图已生成：${visiblePosts.length + pages.filter(p => !p.draft).length} 张`);
