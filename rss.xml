@@ -5,7 +5,7 @@
     <link>https://flymysql.github.io/gitblog/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 11 May 2026 09:12:05 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 11 May 2026 09:14:36 GMT</lastBuildDate>
     <atom:link href="https://flymysql.github.io/gitblog/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GitBlog：一个带伪后台的博客站点</title>
@@ -15,6 +15,15 @@
       <author>Jimmy</author>
       <category>博客建站</category><category>教程</category><category>项目介绍</category>
       <description><![CDATA[一个完全静态、托管在 GitHub Pages 上的博客，但带有可以在浏览器里直接写、直接发的'伪后台'。这篇文章记录它能做什么，相比传统方案为什么这样设计，以及如果你也想搭一个，要怎么开始。]]></description>
+    </item>
+    <item>
+      <title>关于</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=about</link>
+      <guid isPermaLink="false">about</guid>
+      <pubDate>Mon, 11 May 2026 08:40:00 GMT</pubDate>
+      <author>Jimmy</author>
+      
+      <description><![CDATA[关于这个博客和写它的人 —— 一名做系统软件与数据库系统的程序员，业余写点代码、读点书、记点流水账。]]></description>
     </item>
     <item>
       <title>多维数组的索引方案与内存设计</title>
@@ -267,15 +276,6 @@
       <author>兰州小红鸡</author>
       <category>教程</category><category>前端</category>
       <description><![CDATA[之前用的是spf13的方案 不过自己也删删减减了好多 就修改成比较适合自己的 其中vim scripts是vim的一些基本插件，包括语法高亮的支持、缩进等等。 当然我也可以使用其他…]]></description>
-    </item>
-    <item>
-      <title>挣钱要比想象的难</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%8C%A3%E9%92%B1%E8%A6%81%E6%AF%94%E6%83%B3%E8%B1%A1%E7%9A%84%E9%9A%BE-79ade34d</link>
-      <guid isPermaLink="false">挣钱要比想象的难-79ade34d</guid>
-      <pubDate>Mon, 14 May 2018 08:33:24 GMT</pubDate>
-      <author>兰州小红鸡</author>
-      <category>随想</category>
-      <description><![CDATA[1 五一长假飞到南京和女朋友玩了三天，回学校已经只剩几百块钱。没和家里说，也不太想再找家里要钱。 我想，我可以挣钱养活自己的。 公众号重新做了，荔枝微课开了专栏卖资源，一切又和想象…]]></description>
     </item>
   </channel>
 </rss>
