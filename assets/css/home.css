@@ -272,6 +272,37 @@
 /* ---------- 文章卡片 ---------- */
 .post-list { list-style: none; }
 
+/* ---------- 列表懒加载哨兵 / 到底提示 ---------- */
+.load-more-sentinel,
+.load-more-end {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 22px 4px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+.load-more-sentinel:hover { background: none; padding-left: 4px; padding-right: 4px; }
+.load-more-end::before,
+.load-more-end::after {
+  content: "";
+  flex: 0 0 28px;
+  height: 1px;
+  background: var(--border);
+}
+.load-more-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  animation: lm-spin 0.8s linear infinite;
+}
+@keyframes lm-spin { to { transform: rotate(360deg); } }
+
 .post-item {
   display: flex;
   gap: 22px;

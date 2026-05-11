@@ -97,15 +97,10 @@ function renderCarousel(posts) {
   }
 }
 
-function renderList(posts) {
-  const ul = $('#postList');
-  if (!posts.length) {
-    ul.innerHTML = '<li class="empty">还没有文章。点击右上角"写文章"开始第一篇～</li>';
-    return;
-  }
-  const author = CONFIG.site.author;
-  const avatar = CONFIG.site.avatar;
-  ul.innerHTML = posts.map(p => `
+const PAGE_SIZE = 15;
+
+function postItemHtml(p, author, avatar) {
+  return `
     <li class="post-item" data-slug="${escapeHtml(p.slug)}">
       <a class="post-content" href="post.html?slug=${encodeURIComponent(p.slug)}">
         <div class="post-author-row">
@@ -123,7 +118,65 @@ function renderList(posts) {
       </a>
       ${p.cover ? `<a href="post.html?slug=${encodeURIComponent(p.slug)}" class="post-thumbnail"><img src="${escapeHtml(publicImageUrl(p.cover))}" alt="${escapeHtml(p.title || '')}" loading="lazy"></a>` : ''}
     </li>
-  `).join('');
+  `;
+}
+
+// 懒加载状态：每次切 tab/筛选都会被替换
+let listState = null;
+
+function renderList(posts) {
+  const ul = $('#postList');
+  // 销毁上一次的观察器
+  if (listState && listState.observer) listState.observer.disconnect();
+
+  if (!posts.length) {
+    ul.innerHTML = '<li class="empty">还没有文章。点击右上角"写文章"开始第一篇～</li>';
+    listState = null;
+    return;
+  }
+
+  const author = CONFIG.site.author;
+  const avatar = CONFIG.site.avatar;
+
+  // 第一页 + sentinel
+  const firstChunk = posts.slice(0, PAGE_SIZE);
+  ul.innerHTML = firstChunk.map(p => postItemHtml(p, author, avatar)).join('')
+    + (posts.length > PAGE_SIZE
+      ? `<li class="load-more-sentinel" id="loadMoreSentinel" aria-hidden="true">
+           <span class="load-more-spinner"></span>
+           <span class="load-more-text">加载更多</span>
+         </li>`
+      : `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`);
+
+  let loaded = firstChunk.length;
+  const sentinel = document.getElementById('loadMoreSentinel');
+
+  function loadNext() {
+    const nextChunk = posts.slice(loaded, loaded + PAGE_SIZE);
+    if (!nextChunk.length) return;
+    const frag = document.createElement('div');
+    frag.innerHTML = nextChunk.map(p => postItemHtml(p, author, avatar)).join('');
+    [...frag.children].forEach(node => ul.insertBefore(node, sentinel));
+    loaded += nextChunk.length;
+    if (loaded >= posts.length) {
+      // 全部加载完，把 sentinel 替换成"到底"提示
+      if (listState && listState.observer) listState.observer.disconnect();
+      sentinel.outerHTML = `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`;
+    }
+  }
+
+  let observer = null;
+  if (sentinel && 'IntersectionObserver' in window) {
+    observer = new IntersectionObserver(entries => {
+      for (const e of entries) if (e.isIntersecting) loadNext();
+    }, { rootMargin: '300px 0px' });
+    observer.observe(sentinel);
+  } else if (sentinel) {
+    sentinel.style.cursor = 'pointer';
+    sentinel.addEventListener('click', loadNext);
+  }
+
+  listState = { posts, loaded, observer };
 }
 
 function renderTags(posts) {
