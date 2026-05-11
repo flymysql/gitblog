@@ -30,15 +30,6 @@
 
 .article-header { margin-bottom: 24px; }
 
-.article-cover {
-  width: 100%;
-  aspect-ratio: 16 / 7;
-  background-size: cover;
-  background-position: center;
-  border-radius: var(--radius-lg);
-  margin-bottom: 24px;
-}
-
 .article-tags-top {
   display: flex;
   gap: 6px;
@@ -268,7 +259,6 @@
 
 @media (max-width: 720px) {
   .article-layout { padding: 18px 14px 50px; }
-  .article-cover { aspect-ratio: 16 / 9; margin-bottom: 18px; border-radius: 8px; }
   .article-tags-top { gap: 5px; margin-bottom: 12px; }
   .article-title {
     font-size: 23px;

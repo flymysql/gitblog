@@ -9,6 +9,10 @@ import { setMeta } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
 
+function publicImageUrl(url) {
+  return String(url || '').replace(/^\.\.\/assets\//, 'assets/');
+}
+
 function renderHero(posts) {
   const hero = $('#hero');
   if (!hero) return;
@@ -27,6 +31,67 @@ function renderHero(posts) {
       </div>
     </div>
   `;
+}
+
+function renderCarousel(posts) {
+  const root = $('#homeCarousel');
+  if (!root) return;
+
+  const items = [...posts]
+    .filter(p => p.cover)
+    .sort((a, b) => {
+      if ((b.pinned ? 1 : 0) !== (a.pinned ? 1 : 0)) return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+      return new Date(b.date || 0) - new Date(a.date || 0);
+    })
+    .slice(0, 5);
+
+  if (!items.length) {
+    root.hidden = true;
+    return;
+  }
+
+  let current = 0;
+  root.hidden = false;
+  root.innerHTML = `
+    <div class="carousel-viewport">
+      ${items.map((p, i) => `
+        <a class="carousel-slide${i === 0 ? ' active' : ''}" href="post.html?slug=${encodeURIComponent(p.slug)}" aria-label="${escapeHtml(p.title || '文章')}">
+          <img src="${escapeHtml(publicImageUrl(p.cover))}" alt="${escapeHtml(p.title || '')}" loading="${i === 0 ? 'eager' : 'lazy'}">
+          <span class="carousel-shade"></span>
+          <span class="carousel-content">
+            ${p.pinned ? '<span class="carousel-badge">置顶推荐</span>' : '<span class="carousel-badge">精选文章</span>'}
+            <strong>${escapeHtml(p.title || '无标题')}</strong>
+            ${p.summary ? `<em>${escapeHtml(p.summary)}</em>` : ''}
+          </span>
+        </a>
+      `).join('')}
+      <button class="carousel-btn prev" type="button" aria-label="上一张">‹</button>
+      <button class="carousel-btn next" type="button" aria-label="下一张">›</button>
+      <div class="carousel-dots">
+        ${items.map((_, i) => `<button class="${i === 0 ? 'active' : ''}" type="button" aria-label="第 ${i + 1} 张"></button>`).join('')}
+      </div>
+    </div>
+  `;
+
+  const slides = [...root.querySelectorAll('.carousel-slide')];
+  const dots = [...root.querySelectorAll('.carousel-dots button')];
+  const setActive = index => {
+    current = (index + slides.length) % slides.length;
+    slides.forEach((slide, i) => slide.classList.toggle('active', i === current));
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === current));
+  };
+
+  root.querySelector('.prev').addEventListener('click', () => setActive(current - 1));
+  root.querySelector('.next').addEventListener('click', () => setActive(current + 1));
+  dots.forEach((dot, i) => dot.addEventListener('click', () => setActive(i)));
+
+  if (slides.length > 1) {
+    let timer = setInterval(() => setActive(current + 1), 4500);
+    root.addEventListener('mouseenter', () => clearInterval(timer));
+    root.addEventListener('mouseleave', () => {
+      timer = setInterval(() => setActive(current + 1), 4500);
+    });
+  }
 }
 
 function renderList(posts) {
@@ -53,7 +118,7 @@ function renderList(posts) {
           ${(p.tags || []).slice(0, 3).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
         </div>
       </a>
-      ${p.cover ? `<a href="post.html?slug=${encodeURIComponent(p.slug)}" class="post-thumbnail" style="background-image:url(${escapeHtml(p.cover)})"></a>` : ''}
+      ${p.cover ? `<a href="post.html?slug=${encodeURIComponent(p.slug)}" class="post-thumbnail"><img src="${escapeHtml(publicImageUrl(p.cover))}" alt="${escapeHtml(p.title || '')}" loading="lazy"></a>` : ''}
     </li>
   `).join('');
 }
@@ -130,6 +195,7 @@ function applyFilter(posts, tab, q, tag) {
   }
 
   renderHero(allPosts);
+  renderCarousel(allPosts);
   renderSidebarAuthor();
   renderTags(allPosts);
   renderRecent(allPosts);

@@ -159,7 +159,6 @@ function renderGiscus(slug, title) {
   const html = await renderMarkdown(content);
 
   article.innerHTML = `
-    ${cover ? `<div class="article-cover" style="background-image:url(${escapeHtml(cover)})"></div>` : ''}
     <header class="article-header">
       ${tags.length ? `<div class="article-tags-top">${tags.map(t => `<a class="tag" href="tags.html#${encodeURIComponent(t)}">${escapeHtml(t)}</a>`).join('')}</div>` : ''}
       <h1 class="article-title">${escapeHtml(title)}</h1>
