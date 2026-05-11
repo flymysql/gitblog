@@ -1,158 +1,215 @@
-# GitHub Pages 静态博客 · 在线后台编辑
+# GitHub Pages 静态博客 · 在线伪后台
 
-完全静态、托管在 GitHub Pages，但带一个**在线后台**：在浏览器里写文章，发布按钮一点就把 Markdown 文件 commit 到仓库，触发 Pages 自动重新部署。**没有任何后端服务**，使用 GitHub Personal Access Token 直接调用 GitHub API。
+完全静态、托管在 GitHub Pages，但带一个**纯前端的"伪后台"**：在浏览器里写文章、拖拽上传图片、改站点设置，"发布"按钮一点就把 Markdown 直接 commit 到仓库，触发 Pages 自动重新部署。
+
+**没有任何后端服务、没有 OAuth、没有数据库。** 鉴权直接用 GitHub Fine-grained Personal Access Token，调用 GitHub Contents / Repos API 完成所有操作。
+
+[在线 Demo](https://flymysql.github.io/gitblog) · [项目欢迎页](https://flymysql.github.io/gitblog/post.html?slug=welcome) · [关于页](https://flymysql.github.io/gitblog/post.html?slug=about)
+
+---
 
 ## 功能一览
 
-读者侧：
+### 读者侧
 
-- 简洁的首页（Hero + 文章列表 + 标签云 + 最近更新）
-- 文章阅读页支持 TOC 目录、giscus 评论、封面、Open Graph / Twitter Card
-- 标签聚合页 `/tags.html`、归档页 `/archives.html`
-- 站内搜索（顶部按钮 / `Ctrl+K` / `/`）
-- 浅色 / 深色 / 跟随系统三态主题
-- RSS（`rss.xml`）+ sitemap（`sitemap.xml`）
+- **首页**：Hero 个人介绍 + 文章列表（懒加载分页）+ 标签云 + 最近更新 + 简书风轮播
+- **文章页**：自动 TOC 目录、阅读进度条、回到顶部、代码一键复制、标题悬停锚点、图片懒加载 + 灯箱、上一篇 / 下一篇、相关文章（按 tag）、阅读时间估算
+- **导航与检索**：标签聚合页（**彩色标签**，自动按字符 hash 上色）、按年月归档、站内搜索（顶部按钮 / `Ctrl + K` / `/`）
+- **主题系统**：浅色 / 深色 / 跟随系统三态切换，**4 套预设**（jianshu / github / solarized / monokai）可一键切换；管理员可在后台配置色板、自定义 CSS、是否允许读者切换预设
+- **评论**：基于 [giscus](https://giscus.app)（GitHub Discussions），**默认 `mapping: specific`**，每篇文章按 slug 独立绑定一条 Discussion
+- **SEO / 分享**：自动 RSS、sitemap、Open Graph / Twitter Card meta、canonical、JSON-LD 结构化数据、自动生成 OG 分享图（SVG，1200×630）、PWA manifest、robots.txt
+- **性能**：图片**真懒加载**（IntersectionObserver，进入视口前 300px 才注入 src，1×1 SVG 占位防抖）、首屏图 `fetchpriority=high` 优化 LCP、缓存版本号控制
+- **移动端**：响应式排版，文章页图片 / 表格 / iframe 自动适应视口（公众号迁移文章里那些 `width=600` / `<section style="width:..."` 都会被运行时清掉）
 
-后台侧：
+### 写作侧（伪后台）
 
-- GitHub PAT 登录（无后端、无 OAuth）
-- 文章管理：全部 / 已发布 / 草稿三 tab，搜索、删除
-- 站点设置：在线修改 `config.js`（站点名、头像、Logo、favicon、导航、社交链接、giscus、路径、主题等）
-- Markdown 编辑器（EasyMDE）：工具栏、快捷键、实时预览
-- 拖拽 / 粘贴 上传图片（自动写入 `assets/uploads/yyyy/mm/`）
-- 草稿模式（`draft: true` 不进首页）
-- 置顶（`pinned: true` 在首页置顶）
-- 发布前校验（标题/正文/slug/标签/摘要）
-- `Ctrl+S` 一键发布
-- 版本冲突自动重新加载
-- 一键诊断页：检查 token / 仓库 / 分支 / 写权限 / 索引文件 / Pages
+- **登录**：粘贴 GitHub Fine-grained PAT（或 GitHub Device Flow），存在 `localStorage`，无后端
+- **编辑器**：[EasyMDE](https://easymde.tk/)，工具栏、快捷键、实时预览、`Ctrl + S` 一键发布
+- **图片上传**：拖拽 / 粘贴上传到 `assets/uploads/yyyy/mm/`，自动写入 Markdown 链接
+- **图片库**：浏览所有上传过的图片，复制地址 / 一键插入 / 删除
+- **可视化标签输入**：编辑器里标签是从已有标签里选 / 输入新值，不用记住有哪些标签
+- **草稿 / 置顶 / 独立页面**：
+  - `draft: true` 不进首页 / 索引 / RSS / sitemap
+  - `pinned: true` + `pinnedOrder: N` 在首页置顶（数字小的在前）
+  - `page: true` 是关于页 / 友链页这种**独立页面**：不进文章流，但仍有 SEO / sitemap / OG 图
+- **文章管理**：全部 / 已发布 / 草稿三 tab，搜索、删除、跳转编辑
+- **站点设置**：在线修改 `assets/js/config.js` 全部字段——站点名、头像、Logo、favicon、导航（可视化拖拽编辑）、社交链接、giscus、analytics、路径、主题
+- **主题色板编辑**：在后台拖色板调整每个 token，可注入自定义 CSS
+- **发布前校验**：标题 / 摘要 / slug / 标签缺失会拦截
+- **版本冲突**：远端文章已变更时自动提示重新加载，避免覆盖
+- **一键诊断页**：检查 token / 仓库 / 写权限 / 分支 / `posts.json` 索引 / Pages 部署状态
 
-运维：
+### 自动化
 
-- GitHub Actions 自动重新生成 `data/posts.json` / `sitemap.xml` / `rss.xml`
-- 校验 Markdown frontmatter
-- 所有 HTML 静态资源带版本号缓存破坏
+- **GitHub Actions**：push 后自动重建 `data/posts.json` / `sitemap.xml` / `rss.xml` / `assets/og/*.svg` / `manifest.webmanifest` / `robots.txt`
+- **frontmatter 校验**：缺 `title` / `date` 会在 Action 输出 warning
+- **缓存版本号**：所有 HTML 引用 CSS/JS 时带 `?v=YYYYMMDD`，跟 `config.js` 的 `VERSION` 同步
+
+### 文章迁移工具
+
+`scripts/` 下的几个迁移脚本帮你把老博客一次性搬过来，自带图片下载、HTML→Markdown、智能取封面：
+
+| 脚本 | 用途 |
+| -- | -- |
+| `npm run migrate:cnblogs` | 从 cnblogs.com/<user> 抓取并迁移所有文章 |
+| `npm run migrate:hexo` | 从 hexo 站归档页抓取并迁移所有文章 |
+| `npm run fix:hexo-codeblocks` | 修复早期 hexo 迁移中 `<table class="code">` 形式的代码块 |
+| `npm run normalize` | 标签合并 + 自动选封面（按 SHA1 内容哈希区分共享装饰图与正文图） |
+| `npm run strip:wechat` | 公众号文章清洗：剥离推广文案、装饰图、空内容自动转草稿 |
+| `npm run build` | 重建 `posts.json` / `sitemap.xml` / `rss.xml` / OG 图 |
+
+---
 
 ## 目录结构
 
 ```
 blog/
-├── index.html / post.html / tags.html / archives.html
+├── index.html / post.html / tags.html / archives.html / 404.html
 ├── admin/
 │   ├── index.html        # 登录 + 文章管理
 │   ├── editor.html       # Markdown 编辑器
-│   ├── settings.html     # 站点设置
+│   ├── settings.html     # 站点设置（含主题 / 导航 / giscus / analytics）
+│   ├── images.html       # 图片库
 │   └── diagnose.html     # 一键诊断
 ├── assets/
-│   ├── css/              # common / home / post / admin
-│   └── js/               # 各页面入口 + site / theme / seo / api / auth / markdown
+│   ├── css/              # common(主题预设) / home / post / admin
+│   ├── js/               # 各页面入口 + site / theme / seo / api / auth / markdown / config
+│   ├── uploads/          # 图片上传目录（按 yyyy/mm 自动归类）
+│   └── og/               # 自动生成的分享图（SVG）
 ├── data/posts.json       # 文章索引（Action 自动生成）
-├── posts/                # Markdown 源
-├── assets/uploads/       # 图片上传目录（按 yyyy/mm 自动归类）
-├── scripts/build.mjs     # sitemap / rss / posts.json 生成器
-├── .github/workflows/build.yml  # 自动构建
-├── sitemap.xml / rss.xml
+├── posts/                # Markdown 源（含 about.md 等 page 页）
+├── scripts/              # 构建 / 迁移 / 修复脚本
+├── .github/workflows/    # GitHub Actions（自动构建）
+├── sitemap.xml / rss.xml / robots.txt / manifest.webmanifest
+├── package.json          # Node 脚本
 └── README.md
 ```
 
-## 部署
+---
 
-### 1. 推到 GitHub 并启用 Pages
+## 部署 · 五步上线
+
+### 1. Fork 或克隆推到自己仓库
 
 ```bash
-git init
-git add .
-git commit -m "init blog"
-git branch -M main
-git remote add origin https://github.com/<your-username>/<repo>.git
+git clone <your-fork>
+cd <your-fork>
 git push -u origin main
 ```
 
-仓库 → Settings → Pages → Source: `Deploy from a branch`，分支 `main` 根目录。
+### 2. 启用 GitHub Pages
 
-### 2. 修改 `assets/js/config.js`
+仓库 → Settings → Pages → Source: `Deploy from a branch`，分支 `main`，目录 `/`，保存。
 
-首次部署前可以手动修改 `assets/js/config.js`。部署完成后，也可以在后台 `/admin/settings.html` 在线修改这些配置，并自动提交到 GitHub 仓库。
+### 3. 修改 `assets/js/config.js`
 
-可在线配置的内容包括：
+至少改这几项：
 
-- 仓库信息：`owner / name / branch`
-- 站点信息：名称、副标题、作者、描述、站点 URL、头像、Logo、favicon
-- 导航：顶部导航 JSON
-- 社交链接：GitHub / Twitter / Email / RSS
-- giscus 评论配置
-- 文章目录、索引文件、上传目录
-- 默认主题：浅色 / 深色 / 跟随系统
+```js
+repo: { owner: "<your-username>", name: "<your-repo>", branch: "main" },
+authorizedUsers: ["<your-username>"],   // 只允许你自己的账号登录后台
+site: {
+  title: "...",
+  author: "...",
+  url: "https://<your-username>.github.io/<your-repo>",  // 末尾不要 /
+  ...
+},
+```
 
-`site.url` 写你 Pages 站点地址，例如 `https://flymysql.github.io/gitblog`，**末尾不要 `/`**。SEO 元数据、sitemap、rss 都会用到。
+> 之后所有配置都可以在 `/admin/settings.html` 在线编辑，会自动 commit 回仓库。
 
-### 3. 生成 PAT
+### 4. 生成 Fine-grained PAT
 
-[Fine-grained Token](https://github.com/settings/personal-access-tokens/new)：
+[Fine-grained Token 创建页](https://github.com/settings/personal-access-tokens/new)：
 
-- Repository access：`Only select repositories` → 勾选你的博客仓库
-- Repository permissions：
-  - **Contents**: `Read and write`
-  - Metadata: `Read-only`（自动）
-- 其他 `No access`
+- **Repository access**：`Only select repositories` → 勾选你的博客仓库
+- **Repository permissions**：
+  - **Contents**：`Read and write`
+  - Metadata：`Read-only`（自动）
+  - 其他都保持 `No access`
+- 设过期时间，复制 token（**只显示一次**）
 
-### 4. 登录后台
+### 5. 登录后台
 
-访问 `https://<your-username>.github.io/<repo>/admin/`，粘贴 token 登录。
+访问 `https://<your-username>.github.io/<repo>/admin/`，粘贴 token，登录。之后写、改、上图、改设置都在浏览器里完成。
 
-如果遇到问题，去 `/admin/diagnose.html` 一键诊断。
+如果哪一步报错，进 `/admin/diagnose.html`，按提示修复。
 
-### 5. （可选）配置 giscus 评论
+### 6. （可选）开评论
 
-去 [giscus.app](https://giscus.app) 完成配置（需要先在 GitHub 仓库启用 Discussions），把 `repo / repoId / category / categoryId` 填回 `config.js` 的 `giscus` 段，并设 `enabled: true`。
+仓库里启用 **Discussions** → 去 [giscus.app](https://giscus.app) 完成配置（需选 Discussion category），把 `repo / repoId / category / categoryId` 填回 `admin/settings.html` 的 giscus 段，`enabled: true`。
 
-## 文章格式
+> **`mapping` 字段推荐填 `specific`**（每篇文章按 slug 独立绑定一条 Discussion）。
+> ⚠ **不要填 `pathname` 或 `url`**：本站所有文章 URL 路径都是 `/post.html`（只是 query 不同，giscus 不读 query），那两种模式会让所有文章共用同一条评论流。
 
-```markdown
+---
+
+## 文章 frontmatter 约定
+
+```yaml
 ---
 title: 文章标题
-date: 2026-05-11T10:00:00.000Z
-updated: 2026-05-11T10:00:00.000Z
-author: 作者名
-tags: [标签1, 标签2]
-summary: 摘要，会出现在列表和 OG meta 中
-cover: https://example.com/cover.jpg
-draft: false
-pinned: false
+date: 2026-05-11T10:00:00+08:00          # ISO 时间
+updated: 2026-05-11T10:00:00+08:00       # 可选，默认与 date 相同
+author: 作者名                            # 可选
+tags:                                    # 可选
+  - 标签1
+  - 标签2
+summary: 一句话摘要，用于列表 / OG meta / RSS 描述
+cover: assets/uploads/2026/05/cover.png  # 可选
+draft: false                             # 草稿
+pinned: false                            # 首页置顶
+pinnedOrder: 1                           # 置顶顺序，数字小的在前
+page: false                              # 独立页面（关于 / 友链）：不进文章流但有 SEO
 ---
 
 正文 Markdown…
 ```
 
+---
+
 ## 工作流程
 
 ```
-浏览器：写文章 → 点发布
-   ↓ GitHub Contents API
+浏览器：写文章 → 点发布 (或 Ctrl+S)
+   ↓ GitHub Contents API (PUT)
 GitHub 仓库：commit posts/<slug>.md + 更新 data/posts.json
    ↓ push 触发
-GitHub Actions：重新生成 sitemap.xml / rss.xml / posts.json
+GitHub Actions：重建 sitemap.xml / rss.xml / OG 图 / robots.txt / manifest
    ↓ 自动 commit
 GitHub Pages：重新部署
-   ↓
+   ↓ ~30s
 线上博客更新
 ```
 
+---
+
 ## 安全说明
 
-- `config.js` 是公开的，只放公开信息
-- token 只放浏览器 `localStorage` 或 `sessionStorage`
-- 使用 fine-grained PAT、最小权限、设置过期
-- 一旦怀疑泄露，[Token 设置页](https://github.com/settings/tokens?type=beta) 一键 revoke
+- `assets/js/config.js` 是公开的，**只放公开信息**（仓库名、站点名、giscus 配置等）。**绝对不要把 token 写进任何源码文件。**
+- token 只放在浏览器 `localStorage` / `sessionStorage`，可以选"记住登录"。
+- 用 fine-grained PAT、最小权限（`Contents: Read and write`）、设置过期时间。
+- `config.authorizedUsers` 限制后台只允许哪些 GitHub 用户登录（即使别人有 PAT 也进不来）。
+- 一旦怀疑泄露，去 [Token 设置页](https://github.com/settings/tokens?type=beta) 一键 revoke，立即失效。
+
+---
 
 ## 常见问题
 
-**A. 登录后无法发布（404 / 403）**：去 `/admin/diagnose.html`，按提示修复。
+**Q. 登录后无法发布（404 / 403）**：去 `/admin/diagnose.html`，会逐项检查 token / 仓库 / 写权限 / 分支，对应错误码会给修复建议。
 
-**B. 缓存导致改动不生效**：所有 HTML 引用 CSS/JS 时带 `?v=20260511`。需要时把这个值改一下。
+**Q. 改了 CSS / JS 但浏览器还在用旧版**：所有 HTML 引用资源都带 `?v=YYYYMMDD`，跟 `assets/js/config.js` 的 `VERSION` 一致。新版本只需改 `VERSION` 并更新 HTML 里的 `v=` 即可让所有 CDN / 浏览器缓存失效。
 
-**C. Action 没自动跑**：仓库 → Settings → Actions → General，确保允许写权限。
+**Q. GitHub Action 没自动跑**：仓库 → Settings → Actions → General → Workflow permissions，勾选 `Read and write permissions`，并允许 PR。
 
-**D. giscus 不显示**：检查仓库是否启用 Discussions，以及 repoId / categoryId 是否填对。
+**Q. giscus 不显示评论 / 所有文章评论看起来一样**：检查仓库是否启用 Discussions，`repoId / categoryId` 是否对；如果是"所有文章评论一样"，说明 mapping 用了 `pathname` 或 `url`，改成 `specific` 即可。
 
-**E. 不要照搬简书 UI**：本项目是"受简书启发的清爽博客风格"，不复制其品牌 / logo。
+**Q. 移动端文章右边被截断**：旧版 CSS 的 `:has()` 规则在移动端覆盖了媒体查询，已修复（`v=20260522` 起）。如果你 fork 的版本旧，把 `assets/css/post.css` 的 `:has(.toc-sidebar[hidden])` 那条规则包到 `@media (min-width: 981px)` 里。
+
+**Q. 公众号 / 老 hexo 迁移过来的文章排版乱**：用 `npm run strip:wechat`（剥离推广 / 装饰图）、`npm run fix:hexo-codeblocks`（修代码块）、`npm run normalize`（合标签 / 选封面）。脚本都做了幂等，可以反复跑。
+
+---
+
+## 致谢与说明
+
+UI 风格受简书启发，**不复制其品牌 / logo**。本项目仅作为个人博客方案与开源参考；如果你也搭了一个，欢迎在 issue 里交流。
