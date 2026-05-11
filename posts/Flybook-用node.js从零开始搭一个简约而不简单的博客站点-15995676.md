@@ -4,7 +4,7 @@ date: 2018-01-01T00:00:00+08:00
 updated: 2022-03-11T22:50:00+08:00
 author: "兰州小红鸡"
 tags:
-  - "迁移自博客园"
+  - "杂七杂八"
 summary: "前言：玩了快一年博客了，一直用的第三方框架，比如WordPress，typecho，hexo等。其中hexo用的最久，期间把nex主题改得乱七八糟。上周看完node的文档后，决定自…"
 origin:
   from: cnblogs

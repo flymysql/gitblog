@@ -141,6 +141,8 @@ async function fetchArticle(item) {
   const body = $('#cnblogs_post_body');
   const titleNode = $('#cb_post_title_url').text().trim();
   const tags = [];
+  const keywords = $('meta[name=keywords]').attr('content') || '';
+  keywords.split(/[,，]/).map(t => t.trim()).filter(Boolean).forEach(t => tags.push(t));
   $('#BlogPostCategory a, #EntryTag a, #post_next_prev a, #blog_post_info a').each((i, el) => {
     const href = $(el).attr('href') || '';
     const text = $(el).text().trim();
@@ -373,7 +375,7 @@ async function main() {
       date: dateIso,
       updated: cnblogsIso || dateIso,
       author: '兰州小红鸡',
-      tags: art.tags.length ? art.tags : ['迁移自博客园'],
+      tags: art.tags,
       summary,
       origin: {
         from: 'cnblogs',
