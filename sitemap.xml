@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://flymysql.github.io/gitblog/</loc>
-    <lastmod>2026-05-11T06:01:03.010Z</lastmod>
+    <loc>https://gitpull.cn/</loc>
+    <lastmod>2026-05-11T06:35:15.676Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://flymysql.github.io/gitblog/tags.html</loc>
-    <lastmod>2026-05-11T06:01:03.010Z</lastmod>
+    <loc>https://gitpull.cn/tags.html</loc>
+    <lastmod>2026-05-11T06:35:15.676Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://flymysql.github.io/gitblog/archives.html</loc>
-    <lastmod>2026-05-11T06:01:03.010Z</lastmod>
+    <loc>https://gitpull.cn/archives.html</loc>
+    <lastmod>2026-05-11T06:35:15.676Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://flymysql.github.io/gitblog/post.html?slug=welcome</loc>
+    <loc>https://gitpull.cn/post.html?slug=welcome</loc>
     <lastmod>2026-05-11T05:45:48.535Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
