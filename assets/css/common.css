@@ -241,7 +241,12 @@ html, body {
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
-html, body { overflow-x: clip; max-width: 100vw; }
+html, body {
+  /* hidden 兜底（iOS 14- 不支持 clip），clip 给现代浏览器（不破坏 position: sticky） */
+  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100vw;
+}
 
 /* 图片懒加载占位：未注入真实 src 时显示浅灰底，避免空白闪烁与布局抖动 */
 img.lazy-pending {
