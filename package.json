@@ -7,7 +7,8 @@
     "migrate:cnblogs": "node scripts/migrate-cnblogs.mjs",
     "migrate:hexo": "node scripts/migrate-hexo.mjs",
     "fix:hexo-codeblocks": "node scripts/fix-hexo-codeblocks.mjs",
-    "normalize": "node scripts/normalize-tags-and-covers.mjs"
+    "normalize": "node scripts/normalize-tags-and-covers.mjs",
+    "strip:wechat": "node scripts/strip-wechat.mjs"
   },
   "devDependencies": {
     "cheerio": "^1.0.0",

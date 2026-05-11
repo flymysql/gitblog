@@ -21,14 +21,11 @@ origin:
 1.  打开themes\\next\\layout\\page.swig
 2.  找到
 
-
 ```sql
 {% if page.type === "tags" %}
 ```
 
-
 3.  将下面这段代码
-
 
 ```sql
 <div class="tag-cloud">
@@ -42,9 +39,7 @@ origin:
  </div>
 ```
 
-
 换成这段代码
-
 
 ```sql
 <div class="tag-cloud">
@@ -102,7 +97,6 @@ origin:
 </style>
 ```
 
-
 然后就好啦！  
 可能需要清理缓存
 
@@ -116,5 +110,3 @@ origin:
 ![兰州小红鸡](assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-01.png)
 
 标签云页面
-
-![兰州小红鸡](assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-02.png)

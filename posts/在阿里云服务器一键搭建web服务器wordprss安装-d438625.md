@@ -74,7 +74,6 @@ _其实之前想自己写html页面，也在网上找了模板，修修改改，
 
 在/etc/nginx/conf.d里面新建一个wordpress.conf，写入以下内容
 
-
 ```sql
  server { listen 80; server name 你的域名;
  rewrite ^(.*)$ https://$server name$1 permanent;
@@ -93,7 +92,6 @@ _其实之前想自己写html页面，也在网上找了模板，修修改改，
    }
 }
 ```
-
 
 保存后重启nginx,浏览器中访问自己的域名。
 

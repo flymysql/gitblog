@@ -29,6 +29,13 @@ const TAG_MAP = new Map([
   ['html', '前端'],
   ['javascript', '前端'],
   ['js', '前端'],
+  ['css', '前端'],
+
+  // → 随想
+  ['水文', '随想'],
+
+  // → 图计算
+  ['nebula', '图计算'],
 ]);
 
 function normalizeTag(t) {

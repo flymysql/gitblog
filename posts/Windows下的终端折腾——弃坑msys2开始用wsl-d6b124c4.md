@@ -64,7 +64,6 @@ origin:
 
 在Ubuntu或Debian下我们可以通过 apt-get 命令 很方便的安装/卸载软件，由于默认的软件包仓库是位于国外的，安装软件的时候就可能遇到各种网络问题或者下载到的一些资源不完整，因此就需要切换数据源为国内的镜像站点来改善。
 
-
 ```sql
 # 1.备份原来的数据源配置文件
 cp /etc/apt/sources.list /etc/apt/sources.list_backup
@@ -72,9 +71,7 @@ cp /etc/apt/sources.list /etc/apt/sources.list_backup
 vi /etc/apt/sources.list
 ```
 
-
 在这里我使用的是阿里云的数据源：
-
 
 ```sql
 deb http://mirrors.aliyun.com/ubuntu/ trusty main restricted universe multiverse
@@ -89,17 +86,13 @@ deb-src http://mirrors.aliyun.com/ubuntu/ trusty-proposed main restricted univer
 deb-src http://mirrors.aliyun.com/ubuntu/ trusty-backports main restricted universe multiverse
 ```
 
-
 -   更新配置
-
 
 ```sql
 apt-get update
 ```
 
-
 注：14986版之后更新了内核，第三方的镜像站可能找不到软件包资源，需要切换回官方的源。经测试中科大的源可用
-
 
 ```sql
 deb https://mirrors.ustc.edu.cn/ubuntu/ xenial main restricted universe multiverse
@@ -107,7 +100,6 @@ deb https://mirrors.ustc.edu.cn/ubuntu/ xenial-updates main restricted universe 
 deb https://mirrors.ustc.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
 deb https://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe multiverse
 ```
-
 
 ## [¶](#与vscode搭配使用)与vscode搭配使用
 
@@ -117,19 +109,15 @@ deb https://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe
 
 在设置里面将
 
-
 ```sql
 "terminal.integrated.shell.windows": "C:\WINDOWS\System32\cmd.exe"
 ```
 
-
 中的`cmd.exe`换成`wsl.exe`就好啦
-
 
 ```sql
 "terminal.integrated.shell.windows": "C:\WINDOWS\System32\wsl.exe"
 ```
-
 
 **vscode真香**
 

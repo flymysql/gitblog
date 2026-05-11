@@ -14,8 +14,6 @@ origin:
   categories: "教程"
 ---
 
-![兰州小红鸡](assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.png)
-
 **教程很简单，整个教程分三步：**
 
 > 第一步：购买VPS服务器  
@@ -67,23 +65,19 @@ CentOS/Debian/Ubuntu ShadowsocksR单/多端口一键管理脚本：
 
 主用下载地址：
 
-
 ```sql
 $ yum -y install wget
 
 $ wget -N --no-check-certificate https://softs.fun/Bash/ssr.sh && chmod +x ssr.sh && bash ssr.sh
 ```
 
-
 或者备用下载地址：
-
 
 ```sql
 $ yum -y install wget
 
 $ wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ssr.sh && chmod +x ssr.sh && bash ssr.sh
 ```
-
 
 复制上面的主用下载地址的两句代码到VPS服务器里，然后按回车：
 
@@ -128,7 +122,6 @@ $ wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/d
 
 【谷歌BBR加速教程】
 
-
 ```sql
 yum -y install wget
 
@@ -138,7 +131,6 @@ chmod +x bbr.sh
 
 ./bbr.sh
 ```
-
 
 把上面整个代码复制后粘贴进去，不动的时候按回车，然后耐心等待，最后重启vps服务器即可。该方法是开机自动启动，部署一次就可以了。
 
