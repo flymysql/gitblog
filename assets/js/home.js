@@ -4,7 +4,7 @@
 
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
-import { initSite, escapeHtml, fmtDate, timeAgo } from './site.js';
+import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml } from './site.js';
 import { setMeta, setJsonLd } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -118,7 +118,7 @@ function renderList(posts) {
         <h3 class="post-title">${escapeHtml(p.title || '无标题')}</h3>
         <p class="post-summary">${escapeHtml(p.summary || '')}</p>
         <div class="post-meta">
-          ${(p.tags || []).slice(0, 3).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+          ${(p.tags || []).slice(0, 3).map(t => tagHtml(t)).join('')}
         </div>
       </a>
       ${p.cover ? `<a href="post.html?slug=${encodeURIComponent(p.slug)}" class="post-thumbnail"><img src="${escapeHtml(publicImageUrl(p.cover))}" alt="${escapeHtml(p.title || '')}" loading="lazy"></a>` : ''}
@@ -138,7 +138,7 @@ function renderTags(posts) {
     cloud.innerHTML = '<span style="color:var(--text-tertiary);font-size:12px;">暂无标签</span>';
     return;
   }
-  cloud.innerHTML = sorted.map(([t, n]) => `<a class="tag" href="tags.html#${encodeURIComponent(t)}">${escapeHtml(t)} · ${n}</a>`).join('');
+  cloud.innerHTML = sorted.map(([t, n]) => tagHtml(t, { href: `tags.html#${encodeURIComponent(t)}`, count: ` · ${n}` })).join('');
 }
 
 function renderRecent(posts) {

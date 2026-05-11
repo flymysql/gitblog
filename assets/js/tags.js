@@ -5,7 +5,7 @@
 
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
-import { initSite, escapeHtml, fmtDate } from './site.js';
+import { initSite, escapeHtml, fmtDate, tagHtml, tagStyle } from './site.js';
 import { setMeta } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -25,7 +25,7 @@ function renderCloud(tags, active) {
     return;
   }
   cloud.innerHTML = tags.map(([t, n]) =>
-    `<a class="tag${active === t ? ' active' : ''}" data-tag="${escapeHtml(t)}" href="#${encodeURIComponent(t)}">${escapeHtml(t)}<span class="count">${n}</span></a>`
+    tagHtml(t, { href: `#${encodeURIComponent(t)}`, active: active === t, count: n })
   ).join('');
 }
 
@@ -41,7 +41,7 @@ function renderFiltered(posts, tag) {
       return `
         <div class="group-block">
           <h3 class="group-title">
-            <a href="#${encodeURIComponent(t)}">#${escapeHtml(t)}</a>
+            <a class="group-tag-title" style="${tagStyle(t)}" href="#${encodeURIComponent(t)}">#${escapeHtml(t)}</a>
             <span class="count">${n} 篇</span>
           </h3>
           <ul class="post-list">
@@ -73,7 +73,7 @@ function postCard(p) {
         <p class="post-summary">${escapeHtml(p.summary || '')}</p>
         <div class="post-meta">
           <span>${fmtDate(p.date)}</span>
-          ${(p.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+          ${(p.tags || []).map(t => tagHtml(t)).join('')}
         </div>
       </a>
     </li>
