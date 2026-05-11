@@ -1,0 +1,14 @@
+{
+  "name": "blog",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "migrate:cnblogs": "node scripts/migrate-cnblogs.mjs"
+  },
+  "devDependencies": {
+    "cheerio": "^1.0.0",
+    "turndown": "^7.2.0",
+    "turndown-plugin-gfm": "^1.0.2"
+  }
+}

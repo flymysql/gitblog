@@ -5,7 +5,7 @@
     <link>https://flymysql.github.io/gitblog/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 11 May 2026 07:01:05 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 11 May 2026 07:18:41 GMT</lastBuildDate>
     <atom:link href="https://flymysql.github.io/gitblog/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>欢迎来到我的博客</title>
@@ -15,6 +15,96 @@
       <author>你的名字</author>
       <category>介绍</category><category>GitHub Pages</category><category>在线编辑</category>
       <description><![CDATA[这是一个完全静态、托管在 GitHub Pages 的博客，但带有可在线编辑的伪后台。]]></description>
+    </item>
+    <item>
+      <title>多维数组的索引方案与内存设计</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E5%A4%9A%E7%BB%B4%E6%95%B0%E7%BB%84%E7%9A%84%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88%E4%B8%8E%E5%86%85%E5%AD%98%E8%AE%BE%E8%AE%A1-16000038</link>
+      <guid isPermaLink="false">多维数组的索引方案与内存设计-16000038</guid>
+      <pubDate>Sun, 13 Mar 2022 04:08:00 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>迁移自博客园</category>
+      <description><![CDATA[多维数组的内存结构 类似ndarray之类的多维数组，实际上是一个连续的内存地址+一种索引方案。我们可以将一个多维数组对象分为两部分，一部分是实际存储数组数据的连续内存段，另一部分…]]></description>
+    </item>
+    <item>
+      <title>推荐系统——推荐引擎的架构</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E2%80%94%E2%80%94%E6%8E%A8%E8%8D%90%E5%BC%95%E6%93%8E%E7%9A%84%E6%9E%B6%E6%9E%84-15996742</link>
+      <guid isPermaLink="false">推荐系统——推荐引擎的架构-15996742</guid>
+      <pubDate>Sat, 12 Mar 2022 03:31:00 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>迁移自博客园</category>
+      <description><![CDATA[什么是推荐系统 谈推荐系统之前我们先聊一下搜索系统，推荐系统和搜索系统都是为了解决互联网信息过载的问题，互联网信息的数量远超过人类可以逐一浏览的程度，而搜索引擎便是解决这一问题的代…]]></description>
+    </item>
+    <item>
+      <title>nebula graph 图计算数据库</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772</link>
+      <guid isPermaLink="false">置顶-nebula-graph-图计算数据库-15993772</guid>
+      <pubDate>Fri, 11 Mar 2022 07:03:00 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>迁移自博客园</category>
+      <description><![CDATA[更新历史 在学习过程中，本文持续更新 2021 12 13：更新nebula官方介绍 2021 12 14：更新编译与部署方式，总结importer导入方式 2021 12 15：…]]></description>
+    </item>
+    <item>
+      <title>nebula代码走读——从Validator到Executor</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=nebula%E4%BB%A3%E7%A0%81%E8%B5%B0%E8%AF%BB%E2%80%94%E2%80%94%E4%BB%8EValidator%E5%88%B0Executor-15988828</link>
+      <guid isPermaLink="false">nebula代码走读——从Validator到Executor-15988828</guid>
+      <pubDate>Thu, 10 Mar 2022 03:41:00 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>迁移自博客园</category>
+      <description><![CDATA[整体架构 Nebula Graph Query Engine 主要分为四个模块，分别是 Parser、Validator、Optimizer 和 Executor。 Parser …]]></description>
+    </item>
+    <item>
+      <title>推荐召回-向量召回之U2I学习总结</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%8E%A8%E8%8D%90%E5%8F%AC%E5%9B%9E-%E5%90%91%E9%87%8F%E5%8F%AC%E5%9B%9E%E4%B9%8BU2I%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93-15986952</link>
+      <guid isPermaLink="false">推荐召回-向量召回之U2I学习总结-15986952</guid>
+      <pubDate>Wed, 09 Mar 2022 12:42:00 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>迁移自博客园</category>
+      <description><![CDATA[常见召回模型 I2I：计算item item相似度，用于相似推荐、相关推荐； U2I：基于矩阵分解，通过用户特征直接推荐item； U2U2I：基于用户的协同过滤，先找相似用户，再…]]></description>
+    </item>
+    <item>
+      <title>随笔杂谈</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E9%9A%8F%E7%AC%94%E6%9D%82%E8%B0%88-15995658</link>
+      <guid isPermaLink="false">随笔杂谈-15995658</guid>
+      <pubDate>Tue, 31 Dec 2019 16:00:00 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>迁移自博客园</category>
+      <description><![CDATA[拍完毕业照，从图书馆走回宿舍的路上，学校的林荫小道微风习习，好惬意，夏天的风从树下拂过脑袋，走路都轻飘飘的。这种舒服而又宁静的感觉，像是十年前在那个小岛上，小学毕业的我，走在回家的…]]></description>
+    </item>
+    <item>
+      <title>【PCC】一个用python写的ｃ语言编译器</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=PCC%E4%B8%80%E4%B8%AA%E7%94%A8python%E5%86%99%E7%9A%84%EF%BD%83%E8%AF%AD%E8%A8%80%E7%BC%96%E8%AF%91%E5%99%A8-15991910</link>
+      <guid isPermaLink="false">PCC一个用python写的ｃ语言编译器-15991910</guid>
+      <pubDate>Mon, 31 Dec 2018 16:00:00 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>迁移自博客园</category>
+      <description><![CDATA[PCC——python实现编译器 大学的编译原理课设，实现源码到汇编代码的翻译，链接部分使用gcc的功能。目前支持数组，四则运算，赋值，判断，输出，循环语句等。 项目地址：http…]]></description>
+    </item>
+    <item>
+      <title>桃李春风一杯酒，江湖夜雨十年灯</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%A1%83%E6%9D%8E%E6%98%A5%E9%A3%8E%E4%B8%80%E6%9D%AF%E9%85%92%E6%B1%9F%E6%B9%96%E5%A4%9C%E9%9B%A8%E5%8D%81%E5%B9%B4%E7%81%AF-15995716</link>
+      <guid isPermaLink="false">桃李春风一杯酒江湖夜雨十年灯-15995716</guid>
+      <pubDate>Mon, 31 Dec 2018 16:00:00 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>迁移自博客园</category>
+      <description><![CDATA[最终我还是选择放弃考研了。感到无比的轻松。 01 准备考研的大学生好多，我也是其中之一，准备了大半年，数学快复习完了，专业课也复习一半了。一切都进行地井然有序，如果我没有放弃考研的…]]></description>
+    </item>
+    <item>
+      <title>Flybook-用node.js从零开始搭一个简约而不简单的博客站点</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=Flybook-%E7%94%A8node.js%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E6%90%AD%E4%B8%80%E4%B8%AA%E7%AE%80%E7%BA%A6%E8%80%8C%E4%B8%8D%E7%AE%80%E5%8D%95%E7%9A%84%E5%8D%9A%E5%AE%A2%E7%AB%99%E7%82%B9-15995676</link>
+      <guid isPermaLink="false">Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676</guid>
+      <pubDate>Sun, 31 Dec 2017 16:00:00 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>迁移自博客园</category>
+      <description><![CDATA[前言：玩了快一年博客了，一直用的第三方框架，比如WordPress，typecho，hexo等。其中hexo用的最久，期间把nex主题改得乱七八糟。上周看完node的文档后，决定自…]]></description>
+    </item>
+    <item>
+      <title>用python做一个C类编译器——语法翻译器</title>
+      <link>https://flymysql.github.io/gitblog/post.html?slug=%E7%94%A8python%E5%81%9A%E4%B8%80%E4%B8%AAC%E7%B1%BB%E7%BC%96%E8%AF%91%E5%99%A8%E2%80%94%E2%80%94%E8%AF%AD%E6%B3%95%E7%BF%BB%E8%AF%91%E5%99%A8-15995704</link>
+      <guid isPermaLink="false">用python做一个C类编译器——语法翻译器-15995704</guid>
+      <pubDate>Sat, 31 Dec 2016 16:00:00 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>迁移自博客园</category>
+      <description><![CDATA[编程语言:Python 3.7 项目地址：python做编译器——语法翻译器 编程平台:manjaro 编程环境:vscode 完成的内容:承接上次的词法分析器，将其输出的字符表转…]]></description>
     </item>
   </channel>
 </rss>
