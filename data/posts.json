@@ -867,7 +867,8 @@
         "杂七杂八"
       ],
       "cover": "assets/uploads/2026/05/用python做一个C类编译器——语法翻译器-15995704-01.png",
-      "path": "posts/用python做一个C类编译器——语法翻译器-15995704.md"
+      "path": "posts/用python做一个C类编译器——语法翻译器-15995704.md",
+      "carousel": true
     }
   ]
 }
