@@ -202,6 +202,11 @@ function enhanceImages(article) {
     if (/^\.\.\/assets\//.test(rawSrc)) {
       img.setAttribute('src', publicImageUrl(rawSrc));
     }
+    // 清除老内容里的固定 width / height（公众号常见 width="600"），让图按容器宽度自适应
+    if (img.hasAttribute('width')) img.removeAttribute('width');
+    if (img.hasAttribute('height')) img.removeAttribute('height');
+    if (img.style && img.style.width) img.style.width = '';
+    if (img.style && img.style.height) img.style.height = '';
     img.loading = img.loading || 'lazy';
     img.decoding = img.decoding || 'async';
     img.style.cursor = 'zoom-in';
@@ -232,6 +237,34 @@ function enhanceImages(article) {
       if (e.key === 'Escape' && !lightbox.classList.contains('is-hidden')) closeLightbox();
     });
   }
+}
+
+// ---------- 兼容旧文章：清掉撑爆视口的 inline 固定宽度，用包裹层让宽表格横向滚动 ----------
+function sanitizeArticleLayout(article) {
+  const body = article.querySelector('.article-body');
+  if (!body) return;
+
+  // 1) 给 <table> 套一层可横向滚动的容器
+  body.querySelectorAll('table').forEach(table => {
+    if (table.parentElement && table.parentElement.classList.contains('table-wrap')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'table-wrap';
+    table.parentNode.insertBefore(wrap, table);
+    wrap.appendChild(table);
+  });
+
+  // 2) 清掉 section / div / figure / span / p 上 inline style 里的固定宽度，
+  //    避免公众号迁移内容里 width: 600px 这类把整页撑大、触发移动端 shrink-to-fit
+  const fixedWidthRe = /(?:^|;)\s*(?:min-width|width)\s*:\s*[^;]+/gi;
+  body.querySelectorAll('[style]').forEach(el => {
+    const s = el.getAttribute('style') || '';
+    if (!s) return;
+    if (fixedWidthRe.test(s)) {
+      el.setAttribute('style', s.replace(fixedWidthRe, '').replace(/^;\s*/, ''));
+    }
+  });
+  // 3) 干掉 <font size="..."> / <font color="..."> 这种古早标签的视觉污染（保留文本）
+  body.querySelectorAll('font[size]').forEach(el => el.removeAttribute('size'));
 }
 
 // ---------- 外链自动新窗口 + 图标 ----------
@@ -422,7 +455,8 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
   const items = buildToc(article);
   if (items) renderToc(items);
 
-  // 增强：代码复制 / 标题锚点 / 图片懒加载+灯箱
+  // 增强：清布局 / 代码复制 / 标题锚点 / 图片懒加载+灯箱
+  sanitizeArticleLayout(article);
   enhanceCodeBlocks(article);
   enhanceHeadings(article);
   enhanceImages(article);

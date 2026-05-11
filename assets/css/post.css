@@ -95,7 +95,40 @@
   line-height: 1.85;
   color: var(--text-main);
   word-break: break-word;
+  /* 防止移动端 shrink-to-fit：所有内容必须收在视口内 */
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
+
+/* 兜底：禁止任何后代元素撑出页面（公众号/老博客迁移过来的内联宽度等） */
+.article-body * { max-width: 100%; }
+.article-body img,
+.article-body video,
+.article-body iframe,
+.article-body embed,
+.article-body object,
+.article-body svg {
+  max-width: 100% !important;
+  height: auto;
+  display: block;
+}
+.article-body img { margin-left: auto; margin-right: auto; }
+/* 公众号迁移内容里常见的 section 内联固定宽度 */
+.article-body section,
+.article-body figure,
+.article-body div {
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+/* 表格用包裹层横向滚动，绝不撑爆 */
+.article-body .table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 20px 0;
+  -webkit-overflow-scrolling: touch;
+}
+.article-body .table-wrap > table { margin: 0; min-width: max-content; }
 
 .article-body h1,
 .article-body h2,
@@ -113,7 +146,7 @@
 .article-body p { margin: 14px 0; }
 .article-body a { color: var(--primary); border-bottom: 1px solid rgba(234, 111, 90, 0.3); }
 .article-body a:hover { border-bottom-color: var(--primary); }
-.article-body img { max-width: 100%; margin: 20px auto; border-radius: var(--radius); }
+.article-body img { margin-top: 20px; margin-bottom: 20px; border-radius: var(--radius); }
 
 .article-body blockquote {
   margin: 20px 0;
