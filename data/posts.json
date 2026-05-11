@@ -14,16 +14,6 @@
       ],
       "cover": "../assets/uploads/2026/05/1778478312725-mrx0in-image.png",
       "path": "posts/welcome.md"
-    },
-    {
-      "slug": "新文章测试",
-      "title": "新文章测试",
-      "date": "2026-05-11T03:50:32.864Z",
-      "updated": "2026-05-11T03:50:32.864Z",
-      "author": "兰州小红鸡",
-      "summary": "测试 111",
-      "tags": [],
-      "path": "posts/新文章测试.md"
     }
   ]
 }
