@@ -19,17 +19,21 @@ function renderHero(posts) {
   hero.hidden = false;
   const tagCount = new Set();
   posts.forEach(p => (p.tags || []).forEach(t => tagCount.add(t)));
+  // 整块 hero 包一层 <a> 跳转到「关于」页面：支持点击 / 右键新标签 / 中键新窗口
   hero.innerHTML = `
-    <div class="hero-avatar" style="background-image:url(${escapeHtml(CONFIG.site.avatar || '')})"></div>
-    <div class="hero-info">
-      <div class="hero-title">${escapeHtml(CONFIG.site.title)}</div>
-      <div class="hero-subtitle">${escapeHtml(CONFIG.site.description || CONFIG.site.subtitle || '')}</div>
-      <div class="hero-stats">
-        <div class="stat"><strong>${posts.length}</strong>篇文章</div>
-        <div class="stat"><strong>${tagCount.size}</strong>个标签</div>
-        ${posts.length ? `<div class="stat">最近更新 ${timeAgo(posts[0].date)}</div>` : ''}
+    <a class="hero-link" href="post.html?slug=about" aria-label="进入关于页">
+      <div class="hero-avatar" style="background-image:url(${escapeHtml(CONFIG.site.avatar || '')})"></div>
+      <div class="hero-info">
+        <div class="hero-title">${escapeHtml(CONFIG.site.title)}</div>
+        <div class="hero-subtitle">${escapeHtml(CONFIG.site.description || CONFIG.site.subtitle || '')}</div>
+        <div class="hero-stats">
+          <div class="stat"><strong>${posts.length}</strong>篇文章</div>
+          <div class="stat"><strong>${tagCount.size}</strong>个标签</div>
+          ${posts.length ? `<div class="stat">最近更新 ${timeAgo(posts[0].date)}</div>` : ''}
+        </div>
       </div>
-    </div>
+      <span class="hero-arrow" aria-hidden="true">›</span>
+    </a>
   `;
 }
 
