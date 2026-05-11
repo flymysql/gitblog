@@ -157,7 +157,6 @@ function renderRecent(posts) {
 function renderSidebarAuthor() {
   $('#sidebarAvatar').style.backgroundImage = `url(${CONFIG.site.avatar || ''})`;
   $('#sidebarName').textContent = CONFIG.site.author || '';
-  $('#sidebarDesc').textContent = CONFIG.site.description || CONFIG.site.subtitle || '';
 }
 
 function applyFilter(posts, tab, q, tag) {
