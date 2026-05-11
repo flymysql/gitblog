@@ -21,6 +21,15 @@ export function fmtDate(iso) {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
+// 估算阅读时间（中文按 350 字/分钟，英文按 250 词/分钟，混排取较大者）
+export function readingMinutes(text) {
+  const s = String(text || '');
+  const cn = (s.match(/[\u4e00-\u9fa5]/g) || []).length;
+  const en = (s.replace(/[\u4e00-\u9fa5]/g, ' ').match(/[A-Za-z0-9_]+/g) || []).length;
+  const mins = Math.max(1, Math.round(cn / 350 + en / 250));
+  return mins;
+}
+
 export function timeAgo(iso) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -276,6 +285,28 @@ function bindNavDrawer() {
   });
 }
 
+function injectAnalytics() {
+  const code = CONFIG.analytics && CONFIG.analytics.enabled ? String(CONFIG.analytics.snippet || '').trim() : '';
+  if (!code || document.getElementById('siteAnalyticsSnippet')) return;
+  const tpl = document.createElement('template');
+  tpl.innerHTML = code;
+  const marker = document.createElement('meta');
+  marker.id = 'siteAnalyticsSnippet';
+  marker.name = 'site-analytics-snippet';
+  marker.content = 'enabled';
+  document.head.appendChild(marker);
+  [...tpl.content.childNodes].forEach(node => {
+    if (node.nodeName.toLowerCase() === 'script') {
+      const script = document.createElement('script');
+      [...node.attributes].forEach(attr => script.setAttribute(attr.name, attr.value));
+      script.textContent = node.textContent;
+      document.head.appendChild(script);
+    } else {
+      document.head.appendChild(node.cloneNode(true));
+    }
+  });
+}
+
 export function initSite({ active = '' } = {}) {
   initTheme();
   applyFavicon();
@@ -290,4 +321,5 @@ export function initSite({ active = '' } = {}) {
   bindNavDrawer();
   if ($('#searchBtn')) bindSearchOverlay();
   if ($('#year')) $('#year').textContent = new Date().getFullYear();
+  injectAnalytics();
 }

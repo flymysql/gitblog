@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>?????</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ea6f5a">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/css/common.css?v=20260517">
+  <style>
+    .not-found {
+      min-height: calc(100vh - var(--nav-height));
+      display: grid;
+      place-items: center;
+      padding: 40px 18px;
+    }
+    .not-found-card {
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 46px 34px;
+    }
+    .not-found-code {
+      font-size: 72px;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: -0.06em;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .not-found-card h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .not-found-card p {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+    .not-found-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+  </style>
+  <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="not-found">
+    <section class="not-found-card">
+      <div class="not-found-code">404</div>
+      <h1>?????</h1>
+      <p>?????????????????????????????????</p>
+      <div class="not-found-actions">
+        <a class="btn btn-primary" href="./">????</a>
+        <button class="btn btn-secondary" type="button" id="openSearch404">????</button>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <div id="site-overlays"></div>
+  <script type="module">
+    import { initSite } from './assets/js/site.js?v=20260517';
+    initSite({ active: '' });
+    document.getElementById('openSearch404').addEventListener('click', () => {
+      document.getElementById('searchBtn')?.click();
+    });
+  </script>
+</body>
+</html>

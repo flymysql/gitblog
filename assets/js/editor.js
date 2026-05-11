@@ -282,6 +282,7 @@ async function updateIndex({ slug, title, date, updated, author, summary, tags, 
   if (cover) entry.cover = cover;
   if (draft) entry.draft = true;
   if (pinned) entry.pinned = true;
+  if (pinned && existing >= 0 && data.posts[existing].pinnedOrder) entry.pinnedOrder = data.posts[existing].pinnedOrder;
 
   if (existing >= 0) data.posts[existing] = entry;
   else data.posts.unshift(entry);
@@ -492,7 +493,9 @@ function setupEasyMDE() {
       tags: $('#tags').value,
       cover: $('#cover').value,
       slug: $('#slug').value,
+      savedAt: new Date().toISOString(),
     }));
+    setStatus('本地草稿已自动保存 ' + new Date().toLocaleTimeString(), 'saved');
   }, 4000);
 
   // Ctrl+S / Cmd+S 触发发布

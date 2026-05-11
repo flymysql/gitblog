@@ -5,7 +5,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
 import { initSite, escapeHtml, fmtDate, timeAgo } from './site.js';
-import { setMeta } from './seo.js';
+import { setMeta, setJsonLd } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -41,6 +41,9 @@ function renderCarousel(posts) {
     .filter(p => p.cover)
     .sort((a, b) => {
       if ((b.pinned ? 1 : 0) !== (a.pinned ? 1 : 0)) return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+      if (a.pinned && b.pinned && Number(a.pinnedOrder || 0) !== Number(b.pinnedOrder || 0)) {
+        return Number(a.pinnedOrder || 9999) - Number(b.pinnedOrder || 9999);
+      }
       return new Date(b.date || 0) - new Date(a.date || 0);
     })
     .slice(0, 5);
@@ -175,6 +178,9 @@ function applyFilter(posts, tab, q, tag) {
   } else {
     r.sort((a, b) => {
       if ((b.pinned ? 1 : 0) !== (a.pinned ? 1 : 0)) return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+      if (a.pinned && b.pinned && Number(a.pinnedOrder || 0) !== Number(b.pinnedOrder || 0)) {
+        return Number(a.pinnedOrder || 9999) - Number(b.pinnedOrder || 9999);
+      }
       return new Date(b.date || 0) - new Date(a.date || 0);
     });
   }
@@ -184,6 +190,24 @@ function applyFilter(posts, tab, q, tag) {
 (async function init() {
   initSite({ active: './' });
   setMeta({ title: '', description: CONFIG.site.description, type: 'website' });
+  setJsonLd({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: CONFIG.site.title,
+    description: CONFIG.site.description,
+    url: CONFIG.site.url || window.location.origin,
+    inLanguage: CONFIG.site.locale || 'zh-CN',
+    publisher: {
+      '@type': 'Person',
+      name: CONFIG.site.author,
+      image: CONFIG.site.avatar,
+    },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${CONFIG.site.url || window.location.origin}/?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  });
 
   let allPosts = [];
   try {

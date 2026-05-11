@@ -1,14 +1,19 @@
 // ============================================================================
 // 文章阅读页：渲染 Markdown + TOC + giscus 评论
+// 加上：阅读进度条 / 回到顶部 / 代码复制 / 标题锚点 / 图片灯箱 / 上下篇 / 相关文章 / 阅读时间
 // ============================================================================
 
 import { CONFIG } from './config.js';
 import { fetchIndexPublic, fetchPostMarkdownPublic } from './api.js';
 import { renderMarkdown, parseFrontmatter } from './markdown.js';
-import { initSite, escapeHtml, fmtDate } from './site.js';
-import { setMeta } from './seo.js';
+import { initSite, escapeHtml, fmtDate, readingMinutes } from './site.js';
+import { setMeta, setJsonLd } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
+
+function publicImageUrl(url) {
+  return String(url || '').replace(/^\.\.\/assets\//, 'assets/');
+}
 
 function buildToc(article) {
   const headings = [...article.querySelectorAll('h2, h3')];
@@ -35,7 +40,6 @@ function renderToc(items) {
       ${items.map(i => `<a class="toc-item level-${i.level}" href="#${encodeURIComponent(i.id)}" data-id="${escapeHtml(i.id)}">${escapeHtml(i.text)}</a>`).join('')}
     </nav>
   `;
-  // 滚动高亮
   const tocLinks = sidebar.querySelectorAll('.toc-item');
   const headings = items.map(i => document.getElementById(i.id)).filter(Boolean);
   const onScroll = () => {
@@ -46,7 +50,6 @@ function renderToc(items) {
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
-  // 平滑滚动
   tocLinks.forEach(a => {
     a.addEventListener('click', e => {
       e.preventDefault();
@@ -63,7 +66,6 @@ function renderToc(items) {
 function renderGiscus(slug, title) {
   const g = CONFIG.giscus;
   if (!g || !g.enabled) return;
-
   const article = $('#article');
   const wrap = document.createElement('section');
   wrap.className = 'comments';
@@ -110,8 +112,217 @@ function renderGiscus(slug, title) {
   $('#giscusBox').appendChild(s);
 }
 
+// ---------- 阅读进度条 ----------
+function bindReadingProgress() {
+  const bar = $('#reading-progress');
+  if (!bar) return;
+  const update = () => {
+    const h = document.documentElement;
+    const total = h.scrollHeight - h.clientHeight;
+    const pct = total > 0 ? Math.min(100, Math.max(0, (h.scrollTop / total) * 100)) : 0;
+    bar.style.width = pct + '%';
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+}
+
+// ---------- 回到顶部 ----------
+function bindBackToTop() {
+  const btn = $('#backToTop');
+  if (!btn) return;
+  const update = () => {
+    btn.hidden = window.scrollY < 480;
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  update();
+}
+
+// ---------- 代码块复制按钮 ----------
+function enhanceCodeBlocks(article) {
+  article.querySelectorAll('pre').forEach(pre => {
+    if (pre.querySelector('.code-copy')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-copy';
+    btn.textContent = '复制';
+    btn.addEventListener('click', async () => {
+      const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+      try {
+        await navigator.clipboard.writeText(code);
+        btn.textContent = '已复制';
+        btn.classList.add('done');
+        setTimeout(() => {
+          btn.textContent = '复制';
+          btn.classList.remove('done');
+        }, 1600);
+      } catch {
+        btn.textContent = '失败';
+        setTimeout(() => { btn.textContent = '复制'; }, 1600);
+      }
+    });
+    pre.classList.add('has-copy');
+    pre.appendChild(btn);
+  });
+}
+
+// ---------- 标题悬停锚点 ----------
+function enhanceHeadings(article) {
+  article.querySelectorAll('h2, h3, h4').forEach(h => {
+    if (!h.id) return;
+    if (h.querySelector('.heading-anchor')) return;
+    const a = document.createElement('a');
+    a.className = 'heading-anchor';
+    a.href = '#' + encodeURIComponent(h.id);
+    a.setAttribute('aria-label', '复制段落链接');
+    a.title = '复制段落链接';
+    a.textContent = '#';
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const url = window.location.href.replace(/#.*$/, '') + '#' + encodeURIComponent(h.id);
+      history.replaceState(null, '', '#' + encodeURIComponent(h.id));
+      window.scrollTo({ top: h.offsetTop - 80, behavior: 'smooth' });
+      navigator.clipboard && navigator.clipboard.writeText(url).catch(() => {});
+    });
+    h.appendChild(a);
+  });
+}
+
+// ---------- 图片懒加载 + 灯箱 ----------
+function enhanceImages(article) {
+  const lightbox = $('#lightbox');
+  const lightboxImg = $('#lightboxImg');
+  const closeBtn = lightbox && lightbox.querySelector('.lightbox-close');
+
+  article.querySelectorAll('img').forEach(img => {
+    const rawSrc = img.getAttribute('src') || '';
+    if (/^\.\.\/assets\//.test(rawSrc)) {
+      img.setAttribute('src', publicImageUrl(rawSrc));
+    }
+    img.loading = img.loading || 'lazy';
+    img.decoding = img.decoding || 'async';
+    img.style.cursor = 'zoom-in';
+    img.addEventListener('click', () => openLightbox(img.src, img.alt));
+  });
+
+  function openLightbox(src, alt) {
+    if (!lightbox) return;
+    lightboxImg.src = src;
+    lightboxImg.alt = alt || '';
+    lightbox.classList.remove('is-hidden');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.add('is-hidden');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    lightboxImg.src = '';
+  }
+  if (lightbox) {
+    lightbox.addEventListener('click', e => {
+      if (e.target === lightbox || e.target === lightboxImg) closeLightbox();
+    });
+    if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !lightbox.classList.contains('is-hidden')) closeLightbox();
+    });
+  }
+}
+
+// ---------- 外链自动新窗口 + 图标 ----------
+function enhanceLinks(article) {
+  article.querySelectorAll('.article-body a[href]').forEach(a => {
+    const href = a.getAttribute('href') || '';
+    if (!href || href.startsWith('#') || href.startsWith('mailto:')) return;
+    let url;
+    try {
+      url = new URL(href, window.location.href);
+    } catch {
+      return;
+    }
+    if (url.origin !== window.location.origin) {
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.classList.add('external-link');
+    }
+  });
+}
+
+// ---------- 上一篇 / 下一篇 + 相关文章 ----------
+function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
+  const visible = (allPosts || []).filter(p => !p.draft && p.slug !== currentSlug);
+  // 上下篇：基于"全部已发布按时间升序"找当前文章相邻位置
+  const allByDateAsc = [...(allPosts || []).filter(p => !p.draft)]
+    .sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+  const myIndex = allByDateAsc.findIndex(p => p.slug === currentSlug);
+  const prev = myIndex > 0 ? allByDateAsc[myIndex - 1] : null;
+  const next = myIndex >= 0 && myIndex < allByDateAsc.length - 1 ? allByDateAsc[myIndex + 1] : null;
+
+  // 相关文章：标签重合度排序，最多 4 篇
+  const tagSet = new Set(currentTags || []);
+  const related = visible
+    .map(p => {
+      const overlap = (p.tags || []).filter(t => tagSet.has(t)).length;
+      return { p, overlap };
+    })
+    .filter(x => x.overlap > 0)
+    .sort((a, b) => {
+      if (b.overlap !== a.overlap) return b.overlap - a.overlap;
+      return new Date(b.p.date || 0) - new Date(a.p.date || 0);
+    })
+    .slice(0, 4)
+    .map(x => x.p);
+
+  const article = $('#article');
+  if (!article) return;
+
+  if (prev || next) {
+    const nav = document.createElement('nav');
+    nav.className = 'post-neighbors';
+    nav.innerHTML = `
+      ${prev ? `
+        <a class="post-neighbor prev" href="post.html?slug=${encodeURIComponent(prev.slug)}">
+          <span class="label">← 上一篇</span>
+          <span class="title">${escapeHtml(prev.title || '无标题')}</span>
+        </a>` : '<span></span>'}
+      ${next ? `
+        <a class="post-neighbor next" href="post.html?slug=${encodeURIComponent(next.slug)}">
+          <span class="label">下一篇 →</span>
+          <span class="title">${escapeHtml(next.title || '无标题')}</span>
+        </a>` : '<span></span>'}
+    `;
+    article.appendChild(nav);
+  }
+
+  if (related.length) {
+    const sec = document.createElement('section');
+    sec.className = 'post-related';
+    sec.innerHTML = `
+      <div class="post-related-title">相关文章</div>
+      <ul class="post-related-list">
+        ${related.map(p => `
+          <li>
+            <a href="post.html?slug=${encodeURIComponent(p.slug)}">
+              <span class="t">${escapeHtml(p.title || '无标题')}</span>
+              <span class="meta">${fmtDate(p.date)} · ${(p.tags || []).slice(0, 3).map(t => '#' + escapeHtml(t)).join(' ')}</span>
+            </a>
+          </li>
+        `).join('')}
+      </ul>
+    `;
+    article.appendChild(sec);
+  }
+}
+
 (async function init() {
   initSite({ active: '' });
+  bindReadingProgress();
+  bindBackToTop();
 
   const params = new URLSearchParams(window.location.search);
   const slug = params.get('slug');
@@ -122,9 +333,11 @@ function renderGiscus(slug, title) {
   }
 
   let meta = null;
+  let allPosts = [];
   try {
     const idx = await fetchIndexPublic();
-    meta = (idx.posts || []).find(p => p.slug === slug) || null;
+    allPosts = idx.posts || [];
+    meta = allPosts.find(p => p.slug === slug) || null;
   } catch {}
 
   let raw = '';
@@ -141,14 +354,16 @@ function renderGiscus(slug, title) {
   const updated = (meta && meta.updated) || data.updated || date;
   const author = (meta && meta.author) || data.author || CONFIG.site.author;
   const avatar = (meta && meta.avatar) || CONFIG.site.avatar;
-  const cover = (meta && meta.cover) || data.cover || '';
+  const cover = publicImageUrl((meta && meta.cover) || data.cover || '');
   const tags = (meta && meta.tags) || data.tags || [];
   const summary = (meta && meta.summary) || data.summary || '';
 
+  // SEO + 优先用 OG 自动图（assets/og/{slug}.svg）兜底
+  const ogAuto = `${CONFIG.site.url || ''}/assets/og/${encodeURIComponent(slug)}.svg`;
   setMeta({
     title,
     description: summary,
-    image: cover || avatar,
+    image: cover || (CONFIG.site.url ? ogAuto : avatar),
     type: 'article',
     publishedTime: date,
     modifiedTime: updated,
@@ -156,7 +371,26 @@ function renderGiscus(slug, title) {
     tags,
   });
 
+  setJsonLd({
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: title,
+    description: summary,
+    image: cover || (CONFIG.site.url ? ogAuto : avatar),
+    datePublished: date,
+    dateModified: updated,
+    author: { '@type': 'Person', name: author || CONFIG.site.author },
+    publisher: {
+      '@type': 'Organization',
+      name: CONFIG.site.title,
+      logo: CONFIG.site.logo || CONFIG.site.avatar ? { '@type': 'ImageObject', url: CONFIG.site.logo || CONFIG.site.avatar } : undefined,
+    },
+    mainEntityOfPage: window.location.href.replace(/#.*$/, ''),
+    keywords: (tags || []).join(','),
+  });
+
   const html = await renderMarkdown(content);
+  const mins = readingMinutes(content);
 
   article.innerHTML = `
     <header class="article-header">
@@ -171,6 +405,8 @@ function renderGiscus(slug, title) {
             ${updated && updated !== date ? `<span class="dot"></span><span>更新于 ${fmtDate(updated)}</span>` : ''}
             <span class="dot"></span>
             <span>${(content || '').length} 字</span>
+            <span class="dot"></span>
+            <span>约 ${mins} 分钟</span>
           </div>
         </div>
         <a class="article-edit" href="admin/editor.html?slug=${encodeURIComponent(slug)}" title="编辑此文">编辑</a>
@@ -185,6 +421,15 @@ function renderGiscus(slug, title) {
   // TOC
   const items = buildToc(article);
   if (items) renderToc(items);
+
+  // 增强：代码复制 / 标题锚点 / 图片懒加载+灯箱
+  enhanceCodeBlocks(article);
+  enhanceHeadings(article);
+  enhanceImages(article);
+  enhanceLinks(article);
+
+  // 上下篇 + 相关文章
+  renderNeighborsAndRelated(allPosts, slug, tags);
 
   // 评论
   renderGiscus(slug, title);
