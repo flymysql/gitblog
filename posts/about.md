@@ -1,14 +1,13 @@
 ---
-title: 关于
+title: 关于小红鸡
 date: "2026-05-11T16:40:00+08:00"
-updated: "2026-05-11T09:17:16.770Z"
+updated: "2026-05-11T09:21:42.018Z"
 author: Jimmy
 tags: [杂七杂八]
 cover: ../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.jpg
 summary: 关于这个博客和写它的人 —— 一名做系统软件与数据库系统的程序员，业余写点代码、读点书、记点流水账。
 pinned: true
 ---
-
 
 ![1029bg.jpg](../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.jpg)
 
