@@ -107,7 +107,17 @@ export async function writeFile(path, content, message, sha) {
     branch: CONFIG.repo.branch,
   };
   if (sha) body.sha = sha;
-  return ghFetch(repoPath(path), { method: 'PUT', body });
+  try {
+    return await ghFetch(repoPath(path), { method: 'PUT', body });
+  } catch (e) {
+    // GitHub 在 fine-grained PAT 缺少 Contents:write 权限时会返回 404 而不是 403
+    // 这里改写错误信息，给用户更清晰的提示
+    if (e.status === 404) {
+      const hint = `\n可能原因：\n  1) Token 没有 "Contents: Read and write" 权限\n  2) Token 没有授权访问 ${CONFIG.repo.owner}/${CONFIG.repo.name}\n  3) config.js 里的仓库或分支 (${CONFIG.repo.branch}) 写错了`;
+      e.message = (e.message || 'Not Found') + hint;
+    }
+    throw e;
+  }
 }
 
 // 删除文件

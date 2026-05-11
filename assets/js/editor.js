@@ -229,6 +229,9 @@ async function publish() {
     if (e.status === 409 || /sha/i.test(e.message || '')) {
       setStatus('版本冲突：请刷新后重试', 'error');
       showToast('版本冲突：仓库里已有更新版本，请刷新页面重试', 'error');
+    } else if (e.status === 404 || e.status === 403) {
+      setStatus('发布失败：权限不足', 'error');
+      alert('发布失败\n\n' + (e.message || '权限不足'));
     } else {
       setStatus('发布失败：' + e.message, 'error');
       showToast('发布失败：' + e.message, 'error');
