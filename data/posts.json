@@ -863,12 +863,10 @@
       "updated": "2022-03-11T23:01:00+08:00",
       "author": "兰州小红鸡",
       "summary": "编程语言:Python 3.7 项目地址：python做编译器——语法翻译器 编程平台:manjaro 编程环境:vscode 完成的内容:承接上次的词法分析器，将其输出的字符表转…",
-      "tags": [
-        "杂七杂八"
-      ],
+      "tags": [],
       "cover": "assets/uploads/2026/05/用python做一个C类编译器——语法翻译器-15995704-01.png",
-      "path": "posts/用python做一个C类编译器——语法翻译器-15995704.md",
-      "carousel": true
+      "carousel": true,
+      "path": "posts/用python做一个C类编译器——语法翻译器-15995704.md"
     }
   ]
 }
