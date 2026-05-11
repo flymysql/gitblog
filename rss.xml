@@ -5,7 +5,7 @@
     <link>https://flymysql.github.io/gitblog/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 11 May 2026 07:40:56 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 11 May 2026 07:56:24 GMT</lastBuildDate>
     <atom:link href="https://flymysql.github.io/gitblog/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>欢迎来到我的博客</title>
@@ -95,7 +95,7 @@
       <pubDate>Sun, 16 Dec 2018 09:13:47 GMT</pubDate>
       <author>兰州小红鸡</author>
       <category>教程</category><category>javascript</category><category>html</category><category>css</category>
-      <description><![CDATA[今天逛知乎发现他们的链接卡片挺好看，就想写一个自己拿来博客用（扒下来知乎的代码），效果如下。 源码放在github，感兴趣的朋友可以自己拿。 $1 $1 $1 如何使用 在需要把链…]]></description>
+      <description><![CDATA[今天逛知乎发现他们的链接卡片挺好看，就想写一个自己拿来博客用（扒下来知乎的代码），效果如下。 源码放在github，感兴趣的朋友可以自己拿。 兰州小红鸡的博客 小鸡背单词 gith…]]></description>
     </item>
     <item>
       <title>Windows下的终端折腾——弃坑msys2，开始用wsl</title>
@@ -140,7 +140,7 @@
       <pubDate>Fri, 23 Nov 2018 09:32:33 GMT</pubDate>
       <author>兰州小红鸡</author>
       <category>前端</category><category>javascript</category><category>html</category><category>算法</category><category>C++</category>
-      <description><![CDATA[$1 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 $1问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。另外，还给…]]></description>
+      <description><![CDATA[算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。…]]></description>
     </item>
     <item>
       <title>使用腾讯云cdn加速博客</title>
@@ -158,7 +158,7 @@
       <pubDate>Wed, 14 Nov 2018 07:25:40 GMT</pubDate>
       <author>兰州小红鸡</author>
       <category>教程</category><category>前端</category><category>html</category><category>博客</category>
-      <description><![CDATA[$1设计特点 轮播图UI：模仿简书 可以直接在每篇文章的md文件里设置是否要设为轮播图的文章 就是我们每次新写一篇文章，用hexo生成一个md文件，我们只要在头部注明是否要作为轮播…]]></description>
+      <description><![CDATA[¶设计特点 轮播图UI：模仿简书 可以直接在每篇文章的md文件里设置是否要设为轮播图的文章 就是我们每次新写一篇文章，用hexo生成一个md文件，我们只要在头部注明是否要作为轮播图…]]></description>
     </item>
     <item>
       <title>将公众号文章爬到hexo博客</title>
@@ -194,7 +194,7 @@
       <pubDate>Tue, 30 Oct 2018 09:21:21 GMT</pubDate>
       <author>兰州小红鸡</author>
       <category>sql</category>
-      <description><![CDATA[今天继续做了会儿练习语句 都是比较基本的sql查询语句 需要熟练掌握的 1. 查询选修毛概的学生的姓名成绩，并且升序输出 <table <tbody <tr <td class=\"…]]></description>
+      <description><![CDATA[今天继续做了会儿练习语句 都是比较基本的sql查询语句 需要熟练掌握的 1. 查询选修毛概的学生的姓名成绩，并且升序输出 2. 查询所有科目分数总和大于1100的学生姓名与分数总和…]]></description>
     </item>
     <item>
       <title>手动修改博客css样式，打造属于自己的博客样式</title>
@@ -203,7 +203,7 @@
       <pubDate>Sun, 28 Oct 2018 22:39:31 GMT</pubDate>
       <author>兰州小红鸡</author>
       <category>教程</category><category>博客</category>
-      <description><![CDATA[这两天花了点时间修改了下自己的next主题的博客 样式表放在了GitHub上喜欢的话可以直接使用 $1 使用方法 直接下载$1，然后复制到自己主题的themes\\\\next\\\\so…]]></description>
+      <description><![CDATA[这两天花了点时间修改了下自己的next主题的博客 样式表放在了GitHub上喜欢的话可以直接使用 next博客主题样式修改 使用方法 直接下载样式表，然后复制到自己主题的theme…]]></description>
     </item>
     <item>
       <title>服务端搭建ssr教程</title>
@@ -212,7 +212,7 @@
       <pubDate>Thu, 25 Oct 2018 13:32:17 GMT</pubDate>
       <author>兰州小红鸡</author>
       <category>教程</category><category>ssr</category>
-      <description><![CDATA[教程很简单，整个教程分三步： 第一步：购买VPS服务器 第二步：一键部署VPS服务器 第三步：一键加速VPS服务器 （谷歌BBR加速；对速度要求不高的话，此步骤可省略） $1第一步…]]></description>
+      <description><![CDATA[教程很简单，整个教程分三步： 第一步：购买VPS服务器 第二步：一键部署VPS服务器 第三步：一键加速VPS服务器 （谷歌BBR加速；对速度要求不高的话，此步骤可省略） ¶第一步：…]]></description>
     </item>
     <item>
       <title>解决来必力评论系统加载慢的问题</title>
@@ -230,7 +230,7 @@
       <pubDate>Wed, 10 Oct 2018 00:41:50 GMT</pubDate>
       <author>兰州小红鸡</author>
       <category>教程</category><category>博客</category>
-      <description><![CDATA[$1前言 本文虽然是非常详细的小白教程 但是也需要一点点的姿势，额，知识储量 $1知识储量 了解css和html，会写一点html基础语句 用过GitHub，知道建仓库过程以及在命…]]></description>
+      <description><![CDATA[¶前言 本文虽然是非常详细的小白教程 但是也需要一点点的姿势，额，知识储量 ¶知识储量 了解css和html，会写一点html基础语句 用过GitHub，知道建仓库过程以及在命令行…]]></description>
     </item>
     <item>
       <title>sql语言学习笔记</title>
@@ -239,7 +239,7 @@
       <pubDate>Mon, 08 Oct 2018 13:16:09 GMT</pubDate>
       <author>兰州小红鸡</author>
       <category>sql</category>
-      <description><![CDATA[$1创建数据库 主要是今天第一次上了数据库实验课 就随便记记 新手上路，见笑了 以下是创建数据库userdb1的SQL语句， <table <tbody <tr <td class…]]></description>
+      <description><![CDATA[¶创建数据库 主要是今天第一次上了数据库实验课 就随便记记 新手上路，见笑了 以下是创建数据库userdb1的SQL语句， ¶运行上诉语句建立数据库userdb1 ¶建立学生选课和…]]></description>
     </item>
     <item>
       <title>假期最后一天</title>
@@ -257,7 +257,7 @@
       <pubDate>Sat, 06 Oct 2018 05:12:16 GMT</pubDate>
       <author>兰州小红鸡</author>
       <category>前端</category>
-      <description><![CDATA[标题 <table <tbody <tr <td class=\"gutter\" <pre <span class=\"line\" 1</span <br <span class=\"l…]]></description>
+      <description><![CDATA[标题 一级标题 ¶二级标题 ¶三级标题 ¶四级标题 ¶五级标题 ¶六级标题 列表 无序列表用 \\ 1. 有序列表用 1. 2. 3. 引用 只需要在文本前加入 这种尖括号（大于号）…]]></description>
     </item>
     <item>
       <title>windows上的vim配置，打造超级舒心又有逼格的编辑器</title>

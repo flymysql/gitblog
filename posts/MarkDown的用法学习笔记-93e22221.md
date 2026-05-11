@@ -5,7 +5,7 @@ updated: 2018-11-16T13:12:16+08:00
 author: "兰州小红鸡"
 tags:
   - "前端"
-summary: "标题 <table <tbody <tr <td class=\"gutter\" <pre <span class=\"line\" 1</span <br <span class=\"l…"
+summary: "标题 一级标题 ¶二级标题 ¶三级标题 ¶四级标题 ¶五级标题 ¶六级标题 列表 无序列表用 \\ 1. 有序列表用 1. 2. 3. 引用 只需要在文本前加入 这种尖括号（大于号）…"
 origin:
   from: hexo
   url: https://flymysql.github.io/post/93e22221.html
@@ -13,7 +13,16 @@ origin:
 
 # 标题
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 一级标题</span><br><span class="line">## 二级标题</span><br><span class="line">### 三级标题</span><br><span class="line">#### 四级标题</span><br><span class="line">##### 五级标题</span><br><span class="line">###### 六级标题</span><br></pre></td></tr></tbody></table>
+
+```sql
+# 一级标题
+## 二级标题
+### 三级标题
+#### 四级标题
+##### 五级标题
+###### 六级标题
+```
+
 
 # 一级标题
 
@@ -75,7 +84,15 @@ origin:
 
 Markdown 比较累人的地方，例子如下：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">| Tables        | Are           | Cool  |</span><br><span class="line">| ------------- |:-------------:| -----:|</span><br><span class="line">| col 3 is      | right-aligned | $1600 |</span><br><span class="line">| col 2 is      | centered      |   $12 |</span><br><span class="line">| zebra stripes | are neat      |    $1 |</span><br></pre></td></tr></tbody></table>
+
+```sql
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
+```
+
 
 这种语法生成的表格如下：
 
@@ -98,7 +115,15 @@ return 0;
 }  
 \`\`\`
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"hello world!"</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table>
+
+```sql
+int main()
+{
+	printf("hello world!");
+	return 0;
+}
+```
+
 
 # 分割线
 
