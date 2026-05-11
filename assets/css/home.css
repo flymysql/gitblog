@@ -52,6 +52,172 @@
   .hero-stats .stat strong { font-size: 14px; }
 }
 
+/* ---------- 首页轮播 ---------- */
+.home-carousel {
+  max-width: var(--content-max);
+  margin: 18px auto 0;
+  padding: 0 24px;
+}
+
+.carousel-viewport {
+  position: relative;
+  height: 260px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-soft);
+  box-shadow: var(--shadow);
+}
+
+.carousel-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+  color: #fff;
+}
+.carousel-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.carousel-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.18) 58%, rgba(0, 0, 0, 0.08));
+}
+.carousel-content {
+  position: absolute;
+  left: 34px;
+  right: 88px;
+  bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.carousel-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(234, 111, 90, 0.92);
+  font-size: 12px;
+  font-weight: 500;
+}
+.carousel-content strong {
+  max-width: 680px;
+  font-size: 26px;
+  line-height: 1.35;
+  font-weight: 800;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.32);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.carousel-content em {
+  max-width: 560px;
+  font-style: normal;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.86);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 46px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.24);
+  color: #fff;
+  font-size: 30px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.carousel-btn:hover { background: rgba(0, 0, 0, 0.42); }
+.carousel-btn.prev { left: 16px; }
+.carousel-btn.next { right: 16px; }
+.carousel-dots {
+  position: absolute;
+  right: 26px;
+  bottom: 24px;
+  display: flex;
+  gap: 7px;
+}
+.carousel-dots button {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.52);
+  transition: width 0.2s, background 0.2s;
+}
+.carousel-dots button.active {
+  width: 22px;
+  background: #fff;
+}
+
+@media (max-width: 720px) {
+  .home-carousel {
+    margin: 12px auto 0;
+    padding: 0 14px;
+  }
+  .carousel-viewport {
+    height: 180px;
+    border-radius: 12px;
+  }
+  .carousel-shade {
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0.1) 68%);
+  }
+  .carousel-content {
+    left: 16px;
+    right: 16px;
+    bottom: 18px;
+    gap: 6px;
+  }
+  .carousel-badge {
+    height: 22px;
+    padding: 0 8px;
+    font-size: 11px;
+  }
+  .carousel-content strong {
+    font-size: 18px;
+    line-height: 1.35;
+  }
+  .carousel-content em { display: none; }
+  .carousel-btn {
+    display: none;
+  }
+  .carousel-dots {
+    right: 14px;
+    bottom: 12px;
+    gap: 5px;
+  }
+  .carousel-dots button {
+    width: 6px;
+    height: 6px;
+  }
+  .carousel-dots button.active {
+    width: 18px;
+  }
+}
+
 /* ---------- 主体布局 ---------- */
 .layout {
   max-width: var(--content-max);
@@ -210,10 +376,17 @@
   aspect-ratio: 16 / 10;
   flex-shrink: 0;
   background: var(--bg-soft);
-  background-size: cover;
-  background-position: center;
   border-radius: var(--radius);
+  overflow: hidden;
 }
+.post-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.25s ease;
+}
+.post-item:hover .post-thumbnail img { transform: scale(1.03); }
 
 @media (max-width: 720px) {
   .post-thumbnail { width: 96px; aspect-ratio: 4 / 3; border-radius: 8px; }
