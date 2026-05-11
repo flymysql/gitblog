@@ -14,8 +14,6 @@ origin:
   categories: "教程"
 ---
 
-![兰州小红鸡](assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-01.png)
-
 ## [¶](#前言)前言
 
 本文虽然是非常详细的小白教程  
@@ -64,14 +62,12 @@ hexo 主题很多 可以在下面选择自己的喜欢的一款：
 -   在Github上创建名字为XXX.github.io的项目，XXX为自己的github用户名。
 -   打开本地的MyBlog文件夹项目内的\_config.yml配置文件，将其中的type设置为git
 
-
 ```sql
 deploy:
   type: git
   repository: https://github.com/yourname/yourname.github.io.git
   branch: master
 ```
-
 
 **记得替换上面的yourname**  
 本教程提到的yourname都是指你的github账号id
@@ -113,11 +109,9 @@ deploy:
 
 下载主题 (以next主题为例)
 
-
 ```sql
 git clone https://github.com/iissnan/hexo-theme-next.git（主题的地址）
 ```
-
 
 打开站点\_\_config.yml文件，将themes修改为next（下载到的主题文件夹的名字）
 
@@ -136,7 +130,6 @@ git clone https://github.com/iissnan/hexo-theme-next.git（主题的地址）
 2.  编辑该文件（遵循Markdown规则）
 3.  修改起始字段
 
-
 ```sql
 title 文章的标题
 date 创建日期 （文件的创建日期 ）
@@ -151,7 +144,6 @@ hexo g 生成本地静态文件（Public目录）
 hexo deploy 将本地静态文件推送至github（hexo d）
 ```
 
-
 4.  编写正文内容（MakeDown）
 5.  hexo clean 删除本地静态文件（Public目录），可不执行。
 6.  hexo g 生成本地静态文件（Public目录）
@@ -161,7 +153,6 @@ hexo deploy 将本地静态文件推送至github（hexo d）
 
 进入theme目录，编辑\_config\_yml文件，找到menu:字段，在该字段下添加一个字段。  
 NexT主题菜单设置，用于设置博客上方导航栏，在主题配置文件中修改。
-
 
 ```sql
 menu:
@@ -173,23 +164,19 @@ menu:
   #commonweal: /404.html        #公益 404 （需手动创建）
 ```
 
-
 -   只是在menu选项中设置还不能让标签页面、分类页面生效，需要我们手动创建 \*
 
 ### [¶](#标签页面)标签页面
 
 1.  运行以下命令
 
-
 ```sql
 hexo new page "tags"
 ```
 
-
 同时，在/source目录下会生成一个tags文件夹，里面包含一个index.md文件
 
 2.  修改/source/tags目录下的index.md文件
-
 
 ```sql
 title: tags
@@ -198,10 +185,8 @@ type: "tags"
 ---
 ```
 
-
 3.  修改主题配置文件  
     去掉tags的注释
-
 
 ```sql
 menu:
@@ -213,21 +198,17 @@ menu:
   #commonweal: /404.html        #公益 404 （需手动创建）
 ```
 
-
 ### [¶](#分类页面)分类页面
 
 1.  运行以下命令
-
 
 ```sql
 hexo new page "categories"
 ```
 
-
 同时，在/source目录下会生成一个categories文件夹，里面包含一个index.md文件
 
 2.  修改/source/categories目录下的index.md文件
-
 
 ```sql
 title: categories
@@ -236,10 +217,8 @@ type: "categories"
 ---
 ```
 
-
 3.  修改主题配置文件  
     去掉categories的注释
-
 
 ```sql
 menu:
@@ -251,19 +230,16 @@ menu:
   #commonweal: /404.html        #公益 404 （需手动创建）
 ```
 
-
 ## [¶](#主题美化)主题美化
 
 ### [¶](#侧边栏头像设置)侧边栏头像设置
 
 编辑站点配置文件，增加avatar字段
 
-
 ```sql
 # 头像
 avatar: /images/avatar.png
 ```
-
 
 头像图片须放置在主题的/source/images/目录下
 
@@ -271,16 +247,13 @@ avatar: /images/avatar.png
 
 文章Markdown中填写如下：
 
-
 ```sql
 <blockquote class="blockquote-center">优秀的人，不是不合群，而是他们合群的人里面没有你</blockquote>
 ```
 
-
 ### [¶](#在文章底部增加版权信息)在文章底部增加版权信息
 
 在目录 next/layout/\_macro/下添加 my-copyright.swig：
-
 
 ```sql
 {% if page.copyright %}
@@ -316,9 +289,7 @@ avatar: /images/avatar.png
 {% endif %}
 ```
 
-
 在目录next/source/css/\_common/components/post/下添加my-post-copyright.styl：
-
 
 ```sql
 .my_post_copyright {
@@ -368,9 +339,7 @@ avatar: /images/avatar.png
 }
 ```
 
-
 修改next/layout/\_macro/post.swig，在代码
-
 
 ```sql
 <div>
@@ -380,9 +349,7 @@ avatar: /images/avatar.png
 </div>
 ```
 
-
 之前添加增加如下代码：
-
 
 ```sql
 <div>
@@ -392,17 +359,13 @@ avatar: /images/avatar.png
 </div>
 ```
 
-
 修改next/source/css/\_common/components/post/post.styl文件，在最后一行增加代码：
-
 
 ```sql
 @import "my-post-copyright"
 ```
 
-
 如果要在该博文下面增加版权信息的显示，需要在 Markdown 中增加copyright: true的设置，类似：
-
 
 ```sql
 ---
@@ -414,11 +377,9 @@ copyright: true
 ---
 ```
 
-
 ### [¶](#自定义hexo-new生成md文件的选项)自定义hexo new生成md文件的选项
 
 在/scaffolds/post.md文件中添加：
-
 
 ```sql
 ---
@@ -431,11 +392,9 @@ password:
 ---
 ```
 
-
 ### [¶](#隐藏网页底部powered-by-hexo-强力驱动)隐藏网页底部powered By Hexo / 强力驱动
 
 打开themes/next/layout/\_partials/footer.swig,使用””隐藏之间的代码即可，或者直接删除。
-
 
 ```sql
 <!--
@@ -449,11 +408,9 @@ password:
 -->
 ```
 
-
 ### [¶](#文章加密访问)文章加密访问
 
 打开themes->next->layout->\_partials->head.swig文件,在meta标签后面插入这样一段代码：
-
 
 ```sql
 <script>
@@ -468,21 +425,17 @@ password:
 </script>
 ```
 
-
 然后文章中添加：
-
 
 ```sql
 password: nmask
 ```
-
 
 如果password后面为空，则表示不用密码。
 
 ### [¶](#文章置顶)文章置顶
 
 修改 hero-generator-index 插件，把文件：node\_modules/hexo-generator-index/lib/generator.js 内的代码替换为：
-
 
 ```sql
 'use strict';
@@ -515,9 +468,7 @@ module.exports = function(locals){
 };
 ```
 
-
 在文章中添加 top 值，数值越大文章越靠前，如:
-
 
 ```sql
 ---
@@ -527,22 +478,18 @@ top: 100
 ---
 ```
 
-
 默认不设置则为0，数值相同时按时间排序。
 
 ### [¶](#添加顶部加载条)添加顶部加载条
 
 打开/themes/next/layout/\_partials/head.swig文件，在maximum-scale=1”/>后添加如下代码:
 
-
 ```sql
 <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
 <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
 ```
 
-
 但是，默认的是粉色的，要改变颜色可以在/themes/next/layout/\_partials/head.swig文件中添加如下代码（接在刚才link的后面）
-
 
 ```sql
 <style>
@@ -560,7 +507,6 @@ top: 100
 </style>
 ```
 
-
 ### [¶](#添加文章热度)添加文章热度
 
 next主题集成leanCloud，打开/themes/next/layout/\_macro/post.swig  
@@ -570,7 +516,6 @@ next主题集成leanCloud，打开/themes/next/layout/\_macro/post.swig
 ### [¶](#主页文章添加阴影效果)主页文章添加阴影效果
 
 打开\\themes\\next\\source\\css\_custom\\custom.styl,向里面加入：
-
 
 ```sql
 // 主页文章添加阴影效果
@@ -583,7 +528,6 @@ next主题集成leanCloud，打开/themes/next/layout/\_macro/post.swig
   }
 ```
 
-
 ### [¶](#修改文章底部的那个带-号的标签)修改文章底部的那个带#号的标签
 
 修改模板/themes/next/layout/\_macro/post.swig，搜索 rel=”tag”>#，将 # 换成 🏷
@@ -593,12 +537,10 @@ next主题集成leanCloud，打开/themes/next/layout/\_macro/post.swig
 将 [love.js](https://github.com/Neveryu/Neveryu.github.io/blob/master/js/src/love.js) 文件添加到 \\themes\\next\\source\\js\\src 文件目录下。  
 找到 \\themes\\next\\layout\_layout.swing 文件， 在文件的后面， 标签之前 添加以下代码：
 
-
 ```sql
 <!-- 页面点击小红心 -->
 <script type="text/javascript" src="/js/src/love.js"></script>
 ```
-
 
 ### [¶](#鼠标点击四级单词)鼠标点击四级单词
 
@@ -606,17 +548,14 @@ next主题集成leanCloud，打开/themes/next/layout/\_macro/post.swig
 文件添加到 \\themes\\next\\source\\js\\src 文件目录下。  
 找到 \\themes\\next\\layout\_layout.swing 文件， 在文件的后面， 标签之前 添加以下代码：
 
-
 ```sql
 <!-- 页面点击小红心 -->
 <script type="text/javascript" src="/js/src/cet4.js"></script>
 ```
 
-
 ### [¶](#鼠标点击文明和谐)鼠标点击文明和谐
 
 将上述的love.js(或者自己新建一个js文件也都可以)改成
-
 
 ```sql
 <script type="text/javascript">
@@ -651,31 +590,25 @@ function() {
 </script>
 ```
 
-
 ### [¶](#背景的设置)背景的设置
 
 将 [particle.js](https://github.com/Neveryu/Neveryu.github.io/blob/master/js/src/particle.js) 文件添加到 \\themes\\next\\source\\js\\src 文件目录下。  
 找到 \\themes\\next\\layout\_layout.swing 文件， 在文件的后面，标签之前 添加以下代码：
-
 
 ```sql
 <!-- 背景动画 -->
 <script type="text/javascript" src="/js/src/particle.js"></script>
 ```
 
-
 ### [¶](#搜索功能)搜索功能
 
 安装 hexo-generator-searchdb，在站点的根目录下执行以下命令：
-
 
 ```sql
 $ npm install hexo-generator-searchdb --save
 ```
 
-
 编辑 站点配置文件，新增以下内容到任意位置：
-
 
 ```sql
 search:
@@ -684,7 +617,6 @@ search:
   format: html
   limit: 10000
 ```
-
 
 ### [¶](#添加来必力评论)添加来必力评论
 
@@ -696,15 +628,12 @@ search:
 
 首先在 \_config.yml 文件中添加如下配置：
 
-
 ```sql
 livere_uid: your uid
 ```
 
-
 其中 livere\_uid 即注册来必力获取到的 uid。  
 在 layout/\_scripts/third-party/comments/ 目录中添加 livere.swig，文件内容如下：
-
 
 ```sql
 {% if not (theme.duoshuo and theme.duoshuo.shortname) and not theme.duoshuo_shortname and not theme.disqus_shortname and not theme.hypercomments_id and not theme.gentie_productKey %}
@@ -723,25 +652,20 @@ livere_uid: your uid
 {% endif %}
 ```
 
-
 优先使用其他评论插件，如果其他评论插件没有开启，且LiveRe评论插件配置开启了，则使用LiveRe。其中脚本代码为上一步管理页面中获取到的。在layout/\_scripts/third-party/comments.swig文件中追加：
-
 
 ```sql
 {% include './comments/livere.swig' %}
 ```
 
-
 引入 LiveRe 评论插件。  
 最后，在 layout/\_partials/comments.swig 文件中条件最后追加LiveRe插件是否引用的判断逻辑：
-
 
 ```sql
 {% elseif theme.livere_uid %}
       <div id="lv-container" data-id="city" data-uid="{{ theme.livere_uid }}"></div>
 {% endif %}
 ```
-
 
 ### [¶](#解决来必力评论系统加载慢的方法)解决来必力评论系统加载慢的方法
 
@@ -760,21 +684,17 @@ livere_uid: your uid
 
 将这段代码
 
-
 ```sql
 <div class="comments" id="comments">
   <div id="lv-container" data-id="city" data-uid="{{ theme.livere_uid }}"></div>
 </div>
 ```
 
-
 改成
-
 
 ```sql
 <iframe title="livere" src="https://was.livere.me/comment/city?id=city&refer={{page.permalink}}&uid={{theme.livere_uid}}&site={{page.permalink}}&title={{page.title}}" scrolling="" frameborder="0" id="lv-comment-399" style="min-width: 100%; width: 100px; min-height: 400px; overflow: auto; border: 0px; z-index: 124212; height: 500px;" ></iframe>
 ```
-
 
 **然后就ok啦**重新编译和提交博客内容，**不过需要先清除缓存**
 
@@ -799,16 +719,13 @@ livere_uid: your uid
 
 将这段代码
 
-
 ```sql
 <div class="comments" id="comments">
   <div id="lv-container" data-id="city" data-uid="{{ theme.livere_uid }}"></div>
 </div>
 ```
 
-
 换成
-
 
 ```sql
  <div id="container" data-id="city" data-title="{{page.title}}" data-logo="" data-desc="" data-uid="{{theme.livere_uid}}" data-site="{{page.permalink}}" data-refer="{{page.permalink}}" data-redirectorigin="" data-highlightseq="" data-discuss="false" data-facebookpageid="" data-facebookuploadurl="">
@@ -829,7 +746,6 @@ livere_uid: your uid
 <script type="text/javascript" src="https://cdn-city.livere.com/js/lib.zero.js"></script>
 <script type="text/javascript" src="https://cdn-city.livere.com/js/comment.zero.zh-cn.dist.js"></script>
 ```
-
 
 > 就是直接将框架里的代码复制出来，不用框架。  
 > 但是这也会造成一个问题，没了框架的保护，来必力提供的外联样式表会与本地 css 样式冲突，导致本地的部分样式变形。
@@ -860,14 +776,12 @@ gitalk：一个基于 Github Issue 和 Preact 开发的评论插件
 
 参数说明：
 
-
 ```sql
 Application name： # 应用名称，随意
 Homepage URL： # 网站URL，如https://asdfv1929.github.io
 Application description # 描述，随意
 Authorization callback URL：# 网站URL，https://asdfv1929.github.io
 ```
-
 
 点击注册后，页面跳转如下，其中Client ID和Client Secret在后面的配置中需要用到，到时复制粘贴即可：
 
@@ -876,7 +790,6 @@ Authorization callback URL：# 网站URL，https://asdfv1929.github.io
 #### [¶](#gitalk-swig)gitalk.swig
 
 新建/layout/\_third-party/comments/gitalk.swig文件，并添加内容：
-
 
 ```sql
 {% if page.comments && theme.gitalk.enable %}
@@ -897,32 +810,26 @@ Authorization callback URL：# 网站URL，https://asdfv1929.github.io
 {% endif %}
 ```
 
-
 #### [¶](#comments-swig)comments.swig
 
 修改/layout/\_partials/comments.swig，添加内容如下，与前面的elseif同一级别上：
-
 
 ```sql
 {% elseif theme.gitalk.enable %}
  <div id="gitalk-container"></div>
 ```
 
-
 #### [¶](#index-swig)index.swig
 
 修改layout/\_third-party/comments/index.swig，在最后一行添加内容：
-
 
 ```sql
 {% include 'gitalk.swig' %}
 ```
 
-
 #### [¶](#config-yml)\_config.yml
 
 在主题配置文件next/\_config.yml中添加如下内容：
-
 
 ```sql
 gitalk:
@@ -935,7 +842,6 @@ gitalk:
   distractionFreeMode: true
 ```
 
-
 以上就是NexT中添加gitalk评论的配置，博客上传到GitHub上后，打开页面进入某一博客内容下，就可看到评论处。
 
 部分问题解决方法，可参见：  
@@ -944,7 +850,6 @@ gitalk:
 ### [¶](#设置网页背景图片)设置网页背景图片
 
 在themes\\next\\source\\css\_custom\\中添加
-
 
 ```sql
 body {
@@ -956,7 +861,6 @@ body {
 }
 ```
 
-
 将你的背景图片放在theme/next/source/images目录  
 上面的css代码我只设置图片放在网页右下角，可以根据个人爱好设置
 
@@ -966,7 +870,6 @@ body {
 
 在目录themes\\next\\layout找到index.swig文件  
 **在下面标记地方添加标记内容**
-
 
 ```sql
 {% block content %}
@@ -988,7 +891,6 @@ body {
       {{ post_template.render(post, true) }}    {% endfor %}
   </section>
 ```
-
 
 ### [¶](#设置字体)设置字体
 
@@ -1015,7 +917,6 @@ body {
 另外，每一项都有一个额外的 external 属性，此属性用来控制是否使用外链字体库。 开放此属性方便你设定那些已经安装在系统中的字体，减少不必要的请求（请求大小）。
 
 \*\*配置示例
-
 
 ```sql
 font:
@@ -1051,7 +952,6 @@ font:
     family: PT Mono
 ```
 
-
 ### [¶](#设置代码高亮主题)设置代码高亮主题
 
 NexT 使用 Tomorrow Theme 作为代码高亮，共有5款主题供你选择。 NexT 默认使用的是 白色的 normal 主题，可选的值有 normal，night， night blue， night bright， night eighties：
@@ -1060,14 +960,12 @@ NexT 使用 Tomorrow Theme 作为代码高亮，共有5款主题供你选择。 
 
 高亮主题设置示例
 
-
 ```sql
 # Code Highlight theme
 # Available value: normal | night | night eighties | night blue | night bright
 # https://github.com/chriskempson/tomorrow-theme
 highlight_theme: normal
 ```
-
 
 ### [¶](#侧边栏社交链接)侧边栏社交链接
 
@@ -1076,7 +974,6 @@ highlight_theme: normal
 1.  链接放置在 social 字段下，一行一个链接。其键值格式是 显示文本: 链接地址。
 
 配置示例
-
 
 ```sql
 # Social links
@@ -1089,11 +986,9 @@ social:
   # 等等
 ```
 
-
 2.  设定链接的图标，对应的字段是 social\_icons。其键值格式是 匹配键: Font Awesome 图标名称， 匹配键 与上一步所配置的链接的 显示文本 相同（大小写严格匹配），图标名称 是 Font Awesome 图标的名字（不必带 fa- 前缀）。 enable 选项用于控制是否显示图标，你可以设置成 false 来去掉图标。
 
 配置示例
-
 
 ```sql
 # Social Icons
@@ -1105,13 +1000,11 @@ social_icons:
   微博: weibo
 ```
 
-
 ### [¶](#开启打赏功能)开启打赏功能
 
 越来越多的平台（微信公众平台，新浪微博，简书，百度打赏等）支持打赏功能，付费阅读时代越来越近，特此增加了打赏功能，支持微信打赏和支付宝打赏。 只需要 主题配置文件 中填入 微信 和 支付宝 收款二维码图片地址 即可开启该功能。
 
 打赏功能配置示例
-
 
 ```sql
 reward_comment: 坚持原创技术分享，您的支持将鼓励我继续创作！
@@ -1119,13 +1012,11 @@ wechatpay: /path/to/wechat-reward-image
 alipay: /path/to/alipay-reward-image
 ```
 
-
 ### [¶](#友情链接)友情链接
 
 编辑 主题配置文件 添加：
 
 友情链接配置示例
-
 
 ```sql
 # title
@@ -1135,12 +1026,10 @@ links:
   Title: http://example.com/
 ```
 
-
 ### [¶](#腾讯公益404页面)腾讯公益404页面
 
 腾讯公益404页面，寻找丢失儿童，让大家一起关注此项公益事业！效果如下 [http://www.ixirong.com/404.html](http://www.ixirong.com/404.html)  
 使用方法，新建 404.html 页面，放到主题的 source 目录下，内容如下：
-
 
 ```sql
 <!DOCTYPE HTML>
@@ -1163,18 +1052,15 @@ links:
 </html>
 ```
 
-
 ### [¶](#站点建立时间)站点建立时间
 
 这个时间将在站点的底部显示，例如 © 2013 - 2015。 编辑 主题配置文件，新增字段 since。
 
 配置示例
 
-
 ```sql
 since: 2013
 ```
-
 
 ### [¶](#订阅微信公众号)订阅微信公众号
 
@@ -1183,7 +1069,6 @@ since: 2013
 
 1.  在微信公众号平台下载您的二维码，并将它存放于博客source/uploads/目录下。
 2.  然后编辑 主题配置文件，如下：
-
 
 ```sql
 配置示例
@@ -1194,14 +1079,12 @@ wechat_subscriber:
   description: 欢迎您扫一扫上面的微信公众号，订阅我的博客！
 ```
 
-
 ## [¶](#seo优化)SEO优化
 
 seo优化对于网站是否能被搜索引擎快速收录有很大帮助，因此适当做一些seo还是有必要的，以下内容参考：https://lancelot\_lewis.coding.me/2016/08/16/blog/Hexo-NexT-SEO/
 
 添加sitemap文件  
 安装以下2个插件，然后重启hexo后，网站根目录（source）下会生成sitemap.xml与baidusitemap.xml文件，搜索引擎在爬取时会参照文件中的url去收录。
-
 
 ```sql
 npm install hexo-generator-sitemap --save-dev
@@ -1210,11 +1093,9 @@ npm install hexo-generator-baidu-sitemap --save-dev
 hexo d -g
 ```
 
-
 #### [¶](#添加robots-txt)添加robots.txt
 
 新建robots.txt文件，添加以下文件内容，把robots.txt放在hexo站点的source文件下。
-
 
 ```sql
 User-agent: * Allow: /
@@ -1229,24 +1110,19 @@ Sitemap: http://thief.one/sitemap.xml
 Sitemap: http://thief.one/baidusitemap.xml
 ```
 
-
 #### [¶](#首页title的优化)首页title的优化
 
 更改index.swig文件，文件路径是your-hexo-site\\themes\\next\\layout，将下面代码
-
 
 ```sql
 {% block title %}  {{ config.title }} {% endblock %}
 ```
 
-
 改成
-
 
 ```sql
 {% block title %}  {{ config.title }}- {{ theme.description }} {% endblock}
 ```
-
 
 观察首页title就是标题+描述了。
 
@@ -1258,14 +1134,11 @@ sitemap安装配置
 
 1.  安装
 
-
 ```sql
 $ npm install hexo-generator-sitemap --save
 ```
 
-
 2.  修改站点配置文件
-
 
 ```sql
 # Extensions
@@ -1273,15 +1146,12 @@ plugins:
 - hexo-generator-sitemap
 ```
 
-
 使用以下命令后，你可以在站点的/public目录下找到一个sitemap.xml文件，这个文件就是你的站点地图，里面包含你的站点的网页地址。
-
 
 ```sql
 hexo clean
 hexo g
 ```
-
 
 [如何向google提交sitemap](http://fionat.github.io/blog/2013/10/23/sitemap/)
 
@@ -1290,14 +1160,11 @@ hexo g
 问题:  
 使用以下命令安装sitemap插件后,按上面步骤配置，执行hexo g命令无法生成sitemap.xml文件。
 
-
 ```sql
 $ npm install hexo-generator-sitemap
 ```
 
-
 观察发现博客根目录下的package.json文件中dependencies并没有sitemap插件的依赖。
-
 
 ```sql
 {
@@ -1322,23 +1189,18 @@ $ npm install hexo-generator-sitemap
 }
 ```
 
-
 解决方法：  
 如果已安装sitemap插件，卸载sitemap插件
-
 
 ```sql
 $ npm uninstall hexo-generator-sitemap
 ```
 
-
 安装sitemap插件时，加上- -save参数，如下
-
 
 ```sql
 $ npm install hexo-generator-sitemap --save
 ```
-
 
 安装完成后，我们再查看博客根目录下的package.json文件，发现dependencies中已经有了sitemap插件，然后我们再执行hexo g命令，就能够在/public目录下找到一个sitemap.xml文件了。
 
@@ -1348,14 +1210,11 @@ $ npm install hexo-generator-sitemap --save
 
 1.  安装
 
-
 ```sql
 $ npm install hexo-generator-baidu-sitemap --save
 ```
 
-
 2.  修改站点配置文件
-
 
 ```sql
 # Extensions
@@ -1366,15 +1225,12 @@ baidusitemap:
     path: baidusitemap.xml
 ```
 
-
 同理，使用以下命令后，你可以在站点的/public目录下找到一个baidusitemap.xml文件。
-
 
 ```sql
 hexo clean
 hexo g
 ```
-
 
 3.  将baidusitemap.xml提交给百度
 

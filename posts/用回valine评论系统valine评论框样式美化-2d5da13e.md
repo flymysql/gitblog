@@ -39,7 +39,6 @@ origin:
 
 在themes\\next\\source\\css\\custom目录下的custom.styl文件中添加如下
 
-
 ```sql
 
 /*valine 评论系统样式*/
@@ -240,7 +239,6 @@ div.vedit{
 
 /**/
 ```
-
 
 更新文件
 

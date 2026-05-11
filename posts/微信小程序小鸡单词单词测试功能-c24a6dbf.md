@@ -15,7 +15,6 @@ origin:
 
 ### [¶](#页面初始数据)页面初始数据
 
-
 ```sql
 data: {
 	da1:"",
@@ -36,9 +35,7 @@ data: {
 },
 ```
 
-
 ### [¶](#生命周期函数-监听页面加载)生命周期函数–监听页面加载
-
 
 ```sql
 onLoad: function (options) {
@@ -51,9 +48,7 @@ app.pageGetUserInfo(this,
 	this.getScore)
 ```
 
-
 ### [¶](#单词选择函数)//单词选择函数
-
 
 ```sql
 choice(e){
@@ -95,9 +90,7 @@ console.log(e)
   },
 ```
 
-
 ### [¶](#下一组单词分配函数)下一组单词分配函数
-
 
 ```sql
 search(){
@@ -140,9 +133,7 @@ success: function (res) {
 }) } } }) },
 ```
 
-
 ### [¶](#成绩上传)成绩上传
-
 
 ```sql
 set_score(score) {
@@ -163,9 +154,7 @@ set_score(score) {
 }); } },
 ```
 
-
 ### [¶](#获取成绩)获取成绩
-
 
 ```sql
 getScore(openId) {
@@ -188,9 +177,7 @@ getScore(openId) {
  that.getRankGlobalData() } },
 ```
 
-
 ### [¶](#加载全球排名的数据)//加载全球排名的数据
-
 
 ```sql
 ![](https://www.idealli.com/wp-content/uploads/2018/04/092204rcpp42avah2zon2m-169x300.jpg) getRankGlobalData() {
@@ -210,6 +197,5 @@ getScore(openId) {
 }) },
 })
 ```
-
 
 上面写了部分的函数功能，全部代码在这里 [https://github.com/six-3/-/blob/master/pages/test/test.js](https://github.com/six-3/-/blob/master/pages/test/test.js)

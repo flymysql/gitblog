@@ -49,18 +49,15 @@ cd ~/downloads/vim74/
 
 其中参数说明如下：
 
-
 ```cpp
 –with-features=huge：支持最大特性 –enable-rubyinterp：启用Vim对ruby编写的插件的支持 –enable-pythoninterp：启用Vim对python编写的插件的支持 –enable-luainterp：启用Vim对lua编写的插件的支持 –enable-perlinterp：启用Vim对perl编写的插件的支持 –enable-multibyte：多字节支持 可以在Vim中输入中文 –enable-cscope：Vim对cscope支持 –enable-gui=gtk2：gtk2支持,也可以使用gnome，表示生成gvim –with-python-config-dir=/usr/lib/python2.7/config-i386-linux-gnu/ 指定 python 路径 –prefix=/usr：编译安装路径 需要重新配置时，可以输入 make distclean #清理一下上一次编译生成的所有文件，这些其实都是GNU Make的命令我们就不细讲了
 ```
-
 
 ```
 sudo make VIMRUNTIMEDIR=/usr/share/vim/vim74
 
 sudo make install
 ```
-
 
 ```cpp
 
@@ -619,5 +616,3 @@ let NERDTreeWinSize=22 "--------------------------------------------------------
 
 "----------------------------------------------------------------- " plugin - NeoComplCache.vim 自动补全插件 "----------------------------------------------------------------- let g:AutoComplPop NotEnableAtStartup = 1 let g:NeoComplCache EnableAtStartup = 1 let g:NeoComplCache SmartCase = 1 let g:NeoComplCache TagsAutoUpdate = 1 let g:NeoComplCache EnableInfo = 1 let g:NeoComplCache EnableCamelCaseCompletion = 1 let g:NeoComplCache MinSyntaxLength = 3 let g:NeoComplCache EnableSkipCompletion = 1 let g:NeoComplCache SkipInputTime = '0.5' let g:NeoComplCache SnippetsDir = $VIMFILES.'/snippets' " <TAB> completion. inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>" " snippets expand key imap <silent> <C-e> <Plug>(neocomplcache snippets expand) smap <silent> <C-e> <Plug>(neocomplcache snippets expand)
 ```
-
-

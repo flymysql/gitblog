@@ -92,7 +92,6 @@ Address Data Next
 
 代码如下
 
-
 ```cpp
 #include <iostream>
 #include <algorithm>
@@ -119,7 +118,6 @@ int main()
  printf("%05d %d -1", lis[sum - 1], data[lis[sum - 1]]);
 }
 ```
-
 
 **有几个PAT（25）**
 
@@ -154,7 +152,6 @@ APPAPT
 
 代码：
 
-
 ```cpp
 #include <iostream>
 using namespace std;
@@ -170,5 +167,3 @@ int main() {
  cou**t<<c%1000000007;
 }
 ```
-
-
