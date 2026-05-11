@@ -7,7 +7,7 @@ export const CONFIG = {
   // 你的 GitHub 仓库（也是 GitHub Pages 部署的仓库）
   repo: {
     owner: 'flymysql',
-    name: 'blog',
+    name: 'gitblog',
     branch: 'main',
   },
 
@@ -18,9 +18,9 @@ export const CONFIG = {
 
   // 站点信息
   site: {
-    title: '我的博客',
+    title: '春日野鬼',
     subtitle: '记录想法与代码',
-    author: '你的名字',
+    author: '小红鸡',
     avatar: 'https://avatars.githubusercontent.com/u/37113068?s=400&u=cf2b8a258ad1de5e9a23e3c72da6ca04e058dd46&v=4',
     description: '一个用 GitHub Pages 托管、可在线编辑的简书风格博客',
   },
