@@ -75,9 +75,9 @@ function navHtml(active) {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </button>
         ${themeToggleHtml()}
-        <a class="btn-write" href="admin/editor.html">
+        <a class="btn-write" href="admin/" title="进入创作后台">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-          写文章
+          创作
         </a>
       </div>
     </nav>

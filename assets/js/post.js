@@ -62,12 +62,26 @@ function renderToc(items) {
 
 function renderGiscus(slug, title) {
   const g = CONFIG.giscus;
-  if (!g || !g.enabled || !g.repoId || !g.categoryId) return;
+  if (!g || !g.enabled) return;
+
   const article = $('#article');
   const wrap = document.createElement('section');
   wrap.className = 'comments';
-  wrap.innerHTML = `<div class="comments-title">评论</div><div id="giscusBox"></div>`;
   article.appendChild(wrap);
+
+  if (!g.repoId || !g.categoryId) {
+    wrap.innerHTML = `
+      <div class="comments-title">评论</div>
+      <div class="comments-hint">
+        评论功能已启用，但缺少 <code>repoId</code> 或 <code>categoryId</code>。<br>
+        请到 <a href="https://giscus.app" target="_blank" rel="noopener">giscus.app</a> 生成配置，再到
+        <a href="admin/settings.html">后台 · 设置</a> 里填写后保存。
+      </div>
+    `;
+    return;
+  }
+
+  wrap.innerHTML = `<div class="comments-title">评论</div><div id="giscusBox"></div>`;
 
   const html = document.documentElement;
   const choice = html.dataset.themeChoice || 'auto';

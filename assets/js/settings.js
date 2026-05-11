@@ -2,9 +2,9 @@
 // 后台站点设置：在线编辑 assets/js/config.js
 // ============================================================================
 
-import { CONFIG, VERSION } from './config.js';
-import { getToken, isAuthorized, rememberReturnTo } from './auth.js';
+import { CONFIG } from './config.js';
 import { readFile, writeFile } from './api.js';
+import { mountAdminShell, escapeHtml, showToast } from './admin-shell.js';
 
 const CONFIG_PATH = 'assets/js/config.js';
 const $ = sel => document.querySelector(sel);
@@ -19,21 +19,10 @@ function clone(v) {
 }
 
 function setStatus(text, kind = '') {
-  const el = $('#status');
+  const el = $('#settingsStatus');
+  if (!el) return;
   el.textContent = text;
-  el.className = 'editor-status ' + kind;
-}
-
-function toast(msg, kind = '') {
-  const t = document.createElement('div');
-  t.className = 'toast' + (kind ? ' ' + kind : '');
-  t.textContent = msg;
-  document.body.appendChild(t);
-  requestAnimationFrame(() => t.classList.add('show'));
-  setTimeout(() => {
-    t.classList.remove('show');
-    setTimeout(() => t.remove(), 200);
-  }, 2600);
+  el.className = 'settings-status ' + kind;
 }
 
 function getByPath(obj, path) {
@@ -120,7 +109,6 @@ function normalizeConfig(config) {
   config.theme = config.theme || { default: 'auto' };
   if (!['auto', 'light', 'dark'].includes(config.theme.default)) config.theme.default = 'auto';
 
-  // giscus 使用字符串配置，避免第三方脚本 data-* 属性类型不一致
   config.giscus.strict = String(config.giscus.strict ?? '0');
   config.giscus.reactionsEnabled = String(config.giscus.reactionsEnabled ?? '1');
   config.giscus.emitMetadata = String(config.giscus.emitMetadata ?? '0');
@@ -172,7 +160,6 @@ function makeVersion() {
 }
 
 function stableStringify(obj, indent = 0) {
-  // 生成更适合人工阅读的 JS object literal；配置里只含 JSON 数据
   const space = '  '.repeat(indent);
   const next = '  '.repeat(indent + 1);
   if (Array.isArray(obj)) {
@@ -223,7 +210,7 @@ async function save() {
 
   setStatus('保存中…', 'saving');
   $('#saveBtn').disabled = true;
-  $('#saveTop').disabled = true;
+  if ($('#saveTop')) $('#saveTop').disabled = true;
   try {
     if (!state.sourceSha) await loadRemoteConfigSha();
     const source = toSource(config);
@@ -231,7 +218,7 @@ async function save() {
     state.sourceSha = res && res.content && res.content.sha;
     state.current = config;
     setStatus('已保存', 'saved');
-    toast('设置已保存，Pages 重新部署后生效');
+    showToast('设置已保存，Pages 重新部署后生效');
     alert('设置已保存。\n\nGitHub Pages 通常会在 30-120 秒后更新。若前台仍是旧配置，请强制刷新或在 URL 后加 ?v=' + Date.now());
   } catch (e) {
     console.error(e);
@@ -239,37 +226,107 @@ async function save() {
     alert('保存失败：\n\n' + (e.message || String(e)));
   } finally {
     $('#saveBtn').disabled = false;
-    $('#saveTop').disabled = false;
+    if ($('#saveTop')) $('#saveTop').disabled = false;
   }
 }
 
-function gate() {
-  if (!getToken()) {
-    rememberReturnTo(window.location.href);
-    window.location.href = './';
-    return false;
-  }
-  if (!isAuthorized()) {
-    alert('当前账号不在白名单内，无法修改设置');
-    window.location.href = './';
-    return false;
-  }
-  return true;
+function settingsContentHtml() {
+  return `
+    <div class="admin-toolbar">
+      <span id="settingsStatus" class="settings-status">未保存</span>
+      <div class="admin-toolbar-spacer"></div>
+      <button class="btn btn-secondary" id="resetBtn">恢复当前配置</button>
+      <button class="btn btn-primary" id="saveBtn">保存设置</button>
+    </div>
+
+    <form id="settingsForm" class="settings-form">
+      <section class="settings-card">
+        <h3>站点信息</h3>
+        <div class="settings-grid">
+          <label>站点名称 <input name="site.title" placeholder="我的博客"></label>
+          <label>副标题 <input name="site.subtitle" placeholder="记录想法与代码"></label>
+          <label>作者名 <input name="site.author" placeholder="作者"></label>
+          <label>站点 URL <input name="site.url" placeholder="https://user.github.io/repo"></label>
+          <label class="span-2">描述 <textarea name="site.description" rows="3" placeholder="一句话介绍你的博客"></textarea></label>
+          <label>头像 URL <input name="site.avatar" placeholder="https://..."></label>
+          <label>Logo URL <input name="site.logo" placeholder="可选，顶部导航图标"></label>
+          <label>Favicon URL <input name="site.favicon" placeholder="可选，浏览器标签页图标"></label>
+          <label>语言 <input name="site.locale" placeholder="zh-CN"></label>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <h3>仓库与权限</h3>
+        <p class="settings-help">这里决定后台保存到哪个 GitHub 仓库。修改仓库名后，本次保存仍会写到当前仓库，下一次刷新后新配置才生效。</p>
+        <div class="settings-grid">
+          <label>owner <input name="repo.owner" placeholder="flymysql"></label>
+          <label>repo name <input name="repo.name" placeholder="gitblog"></label>
+          <label>branch <input name="repo.branch" placeholder="main"></label>
+          <label class="span-2">后台白名单（逗号或换行分隔） <textarea name="authorizedUsers" rows="3" placeholder="flymysql"></textarea></label>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <h3>导航与社交链接</h3>
+        <div class="settings-grid">
+          <label>GitHub <input name="site.social.github" placeholder="https://github.com/xxx"></label>
+          <label>Twitter / X <input name="site.social.twitter" placeholder="https://x.com/xxx"></label>
+          <label>Email <input name="site.social.email" placeholder="name@example.com"></label>
+          <label>RSS <input name="site.social.rss" placeholder="rss.xml"></label>
+          <label class="span-2">顶部导航（JSON 数组） <textarea name="site.nav" rows="8" spellcheck="false"></textarea></label>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <h3>评论（giscus）</h3>
+        <p class="settings-help">需要先在 GitHub 仓库启用 Discussions，然后到 giscus.app 生成 repoId 和 categoryId。</p>
+        <div class="settings-grid">
+          <label class="settings-check"><input type="checkbox" name="giscus.enabled"> 启用 giscus 评论</label>
+          <label>repo <input name="giscus.repo" placeholder="owner/repo"></label>
+          <label>repoId <input name="giscus.repoId"></label>
+          <label>category <input name="giscus.category"></label>
+          <label>categoryId <input name="giscus.categoryId"></label>
+          <label>mapping <input name="giscus.mapping" placeholder="pathname"></label>
+          <label>language <input name="giscus.lang" placeholder="zh-CN"></label>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <h3>路径与主题</h3>
+        <div class="settings-grid">
+          <label>文章目录 <input name="paths.posts" placeholder="posts"></label>
+          <label>索引文件 <input name="paths.index" placeholder="data/posts.json"></label>
+          <label>上传目录 <input name="paths.uploads" placeholder="assets/uploads"></label>
+          <label>默认主题
+            <select name="theme.default">
+              <option value="auto">跟随系统</option>
+              <option value="light">浅色</option>
+              <option value="dark">深色</option>
+            </select>
+          </label>
+        </div>
+      </section>
+    </form>
+  `;
 }
 
-async function init() {
-  if (!gate()) return;
-  document.title = `站点设置 · ${CONFIG.site.title}`;
+function topActions() {
+  return `<button class="btn btn-primary" id="saveTop">保存设置</button>`;
+}
+
+(async function init() {
+  const ctx = await mountAdminShell({ active: 'settings', title: '站点设置', actions: topActions() });
+  if (!ctx) return;
+
+  ctx.content.innerHTML = settingsContentHtml();
   fillForm(state.current);
   await loadRemoteConfigSha();
 
   $('#saveBtn').addEventListener('click', save);
-  $('#saveTop').addEventListener('click', save);
+  if ($('#saveTop')) $('#saveTop').addEventListener('click', save);
   $('#resetBtn').addEventListener('click', () => {
     if (confirm('确定恢复为当前线上配置吗？未保存修改会丢失。')) fillForm(state.current);
   });
 
   $('#settingsForm').addEventListener('input', () => setStatus('未保存', 'saving'));
-}
-
-init();
+})();

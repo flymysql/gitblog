@@ -3,15 +3,10 @@
 // ============================================================================
 
 import { CONFIG } from './config.js';
-import { getToken, getUser } from './auth.js';
+import { getToken } from './auth.js';
+import { mountAdminShell, escapeHtml } from './admin-shell.js';
 
 const $ = sel => document.querySelector(sel);
-
-function escapeHtml(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
-  );
-}
 
 function makeRow(id, title) {
   return `
@@ -60,7 +55,6 @@ async function ghAuth(path) {
 async function run() {
   $('#list').innerHTML = checks.map(c => makeRow(c.id, c.title)).join('');
 
-  // 1. token
   const token = getToken();
   if (!token) {
     setRow('token', 'fail', '没有 token。<a href="./" style="color:var(--primary)">前往登录</a>');
@@ -68,7 +62,6 @@ async function run() {
   }
   setRow('token', 'ok', `已登录，token 后 6 位：<code>${escapeHtml(token.slice(-6))}</code>`);
 
-  // 2. user
   let userLogin = '';
   try {
     const r = await ghAuth('/user');
@@ -81,13 +74,11 @@ async function run() {
     return;
   }
 
-  // 3. whitelist
   const allow = (CONFIG.authorizedUsers || []).map(s => s.toLowerCase());
   if (!allow.length) setRow('whitelist', 'warn', '未配置 authorizedUsers，所有登录账号都可访问后台');
   else if (allow.includes(userLogin.toLowerCase())) setRow('whitelist', 'ok', `已包含 <code>${escapeHtml(userLogin)}</code>`);
   else setRow('whitelist', 'fail', `账号 <code>${escapeHtml(userLogin)}</code> 不在白名单 <code>[${escapeHtml(allow.join(', '))}]</code>`);
 
-  // 4. repo
   let repoData = null;
   try {
     const r = await ghAuth(`/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}`);
@@ -105,7 +96,6 @@ async function run() {
     return;
   }
 
-  // 5. branch
   try {
     const r = await ghAuth(`/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}/branches/${encodeURIComponent(CONFIG.repo.branch)}`);
     if (r.status === 404) {
@@ -120,7 +110,6 @@ async function run() {
     setRow('branch', 'warn', '检查失败：' + escapeHtml(e.message));
   }
 
-  // 6. contents 写权限：发起一次诊断写入再删除
   try {
     const probe = `.diagnose/probe-${Date.now()}.txt`;
     const put = await fetch(`https://api.github.com/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}/contents/${probe}`, {
@@ -138,7 +127,6 @@ async function run() {
     });
     const pj = await put.json();
     if (put.ok) {
-      // 立即删除
       try {
         await fetch(`https://api.github.com/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}/contents/${probe}`, {
           method: 'DELETE',
@@ -164,7 +152,6 @@ async function run() {
     setRow('contents', 'warn', '检查失败：' + escapeHtml(e.message));
   }
 
-  // 7. 索引文件
   try {
     const r = await ghAuth(`/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}/contents/${encodeURI(CONFIG.paths.index)}?ref=${CONFIG.repo.branch}`);
     if (r.status === 404) setRow('index', 'warn', `<code>${escapeHtml(CONFIG.paths.index)}</code> 不存在，第一次发布文章时会自动创建`);
@@ -186,7 +173,6 @@ async function run() {
     setRow('index', 'warn', '检查失败：' + escapeHtml(e.message));
   }
 
-  // 8. Pages
   try {
     const r = await ghAuth(`/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}/pages`);
     if (r.status === 404) setRow('pages', 'warn', 'GitHub Pages 尚未启用。仓库 Settings → Pages 中开启');
@@ -202,11 +188,17 @@ async function run() {
   }
 }
 
-(function init() {
-  if (!getToken()) {
-    document.getElementById('list').innerHTML = '<div class="empty">尚未登录。<a href="./" style="color:var(--primary)">前往登录</a></div>';
-    return;
-  }
-  run();
-  document.getElementById('rerun').addEventListener('click', run);
+function topActions() {
+  return `<button class="btn btn-primary" id="rerun">重新检查</button>`;
+}
+
+(async function init() {
+  const ctx = await mountAdminShell({ active: 'diagnose', title: '系统诊断', actions: topActions() });
+  if (!ctx) return;
+
+  ctx.content.innerHTML = `<div class="diagnose-list" id="list"></div>`;
+  await run();
+
+  const btn = document.getElementById('rerun');
+  if (btn) btn.addEventListener('click', run);
 })();

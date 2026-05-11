@@ -4,31 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>后台诊断</title>
-  <link rel="stylesheet" href="../assets/css/common.css?v=20260512">
-  <link rel="stylesheet" href="../assets/css/admin.css?v=20260512">
+  <link rel="stylesheet" href="../assets/css/common.css?v=20260513">
+  <link rel="stylesheet" href="../assets/css/admin.css?v=20260513">
   <script>(function(){var t=localStorage.getItem('blog_theme')||'auto';var d=t==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light':t;document.documentElement.setAttribute('data-theme',d);document.documentElement.dataset.themeChoice=t;})();</script>
 </head>
 <body class="admin-page">
-  <header class="nav">
-    <div class="nav-inner">
-      <a class="nav-logo" href="../">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L19.82 8 12 11.82 4.18 8 12 4.18zM4 9.27l7 3.5v7.46l-7-3.5V9.27zm9 10.96v-7.46l7-3.5v7.46l-7 3.5z"/></svg>
-        <span>诊断</span>
-      </a>
-      <a class="nav-link" href="./">返回管理</a>
-      <a class="nav-link" href="settings.html">设置</a>
-      <div class="nav-spacer"></div>
-    </div>
-  </header>
+  <div id="app"></div>
 
-  <main class="admin-layout">
-    <div class="admin-toolbar">
-      <h2>系统诊断</h2>
-      <button class="btn btn-primary" id="rerun">重新检查</button>
-    </div>
-    <div class="diagnose-list" id="list"></div>
-  </main>
-
-  <script type="module" src="../assets/js/diagnose.js?v=20260512"></script>
+  <script type="module" src="../assets/js/diagnose.js?v=20260513"></script>
 </body>
 </html>

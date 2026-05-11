@@ -1,19 +1,13 @@
 // ============================================================================
-// 后台首页：登录 + 文章管理（已发布 / 草稿 tab）
+// 后台首页：文章管理（已发布 / 草稿 tab）
+// 使用 admin-shell 提供的统一 sidebar 布局
 // ============================================================================
 
 import { CONFIG } from './config.js';
-import { loginWithToken, logout, isAuthorized, getToken, getUser, popReturnTo } from './auth.js';
 import { readIndex, fetchIndexPublic, deleteFile, readFile, writeIndex } from './api.js';
-import { initTheme, bindThemeToggle, themeToggleHtml } from './theme.js';
+import { mountAdminShell, escapeHtml, showToast } from './admin-shell.js';
 
 const $ = sel => document.querySelector(sel);
-
-function escapeHtml(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
-  );
-}
 
 function fmtDate(iso) {
   if (!iso) return '';
@@ -21,136 +15,28 @@ function fmtDate(iso) {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
-function showToast(msg, kind = '') {
-  const t = document.createElement('div');
-  t.className = 'toast' + (kind ? ' ' + kind : '');
-  t.textContent = msg;
-  document.body.appendChild(t);
-  requestAnimationFrame(() => t.classList.add('show'));
-  setTimeout(() => {
-    t.classList.remove('show');
-    setTimeout(() => t.remove(), 200);
-  }, 2200);
-}
-
-function renderThemeToggle() {
-  const host = $('#themeToggleHost');
-  if (!host) return;
-  host.outerHTML = themeToggleHtml();
-  bindThemeToggle();
-}
-
-function renderLogin() {
-  $('#navActions').innerHTML = '';
-  const tokenUrl = buildTokenCreateUrl();
-  $('#main').innerHTML = `
-    <div class="login-wrap">
-      <div class="login-card">
-        <div class="logo">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
-            <path d="M12 .3a12 12 0 00-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.2 1.9 1.2 1.1 1.9 2.9 1.3 3.6 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.2c0 .3.2.7.8.6A12 12 0 0012 .3"/>
-          </svg>
-        </div>
-        <h1>登录后台</h1>
-        <p>粘贴你的 GitHub Personal Access Token，文章会以 commit 形式直接推到仓库。<br>
-        <a href="${tokenUrl}" target="_blank" rel="noopener" style="color:var(--primary)">点这里生成 token →</a></p>
-        <form id="loginForm" autocomplete="off" style="text-align:left">
-          <label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px">Personal Access Token</label>
-          <div style="position:relative;margin-bottom:14px">
-            <input type="password" id="tokenInput" placeholder="ghp_xxx 或 github_pat_xxx" required>
-            <button type="button" id="togglePwd" tabindex="-1" class="icon-btn" style="position:absolute;right:4px;top:4px">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);margin-bottom:14px;cursor:pointer">
-            <input type="checkbox" id="remember" checked> 在此设备保持登录
-          </label>
-          <button type="submit" class="btn-github" id="btnLogin">验证并登录</button>
-          <div id="loginError" style="display:none;margin-top:12px;color:#d9534f;font-size:13px;text-align:center"></div>
-        </form>
-        <div class="login-warn">
-          仅 ${escapeHtml((CONFIG.authorizedUsers || []).join('、') || '已配置的用户')} 可进入后台。<br>
-          token 只保存在当前浏览器，不会上传到任何第三方。<br>
-          遇到问题？<a href="diagnose.html" style="color:var(--primary)">打开诊断页</a>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const $form = $('#loginForm');
-  const $token = $('#tokenInput');
-  const $err = $('#loginError');
-  const $btn = $('#btnLogin');
-
-  $('#togglePwd').addEventListener('click', () => {
-    $token.type = $token.type === 'password' ? 'text' : 'password';
-  });
-
-  $form.addEventListener('submit', async e => {
-    e.preventDefault();
-    $err.style.display = 'none';
-    $btn.disabled = true;
-    $btn.textContent = '验证中…';
-    try {
-      await loginWithToken($token.value, { remember: $('#remember').checked });
-      const back = popReturnTo();
-      if (back && back !== window.location.href) window.location.href = back;
-      else window.location.reload();
-    } catch (err) {
-      $err.textContent = err.message || String(err);
-      $err.style.display = '';
-      $btn.disabled = false;
-      $btn.textContent = '验证并登录';
-    }
-  });
-}
-
-function renderUnauthorized() {
-  const user = getUser();
-  $('#main').innerHTML = `
-    <div class="login-wrap">
-      <div class="login-card">
-        <div class="logo">!</div>
-        <h1>没有权限</h1>
-        <p>当前账号 <b>${escapeHtml(user ? user.login : '')}</b> 不在白名单内。<br>
-        如果需要授权，请把你的 GitHub 用户名加入 <code>assets/js/config.js</code> 的 <code>authorizedUsers</code>。</p>
-        <button class="btn-github" id="btnLogout">退出登录</button>
-      </div>
-    </div>
-  `;
-  $('#btnLogout').addEventListener('click', () => logout(window.location.href));
-}
-
-function renderHeaderUser() {
-  const user = getUser();
-  $('#navActions').innerHTML = `
-    <a class="btn-write" href="editor.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+function topActions() {
+  return `
+    <a class="btn btn-primary" href="editor.html">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:-2px"><path d="M12 5v14M5 12h14"/></svg>
       新建文章
     </a>
-    <div class="nav-avatar" style="background-image:url(${escapeHtml(user && user.avatar_url || '')});width:32px;height:32px;border-radius:50%;background-size:cover" title="${escapeHtml(user ? user.login : '')}"></div>
-    <button class="btn-ghost" id="btnLogout">退出</button>
   `;
-  $('#btnLogout').addEventListener('click', () => logout(window.location.href));
 }
 
-async function renderDashboard() {
-  renderHeaderUser();
-  $('#main').innerHTML = `
-    <div class="admin-layout">
-      <div class="admin-toolbar">
-        <h2>文章管理</h2>
-        <div class="admin-tabs">
-          <button data-tab="all" class="active">全部</button>
-          <button data-tab="published">已发布</button>
-          <button data-tab="draft">草稿</button>
-        </div>
-        <input class="search-input" id="search" placeholder="搜索标题或标签">
-        <a class="btn btn-primary" href="editor.html">+ 新建</a>
+async function renderDashboard(content) {
+  content.innerHTML = `
+    <div class="admin-toolbar">
+      <div class="admin-tabs">
+        <button data-tab="all" class="active">全部</button>
+        <button data-tab="published">已发布</button>
+        <button data-tab="draft">草稿</button>
       </div>
-      <div class="admin-list" id="list">
-        <div class="loading">加载中…</div>
-      </div>
+      <div class="admin-toolbar-spacer"></div>
+      <input class="search-input" id="search" placeholder="搜索标题或标签">
+    </div>
+    <div class="admin-list" id="list">
+      <div class="loading">加载中…</div>
     </div>
   `;
 
@@ -266,24 +152,13 @@ async function renderDashboard() {
   });
 }
 
-function buildTokenCreateUrl() {
-  const desc = encodeURIComponent(`Blog Admin - ${CONFIG.repo.owner}/${CONFIG.repo.name}`);
-  return `https://github.com/settings/personal-access-tokens/new?description=${desc}&target_name=${encodeURIComponent(CONFIG.repo.owner)}`;
-}
-
-(function init() {
-  initTheme();
-  renderThemeToggle();
-  document.title = `后台 · ${CONFIG.site.title}`;
-
-  if (!getToken()) return renderLogin();
-  if (!isAuthorized()) return renderUnauthorized();
-  renderDashboard().catch(err => {
+(async function init() {
+  const ctx = await mountAdminShell({ active: 'posts', title: '文章管理', actions: topActions() });
+  if (!ctx) return;
+  try {
+    await renderDashboard(ctx.content);
+  } catch (err) {
     console.error(err);
-    if (err.status === 401) {
-      logout(window.location.href);
-      return;
-    }
-    showToast('加载失败：' + err.message, 'error');
-  });
+    ctx.showToast('加载失败：' + err.message, 'error');
+  }
 })();
