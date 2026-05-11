@@ -7,18 +7,24 @@
   margin: 0 auto;
   padding: 36px 24px 80px;
   display: grid;
-  grid-template-columns: 1fr 220px;
+  /* minmax(0, 1fr) 而不是 1fr：grid 默认 1fr = minmax(auto, 1fr)，
+     超长内容（长链接 / 长公式 / 代码块）会把列撑到视口之外，必须用 minmax(0, ...) 兜底 */
+  grid-template-columns: minmax(0, 1fr) 220px;
   gap: 48px;
 }
 
-/* TOC 隐藏时回到单列 */
-.article-layout:has(.toc-sidebar[hidden]) {
-  grid-template-columns: minmax(0, 760px);
-  justify-content: center;
+/* TOC 隐藏时（短文章）的桌面布局：限定 760px 列居中。
+   ⚠ 必须只在桌面生效，否则 :has() 的特异性会覆盖下面 @media 的单列规则，
+   导致手机上主列仍是 760px，挤出视口造成"右边被截断"。 */
+@media (min-width: 981px) {
+  .article-layout:has(.toc-sidebar[hidden]) {
+    grid-template-columns: minmax(0, 760px);
+    justify-content: center;
+  }
 }
 
 @media (max-width: 980px) {
-  .article-layout { grid-template-columns: 1fr; gap: 0; }
+  .article-layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .toc-sidebar { display: none; }
 }
 
