@@ -27,9 +27,9 @@
       "tags": [
         "杂七杂八"
       ],
-      "path": "posts/about.md",
       "cover": "../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.jpg",
-      "pinned": true
+      "pinned": true,
+      "path": "posts/about.md"
     },
     {
       "slug": "多维数组的索引方案与内存设计-16000038",
