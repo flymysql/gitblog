@@ -7,7 +7,7 @@ tags:
   - "算法"
   - C++
   - pat
-summary: "$1 素数 $1 题目描述 令Pi表示第i个素数。现任给两个正整数M <= N <= 10000，请输出PM到PN的所有素数。 $1 输入描述: 输入在一行中给出M和N，其间以空格…"
+summary: "¶ 素数 ¶ 题目描述 令Pi表示第i个素数。现任给两个正整数M include include using namespace std; class prime { int pr…"
 origin:
   from: hexo
   url: https://flymysql.github.io/post/dedc9755.html
@@ -92,7 +92,34 @@ Address Data Next
 
 代码如下
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line"> <span class="keyword">int</span> first,n,k,temp,sum=<span class="number">0</span>;</span><br><span class="line"> <span class="built_in">cin</span>&gt;&gt;first&gt;&gt;n&gt;&gt;k;</span><br><span class="line"> <span class="keyword">int</span> lis[<span class="number">100001</span>],data[<span class="number">100001</span>],next[<span class="number">100001</span>];   <span class="comment">//程序关键在于将数组下标作为节点地址</span></span><br><span class="line"> <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;n;i++) </span><br><span class="line"> { </span><br><span class="line"> 	<span class="built_in">cin</span>&gt;&gt;temp; </span><br><span class="line"> 	<span class="built_in">cin</span>&gt;&gt;data[temp]&gt;&gt;next[temp]; </span><br><span class="line"> }</span><br><span class="line"> <span class="keyword">while</span>(first!=<span class="number">-1</span>) </span><br><span class="line"> { </span><br><span class="line"> 	lis[sum++]=first;</span><br><span class="line">    first=next[first]; </span><br><span class="line"> }</span><br><span class="line"> <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i &lt;(sum - sum % k);i=i+k)</span><br><span class="line"> reverse(begin(lis) + i, begin(lis) + i + k);</span><br><span class="line"> <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;sum<span class="number">-1</span>;i++)</span><br><span class="line"> <span class="built_in">printf</span>(<span class="string">"%05d %d %05d\n"</span>, lis[i], data[lis[i]], lis[i + <span class="number">1</span>]);</span><br><span class="line"> <span class="built_in">printf</span>(<span class="string">"%05d %d -1"</span>, lis[sum - <span class="number">1</span>], data[lis[sum - <span class="number">1</span>]]);</span><br><span class="line">}</span><br></pre></td></tr></tbody></table>
+
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+int main()
+{
+ int first,n,k,temp,sum=0;
+ cin>>first>>n>>k;
+ int lis[100001],data[100001],next[100001];   //程序关键在于将数组下标作为节点地址
+ for(int i=0;i<n;i++)
+ {
+ 	cin>>temp;
+ 	cin>>data[temp]>>next[temp];
+ }
+ while(first!=-1)
+ {
+ 	lis[sum++]=first;
+    first=next[first];
+ }
+ for(int i=0;i <(sum - sum % k);i=i+k)
+ reverse(begin(lis) + i, begin(lis) + i + k);
+ for(int i=0;i<sum-1;i++)
+ printf("%05d %d %05d\n", lis[i], data[lis[i]], lis[i + 1]);
+ printf("%05d %d -1", lis[sum - 1], data[lis[sum - 1]]);
+}
+```
+
 
 **有几个PAT（25）**
 
@@ -127,4 +154,21 @@ APPAPT
 
 代码：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>{</span><br><span class="line"> <span class="keyword">char</span> data[<span class="number">100001</span>];</span><br><span class="line"> <span class="keyword">long</span> <span class="keyword">int</span> a=<span class="number">0</span>,b=<span class="number">0</span>,c=<span class="number">0</span>;</span><br><span class="line"> <span class="built_in">cin</span>&gt;&gt;data;</span><br><span class="line"> <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;data[i]!=<span class="string">'\0'</span>;i++){</span><br><span class="line"> <span class="keyword">if</span>(data[i]==<span class="string">'P'</span>)a++;</span><br><span class="line"> <span class="keyword">if</span>(data[i]==<span class="string">'A'</span>)b+=a;</span><br><span class="line"> <span class="keyword">if</span>(data[i]==<span class="string">'T'</span>)c+=b;</span><br><span class="line"> }</span><br><span class="line"> cou**t&lt;&lt;c%<span class="number">1000000007</span>;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table>
+
+```cpp
+#include <iostream>
+using namespace std;
+int main() {
+ char data[100001];
+ long int a=0,b=0,c=0;
+ cin>>data;
+ for(int i=0;data[i]!='\0';i++){
+ if(data[i]=='P')a++;
+ if(data[i]=='A')b+=a;
+ if(data[i]=='T')c+=b;
+ }
+ cou**t<<c%1000000007;
+}
+```
+
+

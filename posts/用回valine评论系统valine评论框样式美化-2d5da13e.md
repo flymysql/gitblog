@@ -38,7 +38,208 @@ origin:
 
 在themes\\next\\source\\css\\custom目录下的custom.styl文件中添加如下
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">/*valine 评论系统样式*/</span><br><span class="line"></span><br><span class="line">div#comments.comments.v{</span><br><span class="line">  margin-top: 0px !important;</span><br><span class="line">  margin-left: 0px !important;</span><br><span class="line">  margin-right: 0px !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">div.vheader.item2{</span><br><span class="line">  border-bottom: 1px solid #5f5f5f;</span><br><span class="line">  height: 35px !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vwrap .vheader.item2 .vinput{</span><br><span class="line">  height: 30px !important;</span><br><span class="line">  border: 0px !important;</span><br><span class="line">  width: 25% !important;</span><br><span class="line">  margin: 0px !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">input.vnick.vinput{</span><br><span class="line">  border-right: 2px solid #a4d8fa !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">div.vcontrol{</span><br><span class="line">  padding-top: 0px !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">div#comments.comments.v{</span><br><span class="line">  border: 0px;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vwrap{</span><br><span class="line">  border: 2px solid black !important;</span><br><span class="line">  height: 210px !important;</span><br><span class="line">  border-radius: 6px !important;</span><br><span class="line">  overflow: visible !important;</span><br><span class="line">  counter-reset: avater;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vwrap .vedit .vemojis{</span><br><span class="line">  width: 600px !important;</span><br><span class="line">  background-color: #fff !important;</span><br><span class="line">  border-radius: 5px !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vwrap .vedit .vpreview {</span><br><span class="line">  width: 600px !important;</span><br><span class="line">  background-color: #fff !important;</span><br><span class="line">  border-radius: 5px !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vbtn{</span><br><span class="line">  background-color: #5f5f5f !important;</span><br><span class="line">  color: #fff !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vwrap .vedit .vctrl{</span><br><span class="line">  text-align: left !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vwrap .vedit .vctrl span{</span><br><span class="line">  background-color: #7f7f7f !important;</span><br><span class="line">  color: #fff !important;</span><br><span class="line">  border-radius: 3px !important;</span><br><span class="line">  padding: 3px !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vwrap .vedit .vctrl{</span><br><span class="line">  padding: 0px !important;</span><br><span class="line">  margin: 0px !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">div.vedit{</span><br><span class="line">  height: 120px;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .veditor{</span><br><span class="line">  min-height: 70px !important;</span><br><span class="line">  height: 70px !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">.v .vlist .vcard {</span><br><span class="line">  border: 1px dashed #49b1f5 !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard .vhead .vsys{</span><br><span class="line">  display: none !important;</span><br><span class="line">  background-color: #fff !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard .vh .vmeta .vat{</span><br><span class="line">  background-color: #7f7f7f !important;</span><br><span class="line">  color: #fff !important;</span><br><span class="line">  border-radius: 3px !important;</span><br><span class="line">  padding-left: 10px !important;</span><br><span class="line">  padding-right: 10px !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard .vhead:before{</span><br><span class="line"></span><br><span class="line">    display: block;</span><br><span class="line">    float: left;</span><br><span class="line">    width: 50px;</span><br><span class="line">    height: 50px;</span><br><span class="line">    line-height: 50px;</span><br><span class="line">    margin: 0 12px 0 0;</span><br><span class="line">    color: #fff;</span><br><span class="line">    font-size: 15px;</span><br><span class="line">    font-weight: bold;</span><br><span class="line">    font-style: normal;</span><br><span class="line">    background-color: #55aacf;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">    text-align: center;</span><br><span class="line">    </span><br><span class="line">    content: counter(avater)'楼';</span><br><span class="line">    counter-increment: avater;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard .vquote{</span><br><span class="line">  margin-left: 80px; </span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard .vquote{</span><br><span class="line">  counter-reset: avaters;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard .vquote  .vhead:before{</span><br><span class="line">    display: block;</span><br><span class="line">    float: left;</span><br><span class="line">    width: 38px;</span><br><span class="line">    height: 38px;</span><br><span class="line">    line-height: 38px;</span><br><span class="line">    margin: 0 12px 0 0;</span><br><span class="line">    color: #fff;</span><br><span class="line">    font-size: 15px;</span><br><span class="line">    font-weight: bold;</span><br><span class="line">    font-style: normal;</span><br><span class="line">    background-color: #fff;</span><br><span class="line">    border: 3px solid #60a1e5;</span><br><span class="line">    color: #60a1e5;</span><br><span class="line">    border-radius: 50%;</span><br><span class="line">    text-align: center;</span><br><span class="line">    </span><br><span class="line">    content: counter(avaters);</span><br><span class="line">    counter-increment: avaters;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard  p{</span><br><span class="line">  margin-bottom: 0px !important;</span><br><span class="line">  color: #666;</span><br><span class="line">  text-align: left;</span><br><span class="line">  letter-spacing: 3px; </span><br><span class="line">  line-height: 25.59375px;</span><br><span class="line">}</span><br><span class="line">.v .vlist .vcard .vquote a.at{</span><br><span class="line">  float: left;</span><br><span class="line">  margin-right: 13px; </span><br><span class="line">  color: #567843;</span><br><span class="line">  text-decoration: none;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard .vquote .vcontent{</span><br><span class="line">  font-size: 15px;</span><br><span class="line">  font-weight: 200;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard .vcontent{</span><br><span class="line">  margin-top: 58px !important;</span><br><span class="line">  font-size: 15px !important;</span><br><span class="line">  font-weight: 500 !important;</span><br><span class="line">  padding-top: 0px !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard .vhead .vnick{</span><br><span class="line">  font-size: 17px !important;</span><br><span class="line">  font-weight: 600 !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard{</span><br><span class="line">  padding-top: 8px !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard .vhead{</span><br><span class="line">  float: left !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard .vh .vmeta{</span><br><span class="line">  float: right !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">.v .vlist .vcard .vcontent.expand:after{</span><br><span class="line">  content: "点击查看全部" !important;</span><br><span class="line">  font-weight: 400 !important;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">/**/</span><br></pre></td></tr></tbody></table>
+
+```sql
+
+/*valine 评论系统样式*/
+
+div#comments.comments.v{
+  margin-top: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+div.vheader.item2{
+  border-bottom: 1px solid #5f5f5f;
+  height: 35px !important;
+}
+
+.v .vwrap .vheader.item2 .vinput{
+  height: 30px !important;
+  border: 0px !important;
+  width: 25% !important;
+  margin: 0px !important;
+}
+
+input.vnick.vinput{
+  border-right: 2px solid #a4d8fa !important;
+}
+
+div.vcontrol{
+  padding-top: 0px !important;
+}
+
+div#comments.comments.v{
+  border: 0px;
+}
+
+.v .vwrap{
+  border: 2px solid black !important;
+  height: 210px !important;
+  border-radius: 6px !important;
+  overflow: visible !important;
+  counter-reset: avater;
+}
+
+.v .vwrap .vedit .vemojis{
+  width: 600px !important;
+  background-color: #fff !important;
+  border-radius: 5px !important;
+}
+
+.v .vwrap .vedit .vpreview {
+  width: 600px !important;
+  background-color: #fff !important;
+  border-radius: 5px !important;
+}
+
+.v .vbtn{
+  background-color: #5f5f5f !important;
+  color: #fff !important;
+}
+
+.v .vwrap .vedit .vctrl{
+  text-align: left !important;
+}
+
+.v .vwrap .vedit .vctrl span{
+  background-color: #7f7f7f !important;
+  color: #fff !important;
+  border-radius: 3px !important;
+  padding: 3px !important;
+}
+
+.v .vwrap .vedit .vctrl{
+  padding: 0px !important;
+  margin: 0px !important;
+}
+
+div.vedit{
+  height: 120px;
+}
+
+.v .veditor{
+  min-height: 70px !important;
+  height: 70px !important;
+}
+
+.v .vlist .vcard {
+  border: 1px dashed #49b1f5 !important;
+}
+
+.v .vlist .vcard .vhead .vsys{
+  display: none !important;
+  background-color: #fff !important;
+}
+
+.v .vlist .vcard .vh .vmeta .vat{
+  background-color: #7f7f7f !important;
+  color: #fff !important;
+  border-radius: 3px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+.v .vlist .vcard .vhead:before{
+
+    display: block;
+    float: left;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    margin: 0 12px 0 0;
+    color: #fff;
+    font-size: 15px;
+    font-weight: bold;
+    font-style: normal;
+    background-color: #55aacf;
+    border-radius: 50%;
+    text-align: center;
+
+    content: counter(avater)'楼';
+    counter-increment: avater;
+}
+
+.v .vlist .vcard .vquote{
+  margin-left: 80px;
+}
+
+.v .vlist .vcard .vquote{
+  counter-reset: avaters;
+}
+
+.v .vlist .vcard .vquote  .vhead:before{
+    display: block;
+    float: left;
+    width: 38px;
+    height: 38px;
+    line-height: 38px;
+    margin: 0 12px 0 0;
+    color: #fff;
+    font-size: 15px;
+    font-weight: bold;
+    font-style: normal;
+    background-color: #fff;
+    border: 3px solid #60a1e5;
+    color: #60a1e5;
+    border-radius: 50%;
+    text-align: center;
+
+    content: counter(avaters);
+    counter-increment: avaters;
+}
+
+.v .vlist .vcard  p{
+  margin-bottom: 0px !important;
+  color: #666;
+  text-align: left;
+  letter-spacing: 3px;
+  line-height: 25.59375px;
+}
+.v .vlist .vcard .vquote a.at{
+  float: left;
+  margin-right: 13px;
+  color: #567843;
+  text-decoration: none;
+}
+
+.v .vlist .vcard .vquote .vcontent{
+  font-size: 15px;
+  font-weight: 200;
+}
+
+.v .vlist .vcard .vcontent{
+  margin-top: 58px !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  padding-top: 0px !important;
+}
+
+.v .vlist .vcard .vhead .vnick{
+  font-size: 17px !important;
+  font-weight: 600 !important;
+}
+
+.v .vlist .vcard{
+  padding-top: 8px !important;
+}
+
+.v .vlist .vcard .vhead{
+  float: left !important;
+}
+
+.v .vlist .vcard .vh .vmeta{
+  float: right !important;
+}
+
+.v .vlist .vcard .vcontent.expand:after{
+  content: "点击查看全部" !important;
+  font-weight: 400 !important;
+}
+
+/**/
+```
+
 
 更新文件
 

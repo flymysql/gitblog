@@ -9,7 +9,7 @@ tags:
   - html
   - "算法"
   - C++
-summary: "$1 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 $1问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。另外，还给…"
+summary: "算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。…"
 origin:
   from: hexo
   url: https://flymysql.github.io/post/15e41f53.html
@@ -42,7 +42,83 @@ Dijkstra提出按各顶点与源点v间的路径长度的递增次序，生成�
 
 ### [¶](#c-代码)C++代码
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MaxvertextType 100</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> gigantic 99999</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">char</span> vertextType;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">int</span> edgeType;</span><br><span class="line"></span><br><span class="line"><span class="comment">//邻接矩阵</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> {</span></span><br><span class="line">    vertextType vex[MaxvertextType];</span><br><span class="line">    edgeType edge[MaxvertextType][MaxvertextType];</span><br><span class="line">    <span class="keyword">int</span> vexnum=MaxvertextType,arcnum;</span><br><span class="line">}Mgraph;</span><br><span class="line"></span><br><span class="line"><span class="comment">//节点在数组中的下标</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getVex</span><span class="params">(Mgraph G,vertextType x)</span></span>{</span><br><span class="line">    <span class="keyword">int</span> i=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(;G.vex[i]!=x;i++);</span><br><span class="line">    <span class="keyword">return</span> i;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">//单源最短路径算法</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Dijkstra</span><span class="params">(Mgraph g,vertextType x)</span></span>{</span><br><span class="line">    <span class="keyword">int</span> vexnum=g.vexnum;</span><br><span class="line">    <span class="keyword">int</span> vex=getVex(g,x);</span><br><span class="line">    edgeType dist[vexnum];</span><br><span class="line">    <span class="keyword">int</span> path[vexnum];</span><br><span class="line">    path[<span class="number">0</span>]=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; vexnum; ++i) {</span><br><span class="line">        dist[i]=g.edge[vex][i];</span><br><span class="line">        <span class="keyword">if</span>(dist[i]!=gigantic)path[i]=<span class="number">0</span>;</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">bool</span> S[vexnum];</span><br><span class="line">    S[<span class="number">0</span>] = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">int</span> dd,dvex=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; vexnum<span class="number">-1</span>; ++j) {</span><br><span class="line">        dd=gigantic;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; vexnum; ++i) {</span><br><span class="line">            <span class="keyword">if</span>(dist[i]&lt;dd &amp;&amp; !S[i]) {</span><br><span class="line">                dd=dist[i];</span><br><span class="line">                dvex=i;</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">        S[dvex]= <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">1</span>; k &lt; vexnum; ++k) {</span><br><span class="line">            <span class="keyword">if</span> (!S[k]){</span><br><span class="line">                <span class="keyword">if</span> (dist[dvex]+g.edge[dvex][k]&lt;dist[k]) {</span><br><span class="line">                    dist[k] = dist[dvex] + g.edge[dvex][k];</span><br><span class="line">                    path[k] = dvex;</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> m = <span class="number">1</span>; m &lt; vexnum; ++m) {</span><br><span class="line">        <span class="keyword">int</span> nowvex=m;</span><br><span class="line">        <span class="built_in">cout</span>&lt;&lt;<span class="string">"\npath:"</span>&lt;&lt;g.vex[nowvex];</span><br><span class="line">        <span class="keyword">while</span>(path[nowvex]!=<span class="number">0</span>){</span><br><span class="line">            nowvex=path[nowvex];</span><br><span class="line">            <span class="built_in">cout</span>&lt;&lt;<span class="string">"&lt;-"</span>&lt;&lt;g.vex[nowvex];</span><br><span class="line">        }</span><br><span class="line">        <span class="built_in">cout</span>&lt;&lt;<span class="string">"&lt;-"</span>&lt;&lt;g.vex[<span class="number">0</span>];</span><br><span class="line">        <span class="built_in">cout</span>&lt;&lt;<span class="string">"\tdistance:"</span>&lt;&lt;dist[m];</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">//图的初始化</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(Mgraph &amp; g)</span></span>{</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;g.vexnum;i++){</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; g.vexnum; ++j) {</span><br><span class="line">            <span class="keyword">if</span> (i==j)g.edge[i][j]=<span class="number">0</span>;</span><br><span class="line">            <span class="keyword">else</span> g.edge[i][j]=gigantic;</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table>
+
+```cpp
+
+#define MaxvertextType 100
+#define gigantic 99999
+typedef char vertextType;
+typedef int edgeType;
+
+//邻接矩阵
+typedef struct {
+    vertextType vex[MaxvertextType];
+    edgeType edge[MaxvertextType][MaxvertextType];
+    int vexnum=MaxvertextType,arcnum;
+}Mgraph;
+
+//节点在数组中的下标
+int getVex(Mgraph G,vertextType x){
+    int i=0;
+    for(;G.vex[i]!=x;i++);
+    return i;
+}
+
+//单源最短路径算法
+void Dijkstra(Mgraph g,vertextType x){
+    int vexnum=g.vexnum;
+    int vex=getVex(g,x);
+    edgeType dist[vexnum];
+    int path[vexnum];
+    path[0]=0;
+    for (int i = 0; i < vexnum; ++i) {
+        dist[i]=g.edge[vex][i];
+        if(dist[i]!=gigantic)path[i]=0;
+    }
+    bool S[vexnum];
+    S[0] = true;
+    int dd,dvex=0;
+    for (int j = 0; j < vexnum-1; ++j) {
+        dd=gigantic;
+        for (int i = 1; i < vexnum; ++i) {
+            if(dist[i]<dd && !S[i]) {
+                dd=dist[i];
+                dvex=i;
+            }
+        }
+        S[dvex]= true;
+        for (int k = 1; k < vexnum; ++k) {
+            if (!S[k]){
+                if (dist[dvex]+g.edge[dvex][k]<dist[k]) {
+                    dist[k] = dist[dvex] + g.edge[dvex][k];
+                    path[k] = dvex;
+                }
+            }
+        }
+    }
+    for (int m = 1; m < vexnum; ++m) {
+        int nowvex=m;
+        cout<<"\npath:"<<g.vex[nowvex];
+        while(path[nowvex]!=0){
+            nowvex=path[nowvex];
+            cout<<"<-"<<g.vex[nowvex];
+        }
+        cout<<"<-"<<g.vex[0];
+        cout<<"\tdistance:"<<dist[m];
+    }
+}
+
+//图的初始化
+void init(Mgraph & g){
+    for(int i=0;i<g.vexnum;i++){
+        for (int j = 0; j < g.vexnum; ++j) {
+            if (i==j)g.edge[i][j]=0;
+            else g.edge[i][j]=gigantic;
+        }
+    }
+}
+```
+
 
 感觉代码还是有点臃肿了 晚点打算再写一个`JavaScript`实现的算法 结合html来制作图形界面
 
@@ -56,4 +132,82 @@ Dijkstra提出按各顶点与源点v间的路径长度的递增次序，生成�
 
 ### [¶](#部分javascript代码)部分javascript代码
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">var MaxvertextType = <span class="number">100</span></span><br><span class="line">var gigantic = <span class="number">99999</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//邻接矩阵</span></span><br><span class="line"><span class="function">function <span class="title">Mgraph</span><span class="params">()</span> </span>{</span><br><span class="line">    <span class="keyword">this</span>.vex=<span class="keyword">new</span> Array();</span><br><span class="line">    <span class="keyword">this</span>.edge=<span class="keyword">new</span> Array();</span><br><span class="line">    <span class="keyword">this</span>.vexnum=MaxvertextType;</span><br><span class="line">    <span class="keyword">this</span>.arcnum=MaxvertextType;</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="function">function <span class="title">getVex</span><span class="params">(G,x)</span></span>{</span><br><span class="line">    var i=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(;G.vex[i]!=x;i++);</span><br><span class="line">    <span class="keyword">return</span> i;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//单源最短路径算法</span></span><br><span class="line"><span class="function">function <span class="title">Dijkstra</span><span class="params">(g,x)</span></span>{</span><br><span class="line">    var vexnum=g.vexnum;</span><br><span class="line">    var vex=getVex(g,x);</span><br><span class="line">    var dist= <span class="keyword">new</span> Array();</span><br><span class="line">    var path = <span class="keyword">new</span> Array();</span><br><span class="line">    path[<span class="number">0</span>]=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (var i = <span class="number">0</span>; i &lt; vexnum; ++i) {</span><br><span class="line">        dist[i]=g.edge[vex][i];</span><br><span class="line">        <span class="keyword">if</span>(dist[i]!=gigantic)path[i]=<span class="number">0</span>;</span><br><span class="line">    }</span><br><span class="line">    var S = <span class="keyword">new</span> Array();</span><br><span class="line">    S[<span class="number">0</span>] = <span class="keyword">true</span>;</span><br><span class="line">    var dd;</span><br><span class="line">    var dvex=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (var j = <span class="number">0</span>; j &lt; vexnum-<span class="number">1</span>; ++j) {</span><br><span class="line">        dd=gigantic;</span><br><span class="line">        <span class="keyword">for</span> (var i = <span class="number">1</span>; i &lt; vexnum; ++i) {</span><br><span class="line">            <span class="keyword">if</span>(dist[i]&lt;dd &amp;&amp; !S[i]) {</span><br><span class="line">                dd=dist[i];</span><br><span class="line">                dvex=i;</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">        S[dvex]= <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">for</span> (var k = <span class="number">1</span>; k &lt; vexnum; ++k) {</span><br><span class="line">            <span class="keyword">if</span> (!S[k]){</span><br><span class="line">                <span class="keyword">if</span> (dist[dvex]+g.edge[dvex][k]&lt;dist[k]) {</span><br><span class="line">                    dist[k] = dist[dvex] + g.edge[dvex][k];</span><br><span class="line">                    path[k] = dvex;</span><br><span class="line">                }</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">for</span> (var m = <span class="number">1</span>; m &lt; vexnum; ++m) {</span><br><span class="line">        var nowvex=m;</span><br><span class="line">        var str=<span class="string">"\npath:"</span>+g.vex[nowvex];</span><br><span class="line">        <span class="keyword">while</span>(path[nowvex]!=<span class="number">0</span>){</span><br><span class="line">            nowvex=path[nowvex];</span><br><span class="line">            str=str+<span class="string">"&lt;-"</span>+g.vex[nowvex];</span><br><span class="line">        }</span><br><span class="line">        str=str+<span class="string">"&lt;-"</span>+g.vex[<span class="number">0</span>]+<span class="string">"\tdistance:"</span>+dist[m];</span><br><span class="line">        console.log(str);</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//图的初始化</span></span><br><span class="line"><span class="function">function <span class="title">init</span><span class="params">(g)</span></span>{</span><br><span class="line">    <span class="keyword">for</span>(var i=<span class="number">0</span>;i&lt;g.vexnum;i++){</span><br><span class="line">        var temp=[];</span><br><span class="line">        <span class="keyword">for</span> (var j = <span class="number">0</span>; j &lt; g.vexnum; ++j) {</span><br><span class="line">            <span class="keyword">if</span> (i==j) temp[j]=<span class="number">0</span>;</span><br><span class="line">            <span class="keyword">else</span> temp[j]=gigantic;</span><br><span class="line">        }</span><br><span class="line">        g.edge[i]=temp;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table>
+
+```cpp
+
+var MaxvertextType = 100
+var gigantic = 99999
+
+//邻接矩阵
+function Mgraph() {
+    this.vex=new Array();
+    this.edge=new Array();
+    this.vexnum=MaxvertextType;
+    this.arcnum=MaxvertextType;
+};
+
+function getVex(G,x){
+    var i=0;
+    for(;G.vex[i]!=x;i++);
+    return i;
+}
+
+//单源最短路径算法
+function Dijkstra(g,x){
+    var vexnum=g.vexnum;
+    var vex=getVex(g,x);
+    var dist= new Array();
+    var path = new Array();
+    path[0]=0;
+    for (var i = 0; i < vexnum; ++i) {
+        dist[i]=g.edge[vex][i];
+        if(dist[i]!=gigantic)path[i]=0;
+    }
+    var S = new Array();
+    S[0] = true;
+    var dd;
+    var dvex=0;
+    for (var j = 0; j < vexnum-1; ++j) {
+        dd=gigantic;
+        for (var i = 1; i < vexnum; ++i) {
+            if(dist[i]<dd && !S[i]) {
+                dd=dist[i];
+                dvex=i;
+            }
+        }
+        S[dvex]= true;
+        for (var k = 1; k < vexnum; ++k) {
+            if (!S[k]){
+                if (dist[dvex]+g.edge[dvex][k]<dist[k]) {
+                    dist[k] = dist[dvex] + g.edge[dvex][k];
+                    path[k] = dvex;
+                }
+            }
+        }
+    }
+    for (var m = 1; m < vexnum; ++m) {
+        var nowvex=m;
+        var str="\npath:"+g.vex[nowvex];
+        while(path[nowvex]!=0){
+            nowvex=path[nowvex];
+            str=str+"<-"+g.vex[nowvex];
+        }
+        str=str+"<-"+g.vex[0]+"\tdistance:"+dist[m];
+        console.log(str);
+    }
+}
+
+//图的初始化
+function init(g){
+    for(var i=0;i<g.vexnum;i++){
+        var temp=[];
+        for (var j = 0; j < g.vexnum; ++j) {
+            if (i==j) temp[j]=0;
+            else temp[j]=gigantic;
+        }
+        g.edge[i]=temp;
+    }
+}
+```
+
+

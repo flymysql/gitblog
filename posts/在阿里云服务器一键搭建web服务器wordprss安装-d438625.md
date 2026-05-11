@@ -6,7 +6,7 @@ author: "兰州小红鸡"
 tags:
   - wordpress
   - "博客"
-summary: "$1前期准备 1. 在校学生可以在阿里买一轻量级云服务器，大概一百多一年，玩一玩还是蛮划算的。 2. 推荐使用CentOs镜像系统。 3. 4. 然后再买一个域名（几块钱到几十块钱…"
+summary: "¶前期准备 1. 在校学生可以在阿里买一轻量级云服务器，大概一百多一年，玩一玩还是蛮划算的。 2. 推荐使用CentOs镜像系统。 3. 4. 然后再买一个域名（几块钱到几十块钱不…"
 origin:
   from: hexo
   url: https://flymysql.github.io/post/d438625.html
@@ -75,7 +75,26 @@ _其实之前想自己写html页面，也在网上找了模板，修修改改，
 
 在/etc/nginx/conf.d里面新建一个wordpress.conf，写入以下内容
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> server { listen 80; server name 你的域名;</span><br><span class="line"> rewrite ^(.*)$ https://$server name$1 permanent;</span><br><span class="line"> } </span><br><span class="line"> server { listen 443; server name 你的域名;</span><br><span class="line">  ssl on; </span><br><span class="line">  ssl certificate /etc/nginx/cert/214579180610128.crt; </span><br><span class="line">  ssl certificate key /etc/nginx/cert/14579180610128.key; </span><br><span class="line">  ssl session timeout 5m; </span><br><span class="line">  ssl protocols TLSv1 TLSv1.1 TLSv1.2; </span><br><span class="line">  ssl ciphers ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA;</span><br><span class="line">  ssl session cache shared:SSL:50m; </span><br><span class="line">  ssl prefer server_ciphers on; </span><br><span class="line">  location ~ \\.php$ {</span><br><span class="line">      root /alidata/www/wordpress;</span><br><span class="line">   } </span><br><span class="line">}</span><br></pre></td></tr></tbody></table>
+
+```sql
+ server { listen 80; server name 你的域名;
+ rewrite ^(.*)$ https://$server name$1 permanent;
+ }
+ server { listen 443; server name 你的域名;
+  ssl on;
+  ssl certificate /etc/nginx/cert/214579180610128.crt;
+  ssl certificate key /etc/nginx/cert/14579180610128.key;
+  ssl session timeout 5m;
+  ssl protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl ciphers ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA;
+  ssl session cache shared:SSL:50m;
+  ssl prefer server_ciphers on;
+  location ~ \.php$ {
+      root /alidata/www/wordpress;
+   }
+}
+```
+
 
 保存后重启nginx,浏览器中访问自己的域名。
 

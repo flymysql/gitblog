@@ -6,7 +6,7 @@ author: "兰州小红鸡"
 tags:
   - "教程"
   - "博客"
-summary: "$1前言 本文虽然是非常详细的小白教程 但是也需要一点点的姿势，额，知识储量 $1知识储量 了解css和html，会写一点html基础语句 用过GitHub，知道建仓库过程以及在命…"
+summary: "¶前言 本文虽然是非常详细的小白教程 但是也需要一点点的姿势，额，知识储量 ¶知识储量 了解css和html，会写一点html基础语句 用过GitHub，知道建仓库过程以及在命令行…"
 origin:
   from: hexo
   url: https://flymysql.github.io/post/e8d13fc.html
@@ -63,7 +63,14 @@ hexo 主题很多 可以在下面选择自己的喜欢的一款：
 -   在Github上创建名字为XXX.github.io的项目，XXX为自己的github用户名。
 -   打开本地的MyBlog文件夹项目内的\_config.yml配置文件，将其中的type设置为git
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repository: https:<span class="comment">//github.com/yourname/yourname.github.io.git</span></span><br><span class="line">  branch: master</span><br></pre></td></tr></tbody></table>
+
+```sql
+deploy:
+  type: git
+  repository: https://github.com/yourname/yourname.github.io.git
+  branch: master
+```
+
 
 **记得替换上面的yourname**  
 本教程提到的yourname都是指你的github账号id
@@ -105,7 +112,11 @@ hexo 主题很多 可以在下面选择自己的喜欢的一款：
 
 下载主题 (以next主题为例)
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:<span class="comment">//github.com/iissnan/hexo-theme-next.git（主题的地址）</span></span><br></pre></td></tr></tbody></table>
+
+```sql
+git clone https://github.com/iissnan/hexo-theme-next.git（主题的地址）
+```
+
 
 打开站点\_\_config.yml文件，将themes修改为next（下载到的主题文件夹的名字）
 
@@ -124,7 +135,21 @@ hexo 主题很多 可以在下面选择自己的喜欢的一款：
 2.  编辑该文件（遵循Markdown规则）
 3.  修改起始字段
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">title 文章的标题</span><br><span class="line">date 创建日期 （文件的创建日期 ）</span><br><span class="line">updated 修改日期 （ 文件的修改日期）</span><br><span class="line">comments 是否开启评论 true</span><br><span class="line">tags 标签</span><br><span class="line">categories 分类</span><br><span class="line">permalink url中的名字（文件名）</span><br><span class="line">编写正文内容（MakeDown）</span><br><span class="line">hexo clean 删除本地静态文件（Public目录），可不执行。</span><br><span class="line">hexo g 生成本地静态文件（Public目录）</span><br><span class="line">hexo deploy 将本地静态文件推送至github（hexo d）</span><br></pre></td></tr></tbody></table>
+
+```sql
+title 文章的标题
+date 创建日期 （文件的创建日期 ）
+updated 修改日期 （ 文件的修改日期）
+comments 是否开启评论 true
+tags 标签
+categories 分类
+permalink url中的名字（文件名）
+编写正文内容（MakeDown）
+hexo clean 删除本地静态文件（Public目录），可不执行。
+hexo g 生成本地静态文件（Public目录）
+hexo deploy 将本地静态文件推送至github（hexo d）
+```
+
 
 4.  编写正文内容（MakeDown）
 5.  hexo clean 删除本地静态文件（Public目录），可不执行。
@@ -136,7 +161,17 @@ hexo 主题很多 可以在下面选择自己的喜欢的一款：
 进入theme目录，编辑\_config\_yml文件，找到menu:字段，在该字段下添加一个字段。  
 NexT主题菜单设置，用于设置博客上方导航栏，在主题配置文件中修改。
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">menu:</span><br><span class="line">  home: /                       #主页</span><br><span class="line">  categories: /categories	      #分类页（需手动创建）</span><br><span class="line">  #about: /about 			        	#关于页面（需手动创建）</span><br><span class="line">  archives: /archives		       	#归档页</span><br><span class="line">  tags: /tags				           	#标签页（需手动创建）</span><br><span class="line">  #commonweal: /404.html        #公益 404 （需手动创建）</span><br></pre></td></tr></tbody></table>
+
+```sql
+menu:
+  home: /                       #主页
+  categories: /categories	      #分类页（需手动创建）
+  #about: /about 			        	#关于页面（需手动创建）
+  archives: /archives		       	#归档页
+  tags: /tags				           	#标签页（需手动创建）
+  #commonweal: /404.html        #公益 404 （需手动创建）
+```
+
 
 -   只是在menu选项中设置还不能让标签页面、分类页面生效，需要我们手动创建 \*
 
@@ -144,35 +179,77 @@ NexT主题菜单设置，用于设置博客上方导航栏，在主题配置文�
 
 1.  运行以下命令
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo <span class="keyword">new</span> page <span class="string">"tags"</span></span><br></pre></td></tr></tbody></table>
+
+```sql
+hexo new page "tags"
+```
+
 
 同时，在/source目录下会生成一个tags文件夹，里面包含一个index.md文件
 
 2.  修改/source/tags目录下的index.md文件
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">title: tags</span><br><span class="line">date: <span class="number">2015</span>-<span class="number">09</span>-<span class="number">29</span> <span class="number">14</span>:<span class="number">37</span>:<span class="number">02</span></span><br><span class="line">type: <span class="string">"tags"</span></span><br><span class="line">---</span><br></pre></td></tr></tbody></table>
+
+```sql
+title: tags
+date: 2015-09-29 14:37:02
+type: "tags"
+---
+```
+
 
 3.  修改主题配置文件  
     去掉tags的注释
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">menu:</span><br><span class="line">  home: /                       #主页</span><br><span class="line">  categories: /categories	    	#分类页（需手动创建）</span><br><span class="line">  #about: /about			         	#关于页面（需手动创建）</span><br><span class="line">  archives: /archives	      		#归档页</span><br><span class="line">  tags: /tags				           	#标签页（需手动创建）</span><br><span class="line">  #commonweal: /404.html        #公益 404 （需手动创建）</span><br></pre></td></tr></tbody></table>
+
+```sql
+menu:
+  home: /                       #主页
+  categories: /categories	    	#分类页（需手动创建）
+  #about: /about			         	#关于页面（需手动创建）
+  archives: /archives	      		#归档页
+  tags: /tags				           	#标签页（需手动创建）
+  #commonweal: /404.html        #公益 404 （需手动创建）
+```
+
 
 ### [¶](#分类页面)分类页面
 
 1.  运行以下命令
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo <span class="keyword">new</span> page <span class="string">"categories"</span></span><br></pre></td></tr></tbody></table>
+
+```sql
+hexo new page "categories"
+```
+
 
 同时，在/source目录下会生成一个categories文件夹，里面包含一个index.md文件
 
 2.  修改/source/categories目录下的index.md文件
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">title: categories</span><br><span class="line">date: <span class="number">2015</span>-<span class="number">09</span>-<span class="number">29</span> <span class="number">14</span>:<span class="number">47</span>:<span class="number">21</span></span><br><span class="line">type: <span class="string">"categories"</span></span><br><span class="line">---</span><br></pre></td></tr></tbody></table>
+
+```sql
+title: categories
+date: 2015-09-29 14:47:21
+type: "categories"
+---
+```
+
 
 3.  修改主题配置文件  
     去掉categories的注释
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">menu:</span><br><span class="line">  home: /                       #主页</span><br><span class="line">  categories: /categories	    	#分类页（需手动创建）</span><br><span class="line">  #about: /about			         	#关于页面（需手动创建）</span><br><span class="line">  archives: /archives		       	#归档页</span><br><span class="line">  tags: /tags				           	#标签页（需手动创建）</span><br><span class="line">  #commonweal: /404.html        #公益 404 （需手动创建）</span><br></pre></td></tr></tbody></table>
+
+```sql
+menu:
+  home: /                       #主页
+  categories: /categories	    	#分类页（需手动创建）
+  #about: /about			         	#关于页面（需手动创建）
+  archives: /archives		       	#归档页
+  tags: /tags				           	#标签页（需手动创建）
+  #commonweal: /404.html        #公益 404 （需手动创建）
+```
+
 
 ## [¶](#主题美化)主题美化
 
@@ -180,7 +257,12 @@ NexT主题菜单设置，用于设置博客上方导航栏，在主题配置文�
 
 编辑站点配置文件，增加avatar字段
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 头像</span><br><span class="line">avatar: /images/avatar.png</span><br></pre></td></tr></tbody></table>
+
+```sql
+# 头像
+avatar: /images/avatar.png
+```
+
 
 头像图片须放置在主题的/source/images/目录下
 
@@ -188,55 +270,211 @@ NexT主题菜单设置，用于设置博客上方导航栏，在主题配置文�
 
 文章Markdown中填写如下：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;blockquote class="blockquote-center"&gt;优秀的人，不是不合群，而是他们合群的人里面没有你&lt;/blockquote&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<blockquote class="blockquote-center">优秀的人，不是不合群，而是他们合群的人里面没有你</blockquote>
+```
+
 
 ### [¶](#在文章底部增加版权信息)在文章底部增加版权信息
 
 在目录 next/layout/\_macro/下添加 my-copyright.swig：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">{% <span class="keyword">if</span> page.copyright %}</span><br><span class="line">&lt;div <span class="class"><span class="keyword">class</span></span>=<span class="string">"my_post_copyright"</span>&gt;</span><br><span class="line">  &lt;script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"&gt;&lt;/script&gt;</span><br><span class="line">  &lt;!-- JS库 sweetalert 可修改路径 --&gt;</span><br><span class="line">  &lt;script type="text/javascript" src="http://jslibs.wuxubj.cn/sweetalert_mini/jquery-1.7.1.min.js"&gt;&lt;/script&gt;</span><br><span class="line">  &lt;script src="http://jslibs.wuxubj.cn/sweetalert_mini/sweetalert.min.js"&gt;&lt;/script&gt;</span><br><span class="line">  &lt;link rel=<span class="string">"stylesheet"</span> type=<span class="string">"text/css"</span> href=<span class="string">"http://jslibs.wuxubj.cn/sweetalert_mini/sweetalert.mini.css"</span>&gt;</span><br><span class="line">  &lt;p&gt;&lt;span&gt;本文标题:&lt;/span&gt;&lt;a href="{{ url_for(page.path) }}&gt;{{ page.title }}/a&gt;&lt;/p&gt;</span><br><span class="line">  &lt;p&gt;&lt;span&gt;文章作者:&lt;/span&gt;&lt;a href="/" title="访问 {{ theme.author }}的个人博客"&gt;{{ theme.author }}/a&gt;&lt;/p&gt;</span><br><span class="line">  &lt;p&gt;&lt;span&gt;发布时间:&lt;/span&gt;{{ page.date.format("YYYY年MM月DD日 - HH:MM") }}/p&gt;</span><br><span class="line">  &lt;p&gt;&lt;span&gt;最后更新:&lt;/span&gt;{{ page.updated.format("YYYY年MM月DD日 - HH:MM") }}/p&gt;</span><br><span class="line">  &lt;p&gt;&lt;span&gt;原始链接:&lt;/span&gt;&lt;a href="{{ url_for(page.path) }} title="{{ page.title }}&gt;{{ page.permalink }}/a&gt;</span><br><span class="line">    &lt;span <span class="class"><span class="keyword">class</span></span>=<span class="string">"copy-path"</span>  title=<span class="string">"点击复制文章链接"</span>&gt;&lt;i <span class="class"><span class="keyword">class</span></span>=<span class="string">"fa fa-clipboard"</span> data-clipboard-text=<span class="string">"{{ page.permalink }}  aria-label="</span>复制成功！<span class="string">"&gt;&lt;/i&gt;&lt;/span&gt;</span></span><br><span class="line"><span class="string">  &lt;/p&gt;</span></span><br><span class="line"><span class="string">  &lt;p&gt;&lt;span&gt;许可协议:&lt;/span&gt;&lt;i class="</span>fa fa-creative-commons<span class="string">"&gt;&lt;/i&gt; &lt;a rel="</span>license<span class="string">" href="</span>https:<span class="comment">//creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"&gt;署名-非商业性使用-禁止演绎 4.0 国际&lt;/a&gt; 转载请保留原文链接及作者。&lt;/p&gt;  </span></span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;script&gt; </span><br><span class="line">    var clipboard = <span class="keyword">new</span> Clipboard(<span class="string">'.fa-clipboard'</span>);</span><br><span class="line">    clipboard.on(<span class="string">'success'</span>, $(function(){</span><br><span class="line">      $(<span class="string">".fa-clipboard"</span>).click(function(){</span><br><span class="line">        swal({   </span><br><span class="line">          title: <span class="string">""</span>,   </span><br><span class="line">          text: <span class="string">'复制成功'</span>,   </span><br><span class="line">          html: <span class="keyword">false</span>,</span><br><span class="line">          timer: <span class="number">500</span>,   </span><br><span class="line">          showConfirmButton: <span class="keyword">false</span></span><br><span class="line">        });</span><br><span class="line">      });</span><br><span class="line">    }));  </span><br><span class="line">&lt;/script&gt;</span><br><span class="line">{% endif %}</span><br></pre></td></tr></tbody></table>
+
+```sql
+{% if page.copyright %}
+<div class="my_post_copyright">
+  <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+  <!-- JS库 sweetalert 可修改路径 -->
+  <script type="text/javascript" src="http://jslibs.wuxubj.cn/sweetalert_mini/jquery-1.7.1.min.js"></script>
+  <script src="http://jslibs.wuxubj.cn/sweetalert_mini/sweetalert.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="http://jslibs.wuxubj.cn/sweetalert_mini/sweetalert.mini.css">
+  <p><span>本文标题:</span><a href="{{ url_for(page.path) }}>{{ page.title }}/a></p>
+  <p><span>文章作者:</span><a href="/" title="访问 {{ theme.author }}的个人博客">{{ theme.author }}/a></p>
+  <p><span>发布时间:</span>{{ page.date.format("YYYY年MM月DD日 - HH:MM") }}/p>
+  <p><span>最后更新:</span>{{ page.updated.format("YYYY年MM月DD日 - HH:MM") }}/p>
+  <p><span>原始链接:</span><a href="{{ url_for(page.path) }} title="{{ page.title }}>{{ page.permalink }}/a>
+    <span class="copy-path"  title="点击复制文章链接"><i class="fa fa-clipboard" data-clipboard-text="{{ page.permalink }}  aria-label="复制成功！"></i></span>
+  </p>
+  <p><span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">署名-非商业性使用-禁止演绎 4.0 国际</a> 转载请保留原文链接及作者。</p>
+</div>
+<script>
+    var clipboard = new Clipboard('.fa-clipboard');
+    clipboard.on('success', $(function(){
+      $(".fa-clipboard").click(function(){
+        swal({
+          title: "",
+          text: '复制成功',
+          html: false,
+          timer: 500,
+          showConfirmButton: false
+        });
+      });
+    }));
+</script>
+{% endif %}
+```
+
 
 在目录next/source/css/\_common/components/post/下添加my-post-copyright.styl：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">.my_post_copyright {</span><br><span class="line">  width: <span class="number">85</span>%;</span><br><span class="line">  max-width: <span class="number">45</span>em;</span><br><span class="line">  margin: <span class="number">2.8</span>em auto <span class="number">0</span>;</span><br><span class="line">  padding: <span class="number">0.5</span>em <span class="number">1.0</span>em;</span><br><span class="line">  border: 1px solid #d3d3d3;</span><br><span class="line">  font-size: <span class="number">0.93</span>rem;</span><br><span class="line">  line-height: <span class="number">1.6</span>em;</span><br><span class="line">  word-<span class="keyword">break</span>: <span class="keyword">break</span>-all;</span><br><span class="line">  background: rgba(<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>,<span class="number">0.4</span>);</span><br><span class="line">}</span><br><span class="line">.my_post_copyright p{margin:<span class="number">0</span>;}</span><br><span class="line">.my_post_copyright span {</span><br><span class="line">  display: inline-block;</span><br><span class="line">  width: <span class="number">5.2</span>em;</span><br><span class="line">  color: #b5b5b5;</span><br><span class="line">  font-weight: bold;</span><br><span class="line">}</span><br><span class="line">.my_post_copyright .raw {</span><br><span class="line">  margin-left: <span class="number">1</span>em;</span><br><span class="line">  width: <span class="number">5</span>em;</span><br><span class="line">}</span><br><span class="line">.my_post_copyright a {</span><br><span class="line">  color: #808080;</span><br><span class="line">  border-bottom:<span class="number">0</span>;</span><br><span class="line">}</span><br><span class="line">.my_post_copyright a:hover {</span><br><span class="line">  color: #a3d2a3;</span><br><span class="line">  text-decoration: underline;</span><br><span class="line">}</span><br><span class="line">.my_post_copyright:hover .fa-clipboard {</span><br><span class="line">  color: #000;</span><br><span class="line">}</span><br><span class="line">.my_post_copyright .post-url:hover {</span><br><span class="line">  font-weight: normal;</span><br><span class="line">}</span><br><span class="line">.my_post_copyright .copy-path {</span><br><span class="line">  margin-left: <span class="number">1</span>em;</span><br><span class="line">  width: <span class="number">1</span>em;</span><br><span class="line">  +mobile(){display:none;}</span><br><span class="line">}</span><br><span class="line">.my_post_copyright .copy-path:hover {</span><br><span class="line">  color: #808080;</span><br><span class="line">  cursor: pointer;</span><br><span class="line">}</span><br></pre></td></tr></tbody></table>
+
+```sql
+.my_post_copyright {
+  width: 85%;
+  max-width: 45em;
+  margin: 2.8em auto 0;
+  padding: 0.5em 1.0em;
+  border: 1px solid #d3d3d3;
+  font-size: 0.93rem;
+  line-height: 1.6em;
+  word-break: break-all;
+  background: rgba(255,255,255,0.4);
+}
+.my_post_copyright p{margin:0;}
+.my_post_copyright span {
+  display: inline-block;
+  width: 5.2em;
+  color: #b5b5b5;
+  font-weight: bold;
+}
+.my_post_copyright .raw {
+  margin-left: 1em;
+  width: 5em;
+}
+.my_post_copyright a {
+  color: #808080;
+  border-bottom:0;
+}
+.my_post_copyright a:hover {
+  color: #a3d2a3;
+  text-decoration: underline;
+}
+.my_post_copyright:hover .fa-clipboard {
+  color: #000;
+}
+.my_post_copyright .post-url:hover {
+  font-weight: normal;
+}
+.my_post_copyright .copy-path {
+  margin-left: 1em;
+  width: 1em;
+  +mobile(){display:none;}
+}
+.my_post_copyright .copy-path:hover {
+  color: #808080;
+  cursor: pointer;
+}
+```
+
 
 修改next/layout/\_macro/post.swig，在代码
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;</span><br><span class="line">      {% <span class="keyword">if</span> not is_index %}</span><br><span class="line">        {% include <span class="string">'wechat-subscriber.swig'</span> %}</span><br><span class="line">      {% endif %}</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<div>
+      {% if not is_index %}
+        {% include 'wechat-subscriber.swig' %}
+      {% endif %}
+</div>
+```
+
 
 之前添加增加如下代码：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;</span><br><span class="line">      {% <span class="keyword">if</span> not is_index %}</span><br><span class="line">        {% include <span class="string">'my-copyright.swig'</span> %}</span><br><span class="line">      {% endif %}</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<div>
+      {% if not is_index %}
+        {% include 'my-copyright.swig' %}
+      {% endif %}
+</div>
+```
+
 
 修改next/source/css/\_common/components/post/post.styl文件，在最后一行增加代码：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@import</span> <span class="string">"my-post-copyright"</span></span><br></pre></td></tr></tbody></table>
+
+```sql
+@import "my-post-copyright"
+```
+
 
 如果要在该博文下面增加版权信息的显示，需要在 Markdown 中增加copyright: true的设置，类似：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: </span><br><span class="line">date: </span><br><span class="line">tags: </span><br><span class="line">categories: </span><br><span class="line">copyright: <span class="keyword">true</span></span><br><span class="line">---</span><br></pre></td></tr></tbody></table>
+
+```sql
+---
+title:
+date:
+tags:
+categories:
+copyright: true
+---
+```
+
 
 ### [¶](#自定义hexo-new生成md文件的选项)自定义hexo new生成md文件的选项
 
 在/scaffolds/post.md文件中添加：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">title: {{ title }}date: {{ date }}tags:</span><br><span class="line">categories: </span><br><span class="line">copyright: <span class="keyword">true</span></span><br><span class="line">permalink: <span class="number">01</span></span><br><span class="line">top: <span class="number">0</span></span><br><span class="line">password:</span><br><span class="line">---</span><br></pre></td></tr></tbody></table>
+
+```sql
+---
+title: {{ title }}date: {{ date }}tags:
+categories:
+copyright: true
+permalink: 01
+top: 0
+password:
+---
+```
+
 
 ### [¶](#隐藏网页底部powered-by-hexo-强力驱动)隐藏网页底部powered By Hexo / 强力驱动
 
 打开themes/next/layout/\_partials/footer.swig,使用””隐藏之间的代码即可，或者直接删除。
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--</span><br><span class="line">&lt;div <span class="class"><span class="keyword">class</span></span>=<span class="string">"powered-by"</span>&gt;</span><br><span class="line">  {{ __('footer.powered', '&lt;a class="theme-link" rel="external nofollow" href="https://hexo.io"&gt;Hexo&lt;/a&gt;') }}&lt;/div&gt;</span><br><span class="line">&lt;div <span class="class"><span class="keyword">class</span></span>=<span class="string">"theme-info"</span>&gt;</span><br><span class="line">  {{ __(<span class="string">'footer.theme'</span>) }}-</span><br><span class="line">  &lt;a <span class="class"><span class="keyword">class</span></span>=<span class="string">"theme-link"</span> rel=<span class="string">"external nofollow"</span> href=<span class="string">"https://github.com/iissnan/hexo-theme-next"</span>&gt;</span><br><span class="line">    NexT.{{ theme.scheme }}  &lt;/a&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">--&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<!--
+<div class="powered-by">
+  {{ __('footer.powered', '<a class="theme-link" rel="external nofollow" href="https://hexo.io">Hexo</a>') }}</div>
+<div class="theme-info">
+  {{ __('footer.theme') }}-
+  <a class="theme-link" rel="external nofollow" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.{{ theme.scheme }}  </a>
+</div>
+-->
+```
+
 
 ### [¶](#文章加密访问)文章加密访问
 
 打开themes->next->layout->\_partials->head.swig文件,在meta标签后面插入这样一段代码：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">    (function(){</span><br><span class="line">        <span class="keyword">if</span>(<span class="string">'{{ page.password }}){</span></span><br><span class="line"><span class="string">            if (prompt('</span>请输入文章密码<span class="string">') !== '</span>{{ page.password }}){</span><br><span class="line">                alert(<span class="string">'密码错误！'</span>);</span><br><span class="line">                history.back();</span><br><span class="line">            }</span><br><span class="line">        }</span><br><span class="line">    })();</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<script>
+    (function(){
+        if('{{ page.password }}){
+            if (prompt('请输入文章密码') !== '{{ page.password }}){
+                alert('密码错误！');
+                history.back();
+            }
+        }
+    })();
+</script>
+```
+
 
 然后文章中添加：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">password: nmask</span><br></pre></td></tr></tbody></table>
+
+```sql
+password: nmask
+```
+
 
 如果password后面为空，则表示不用密码。
 
@@ -244,11 +482,50 @@ NexT主题菜单设置，用于设置博客上方导航栏，在主题配置文�
 
 修改 hero-generator-index 插件，把文件：node\_modules/hexo-generator-index/lib/generator.js 内的代码替换为：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'use strict'</span>;</span><br><span class="line">var pagination = require(<span class="string">'hexo-pagination'</span>);</span><br><span class="line"><span class="keyword">module</span>.<span class="keyword">exports</span> = function(locals){</span><br><span class="line">  var config = <span class="keyword">this</span>.config;</span><br><span class="line">  var posts = locals.posts;</span><br><span class="line">    posts.data = posts.data.sort(function(a, b) {</span><br><span class="line">        <span class="keyword">if</span>(a.top &amp;&amp; b.top) { <span class="comment">// 两篇文章top都有定义</span></span><br><span class="line">            <span class="keyword">if</span>(a.top == b.top) <span class="keyword">return</span> b.date - a.date; <span class="comment">// 若top值一样则按照文章日期降序排</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">return</span> b.top - a.top; <span class="comment">// 否则按照top值降序排</span></span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(a.top &amp;&amp; !b.top) { <span class="comment">// 以下是只有一篇文章top有定义，那么将有top的排在前面（这里用异或操作居然不行233）</span></span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(!a.top &amp;&amp; b.top) {</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> b.date - a.date; <span class="comment">// 都没定义按照文章日期降序排</span></span><br><span class="line">    });</span><br><span class="line">  var paginationDir = config.pagination_dir || <span class="string">'page'</span>;</span><br><span class="line">  <span class="keyword">return</span> pagination(<span class="string">''</span>, posts, {</span><br><span class="line">    perPage: config.index_generator.per_page,</span><br><span class="line">    layout: [<span class="string">'index'</span>, <span class="string">'archive'</span>],</span><br><span class="line">    format: paginationDir + <span class="string">'/%d/'</span>,</span><br><span class="line">    data: {</span><br><span class="line">      __index: <span class="keyword">true</span></span><br><span class="line">    }</span><br><span class="line">  });</span><br><span class="line">};</span><br></pre></td></tr></tbody></table>
+
+```sql
+'use strict';
+var pagination = require('hexo-pagination');
+module.exports = function(locals){
+  var config = this.config;
+  var posts = locals.posts;
+    posts.data = posts.data.sort(function(a, b) {
+        if(a.top && b.top) { // 两篇文章top都有定义
+            if(a.top == b.top) return b.date - a.date; // 若top值一样则按照文章日期降序排
+            else return b.top - a.top; // 否则按照top值降序排
+        }
+        else if(a.top && !b.top) { // 以下是只有一篇文章top有定义，那么将有top的排在前面（这里用异或操作居然不行233）
+            return -1;
+        }
+        else if(!a.top && b.top) {
+            return 1;
+        }
+        else return b.date - a.date; // 都没定义按照文章日期降序排
+    });
+  var paginationDir = config.pagination_dir || 'page';
+  return pagination('', posts, {
+    perPage: config.index_generator.per_page,
+    layout: ['index', 'archive'],
+    format: paginationDir + '/%d/',
+    data: {
+      __index: true
+    }
+  });
+};
+```
+
 
 在文章中添加 top 值，数值越大文章越靠前，如:
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">......</span><br><span class="line">copyright: <span class="keyword">true</span></span><br><span class="line">top: <span class="number">100</span></span><br><span class="line">---</span><br></pre></td></tr></tbody></table>
+
+```sql
+---
+......
+copyright: true
+top: 100
+---
+```
+
 
 默认不设置则为0，数值相同时按时间排序。
 
@@ -256,11 +533,32 @@ NexT主题菜单设置，用于设置博客上方导航栏，在主题配置文�
 
 打开/themes/next/layout/\_partials/head.swig文件，在maximum-scale=1”/>后添加如下代码:
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"&gt;&lt;/script&gt;</span><br><span class="line">&lt;link href=<span class="string">"//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css"</span> rel=<span class="string">"stylesheet"</span>&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+```
+
 
 但是，默认的是粉色的，要改变颜色可以在/themes/next/layout/\_partials/head.swig文件中添加如下代码（接在刚才link的后面）
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">    .pace .pace-progress {</span><br><span class="line">        background: #1E92FB; /*进度条颜色*/</span><br><span class="line">        height: <span class="number">3</span>px;</span><br><span class="line">    }</span><br><span class="line">    .pace .pace-progress-inner {</span><br><span class="line">         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/</span><br><span class="line">    }</span><br><span class="line">    .pace .pace-activity {</span><br><span class="line">        border-top-color: #1E92FB;    /*上边框颜色*/</span><br><span class="line">        border-left-color: #1E92FB;    /*左边框颜色*/</span><br><span class="line">    }</span><br><span class="line">&lt;/style&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+```
+
 
 ### [¶](#添加文章热度)添加文章热度
 
@@ -272,7 +570,18 @@ next主题集成leanCloud，打开/themes/next/layout/\_macro/post.swig
 
 打开\\themes\\next\\source\\css\_custom\\custom.styl,向里面加入：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 主页文章添加阴影效果</span></span><br><span class="line"> .post {</span><br><span class="line">   margin-top: <span class="number">60</span>px;</span><br><span class="line">   margin-bottom: <span class="number">60</span>px;</span><br><span class="line">   padding: <span class="number">25</span>px;</span><br><span class="line">   -webkit-box-shadow: <span class="number">0</span> <span class="number">0</span> <span class="number">5</span><span class="function">px <span class="title">rgba</span><span class="params">(<span class="number">202</span>, <span class="number">203</span>, <span class="number">203</span>, <span class="number">.5</span>)</span></span>;</span><br><span class="line">   -moz-box-shadow: <span class="number">0</span> <span class="number">0</span> <span class="number">5</span><span class="function">px <span class="title">rgba</span><span class="params">(<span class="number">202</span>, <span class="number">203</span>, <span class="number">204</span>, <span class="number">.5</span>)</span></span>;</span><br><span class="line">  }</span><br></pre></td></tr></tbody></table>
+
+```sql
+// 主页文章添加阴影效果
+ .post {
+   margin-top: 60px;
+   margin-bottom: 60px;
+   padding: 25px;
+   -webkit-box-shadow: 0 0 5px rgba(202, 203, 203, .5);
+   -moz-box-shadow: 0 0 5px rgba(202, 203, 204, .5);
+  }
+```
+
 
 ### [¶](#修改文章底部的那个带-号的标签)修改文章底部的那个带#号的标签
 
@@ -283,7 +592,12 @@ next主题集成leanCloud，打开/themes/next/layout/\_macro/post.swig
 将 [love.js](https://github.com/Neveryu/Neveryu.github.io/blob/master/js/src/love.js) 文件添加到 \\themes\\next\\source\\js\\src 文件目录下。  
 找到 \\themes\\next\\layout\_layout.swing 文件， 在文件的后面， 标签之前 添加以下代码：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 页面点击小红心 --&gt;</span><br><span class="line">&lt;script type="text/javascript" src="/js/src/love.js"&gt;&lt;/script&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
+```
+
 
 ### [¶](#鼠标点击四级单词)鼠标点击四级单词
 
@@ -291,30 +605,85 @@ next主题集成leanCloud，打开/themes/next/layout/\_macro/post.swig
 文件添加到 \\themes\\next\\source\\js\\src 文件目录下。  
 找到 \\themes\\next\\layout\_layout.swing 文件， 在文件的后面， 标签之前 添加以下代码：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 页面点击小红心 --&gt;</span><br><span class="line">&lt;script type="text/javascript" src="/js/src/cet4.js"&gt;&lt;/script&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/cet4.js"></script>
+```
+
 
 ### [¶](#鼠标点击文明和谐)鼠标点击文明和谐
 
 将上述的love.js(或者自己新建一个js文件也都可以)改成
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line"><span class="comment">/* 鼠标点击特效 */</span></span><br><span class="line">var a_idx = <span class="number">0</span>;</span><br><span class="line">jQuery(document).ready(function($) {</span><br><span class="line">    $(<span class="string">"body"</span>).click(function(e) {</span><br><span class="line">var a = <span class="keyword">new</span> Array(<span class="string">"富强"</span>, <span class="string">"民主"</span>, <span class="string">"文明"</span>, <span class="string">"和谐"</span>, <span class="string">"自由"</span>, <span class="string">"平等"</span>, <span class="string">"公正"</span> ,<span class="string">"法治"</span>, <span class="string">"爱国"</span>, <span class="string">"敬业"</span>, <span class="string">"诚信"</span>, <span class="string">"友善"</span>);</span><br><span class="line">var $i = $(<span class="string">"&lt;span/&gt;"</span>).text(a[a_idx]);</span><br><span class="line">        a_idx = (a_idx + <span class="number">1</span>) % a.length;</span><br><span class="line">var x = e.pageX,</span><br><span class="line">        y = e.pageY;</span><br><span class="line">        $i.css({</span><br><span class="line"><span class="string">"z-index"</span>: <span class="number">999999999999999999999999999999999999999999999999999999999999999999999</span>,</span><br><span class="line"><span class="string">"top"</span>: y - <span class="number">120</span>,</span><br><span class="line"><span class="string">"left"</span>: x,</span><br><span class="line"><span class="string">"position"</span>: <span class="string">"absolute"</span>,</span><br><span class="line"><span class="string">"font-weight"</span>: <span class="string">"bold"</span>,</span><br><span class="line"><span class="string">"color"</span>: <span class="string">"#ff6651"</span></span><br><span class="line">        });</span><br><span class="line">        $(<span class="string">"body"</span>).append($i);</span><br><span class="line">        $i.animate({</span><br><span class="line"><span class="string">"top"</span>: y - <span class="number">180</span>,</span><br><span class="line"><span class="string">"opacity"</span>: <span class="number">0</span></span><br><span class="line">        },</span><br><span class="line">        <span class="number">1500</span>,</span><br><span class="line">function() {</span><br><span class="line">            $i.remove();</span><br><span class="line">        });</span><br><span class="line">    });</span><br><span class="line">});</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<script type="text/javascript">
+/* 鼠标点击特效 */
+var a_idx = 0;
+jQuery(document).ready(function($) {
+    $("body").click(function(e) {
+var a = new Array("富强", "民主", "文明", "和谐", "自由", "平等", "公正" ,"法治", "爱国", "敬业", "诚信", "友善");
+var $i = $("<span/>").text(a[a_idx]);
+        a_idx = (a_idx + 1) % a.length;
+var x = e.pageX,
+        y = e.pageY;
+        $i.css({
+"z-index": 999999999999999999999999999999999999999999999999999999999999999999999,
+"top": y - 120,
+"left": x,
+"position": "absolute",
+"font-weight": "bold",
+"color": "#ff6651"
+        });
+        $("body").append($i);
+        $i.animate({
+"top": y - 180,
+"opacity": 0
+        },
+        1500,
+function() {
+            $i.remove();
+        });
+    });
+});
+</script>
+```
+
 
 ### [¶](#背景的设置)背景的设置
 
 将 [particle.js](https://github.com/Neveryu/Neveryu.github.io/blob/master/js/src/particle.js) 文件添加到 \\themes\\next\\source\\js\\src 文件目录下。  
 找到 \\themes\\next\\layout\_layout.swing 文件， 在文件的后面，标签之前 添加以下代码：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 背景动画 --&gt;</span><br><span class="line">&lt;script type="text/javascript" src="/js/src/particle.js"&gt;&lt;/script&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<!-- 背景动画 -->
+<script type="text/javascript" src="/js/src/particle.js"></script>
+```
+
 
 ### [¶](#搜索功能)搜索功能
 
 安装 hexo-generator-searchdb，在站点的根目录下执行以下命令：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-generator-searchdb --save</span><br></pre></td></tr></tbody></table>
+
+```sql
+$ npm install hexo-generator-searchdb --save
+```
+
 
 编辑 站点配置文件，新增以下内容到任意位置：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">search:</span><br><span class="line">  path: search.xml</span><br><span class="line">  field: post</span><br><span class="line">  format: html</span><br><span class="line">  limit: <span class="number">10000</span></span><br></pre></td></tr></tbody></table>
+
+```sql
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
+```
+
 
 ### [¶](#添加来必力评论)添加来必力评论
 
@@ -326,21 +695,52 @@ next主题集成leanCloud，打开/themes/next/layout/\_macro/post.swig
 
 首先在 \_config.yml 文件中添加如下配置：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">livere_uid: your uid</span><br></pre></td></tr></tbody></table>
+
+```sql
+livere_uid: your uid
+```
+
 
 其中 livere\_uid 即注册来必力获取到的 uid。  
 在 layout/\_scripts/third-party/comments/ 目录中添加 livere.swig，文件内容如下：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">{% <span class="function"><span class="keyword">if</span> <span class="title">not</span> <span class="params">(theme.duoshuo and theme.duoshuo.shortname)</span> and not theme.duoshuo_shortname and not theme.disqus_shortname and not theme.hypercomments_id and not theme.gentie_productKey %}</span></span><br><span class="line"><span class="function">  </span>{% <span class="keyword">if</span> theme.livere_uid %}</span><br><span class="line">    &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">      (function(d, s) {</span><br><span class="line">        var j, e = d.getElementsByTagName(s)[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">if</span> (typeof LivereTower === <span class="string">'function'</span>) { <span class="keyword">return</span>; }</span><br><span class="line">        j = d.createElement(s);</span><br><span class="line">        j.src = <span class="string">'https://cdn-city.livere.com/js/embed.dist.js'</span>;</span><br><span class="line">        j.async = <span class="keyword">true</span>;</span><br><span class="line">        e.parentNode.insertBefore(j, e);</span><br><span class="line">      })(document, <span class="string">'script'</span>);</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line">  {% endif %}</span><br><span class="line">{% endif %}</span><br></pre></td></tr></tbody></table>
+
+```sql
+{% if not (theme.duoshuo and theme.duoshuo.shortname) and not theme.duoshuo_shortname and not theme.disqus_shortname and not theme.hypercomments_id and not theme.gentie_productKey %}
+  {% if theme.livere_uid %}
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  {% endif %}
+{% endif %}
+```
+
 
 优先使用其他评论插件，如果其他评论插件没有开启，且LiveRe评论插件配置开启了，则使用LiveRe。其中脚本代码为上一步管理页面中获取到的。在layout/\_scripts/third-party/comments.swig文件中追加：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{% include <span class="string">'./comments/livere.swig'</span> %}</span><br></pre></td></tr></tbody></table>
+
+```sql
+{% include './comments/livere.swig' %}
+```
+
 
 引入 LiveRe 评论插件。  
 最后，在 layout/\_partials/comments.swig 文件中条件最后追加LiveRe插件是否引用的判断逻辑：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">{% elseif theme.livere_uid %}</span><br><span class="line">      &lt;div id="lv-container" data-id="city" data-uid="{{ theme.livere_uid }}"&gt;&lt;/div&gt;</span><br><span class="line">{% endif %}</span><br></pre></td></tr></tbody></table>
+
+```sql
+{% elseif theme.livere_uid %}
+      <div id="lv-container" data-id="city" data-uid="{{ theme.livere_uid }}"></div>
+{% endif %}
+```
+
 
 ### [¶](#解决来必力评论系统加载慢的方法)解决来必力评论系统加载慢的方法
 
@@ -359,11 +759,21 @@ next主题集成leanCloud，打开/themes/next/layout/\_macro/post.swig
 
 将这段代码
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;div <span class="class"><span class="keyword">class</span></span>=<span class="string">"comments"</span> id=<span class="string">"comments"</span>&gt;</span><br><span class="line">  &lt;div id="lv-container" data-id="city" data-uid="{{ theme.livere_uid }}"&gt;&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<div class="comments" id="comments">
+  <div id="lv-container" data-id="city" data-uid="{{ theme.livere_uid }}"></div>
+</div>
+```
+
 
 改成
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;iframe title="livere" src="https://was.livere.me/comment/city?id=city&amp;refer={{page.permalink}}&amp;uid={{theme.livere_uid}}&amp;site={{page.permalink}}&amp;title={{page.title}}" scrolling="" frameborder="0" id="lv-comment-399" style="min-width: 100%; width: 100px; min-height: 400px; overflow: auto; border: 0px; z-index: 124212; height: 500px;" &gt;&lt;/iframe&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<iframe title="livere" src="https://was.livere.me/comment/city?id=city&refer={{page.permalink}}&uid={{theme.livere_uid}}&site={{page.permalink}}&title={{page.title}}" scrolling="" frameborder="0" id="lv-comment-399" style="min-width: 100%; width: 100px; min-height: 400px; overflow: auto; border: 0px; z-index: 124212; height: 500px;" ></iframe>
+```
+
 
 **然后就ok啦**重新编译和提交博客内容，**不过需要先清除缓存**
 
@@ -388,11 +798,37 @@ next主题集成leanCloud，打开/themes/next/layout/\_macro/post.swig
 
 将这段代码
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;div <span class="class"><span class="keyword">class</span></span>=<span class="string">"comments"</span> id=<span class="string">"comments"</span>&gt;</span><br><span class="line">  &lt;div id="lv-container" data-id="city" data-uid="{{ theme.livere_uid }}"&gt;&lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<div class="comments" id="comments">
+  <div id="lv-container" data-id="city" data-uid="{{ theme.livere_uid }}"></div>
+</div>
+```
+
 
 换成
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"> &lt;div id=<span class="string">"container"</span> data-id=<span class="string">"city"</span> data-title=<span class="string">"{{page.title}}"</span> data-logo=<span class="string">""</span> data-desc=<span class="string">""</span> data-uid=<span class="string">"{{theme.livere_uid}}"</span> data-site=<span class="string">"{{page.permalink}}"</span> data-refer=<span class="string">"{{page.permalink}}"</span> data-redirectorigin=<span class="string">""</span> data-highlightseq=<span class="string">""</span> data-discuss=<span class="string">"false"</span> data-facebookpageid=<span class="string">""</span> data-facebookuploadurl=<span class="string">""</span>&gt;</span><br><span class="line">        &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">            (function(i,s,o,g,r,a,m){i[<span class="string">'GoogleAnalyticsObject'</span>]=r;i[r]=i[r]||function(){</span><br><span class="line">            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=<span class="number">1</span>*<span class="keyword">new</span> Date();a=s.createElement(o),</span><br><span class="line">            m=s.getElementsByTagName(o)[<span class="number">0</span>];a.async=<span class="number">1</span>;a.src=g;m.parentNode.insertBefore(a,m)</span><br><span class="line">            })(window,document,<span class="string">'script'</span>,<span class="string">'//www.google-analytics.com/analytics.js'</span>,<span class="string">'ga'</span>);</span><br><span class="line"></span><br><span class="line">            ga(<span class="string">'create'</span>, <span class="string">'UA-75302230-1'</span>, { sampleRate: <span class="number">1</span> });</span><br><span class="line">            ga(<span class="string">'send'</span>, <span class="string">'pageview'</span>);</span><br><span class="line">      &lt;/script&gt;</span><br><span class="line">    &lt;noscript&gt;Please enable JavaScript to view the LiveRe comments&lt;/a&gt;&lt;/noscript&gt;</span><br><span class="line"> &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">&lt;link type=<span class="string">"text/css"</span> rel=<span class="string">"stylesheet"</span> href=<span class="string">"https://cdn-city.livere.com/css/comment.zero.css"</span>&gt;</span><br><span class="line">&lt;link type=<span class="string">"text/css"</span> rel=<span class="string">"stylesheet"</span> href=<span class="string">"https://cdn-city.livere.com/css/theme/realblack.zero.css"</span>&gt;</span><br><span class="line">&lt;script type="text/javascript" src="https://cdn-city.livere.com/js/lib.zero.js"&gt;&lt;/script&gt;</span><br><span class="line">&lt;script type="text/javascript" src="https://cdn-city.livere.com/js/comment.zero.zh-cn.dist.js"&gt;&lt;/script&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+ <div id="container" data-id="city" data-title="{{page.title}}" data-logo="" data-desc="" data-uid="{{theme.livere_uid}}" data-site="{{page.permalink}}" data-refer="{{page.permalink}}" data-redirectorigin="" data-highlightseq="" data-discuss="false" data-facebookpageid="" data-facebookuploadurl="">
+        <script type="text/javascript">
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-75302230-1', { sampleRate: 1 });
+            ga('send', 'pageview');
+      </script>
+    <noscript>Please enable JavaScript to view the LiveRe comments</a></noscript>
+ </div>
+
+<link type="text/css" rel="stylesheet" href="https://cdn-city.livere.com/css/comment.zero.css">
+<link type="text/css" rel="stylesheet" href="https://cdn-city.livere.com/css/theme/realblack.zero.css">
+<script type="text/javascript" src="https://cdn-city.livere.com/js/lib.zero.js"></script>
+<script type="text/javascript" src="https://cdn-city.livere.com/js/comment.zero.zh-cn.dist.js"></script>
+```
+
 
 > 就是直接将框架里的代码复制出来，不用框架。  
 > 但是这也会造成一个问题，没了框架的保护，来必力提供的外联样式表会与本地 css 样式冲突，导致本地的部分样式变形。
@@ -423,7 +859,14 @@ gitalk：一个基于 Github Issue 和 Preact 开发的评论插件
 
 参数说明：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Application name： # 应用名称，随意</span><br><span class="line">Homepage URL： # 网站URL，如https://asdfv1929.github.io</span><br><span class="line">Application description # 描述，随意</span><br><span class="line">Authorization callback URL：# 网站URL，https://asdfv1929.github.io</span><br></pre></td></tr></tbody></table>
+
+```sql
+Application name： # 应用名称，随意
+Homepage URL： # 网站URL，如https://asdfv1929.github.io
+Application description # 描述，随意
+Authorization callback URL：# 网站URL，https://asdfv1929.github.io
+```
+
 
 点击注册后，页面跳转如下，其中Client ID和Client Secret在后面的配置中需要用到，到时复制粘贴即可：
 
@@ -433,25 +876,64 @@ gitalk：一个基于 Github Issue 和 Preact 开发的评论插件
 
 新建/layout/\_third-party/comments/gitalk.swig文件，并添加内容：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">{% <span class="keyword">if</span> page.comments &amp;&amp; theme.gitalk.enable %}</span><br><span class="line">  &lt;link rel=<span class="string">"stylesheet"</span> href=<span class="string">"https://unpkg.com/gitalk/dist/gitalk.css"</span>&gt;</span><br><span class="line">  &lt;script src="https://unpkg.com/gitalk/dist/gitalk.min.js"&gt;&lt;/script&gt;</span><br><span class="line">   &lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">        var gitalk = <span class="keyword">new</span> Gitalk({</span><br><span class="line">          clientID: <span class="string">'{{ theme.gitalk.ClientID }}'</span>,</span><br><span class="line">          clientSecret: <span class="string">'{{ theme.gitalk.ClientSecret }}'</span>,</span><br><span class="line">          repo: <span class="string">'{{ theme.gitalk.repo }}'</span>,</span><br><span class="line">          owner: <span class="string">'{{ theme.gitalk.githubID }}'</span>,</span><br><span class="line">          admin: [<span class="string">'{{ theme.gitalk.adminUser }}'</span>],</span><br><span class="line">          id: location.pathname,</span><br><span class="line">          distractionFreeMode: <span class="string">'{{ theme.gitalk.distractionFreeMode }}'</span></span><br><span class="line">        })</span><br><span class="line">        gitalk.render(<span class="string">'gitalk-container'</span>)           </span><br><span class="line">       &lt;/script&gt;</span><br><span class="line">{% endif %}</span><br></pre></td></tr></tbody></table>
+
+```sql
+{% if page.comments && theme.gitalk.enable %}
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '{{ theme.gitalk.ClientID }}',
+          clientSecret: '{{ theme.gitalk.ClientSecret }}',
+          repo: '{{ theme.gitalk.repo }}',
+          owner: '{{ theme.gitalk.githubID }}',
+          admin: ['{{ theme.gitalk.adminUser }}'],
+          id: location.pathname,
+          distractionFreeMode: '{{ theme.gitalk.distractionFreeMode }}'
+        })
+        gitalk.render('gitalk-container')
+       </script>
+{% endif %}
+```
+
 
 #### [¶](#comments-swig)comments.swig
 
 修改/layout/\_partials/comments.swig，添加内容如下，与前面的elseif同一级别上：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">{% elseif theme.gitalk.enable %}</span><br><span class="line"> &lt;div id="gitalk-container"&gt;&lt;/div&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+{% elseif theme.gitalk.enable %}
+ <div id="gitalk-container"></div>
+```
+
 
 #### [¶](#index-swig)index.swig
 
 修改layout/\_third-party/comments/index.swig，在最后一行添加内容：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{% include <span class="string">'gitalk.swig'</span> %}</span><br></pre></td></tr></tbody></table>
+
+```sql
+{% include 'gitalk.swig' %}
+```
+
 
 #### [¶](#config-yml)\_config.yml
 
 在主题配置文件next/\_config.yml中添加如下内容：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">gitalk:</span><br><span class="line">  enable: <span class="keyword">true</span></span><br><span class="line">  githubID: github帐号  #    </span><br><span class="line">  repo: 仓库名称   # 名字，不是地址</span><br><span class="line">  ClientID: Client ID</span><br><span class="line">  ClientSecret: Client Secret</span><br><span class="line">  adminUser: github帐号 #指定可初始化评论账户</span><br><span class="line">  distractionFreeMode: <span class="keyword">true</span></span><br></pre></td></tr></tbody></table>
+
+```sql
+gitalk:
+  enable: true
+  githubID: github帐号  #
+  repo: 仓库名称   # 名字，不是地址
+  ClientID: Client ID
+  ClientSecret: Client Secret
+  adminUser: github帐号 #指定可初始化评论账户
+  distractionFreeMode: true
+```
+
 
 以上就是NexT中添加gitalk评论的配置，博客上传到GitHub上后，打开页面进入某一博客内容下，就可看到评论处。
 
@@ -462,7 +944,17 @@ gitalk：一个基于 Github Issue 和 Preact 开发的评论插件
 
 在themes\\next\\source\\css\_custom\\中添加
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">body {</span><br><span class="line"> background-color: #fff; /*Default bg, similar to the background's base color*/</span><br><span class="line"> background-image:url(/images/bg.jpg);  <span class="comment">//你的背景图片地址</span></span><br><span class="line"> background-position: right bottom; <span class="comment">/*Positioning*/</span></span><br><span class="line"> background-attachment: fixed;</span><br><span class="line"> background-repeat: no-repeat; <span class="comment">/*Prevent showing multiple background images*/</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table>
+
+```sql
+body {
+ background-color: #fff; /*Default bg, similar to the background's base color*/
+ background-image:url(/images/bg.jpg);  //你的背景图片地址
+ background-position: right bottom; /*Positioning*/
+ background-attachment: fixed;
+ background-repeat: no-repeat; /*Prevent showing multiple background images*/
+}
+```
+
 
 将你的背景图片放在theme/next/source/images目录  
 上面的css代码我只设置图片放在网页右下角，可以根据个人爱好设置
@@ -474,7 +966,28 @@ gitalk：一个基于 Github Issue 和 Preact 开发的评论插件
 在目录themes\\next\\layout找到index.swig文件  
 **在下面标记地方添加标记内容**
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">{% block content %}</span><br><span class="line"></span><br><span class="line"><span class="comment">//在这里添加下面内容</span></span><br><span class="line"></span><br><span class="line"> &lt;p style=<span class="string">"background-color: #000; color: #fff;font-weight: 800;font-size: 15px; width: 60px;text-align: center;"</span> &gt;</span><br><span class="line">	&lt;标签&gt;</span><br><span class="line">&lt;/p&gt;</span><br><span class="line"> &lt;div <span class="class"><span class="keyword">class</span></span>=<span class="string">"tag-cloud"</span>&gt;</span><br><span class="line">            &lt;div <span class="class"><span class="keyword">class</span></span>=<span class="string">"tag-cloud-tags"</span> align=<span class="string">"left"</span>&gt;</span><br><span class="line">              {{ tagcloud({min_font: 14, max_font: 14, amount: 300, color: true, start_color: '#888', end_color: '#888'}) }}            &lt;/div&gt;</span><br><span class="line">          &lt;/div&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">//上面内容</span></span><br><span class="line"></span><br><span class="line">  &lt;section id=<span class="string">"posts"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"posts-expand"</span>&gt;</span><br><span class="line">    {% <span class="keyword">for</span> post in page.posts %}</span><br><span class="line">      {{ post_template.render(post, <span class="keyword">true</span>) }}    {% endfor %}</span><br><span class="line">  &lt;/section&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+{% block content %}
+
+//在这里添加下面内容
+
+ <p style="background-color: #000; color: #fff;font-weight: 800;font-size: 15px; width: 60px;text-align: center;" >
+	<标签>
+</p>
+ <div class="tag-cloud">
+            <div class="tag-cloud-tags" align="left">
+              {{ tagcloud({min_font: 14, max_font: 14, amount: 300, color: true, start_color: '#888', end_color: '#888'}) }}            </div>
+          </div>
+
+//上面内容
+
+  <section id="posts" class="posts-expand">
+    {% for post in page.posts %}
+      {{ post_template.render(post, true) }}    {% endfor %}
+  </section>
+```
+
 
 ### [¶](#设置字体)设置字体
 
@@ -502,7 +1015,41 @@ gitalk：一个基于 Github Issue 和 Preact 开发的评论插件
 
 \*\*配置示例
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">font:</span><br><span class="line">  enable: <span class="keyword">true</span></span><br><span class="line"></span><br><span class="line">  # 外链字体库地址，例如 //fonts.googleapis.com (默认值)</span><br><span class="line">  host:</span><br><span class="line"></span><br><span class="line">  # 全局字体，应用在 body 元素上</span><br><span class="line">  global:</span><br><span class="line">    external: <span class="keyword">true</span></span><br><span class="line">    family: Monda</span><br><span class="line"></span><br><span class="line">  # 标题字体 (h1, h2, h3, h4, h5, h6)</span><br><span class="line">  headings:</span><br><span class="line">    external: <span class="keyword">true</span></span><br><span class="line">    family: Roboto Slab</span><br><span class="line"></span><br><span class="line">  # 文章字体</span><br><span class="line">  posts:</span><br><span class="line">    external: <span class="keyword">true</span></span><br><span class="line">    family:</span><br><span class="line"></span><br><span class="line">  # Logo 字体</span><br><span class="line">  logo:</span><br><span class="line">    external: <span class="keyword">true</span></span><br><span class="line">    family: Lobster Two</span><br><span class="line">    size: <span class="number">24</span></span><br><span class="line"></span><br><span class="line">  # 代码字体，应用于 code 以及代码块</span><br><span class="line">  codes:</span><br><span class="line">    external: <span class="keyword">true</span></span><br><span class="line">    family: PT Mono</span><br></pre></td></tr></tbody></table>
+
+```sql
+font:
+  enable: true
+
+  # 外链字体库地址，例如 //fonts.googleapis.com (默认值)
+  host:
+
+  # 全局字体，应用在 body 元素上
+  global:
+    external: true
+    family: Monda
+
+  # 标题字体 (h1, h2, h3, h4, h5, h6)
+  headings:
+    external: true
+    family: Roboto Slab
+
+  # 文章字体
+  posts:
+    external: true
+    family:
+
+  # Logo 字体
+  logo:
+    external: true
+    family: Lobster Two
+    size: 24
+
+  # 代码字体，应用于 code 以及代码块
+  codes:
+    external: true
+    family: PT Mono
+```
+
 
 ### [¶](#设置代码高亮主题)设置代码高亮主题
 
@@ -512,7 +1059,14 @@ NexT 使用 Tomorrow Theme 作为代码高亮，共有5款主题供你选择。 
 
 高亮主题设置示例
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># Code Highlight theme</span><br><span class="line"># Available value: normal | night | night eighties | night blue | night bright</span><br><span class="line"># https://github.com/chriskempson/tomorrow-theme</span><br><span class="line">highlight_theme: normal</span><br></pre></td></tr></tbody></table>
+
+```sql
+# Code Highlight theme
+# Available value: normal | night | night eighties | night blue | night bright
+# https://github.com/chriskempson/tomorrow-theme
+highlight_theme: normal
+```
+
 
 ### [¶](#侧边栏社交链接)侧边栏社交链接
 
@@ -522,13 +1076,34 @@ NexT 使用 Tomorrow Theme 作为代码高亮，共有5款主题供你选择。 
 
 配置示例
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># Social links</span><br><span class="line">social:</span><br><span class="line">  GitHub: https:<span class="comment">//github.com/your-user-name</span></span><br><span class="line">  Twitter: https:<span class="comment">//twitter.com/your-user-name</span></span><br><span class="line">  微博: http:<span class="comment">//weibo.com/your-user-name</span></span><br><span class="line">  豆瓣: http:<span class="comment">//douban.com/people/your-user-name</span></span><br><span class="line">  知乎: http:<span class="comment">//www.zhihu.com/people/your-user-name</span></span><br><span class="line">  # 等等</span><br></pre></td></tr></tbody></table>
+
+```sql
+# Social links
+social:
+  GitHub: https://github.com/your-user-name
+  Twitter: https://twitter.com/your-user-name
+  微博: http://weibo.com/your-user-name
+  豆瓣: http://douban.com/people/your-user-name
+  知乎: http://www.zhihu.com/people/your-user-name
+  # 等等
+```
+
 
 2.  设定链接的图标，对应的字段是 social\_icons。其键值格式是 匹配键: Font Awesome 图标名称， 匹配键 与上一步所配置的链接的 显示文本 相同（大小写严格匹配），图标名称 是 Font Awesome 图标的名字（不必带 fa- 前缀）。 enable 选项用于控制是否显示图标，你可以设置成 false 来去掉图标。
 
 配置示例
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># Social Icons</span><br><span class="line">social_icons:</span><br><span class="line">  enable: <span class="keyword">true</span></span><br><span class="line">  # Icon Mappings</span><br><span class="line">  GitHub: github</span><br><span class="line">  Twitter: twitter</span><br><span class="line">  微博: weibo</span><br></pre></td></tr></tbody></table>
+
+```sql
+# Social Icons
+social_icons:
+  enable: true
+  # Icon Mappings
+  GitHub: github
+  Twitter: twitter
+  微博: weibo
+```
+
 
 ### [¶](#开启打赏功能)开启打赏功能
 
@@ -536,7 +1111,13 @@ NexT 使用 Tomorrow Theme 作为代码高亮，共有5款主题供你选择。 
 
 打赏功能配置示例
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">reward_comment: 坚持原创技术分享，您的支持将鼓励我继续创作！</span><br><span class="line">wechatpay: /path/to/wechat-reward-image</span><br><span class="line">alipay: /path/to/alipay-reward-image</span><br></pre></td></tr></tbody></table>
+
+```sql
+reward_comment: 坚持原创技术分享，您的支持将鼓励我继续创作！
+wechatpay: /path/to/wechat-reward-image
+alipay: /path/to/alipay-reward-image
+```
+
 
 ### [¶](#友情链接)友情链接
 
@@ -544,14 +1125,43 @@ NexT 使用 Tomorrow Theme 作为代码高亮，共有5款主题供你选择。 
 
 友情链接配置示例
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># title</span><br><span class="line">links_title: Links</span><br><span class="line">links:</span><br><span class="line">  MacTalk: http:<span class="comment">//macshuo.com/</span></span><br><span class="line">  Title: http:<span class="comment">//example.com/</span></span><br></pre></td></tr></tbody></table>
+
+```sql
+# title
+links_title: Links
+links:
+  MacTalk: http://macshuo.com/
+  Title: http://example.com/
+```
+
 
 ### [¶](#腾讯公益404页面)腾讯公益404页面
 
 腾讯公益404页面，寻找丢失儿童，让大家一起关注此项公益事业！效果如下 [http://www.ixirong.com/404.html](http://www.ixirong.com/404.html)  
 使用方法，新建 404.html 页面，放到主题的 source 目录下，内容如下：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE HTML&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta http-equiv=<span class="string">"content-type"</span> content=<span class="string">"text/html;charset=utf-8;"</span>/&gt;</span><br><span class="line">  &lt;meta http-equiv=<span class="string">"X-UA-Compatible"</span> content=<span class="string">"IE=edge,chrome=1"</span> /&gt;</span><br><span class="line">  &lt;meta name=<span class="string">"robots"</span> content=<span class="string">"all"</span> /&gt;</span><br><span class="line">  &lt;meta name=<span class="string">"robots"</span> content=<span class="string">"index,follow"</span>/&gt;</span><br><span class="line">  &lt;link rel=<span class="string">"stylesheet"</span> type=<span class="string">"text/css"</span> href=<span class="string">"https://qzone.qq.com/gy/404/style/404style.css"</span>&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;script type=<span class="string">"text/plain"</span> src=<span class="string">"http://www.qq.com/404/search_children.js"</span></span><br><span class="line">          charset=<span class="string">"utf-8"</span> homePageUrl=<span class="string">"/"</span></span><br><span class="line">          homePageName=<span class="string">"回到我的主页"</span>&gt;</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">  &lt;script src="https://qzone.qq.com/gy/404/data.js" charset="utf-8"&gt;&lt;/script&gt;</span><br><span class="line">  &lt;script src="https://qzone.qq.com/gy/404/page.js" charset="utf-8"&gt;&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8;"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="robots" content="all" />
+  <meta name="robots" content="index,follow"/>
+  <link rel="stylesheet" type="text/css" href="https://qzone.qq.com/gy/404/style/404style.css">
+</head>
+<body>
+  <script type="text/plain" src="http://www.qq.com/404/search_children.js"
+          charset="utf-8" homePageUrl="/"
+          homePageName="回到我的主页">
+  </script>
+  <script src="https://qzone.qq.com/gy/404/data.js" charset="utf-8"></script>
+  <script src="https://qzone.qq.com/gy/404/page.js" charset="utf-8"></script>
+</body>
+</html>
+```
+
 
 ### [¶](#站点建立时间)站点建立时间
 
@@ -559,7 +1169,11 @@ NexT 使用 Tomorrow Theme 作为代码高亮，共有5款主题供你选择。 
 
 配置示例
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">since: <span class="number">2013</span></span><br></pre></td></tr></tbody></table>
+
+```sql
+since: 2013
+```
+
 
 ### [¶](#订阅微信公众号)订阅微信公众号
 
@@ -569,7 +1183,16 @@ NexT 使用 Tomorrow Theme 作为代码高亮，共有5款主题供你选择。 
 1.  在微信公众号平台下载您的二维码，并将它存放于博客source/uploads/目录下。
 2.  然后编辑 主题配置文件，如下：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">配置示例</span><br><span class="line"># Wechat Subscriber</span><br><span class="line">wechat_subscriber:</span><br><span class="line">  enabled: <span class="keyword">true</span></span><br><span class="line">  qcode: /uploads/wechat-qcode.jpg</span><br><span class="line">  description: 欢迎您扫一扫上面的微信公众号，订阅我的博客！</span><br></pre></td></tr></tbody></table>
+
+```sql
+配置示例
+# Wechat Subscriber
+wechat_subscriber:
+  enabled: true
+  qcode: /uploads/wechat-qcode.jpg
+  description: 欢迎您扫一扫上面的微信公众号，订阅我的博客！
+```
+
 
 ## [¶](#seo优化)SEO优化
 
@@ -578,23 +1201,51 @@ seo优化对于网站是否能被搜索引擎快速收录有很大帮助，因�
 添加sitemap文件  
 安装以下2个插件，然后重启hexo后，网站根目录（source）下会生成sitemap.xml与baidusitemap.xml文件，搜索引擎在爬取时会参照文件中的url去收录。
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-generator-sitemap --save-dev</span><br><span class="line">hexo d -g</span><br><span class="line">npm install hexo-generator-baidu-sitemap --save-dev</span><br><span class="line">hexo d -g</span><br></pre></td></tr></tbody></table>
+
+```sql
+npm install hexo-generator-sitemap --save-dev
+hexo d -g
+npm install hexo-generator-baidu-sitemap --save-dev
+hexo d -g
+```
+
 
 #### [¶](#添加robots-txt)添加robots.txt
 
 新建robots.txt文件，添加以下文件内容，把robots.txt放在hexo站点的source文件下。
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">User-agent: * Allow: /</span><br><span class="line">Allow: /archives/</span><br><span class="line">Disallow: /vendors/</span><br><span class="line">Disallow: /js/</span><br><span class="line">Disallow: /css/</span><br><span class="line">Disallow: /fonts/</span><br><span class="line">Disallow: /vendors/</span><br><span class="line">Disallow: /fancybox/</span><br><span class="line">Sitemap: http:<span class="comment">//thief.one/sitemap.xml</span></span><br><span class="line">Sitemap: http:<span class="comment">//thief.one/baidusitemap.xml</span></span><br></pre></td></tr></tbody></table>
+
+```sql
+User-agent: * Allow: /
+Allow: /archives/
+Disallow: /vendors/
+Disallow: /js/
+Disallow: /css/
+Disallow: /fonts/
+Disallow: /vendors/
+Disallow: /fancybox/
+Sitemap: http://thief.one/sitemap.xml
+Sitemap: http://thief.one/baidusitemap.xml
+```
+
 
 #### [¶](#首页title的优化)首页title的优化
 
 更改index.swig文件，文件路径是your-hexo-site\\themes\\next\\layout，将下面代码
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{% block title %}  {{ config.title }} {% endblock %}</span><br></pre></td></tr></tbody></table>
+
+```sql
+{% block title %}  {{ config.title }} {% endblock %}
+```
+
 
 改成
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">{% block title %}  {{ config.title }}- {{ theme.description }} {% endblock}</span><br></pre></td></tr></tbody></table>
+
+```sql
+{% block title %}  {{ config.title }}- {{ theme.description }} {% endblock}
+```
+
 
 观察首页title就是标题+描述了。
 
@@ -606,15 +1257,30 @@ sitemap安装配置
 
 1.  安装
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-generator-sitemap --save</span><br></pre></td></tr></tbody></table>
+
+```sql
+$ npm install hexo-generator-sitemap --save
+```
+
 
 2.  修改站点配置文件
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># Extensions</span><br><span class="line">plugins:</span><br><span class="line">- hexo-generator-sitemap</span><br></pre></td></tr></tbody></table>
+
+```sql
+# Extensions
+plugins:
+- hexo-generator-sitemap
+```
+
 
 使用以下命令后，你可以在站点的/public目录下找到一个sitemap.xml文件，这个文件就是你的站点地图，里面包含你的站点的网页地址。
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br></pre></td></tr></tbody></table>
+
+```sql
+hexo clean
+hexo g
+```
+
 
 [如何向google提交sitemap](http://fionat.github.io/blog/2013/10/23/sitemap/)
 
@@ -623,20 +1289,55 @@ sitemap安装配置
 问题:  
 使用以下命令安装sitemap插件后,按上面步骤配置，执行hexo g命令无法生成sitemap.xml文件。
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-generator-sitemap</span><br></pre></td></tr></tbody></table>
+
+```sql
+$ npm install hexo-generator-sitemap
+```
+
 
 观察发现博客根目录下的package.json文件中dependencies并没有sitemap插件的依赖。
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">{</span><br><span class="line">  <span class="string">"name"</span>: <span class="string">"hexo-site"</span>,</span><br><span class="line">  <span class="string">"version"</span>: <span class="string">"0.0.0"</span>,</span><br><span class="line">  <span class="string">"private"</span>: <span class="keyword">true</span>,</span><br><span class="line">  <span class="string">"hexo"</span>: {</span><br><span class="line">    <span class="string">"version"</span>: <span class="string">"3.1.1"</span></span><br><span class="line">  },</span><br><span class="line">  <span class="string">"dependencies"</span>: {</span><br><span class="line">    <span class="string">"hexo"</span>: <span class="string">"^3.1.0"</span>,</span><br><span class="line">    <span class="string">"hexo-deployer-git"</span>: <span class="string">"0.0.4"</span>,</span><br><span class="line">    <span class="string">"hexo-generator-archive"</span>: <span class="string">"^0.1.2"</span>,</span><br><span class="line">    <span class="string">"hexo-generator-category"</span>: <span class="string">"^0.1.2"</span>,</span><br><span class="line">    <span class="string">"hexo-generator-index"</span>: <span class="string">"^0.1.2"</span>,</span><br><span class="line">    <span class="string">"hexo-generator-tag"</span>: <span class="string">"^0.1.1"</span>,</span><br><span class="line">    <span class="string">"hexo-renderer-ejs"</span>: <span class="string">"^0.1.0"</span>,</span><br><span class="line">    <span class="string">"hexo-renderer-marked"</span>: <span class="string">"^0.2.4"</span>,</span><br><span class="line">    <span class="string">"hexo-renderer-stylus"</span>: <span class="string">"^0.3.0"</span>,</span><br><span class="line">    <span class="string">"hexo-server"</span>: <span class="string">"^0.1.2"</span></span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table>
+
+```sql
+{
+  "name": "hexo-site",
+  "version": "0.0.0",
+  "private": true,
+  "hexo": {
+    "version": "3.1.1"
+  },
+  "dependencies": {
+    "hexo": "^3.1.0",
+    "hexo-deployer-git": "0.0.4",
+    "hexo-generator-archive": "^0.1.2",
+    "hexo-generator-category": "^0.1.2",
+    "hexo-generator-index": "^0.1.2",
+    "hexo-generator-tag": "^0.1.1",
+    "hexo-renderer-ejs": "^0.1.0",
+    "hexo-renderer-marked": "^0.2.4",
+    "hexo-renderer-stylus": "^0.3.0",
+    "hexo-server": "^0.1.2"
+  }
+}
+```
+
 
 解决方法：  
 如果已安装sitemap插件，卸载sitemap插件
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm uninstall hexo-generator-sitemap</span><br></pre></td></tr></tbody></table>
+
+```sql
+$ npm uninstall hexo-generator-sitemap
+```
+
 
 安装sitemap插件时，加上- -save参数，如下
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-generator-sitemap --save</span><br></pre></td></tr></tbody></table>
+
+```sql
+$ npm install hexo-generator-sitemap --save
+```
+
 
 安装完成后，我们再查看博客根目录下的package.json文件，发现dependencies中已经有了sitemap插件，然后我们再执行hexo g命令，就能够在/public目录下找到一个sitemap.xml文件了。
 
@@ -646,15 +1347,33 @@ sitemap安装配置
 
 1.  安装
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-generator-baidu-sitemap --save</span><br></pre></td></tr></tbody></table>
+
+```sql
+$ npm install hexo-generator-baidu-sitemap --save
+```
+
 
 2.  修改站点配置文件
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># Extensions</span><br><span class="line">plugins:</span><br><span class="line">- hexo-generator-sitemap</span><br><span class="line">- hexo-generator-baidu-sitemap</span><br><span class="line">baidusitemap:</span><br><span class="line">    path: baidusitemap.xml</span><br></pre></td></tr></tbody></table>
+
+```sql
+# Extensions
+plugins:
+- hexo-generator-sitemap
+- hexo-generator-baidu-sitemap
+baidusitemap:
+    path: baidusitemap.xml
+```
+
 
 同理，使用以下命令后，你可以在站点的/public目录下找到一个baidusitemap.xml文件。
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br></pre></td></tr></tbody></table>
+
+```sql
+hexo clean
+hexo g
+```
+
 
 3.  将baidusitemap.xml提交给百度
 

@@ -6,7 +6,7 @@ author: "兰州小红鸡"
 tags:
   - "教程"
   - ssr
-summary: "教程很简单，整个教程分三步： 第一步：购买VPS服务器 第二步：一键部署VPS服务器 第三步：一键加速VPS服务器 （谷歌BBR加速；对速度要求不高的话，此步骤可省略） $1第一步…"
+summary: "教程很简单，整个教程分三步： 第一步：购买VPS服务器 第二步：一键部署VPS服务器 第三步：一键加速VPS服务器 （谷歌BBR加速；对速度要求不高的话，此步骤可省略） ¶第一步：…"
 origin:
   from: hexo
   url: https://flymysql.github.io/post/651cfd47.html
@@ -66,11 +66,23 @@ CentOS/Debian/Ubuntu ShadowsocksR单/多端口一键管理脚本：
 
 主用下载地址：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ yum -y install wget</span><br><span class="line"></span><br><span class="line">$ wget -N --no-check-certificate https://softs.fun/Bash/ssr.sh &amp;&amp; chmod +x ssr.sh &amp;&amp; bash ssr.sh</span><br></pre></td></tr></tbody></table>
+
+```sql
+$ yum -y install wget
+
+$ wget -N --no-check-certificate https://softs.fun/Bash/ssr.sh && chmod +x ssr.sh && bash ssr.sh
+```
+
 
 或者备用下载地址：
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ yum -y install wget</span><br><span class="line"></span><br><span class="line">$ wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ssr.sh &amp;&amp; chmod +x ssr.sh &amp;&amp; bash ssr.sh</span><br></pre></td></tr></tbody></table>
+
+```sql
+$ yum -y install wget
+
+$ wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ssr.sh && chmod +x ssr.sh && bash ssr.sh
+```
+
 
 复制上面的主用下载地址的两句代码到VPS服务器里，然后按回车：
 
@@ -115,7 +127,17 @@ CentOS/Debian/Ubuntu ShadowsocksR单/多端口一键管理脚本：
 
 【谷歌BBR加速教程】
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">yum -y install wget</span><br><span class="line"></span><br><span class="line">wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh</span><br><span class="line"></span><br><span class="line">chmod +x bbr.sh</span><br><span class="line"></span><br><span class="line">./bbr.sh</span><br></pre></td></tr></tbody></table>
+
+```sql
+yum -y install wget
+
+wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh
+
+chmod +x bbr.sh
+
+./bbr.sh
+```
+
 
 把上面整个代码复制后粘贴进去，不动的时候按回车，然后耐心等待，最后重启vps服务器即可。该方法是开机自动启动，部署一次就可以了。
 

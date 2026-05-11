@@ -7,7 +7,7 @@ tags:
   - "微信小程序"
   - "前端"
   - javascript
-summary: "$1页面初始数据 <table <tbody <tr <td class=\"gutter\" <pre <span class=\"line\" 1</span <br <span cl…"
+summary: "¶页面初始数据 ¶生命周期函数–监听页面加载 ¶//单词选择函数 ¶下一组单词分配函数 ¶成绩上传 ¶获取成绩 ¶//加载全球排名的数据 上面写了部分的函数功能，全部代码在这里 h…"
 origin:
   from: hexo
   url: https://flymysql.github.io/post/c24a6dbf.html
@@ -16,30 +16,201 @@ origin:
 
 ### [¶](#页面初始数据)页面初始数据
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">data: {</span><br><span class="line">	da1:<span class="string">""</span>, </span><br><span class="line">	da2: <span class="string">""</span>, </span><br><span class="line">	da3: <span class="string">""</span>, </span><br><span class="line">	da4: <span class="string">""</span>, </span><br><span class="line">	daan:<span class="keyword">false</span>, </span><br><span class="line">	showDaan:<span class="keyword">false</span>, </span><br><span class="line">	complete:<span class="keyword">false</span>, </span><br><span class="line">	true_num:<span class="number">0</span>, </span><br><span class="line">	score:<span class="number">0</span>, </span><br><span class="line">	currentTab: <span class="number">0</span>, </span><br><span class="line">	friendsData: \[\], </span><br><span class="line">	globalData: \[\], </span><br><span class="line">	loadNumber: <span class="number">0</span>, </span><br><span class="line">	<span class="comment">//全球排名数据加载次数 </span></span><br><span class="line">	history:<span class="number">0</span> </span><br><span class="line">},</span><br></pre></td></tr></tbody></table>
+
+```sql
+data: {
+	da1:"",
+	da2: "",
+	da3: "",
+	da4: "",
+	daan:false,
+	showDaan:false,
+	complete:false,
+	true_num:0,
+	score:0,
+	currentTab: 0,
+	friendsData: [],
+	globalData: [],
+	loadNumber: 0,
+	//全球排名数据加载次数
+	history:0
+},
+```
+
 
 ### [¶](#生命周期函数-监听页面加载)生命周期函数–监听页面加载
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">onLoad: function (options) {</span><br><span class="line"></span><br><span class="line"><span class="keyword">this</span>.search() </span><br><span class="line">app.appData.fromClickId = options.currentClickId app.upDateUser\_networkFromClickId = require(<span class="string">'../../utils/upDateUser\_networkFromClickId.js'</span>).upDateUser_networkFromClickId </span><br><span class="line">wx.showShareMenu({</span><br><span class="line"> withShareTicket: <span class="keyword">true</span> }) </span><br><span class="line">app.pageGetUserInfo(<span class="keyword">this</span>, </span><br><span class="line">	<span class="keyword">this</span>.getScore)</span><br></pre></td></tr></tbody></table>
+
+```sql
+onLoad: function (options) {
+
+this.search()
+app.appData.fromClickId = options.currentClickId app.upDateUser_networkFromClickId = require('../../utils/upDateUser_networkFromClickId.js').upDateUser_networkFromClickId
+wx.showShareMenu({
+ withShareTicket: true })
+app.pageGetUserInfo(this,
+	this.getScore)
+```
+
 
 ### [¶](#单词选择函数)//单词选择函数
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">choice(e){</span><br><span class="line"></span><br><span class="line">console.log(e) </span><br><span class="line">	<span class="keyword">if</span>(e.currentTarget.id===<span class="keyword">this</span>.data.<span class="keyword">true</span>\_word){</span><br><span class="line"></span><br><span class="line">		 <span class="keyword">this</span>.setData({</span><br><span class="line">		  daan: <span class="keyword">true</span>, </span><br><span class="line">		  <span class="keyword">true</span>\_num: <span class="keyword">this</span>.data.<span class="keyword">true</span>\_num + <span class="number">1</span>})</span><br><span class="line">		  <span class="keyword">const</span> innerAudioContext = wx.createInnerAudioContext() innerAudioContext.autoplay = <span class="keyword">true</span> innerAudioContext.src = <span class="string">'http://media-audio1.qiniu.baydn.com/us/n/ni/nice\_v3.mp3'</span> </span><br><span class="line">		  innerAudioContext.onPlay(() =&gt; {</span><br><span class="line">		   }) </span><br><span class="line">	}<span class="keyword">else</span>{</span><br><span class="line"></span><br><span class="line">	<span class="keyword">this</span>.setData({</span><br><span class="line">		daan:<span class="keyword">false</span>}) </span><br><span class="line">		<span class="keyword">this</span>.setData({</span><br><span class="line">		 complete: <span class="keyword">true</span> })</span><br><span class="line">			 <span class="keyword">const</span> innerAudioContext = wx.createInnerAudioContext() innerAudioContext.autoplay = <span class="keyword">true</span> innerAudioContext.src = <span class="string">'https://media-audio1.baydn.com/us%2Fs%2Fsa%2Fsad\_v4.mp3'</span> </span><br><span class="line">			 innerAudioContext.onPlay(() =&gt; {</span><br><span class="line">			  })</span><br><span class="line">			  <span class="keyword">if</span>(<span class="keyword">this</span>.data.<span class="keyword">true</span>\_num&gt;<span class="keyword">this</span>.data.score){</span><br><span class="line"></span><br><span class="line">			  <span class="keyword">this</span>.set\_score(<span class="keyword">this</span>.data.<span class="keyword">true</span>\_num) <span class="keyword">this</span>.setData({</span><br><span class="line">			   history: <span class="keyword">this</span>.data.true_num})</span><br><span class="line">		   }<span class="keyword">else</span>{</span><br><span class="line"></span><br><span class="line">			   <span class="keyword">this</span>.setData({</span><br><span class="line">			    history: <span class="keyword">this</span>.data.score }) } </span><br><span class="line">			   app.pageGetUserInfo(<span class="keyword">this</span>, </span><br><span class="line">			   	<span class="keyword">this</span>.getScore)</span><br><span class="line">			    wx.showShareMenu({</span><br><span class="line">			     withShareTicket: <span class="keyword">true</span> })</span><br><span class="line">		     app.pageGetUserInfo(<span class="keyword">this</span>) <span class="keyword">this</span>.getRankGlobalData();</span><br><span class="line">	      } </span><br><span class="line">	      <span class="keyword">this</span>.setData({</span><br><span class="line">	      	showDaan:<span class="keyword">true</span>}) </span><br><span class="line">  },</span><br></pre></td></tr></tbody></table>
+
+```sql
+choice(e){
+
+console.log(e)
+	if(e.currentTarget.id===this.data.true_word){
+
+		 this.setData({
+		  daan: true,
+		  true_num: this.data.true_num + 1})
+		  const innerAudioContext = wx.createInnerAudioContext() innerAudioContext.autoplay = true innerAudioContext.src = 'http://media-audio1.qiniu.baydn.com/us/n/ni/nice_v3.mp3'
+		  innerAudioContext.onPlay(() => {
+		   })
+	}else{
+
+	this.setData({
+		daan:false})
+		this.setData({
+		 complete: true })
+			 const innerAudioContext = wx.createInnerAudioContext() innerAudioContext.autoplay = true innerAudioContext.src = 'https://media-audio1.baydn.com/us%2Fs%2Fsa%2Fsad_v4.mp3'
+			 innerAudioContext.onPlay(() => {
+			  })
+			  if(this.data.true_num>this.data.score){
+
+			  this.set_score(this.data.true_num) this.setData({
+			   history: this.data.true_num})
+		   }else{
+
+			   this.setData({
+			    history: this.data.score }) }
+			   app.pageGetUserInfo(this,
+			   	this.getScore)
+			    wx.showShareMenu({
+			     withShareTicket: true })
+		     app.pageGetUserInfo(this) this.getRankGlobalData();
+	      }
+	      this.setData({
+	      	showDaan:true})
+  },
+```
+
 
 ### [¶](#下一组单词分配函数)下一组单词分配函数
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">search(){</span><br><span class="line"></span><br><span class="line"> var idx = Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span> </span><br><span class="line"> var word = list.wordList\[idx\] </span><br><span class="line"> var that=<span class="keyword">this</span> wx.request({</span><br><span class="line">  url: <span class="string">'https://api.shanbay.com/bdc/search/?word='</span> + word, </span><br><span class="line">  data: {</span><br><span class="line">}, </span><br><span class="line">method: <span class="string">'GET'</span>, </span><br><span class="line">success: function (res) {</span><br><span class="line">  that.setData({</span><br><span class="line">  title: res.data.data.definition.split(<span class="string">","</span></span><br><span class="line">  )\[<span class="number">0</span>\].split(<span class="string">"\\n"</span>)\[<span class="number">0</span>\], </span><br><span class="line">  true_word:word }) var num = Math.floor(Math.random() * <span class="number">400</span>) + <span class="number">1</span> <span class="keyword">if</span>(num&lt;<span class="number">100</span>){</span><br><span class="line">  that.setData({</span><br><span class="line">  da1:res.data.data.content, </span><br><span class="line">  da2: list.wordList\[Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span>\] , </span><br><span class="line">  da3: list.wordList\[Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span>\], </span><br><span class="line">  da4: list.wordList\[Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span>\], </span><br><span class="line">}) } <span class="keyword">if</span> (<span class="number">100</span>&lt;num&amp;&amp;num&lt;<span class="number">200</span>) {</span><br><span class="line">  that.setData({</span><br><span class="line">  da2: res.data.data.content, </span><br><span class="line">  da1: list.wordList\[Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span>\], </span><br><span class="line">  da3: list.wordList\[Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span>\], </span><br><span class="line">  da4: list.wordList\[Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span>\], </span><br><span class="line">}) } <span class="keyword">if</span> (num &lt; <span class="number">300</span>&amp;&amp;num&gt;<span class="number">200</span>) {</span><br><span class="line">  that.setData({</span><br><span class="line">  da3: res.data.data.content, </span><br><span class="line">  da2: list.wordList\[Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span>\], </span><br><span class="line">  da1: list.wordList\[Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span>\], </span><br><span class="line">  da4: list.wordList\[Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span>\], </span><br><span class="line">}) } <span class="keyword">if</span> (num&gt;<span class="number">300</span>) {</span><br><span class="line">  that.setData({</span><br><span class="line">  da4: res.data.data.content, </span><br><span class="line">  da2: list.wordList\[Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span>\], </span><br><span class="line">  da3: list.wordList\[Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span>\], </span><br><span class="line">  da1: list.wordList\[Math.floor(Math.random() * <span class="number">12345</span>) + <span class="number">1</span>\], </span><br><span class="line">}) } } }) },</span><br></pre></td></tr></tbody></table>
+
+```sql
+search(){
+
+ var idx = Math.floor(Math.random() * 12345) + 1
+ var word = list.wordList[idx]
+ var that=this wx.request({
+  url: 'https://api.shanbay.com/bdc/search/?word=' + word,
+  data: {
+},
+method: 'GET',
+success: function (res) {
+  that.setData({
+  title: res.data.data.definition.split(","
+  )[0].split("\n")[0],
+  true_word:word }) var num = Math.floor(Math.random() * 400) + 1 if(num<100){
+  that.setData({
+  da1:res.data.data.content,
+  da2: list.wordList[Math.floor(Math.random() * 12345) + 1] ,
+  da3: list.wordList[Math.floor(Math.random() * 12345) + 1],
+  da4: list.wordList[Math.floor(Math.random() * 12345) + 1],
+}) } if (100<num&&num<200) {
+  that.setData({
+  da2: res.data.data.content,
+  da1: list.wordList[Math.floor(Math.random() * 12345) + 1],
+  da3: list.wordList[Math.floor(Math.random() * 12345) + 1],
+  da4: list.wordList[Math.floor(Math.random() * 12345) + 1],
+}) } if (num < 300&&num>200) {
+  that.setData({
+  da3: res.data.data.content,
+  da2: list.wordList[Math.floor(Math.random() * 12345) + 1],
+  da1: list.wordList[Math.floor(Math.random() * 12345) + 1],
+  da4: list.wordList[Math.floor(Math.random() * 12345) + 1],
+}) } if (num>300) {
+  that.setData({
+  da4: res.data.data.content,
+  da2: list.wordList[Math.floor(Math.random() * 12345) + 1],
+  da3: list.wordList[Math.floor(Math.random() * 12345) + 1],
+  da1: list.wordList[Math.floor(Math.random() * 12345) + 1],
+}) } } }) },
+```
+
 
 ### [¶](#成绩上传)成绩上传
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">set\_score(score) {</span><br><span class="line"> var openId = <span class="keyword">this</span>.data.<span class="function">openId <span class="title">if</span> <span class="params">(openId)</span> </span>{</span><br><span class="line"> qcloud.request({</span><br><span class="line"> login: <span class="keyword">false</span>, </span><br><span class="line"> url: `${</span><br><span class="line"> 	app.appData.baseUrl}set\_score`, </span><br><span class="line"> 	data: {</span><br><span class="line"> openId, </span><br><span class="line"> score, </span><br><span class="line">}, </span><br><span class="line"> success: (res) =&gt; {</span><br><span class="line"> console.log(res) }, </span><br><span class="line"> fail(error) {</span><br><span class="line"> util.showModel(<span class="string">'请求失败'</span>, </span><br><span class="line"> error); }, </span><br><span class="line">}); } },</span><br></pre></td></tr></tbody></table>
+
+```sql
+set_score(score) {
+ var openId = this.data.openId if (openId) {
+ qcloud.request({
+ login: false,
+ url: `${
+ 	app.appData.baseUrl}set_score`,
+ 	data: {
+ openId,
+ score,
+},
+ success: (res) => {
+ console.log(res) },
+ fail(error) {
+ util.showModel('请求失败',
+ error); },
+}); } },
+```
+
 
 ### [¶](#获取成绩)获取成绩
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">getScore(openId) {</span><br><span class="line"> <span class="keyword">if</span> (openId) {</span><br><span class="line"> qcloud.request({</span><br><span class="line"> login: <span class="keyword">false</span>, </span><br><span class="line"> url: `${</span><br><span class="line"> 	app.appData.baseUrl}get_score`, </span><br><span class="line"> 	data: {</span><br><span class="line"> openId }, </span><br><span class="line"> success: (res) =&gt; {</span><br><span class="line"> let score = res.data.data; <span class="keyword">this</span>.setData({</span><br><span class="line"> score }) }, </span><br><span class="line"> fail(error) {</span><br><span class="line"> util.showModel(<span class="string">'请求失败'</span>, </span><br><span class="line"> error); }, </span><br><span class="line">}); } }, </span><br><span class="line"> onReachBottom: function () {</span><br><span class="line"> <span class="comment">//下拉加载 const that = this if (that.data.currentTab) {</span></span><br><span class="line"> that.getRankGlobalData() } },</span><br></pre></td></tr></tbody></table>
+
+```sql
+getScore(openId) {
+ if (openId) {
+ qcloud.request({
+ login: false,
+ url: `${
+ 	app.appData.baseUrl}get_score`,
+ 	data: {
+ openId },
+ success: (res) => {
+ let score = res.data.data; this.setData({
+ score }) },
+ fail(error) {
+ util.showModel('请求失败',
+ error); },
+}); } },
+ onReachBottom: function () {
+ //下拉加载 const that = this if (that.data.currentTab) {
+ that.getRankGlobalData() } },
+```
+
 
 ### [¶](#加载全球排名的数据)//加载全球排名的数据
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">![](https:<span class="comment">//www.idealli.com/wp-content/uploads/2018/04/092204rcpp42avah2zon2m-169x300.jpg) getRankGlobalData() {</span></span><br><span class="line"> <span class="keyword">const</span> that = <span class="keyword">this</span> qcloud.request({</span><br><span class="line"> login: <span class="keyword">false</span>, </span><br><span class="line"> url: app.appData.baseUrl + <span class="string">'getRankGlobalData'</span>, </span><br><span class="line"> data: {</span><br><span class="line"> loadNumber: that.data.loadNumber }, </span><br><span class="line"> success: (res) =&gt; {</span><br><span class="line"> that.setData({</span><br><span class="line"> globalData: that.data.globalData.concat(res.data.data),/</span><br><span class="line"> /数据叠加 loadNumber: that.data.loadNumber + <span class="number">1</span> }) }, </span><br><span class="line"> fail(error) {</span><br><span class="line"> util.showModel(<span class="string">'请求失败'</span>, </span><br><span class="line"> error); console.log(<span class="string">'request fail'</span>, </span><br><span class="line"> error); }, </span><br><span class="line">}) }, </span><br><span class="line">})</span><br></pre></td></tr></tbody></table>
+
+```sql
+![](https://www.idealli.com/wp-content/uploads/2018/04/092204rcpp42avah2zon2m-169x300.jpg) getRankGlobalData() {
+ const that = this qcloud.request({
+ login: false,
+ url: app.appData.baseUrl + 'getRankGlobalData',
+ data: {
+ loadNumber: that.data.loadNumber },
+ success: (res) => {
+ that.setData({
+ globalData: that.data.globalData.concat(res.data.data),/
+ /数据叠加 loadNumber: that.data.loadNumber + 1 }) },
+ fail(error) {
+ util.showModel('请求失败',
+ error); console.log('request fail',
+ error); },
+}) },
+})
+```
+
 
 上面写了部分的函数功能，全部代码在这里 [https://github.com/six-3/-/blob/master/pages/test/test.js](https://github.com/six-3/-/blob/master/pages/test/test.js)

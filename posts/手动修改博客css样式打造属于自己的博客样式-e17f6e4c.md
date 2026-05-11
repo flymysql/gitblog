@@ -6,7 +6,7 @@ author: "兰州小红鸡"
 tags:
   - "教程"
   - "博客"
-summary: "这两天花了点时间修改了下自己的next主题的博客 样式表放在了GitHub上喜欢的话可以直接使用 $1 使用方法 直接下载$1，然后复制到自己主题的themes\\\\next\\\\so…"
+summary: "这两天花了点时间修改了下自己的next主题的博客 样式表放在了GitHub上喜欢的话可以直接使用 next博客主题样式修改 使用方法 直接下载样式表，然后复制到自己主题的theme…"
 origin:
   from: hexo
   url: https://flymysql.github.io/post/e17f6e4c.html
@@ -24,7 +24,11 @@ next博客主题样式修改
 
 -   直接下载[样式表](https://github.com/flymysql/hexo-theme-next-flyme)，然后复制到自己主题的themes\\next\\source\\css\_custom目录下的custom.styl文件
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;link rel=<span class="string">"stylesheet"</span> type=<span class="string">"text/css"</span> href=<span class="string">"https://picture-1256429518.cos.ap-chengdu.myqcloud.com/blog/custom.css"</span>&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+<link rel="stylesheet" type="text/css" href="https://picture-1256429518.cos.ap-chengdu.myqcloud.com/blog/custom.css">
+```
+
 
 ![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-01.png)
 
@@ -64,7 +68,15 @@ next博客主题样式修改
 
 **例如**
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.posts-expand .post-title-link{</span><br><span class="line">	/*</span><br><span class="line">     你的自定义样式</span><br><span class="line">	*/</span><br><span class="line">}</span><br></pre></td></tr></tbody></table>
+
+```sql
+.posts-expand .post-title-link{
+	/*
+     你的自定义样式
+	*/
+}
+```
+
 
 **showtime**
 

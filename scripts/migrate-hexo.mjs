@@ -134,6 +134,24 @@ const td = new TurndownService({
   emDelimiter: '_',
 });
 td.use(turndownGfm.gfm);
+td.addRule('hexoCodeTable', {
+  filter: node => {
+    if (node.nodeName !== 'TABLE') return false;
+    const gutter = node.querySelector && node.querySelector('td.gutter');
+    const code = node.querySelector && node.querySelector('td.code');
+    return Boolean(gutter && code);
+  },
+  replacement: (content, node) => {
+    const codeCell = node.querySelector('td.code');
+    const lines = [...codeCell.querySelectorAll('.line')].map(el => el.textContent || '');
+    const text = (lines.length ? lines.join('\n') : (codeCell.textContent || ''))
+      .replace(/\\([\\`*_{}\[\]()#+\-.!>])/g, '$1')
+      .replace(/\u00a0/g, ' ')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n+$/g, '');
+    return '\n\n```\n' + text + '\n```\n\n';
+  },
+});
 td.addRule('preferLanguage', {
   filter: node => node.nodeName === 'PRE' && node.firstChild && node.firstChild.nodeName === 'CODE',
   replacement: (content, node) => {

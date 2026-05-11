@@ -29,7 +29,39 @@ origin:
 
 **html部分**
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">:class</span>=<span class="string">"classes"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"py-carousel__slide-lists"</span> <span class="attr">ref</span>=<span class="string">"carousel_list"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">slot</span>&gt;</span><span class="tag">&lt;/<span class="name">slot</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">button</span> <span class="attr">:class</span>=<span class="string">"arrowClasses"</span> <span class="attr">class</span>=<span class="string">"lefts"</span> @<span class="attr">click</span>=<span class="string">"change(currentIndex-1)"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">button</span> <span class="attr">:class</span>=<span class="string">"arrowClasses"</span> <span class="attr">class</span>=<span class="string">"rights"</span> @<span class="attr">click</span>=<span class="string">"change(currentIndex+1)"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">button</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">transition-group</span> <span class="attr">tag</span>=<span class="string">"div"</span>  <span class="attr">name</span>=<span class="string">"list"</span> <span class="attr">class</span>=<span class="string">"py-carousel__slide-current"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">li</span> <span class="attr">v-for</span>=<span class="string">"(list,index) in slideList.length"</span></span></span><br><span class="line"><span class="tag">          <span class="attr">class</span>=<span class="string">"py-carousel__slide-current-item"</span></span></span><br><span class="line"><span class="tag">          <span class="attr">:key</span>=<span class="string">"index"</span></span></span><br><span class="line"><span class="tag">          <span class="attr">v-show</span>=<span class="string">"index===currentIndex"</span></span></span><br><span class="line"><span class="tag">          @<span class="attr">mouseenter</span>=<span class="string">"hover(1)"</span></span></span><br><span class="line"><span class="tag">          @<span class="attr">mouseleave</span>=<span class="string">"hover(2)"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">v-html</span>=<span class="string">"slideList[index].outerHTML"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">transition-group</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">:class</span>=<span class="string">"'py-carousel__positions-'+position"</span> <span class="attr">class</span>=<span class="string">"py-carousel__positions"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">span</span> <span class="attr">v-for</span>=<span class="string">"(item,index) in slideList.length"</span> <span class="attr">:key</span>=<span class="string">"index"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">:class</span>=<span class="string">"positionClass(index)"</span></span></span><br><span class="line"><span class="tag">        @<span class="attr">mouseover</span>=<span class="string">"hoverChange(index)"</span></span></span><br><span class="line"><span class="tag">        @<span class="attr">mouseleave</span>=<span class="string">"hover(3)"</span></span></span><br><span class="line"><span class="tag">        @<span class="attr">click</span>=<span class="string">"change(index)"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></tbody></table>
+
+```sql
+<template>
+  <div :class="classes">
+    <div class="py-carousel__slide-lists" ref="carousel_list">
+      <slot></slot>
+    </div>
+    <button :class="arrowClasses" class="lefts" @click="change(currentIndex-1)">
+    </button>
+    <button :class="arrowClasses" class="rights" @click="change(currentIndex+1)">
+    </button>
+    <transition-group tag="div"  name="list" class="py-carousel__slide-current">
+        <li v-for="(list,index) in slideList.length"
+          class="py-carousel__slide-current-item"
+          :key="index"
+          v-show="index===currentIndex"
+          @mouseenter="hover(1)"
+          @mouseleave="hover(2)">
+            <div v-html="slideList[index].outerHTML"></div>
+        </li>
+    </transition-group>
+    <div :class="'py-carousel__positions-'+position" class="py-carousel__positions">
+        <span v-for="(item,index) in slideList.length" :key="index"
+        :class="positionClass(index)"
+        @mouseover="hoverChange(index)"
+        @mouseleave="hover(3)"
+        @click="change(index)">
+        </span>
+    </div>
+  </div>
+</template>
+```
+
 
 ### [¶](#js部分)js部分
 
@@ -37,7 +69,145 @@ origin:
 
 js部分主要就是一些函数鼠标对轮播图的操作，轮播函数是`autoplay()`和`go()`两个函数主要控制的
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="comment">// 组件class前缀</span></span><br><span class="line"><span class="keyword">const</span> prefixCls = <span class="string">'py-carousel'</span>;</span><br><span class="line"><span class="keyword">const</span> Props = {</span><br><span class="line">  arrow: <span class="keyword">new</span> Set([<span class="string">'hover'</span>, <span class="string">'always'</span>, <span class="string">'never'</span>]),</span><br><span class="line">  position: <span class="keyword">new</span> Set([<span class="string">'inside'</span>, <span class="string">'outside'</span>, <span class="string">'none'</span>, <span class="string">'left'</span>, <span class="string">'right'</span>]),</span><br><span class="line">};</span><br><span class="line"></span><br><span class="line">export <span class="keyword">default</span> {</span><br><span class="line">  name: <span class="string">'py-carousel'</span>,</span><br><span class="line">  props: {</span><br><span class="line">    <span class="comment">// 初始位置</span></span><br><span class="line">    value: {</span><br><span class="line">      type: Number,</span><br><span class="line">      <span class="keyword">default</span>: <span class="number">0</span>,</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">// 轮播速度</span></span><br><span class="line">    speed: {</span><br><span class="line">      type: Number,</span><br><span class="line">      <span class="keyword">default</span>: <span class="number">3000</span>,</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">// 初始自动轮播</span></span><br><span class="line">    autoloop: {</span><br><span class="line">      type: Boolean,</span><br><span class="line">      <span class="keyword">default</span>: <span class="keyword">true</span>,</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">// 自动轮播</span></span><br><span class="line">    loop: {</span><br><span class="line">      type: Boolean,</span><br><span class="line">      <span class="keyword">default</span>: <span class="keyword">true</span>,</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">// 鼠标移至界面时是否暂停</span></span><br><span class="line">    hoverstop: {</span><br><span class="line">      type: Boolean,</span><br><span class="line">      <span class="keyword">default</span>: <span class="keyword">true</span>,</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">// 两侧箭头显示时机</span></span><br><span class="line">    arrow: {</span><br><span class="line">      type: String,</span><br><span class="line">      <span class="keyword">default</span>: <span class="string">'hover'</span>,</span><br><span class="line">      validator (value) {</span><br><span class="line">        <span class="keyword">return</span> Props.arrow.has(value);</span><br><span class="line">      },</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">// 底部指示器位置</span></span><br><span class="line">    position: {</span><br><span class="line">      type: String,</span><br><span class="line">      <span class="keyword">default</span>: <span class="string">'outside'</span>,</span><br><span class="line">      validator (value) {</span><br><span class="line">        <span class="keyword">return</span> Props.position.has(value);</span><br><span class="line">      },</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">// 圆形指示器</span></span><br><span class="line">    radiusPosition: {</span><br><span class="line">      type: Boolean,</span><br><span class="line">      <span class="keyword">default</span>: <span class="keyword">false</span>,</span><br><span class="line">    },</span><br><span class="line">    <span class="comment">// 指示器触发方式</span></span><br><span class="line">    trigger: {</span><br><span class="line">      type: Boolean,</span><br><span class="line">      <span class="keyword">default</span>: <span class="keyword">true</span>,</span><br><span class="line">    },</span><br><span class="line">  },</span><br><span class="line">  data () {</span><br><span class="line">    <span class="keyword">return</span> {</span><br><span class="line">      slideList: [],</span><br><span class="line">      currentIndex: <span class="number">0</span>,</span><br><span class="line">      timer: <span class="string">''</span>,</span><br><span class="line">    };</span><br><span class="line">  },</span><br><span class="line">  computed: {</span><br><span class="line">    classes() {</span><br><span class="line">      <span class="keyword">return</span> `${prefixCls}`;</span><br><span class="line">    },</span><br><span class="line">    arrowClasses () {</span><br><span class="line">      <span class="keyword">return</span> [</span><br><span class="line">        `py-carousel__arrow`,</span><br><span class="line">        `py-carousel__arrow-${<span class="keyword">this</span>.arrow}`,</span><br><span class="line">      ];</span><br><span class="line">    },</span><br><span class="line">  },</span><br><span class="line">  methods: {</span><br><span class="line">    go() {</span><br><span class="line">      <span class="keyword">this</span>.timer = setInterval(() =&gt; {</span><br><span class="line">        <span class="keyword">this</span>.autoPlay();</span><br><span class="line">      }, <span class="keyword">this</span>.speed);</span><br><span class="line">    },</span><br><span class="line">    stop() {</span><br><span class="line">      clearInterval(<span class="keyword">this</span>.timer);</span><br><span class="line">      <span class="keyword">this</span>.timer = <span class="keyword">null</span>;</span><br><span class="line">    },</span><br><span class="line">    hover(n) {</span><br><span class="line">      <span class="keyword">if</span> (n === <span class="number">1</span> &amp;&amp; <span class="keyword">this</span>.hoverstop) <span class="keyword">this</span>.stop();</span><br><span class="line">      <span class="keyword">if</span> (n === <span class="number">2</span> &amp;&amp; <span class="keyword">this</span>.hoverstop) <span class="keyword">this</span>.go();</span><br><span class="line">      <span class="keyword">if</span> (n === <span class="number">3</span> &amp;&amp; <span class="keyword">this</span>.trigger) <span class="keyword">this</span>.go();</span><br><span class="line">    },</span><br><span class="line">    change(index) {</span><br><span class="line">      index = (index + <span class="keyword">this</span>.slideList.length) % <span class="keyword">this</span>.slideList.length;</span><br><span class="line">      <span class="keyword">this</span>.currentIndex = index;</span><br><span class="line">      <span class="keyword">this</span>.stop();</span><br><span class="line">    },</span><br><span class="line">    hoverChange(index) {</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.trigger) {</span><br><span class="line">        <span class="keyword">this</span>.change(index);</span><br><span class="line">      }</span><br><span class="line">    },</span><br><span class="line">    autoPlay() {</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.loop) {</span><br><span class="line">        <span class="keyword">this</span>.currentIndex += <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.currentIndex &gt; <span class="keyword">this</span>.slideList.length - <span class="number">1</span>) {</span><br><span class="line">          <span class="keyword">this</span>.currentIndex = <span class="number">0</span>;</span><br><span class="line">        }</span><br><span class="line">      }</span><br><span class="line">    },</span><br><span class="line">    positionClass(index) {</span><br><span class="line">      <span class="keyword">const</span> classs = [];</span><br><span class="line">      <span class="keyword">if</span> (index === <span class="keyword">this</span>.currentIndex) classs.push(`active`);</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.radiusPosition) classs.push(`radius`);</span><br><span class="line">      <span class="keyword">return</span> classs;</span><br><span class="line">    },</span><br><span class="line">  },</span><br><span class="line">  created() {</span><br><span class="line">    <span class="keyword">this</span>.$nextTick(() =&gt; {</span><br><span class="line">      <span class="keyword">this</span>.slideList = <span class="keyword">this</span>.$refs.carousel_list.children;</span><br><span class="line">      <span class="keyword">this</span>.currentIndex = <span class="keyword">this</span>.value;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.autoloop) {</span><br><span class="line">        <span class="keyword">this</span>.timer = setInterval(() =&gt; {</span><br><span class="line">          <span class="keyword">this</span>.autoPlay();</span><br><span class="line">        }, <span class="keyword">this</span>.speed);</span><br><span class="line">      }</span><br><span class="line">    });</span><br><span class="line">  },</span><br><span class="line">};</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></tbody></table>
+
+```sql
+
+<script>
+// 组件class前缀
+const prefixCls = 'py-carousel';
+const Props = {
+  arrow: new Set(['hover', 'always', 'never']),
+  position: new Set(['inside', 'outside', 'none', 'left', 'right']),
+};
+
+export default {
+  name: 'py-carousel',
+  props: {
+    // 初始位置
+    value: {
+      type: Number,
+      default: 0,
+    },
+    // 轮播速度
+    speed: {
+      type: Number,
+      default: 3000,
+    },
+    // 初始自动轮播
+    autoloop: {
+      type: Boolean,
+      default: true,
+    },
+    // 自动轮播
+    loop: {
+      type: Boolean,
+      default: true,
+    },
+    // 鼠标移至界面时是否暂停
+    hoverstop: {
+      type: Boolean,
+      default: true,
+    },
+    // 两侧箭头显示时机
+    arrow: {
+      type: String,
+      default: 'hover',
+      validator (value) {
+        return Props.arrow.has(value);
+      },
+    },
+    // 底部指示器位置
+    position: {
+      type: String,
+      default: 'outside',
+      validator (value) {
+        return Props.position.has(value);
+      },
+    },
+    // 圆形指示器
+    radiusPosition: {
+      type: Boolean,
+      default: false,
+    },
+    // 指示器触发方式
+    trigger: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  data () {
+    return {
+      slideList: [],
+      currentIndex: 0,
+      timer: '',
+    };
+  },
+  computed: {
+    classes() {
+      return `${prefixCls}`;
+    },
+    arrowClasses () {
+      return [
+        `py-carousel__arrow`,
+        `py-carousel__arrow-${this.arrow}`,
+      ];
+    },
+  },
+  methods: {
+    go() {
+      this.timer = setInterval(() => {
+        this.autoPlay();
+      }, this.speed);
+    },
+    stop() {
+      clearInterval(this.timer);
+      this.timer = null;
+    },
+    hover(n) {
+      if (n === 1 && this.hoverstop) this.stop();
+      if (n === 2 && this.hoverstop) this.go();
+      if (n === 3 && this.trigger) this.go();
+    },
+    change(index) {
+      index = (index + this.slideList.length) % this.slideList.length;
+      this.currentIndex = index;
+      this.stop();
+    },
+    hoverChange(index) {
+      if (this.trigger) {
+        this.change(index);
+      }
+    },
+    autoPlay() {
+      if (this.loop) {
+        this.currentIndex += 1;
+        if (this.currentIndex > this.slideList.length - 1) {
+          this.currentIndex = 0;
+        }
+      }
+    },
+    positionClass(index) {
+      const classs = [];
+      if (index === this.currentIndex) classs.push(`active`);
+      if (this.radiusPosition) classs.push(`radius`);
+      return classs;
+    },
+  },
+  created() {
+    this.$nextTick(() => {
+      this.slideList = this.$refs.carousel_list.children;
+      this.currentIndex = this.value;
+      if (this.autoloop) {
+        this.timer = setInterval(() => {
+          this.autoPlay();
+        }, this.speed);
+      }
+    });
+  },
+};
+</script>
+```
+
 
 相对来说，代码量挺少了哈
 
@@ -49,7 +219,201 @@ css部分有个小问题就是，当底部指示器的位置设置在外部时�
 
 以下为scss代码
 
-<table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">charset</span> <span class="string">"UTF-8"</span>;</span><br><span class="line"></span><br><span class="line">@<span class="keyword">include</span> b(carousel) {</span><br><span class="line">  <span class="attribute">box-sizing</span>: border-box;</span><br><span class="line">  <span class="attribute">position</span>:relative;</span><br><span class="line">  <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">  <span class="attribute">display</span>: block;</span><br><span class="line">  -webkit-<span class="attribute">box-sizing</span>: border-box;</span><br><span class="line">  -webkit-user-<span class="selector-tag">select</span>: none;</span><br><span class="line">  -moz-user-<span class="selector-tag">select</span>: none;</span><br><span class="line">  -ms-user-<span class="selector-tag">select</span>: none;</span><br><span class="line">  user-<span class="selector-tag">select</span>: none;</span><br><span class="line">  -ms-touch-action: pan-y;</span><br><span class="line">  touch-action: pan-y;</span><br><span class="line"></span><br><span class="line">  @<span class="keyword">include</span> e(slide) {</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">include</span> e(slide-lists) {</span><br><span class="line">      <span class="attribute">display</span>: none;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">include</span> e(slide-current) {</span><br><span class="line">      <span class="attribute">position</span>: relative;</span><br><span class="line">      <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">      <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">      <span class="attribute">display</span>: block;</span><br><span class="line">      <span class="attribute">overflow</span>: hidden;</span><br><span class="line">      <span class="attribute">padding</span>:<span class="number">0</span>;</span><br><span class="line">      <span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">      <span class="selector-tag">li</span> {</span><br><span class="line">        <span class="attribute">position</span>: absolute;</span><br><span class="line">        <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">        <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">      }</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">include</span> e(slide-current-item) {</span><br><span class="line">      <span class="attribute">list-style-type</span>:none;</span><br><span class="line">      <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">      <span class="attribute">height</span>: <span class="number">100%</span>;</span><br><span class="line">      <span class="attribute">margin</span>:<span class="number">0</span>;</span><br><span class="line">      <span class="attribute">padding</span>:<span class="number">0</span>;</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">  @<span class="keyword">include</span> e(arrow) {</span><br><span class="line">    <span class="attribute">border</span>: none;</span><br><span class="line">    <span class="attribute">outline</span>: none;</span><br><span class="line">    <span class="attribute">padding</span>: <span class="number">0</span>;</span><br><span class="line">    <span class="attribute">margin</span>: <span class="number">0</span>;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">36px</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">36px</span>;</span><br><span class="line">    <span class="attribute">border-radius</span>: <span class="number">50%</span>;</span><br><span class="line">    <span class="attribute">cursor</span>: pointer;</span><br><span class="line">    <span class="attribute">position</span>: absolute;</span><br><span class="line">    <span class="attribute">top</span>: <span class="number">50%</span>;</span><br><span class="line">    <span class="attribute">z-index</span>: <span class="number">10</span>;</span><br><span class="line">    <span class="attribute">transform</span>: translateY(-<span class="number">50%</span>);</span><br><span class="line">    <span class="attribute">background-color</span>: rgba(<span class="number">31</span>, <span class="number">45</span>, <span class="number">61</span>, <span class="number">0.11</span>);</span><br><span class="line">    <span class="attribute">text-align</span>: center;</span><br><span class="line">    <span class="attribute">color</span>: aliceblue;</span><br><span class="line">    <span class="attribute">font-size</span>: <span class="number">1em</span>;</span><br><span class="line">    <span class="attribute">font-family</span>: inherit;</span><br><span class="line">    <span class="attribute">line-height</span>: inherit;</span><br><span class="line">    &amp;<span class="selector-class">.rights</span> {</span><br><span class="line">      <span class="attribute">right</span>: <span class="number">16px</span>;</span><br><span class="line">    }</span><br><span class="line">    &amp;<span class="selector-class">.lefts</span>{</span><br><span class="line">      <span class="attribute">left</span>: <span class="number">16px</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    &amp;<span class="selector-class">.rights</span>:before {</span><br><span class="line">      <span class="attribute">content</span>: <span class="string">"&gt;"</span>;</span><br><span class="line">    }</span><br><span class="line">    &amp;<span class="selector-class">.lefts</span>:before{</span><br><span class="line">      <span class="attribute">content</span>: <span class="string">"&lt;"</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">include</span> e(arrow-hover) {</span><br><span class="line">     <span class="attribute">display</span>: inherit;</span><br><span class="line">     <span class="attribute">opacity</span>: <span class="number">0</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">include</span> e(arrow-always) {</span><br><span class="line">      <span class="attribute">display</span>: inherit;</span><br><span class="line">    }</span><br><span class="line">    @<span class="keyword">include</span> e(arrow-never) {</span><br><span class="line">      <span class="attribute">display</span>: none;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    &amp;-hover &gt; * {</span><br><span class="line">      <span class="attribute">vertical-align</span>: baseline;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">  &amp;:hover &amp;__arrow-hover {</span><br><span class="line">    <span class="attribute">opacity</span>: <span class="number">1</span>;</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">  @<span class="keyword">include</span> e(positions) {</span><br><span class="line">    <span class="attribute">display</span>: block;</span><br><span class="line">    <span class="attribute">z-index</span>: <span class="number">10</span>;</span><br><span class="line">    <span class="attribute">height</span>: <span class="number">16px</span>;</span><br><span class="line">    <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">    <span class="attribute">position</span>: relative;</span><br><span class="line">    <span class="attribute">text-align</span>: center;</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">include</span> e(positions-inside) {</span><br><span class="line">      <span class="attribute">position</span>: absolute;</span><br><span class="line">      <span class="attribute">bottom</span>: <span class="number">8px</span>;</span><br><span class="line">      <span class="attribute">height</span>: <span class="number">12px</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">include</span> e(positions-outside) {</span><br><span class="line">      <span class="attribute">margin-top</span>: <span class="number">8px</span>;</span><br><span class="line">      <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">      <span class="attribute">position</span>: relative;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">include</span> e(positions-none) {</span><br><span class="line">      <span class="attribute">display</span>: none;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">include</span> e(positions-left) {</span><br><span class="line">      <span class="attribute">position</span>: absolute;</span><br><span class="line">      <span class="attribute">bottom</span>: <span class="number">8px</span>;</span><br><span class="line">      <span class="attribute">text-align</span>: left;</span><br><span class="line">      <span class="attribute">padding-left</span>: <span class="number">18px</span>;</span><br><span class="line">      <span class="attribute">height</span>: <span class="number">12px</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">include</span> e(positions-right) {</span><br><span class="line">      <span class="attribute">position</span>: absolute;</span><br><span class="line">      <span class="attribute">bottom</span>: <span class="number">8px</span>;</span><br><span class="line">      <span class="attribute">text-align</span>: right;</span><br><span class="line">      <span class="attribute">padding-right</span>: <span class="number">18px</span>;</span><br><span class="line">      <span class="attribute">height</span>: <span class="number">12px</span>;</span><br><span class="line">    }</span><br><span class="line"></span><br><span class="line">    <span class="selector-tag">span</span> {</span><br><span class="line">      <span class="attribute">display</span>: inline-block;</span><br><span class="line">      <span class="attribute">vertical-align</span>: top;</span><br><span class="line">      <span class="attribute">text-align</span>: center;</span><br><span class="line">      <span class="attribute">margin</span>: <span class="number">0</span> <span class="number">2px</span>;</span><br><span class="line">      <span class="attribute">width</span>: <span class="number">20px</span>;</span><br><span class="line">      <span class="attribute">height</span>: <span class="number">3px</span>;</span><br><span class="line">      <span class="attribute">border-radius</span>: <span class="number">0</span>;</span><br><span class="line">      <span class="attribute">cursor</span>: pointer;</span><br><span class="line">      <span class="attribute">background-color</span>:<span class="number">#898989</span>;</span><br><span class="line">      <span class="attribute">opacity</span>: <span class="number">0.5</span>;</span><br><span class="line">      <span class="attribute">font-size</span>: <span class="number">12px</span>;</span><br><span class="line">      &amp;<span class="selector-class">.active</span> {</span><br><span class="line">        <span class="attribute">width</span>: <span class="number">25px</span>;</span><br><span class="line">        <span class="attribute">background-color</span>: rgb(<span class="number">82</span>, <span class="number">87</span>, <span class="number">74</span>);</span><br><span class="line">        <span class="attribute">opacity</span>: <span class="number">0.7</span>;</span><br><span class="line">      }</span><br><span class="line">    }</span><br><span class="line">    <span class="selector-class">.radius</span> {</span><br><span class="line">      <span class="attribute">width</span>: <span class="number">12px</span>;</span><br><span class="line">      <span class="attribute">height</span>: <span class="number">12px</span>;</span><br><span class="line">      <span class="attribute">border-radius</span>: <span class="number">50%</span>;</span><br><span class="line">      <span class="attribute">border</span>: <span class="number">1px</span> solid <span class="number">#2b2b28</span>;</span><br><span class="line">      <span class="attribute">background</span>: rgba(<span class="number">82</span>, <span class="number">87</span>, <span class="number">74</span>, <span class="number">0.1</span>);</span><br><span class="line">      &amp;<span class="selector-class">.active</span> {</span><br><span class="line">        <span class="attribute">width</span>: <span class="number">12px</span>;</span><br><span class="line">        <span class="attribute">background-color</span>: <span class="number">#505042</span>;</span><br><span class="line">        <span class="attribute">opacity</span>: <span class="number">0.7</span>;</span><br><span class="line">      }</span><br><span class="line">    }</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">  <span class="selector-class">.list-enter-to</span> {</span><br><span class="line">    <span class="attribute">transition</span>: all <span class="number">0.8s</span> ease;</span><br><span class="line">    <span class="attribute">transform</span>: translateX(<span class="number">0</span>);</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">  <span class="selector-class">.list-leave-active</span> {</span><br><span class="line">    <span class="attribute">transition</span>: all <span class="number">0.8s</span> ease;</span><br><span class="line">    <span class="attribute">transform</span>: translateX(-<span class="number">100%</span>)</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">  .list-enter {</span><br><span class="line">    transform: translateX(<span class="number">100%</span>)</span><br><span class="line">  }</span><br><span class="line"></span><br><span class="line">  .list-leave {</span><br><span class="line">    transform: translateX(<span class="number">0</span>)</span><br><span class="line">  }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table>
+
+```sql
+@charset "UTF-8";
+
+@include b(carousel) {
+  box-sizing: border-box;
+  position:relative;
+  height: 100%;
+  width: 100%;
+  display: block;
+  -webkit-box-sizing: border-box;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+
+  @include e(slide) {
+
+    @include e(slide-lists) {
+      display: none;
+    }
+
+    @include e(slide-current) {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: hidden;
+      padding:0;
+      margin: 0;
+      li {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    @include e(slide-current-item) {
+      list-style-type:none;
+      width: 100%;
+      height: 100%;
+      margin:0;
+      padding:0;
+    }
+  }
+
+  @include e(arrow) {
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    z-index: 10;
+    transform: translateY(-50%);
+    background-color: rgba(31, 45, 61, 0.11);
+    text-align: center;
+    color: aliceblue;
+    font-size: 1em;
+    font-family: inherit;
+    line-height: inherit;
+    &.rights {
+      right: 16px;
+    }
+    &.lefts{
+      left: 16px;
+    }
+
+    &.rights:before {
+      content: ">";
+    }
+    &.lefts:before{
+      content: "<";
+    }
+
+    @include e(arrow-hover) {
+     display: inherit;
+     opacity: 0;
+    }
+
+    @include e(arrow-always) {
+      display: inherit;
+    }
+    @include e(arrow-never) {
+      display: none;
+    }
+
+    &-hover > * {
+      vertical-align: baseline;
+    }
+
+  }
+
+  &:hover &__arrow-hover {
+    opacity: 1;
+  }
+
+  @include e(positions) {
+    display: block;
+    z-index: 10;
+    height: 16px;
+    width: 100%;
+    position: relative;
+    text-align: center;
+
+    @include e(positions-inside) {
+      position: absolute;
+      bottom: 8px;
+      height: 12px;
+    }
+
+    @include e(positions-outside) {
+      margin-top: 8px;
+      width: 100%;
+      position: relative;
+    }
+
+    @include e(positions-none) {
+      display: none;
+    }
+
+    @include e(positions-left) {
+      position: absolute;
+      bottom: 8px;
+      text-align: left;
+      padding-left: 18px;
+      height: 12px;
+    }
+
+    @include e(positions-right) {
+      position: absolute;
+      bottom: 8px;
+      text-align: right;
+      padding-right: 18px;
+      height: 12px;
+    }
+
+    span {
+      display: inline-block;
+      vertical-align: top;
+      text-align: center;
+      margin: 0 2px;
+      width: 20px;
+      height: 3px;
+      border-radius: 0;
+      cursor: pointer;
+      background-color:#898989;
+      opacity: 0.5;
+      font-size: 12px;
+      &.active {
+        width: 25px;
+        background-color: rgb(82, 87, 74);
+        opacity: 0.7;
+      }
+    }
+    .radius {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1px solid #2b2b28;
+      background: rgba(82, 87, 74, 0.1);
+      &.active {
+        width: 12px;
+        background-color: #505042;
+        opacity: 0.7;
+      }
+    }
+  }
+
+  .list-enter-to {
+    transition: all 0.8s ease;
+    transform: translateX(0);
+  }
+
+  .list-leave-active {
+    transition: all 0.8s ease;
+    transform: translateX(-100%)
+  }
+
+  .list-enter {
+    transform: translateX(100%)
+  }
+
+  .list-leave {
+    transform: translateX(0)
+  }
+}
+```
+
 
 放上GitHub地址  
 [  
