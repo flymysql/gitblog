@@ -1,7 +1,7 @@
 {
-  "name": "春日野鬼",
-  "short_name": "春日野鬼",
-  "description": "一个用 GitHub Pages 托管、可在线编辑的极简博客",
+  "name": "小红鸡",
+  "short_name": "小红鸡",
+  "description": "桃李春风一杯酒，江湖夜雨十年灯。",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
