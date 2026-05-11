@@ -40,7 +40,21 @@ const SOCIAL_ICONS = {
 };
 
 function logoSvg() {
+  if (CONFIG.site.logo) {
+    return `<img class="nav-logo-img" src="${escapeHtml(CONFIG.site.logo)}" alt="${escapeHtml(CONFIG.site.title || 'logo')}">`;
+  }
   return `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L19.82 8 12 11.82 4.18 8 12 4.18zM4 9.27l7 3.5v7.46l-7-3.5V9.27zm9 10.96v-7.46l7-3.5v7.46l-7 3.5z"/></svg>`;
+}
+
+function applyFavicon() {
+  if (!CONFIG.site.favicon && !CONFIG.site.logo && !CONFIG.site.avatar) return;
+  let link = document.head.querySelector('link[rel="icon"]');
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'icon';
+    document.head.appendChild(link);
+  }
+  link.href = CONFIG.site.favicon || CONFIG.site.logo || CONFIG.site.avatar;
 }
 
 function navHtml(active) {
@@ -188,6 +202,7 @@ function bindSearchOverlay() {
 
 export function initSite({ active = '' } = {}) {
   initTheme();
+  applyFavicon();
   // 渲染骨架
   const navHost = $('#site-nav');
   if (navHost) navHost.innerHTML = navHtml(active);

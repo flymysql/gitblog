@@ -4,6 +4,9 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* HTML hidden 属性强制生效，避免被自定义 display: flex 覆盖 */
+[hidden] { display: none !important; }
+
 :root {
   --primary: #EA6F5A;
   --primary-hover: #D9684F;
@@ -128,6 +131,12 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
 }
 
 .nav-logo svg { width: 26px; height: 26px; }
+.nav-logo-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  object-fit: cover;
+}
 
 .nav-links {
   display: flex;

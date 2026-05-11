@@ -17,6 +17,7 @@
 
 - GitHub PAT 登录（无后端、无 OAuth）
 - 文章管理：全部 / 已发布 / 草稿三 tab，搜索、删除
+- 站点设置：在线修改 `config.js`（站点名、头像、Logo、favicon、导航、社交链接、giscus、路径、主题等）
 - Markdown 编辑器（EasyMDE）：工具栏、快捷键、实时预览
 - 拖拽 / 粘贴 上传图片（自动写入 `assets/uploads/yyyy/mm/`）
 - 草稿模式（`draft: true` 不进首页）
@@ -40,6 +41,7 @@ blog/
 ├── admin/
 │   ├── index.html        # 登录 + 文章管理
 │   ├── editor.html       # Markdown 编辑器
+│   ├── settings.html     # 站点设置
 │   └── diagnose.html     # 一键诊断
 ├── assets/
 │   ├── css/              # common / home / post / admin
@@ -70,12 +72,17 @@ git push -u origin main
 
 ### 2. 修改 `assets/js/config.js`
 
-```js
-repo: { owner, name, branch },
-authorizedUsers: [...],
-site: { title, subtitle, author, avatar, description, url, social, nav },
-giscus: { enabled, repo, repoId, category, categoryId, ... },
-```
+首次部署前可以手动修改 `assets/js/config.js`。部署完成后，也可以在后台 `/admin/settings.html` 在线修改这些配置，并自动提交到 GitHub 仓库。
+
+可在线配置的内容包括：
+
+- 仓库信息：`owner / name / branch`
+- 站点信息：名称、副标题、作者、描述、站点 URL、头像、Logo、favicon
+- 导航：顶部导航 JSON
+- 社交链接：GitHub / Twitter / Email / RSS
+- giscus 评论配置
+- 文章目录、索引文件、上传目录
+- 默认主题：浅色 / 深色 / 跟随系统
 
 `site.url` 写你 Pages 站点地址，例如 `https://flymysql.github.io/gitblog`，**末尾不要 `/`**。SEO 元数据、sitemap、rss 都会用到。
 

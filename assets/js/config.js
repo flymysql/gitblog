@@ -22,6 +22,8 @@ export const CONFIG = {
     title: '春日野鬼',
     subtitle: '记录想法与代码',
     author: '小红鸡',
+    logo: '',
+    favicon: '',
     avatar: 'https://avatars.githubusercontent.com/u/37113068?s=400&u=cf2b8a258ad1de5e9a23e3c72da6ca04e058dd46&v=4',
     description: '一个用 GitHub Pages 托管、可在线编辑的极简博客',
     // 站点根 URL（用于 OG / sitemap / rss 等绝对地址；末尾不要 /）
