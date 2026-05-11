@@ -15,7 +15,8 @@
       "cover": "../assets/uploads/2026/05/1778490605877-blwjij-image.png",
       "pinned": true,
       "pinnedOrder": 1,
-      "path": "posts/welcome.md"
+      "path": "posts/welcome.md",
+      "carousel": true
     },
     {
       "slug": "about",
