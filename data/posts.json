@@ -12,10 +12,10 @@
         "教程",
         "项目介绍"
       ],
-      "path": "posts/welcome.md",
       "cover": "../assets/uploads/2026/05/1778490605877-blwjij-image.png",
       "pinned": true,
-      "pinnedOrder": 1
+      "pinnedOrder": 1,
+      "path": "posts/welcome.md"
     },
     {
       "slug": "多维数组的索引方案与内存设计-16000038",
