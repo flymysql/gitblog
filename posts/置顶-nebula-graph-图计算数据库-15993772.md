@@ -8,6 +8,7 @@ tags:
   - nebula
   - "图计算"
 summary: "更新历史 在学习过程中，本文持续更新 2021 12 13：更新nebula官方介绍 2021 12 14：更新编译与部署方式，总结importer导入方式 2021 12 15：…"
+cover: assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.png
 origin:
   from: cnblogs
   url: https://www.cnblogs.com/gitpull/p/15993772.html

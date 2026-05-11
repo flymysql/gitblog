@@ -4,9 +4,10 @@ date: 2018-11-01T08:52:05+08:00
 updated: 2018-11-01T08:52:05+08:00
 author: "兰州小红鸡"
 tags:
-  - "教程"
-  - "博客"
+  - 教程
+  - 博客建站
 summary: "我感觉我一个处女座的就不应该搞前端，太吹毛求疵追求完美了，哪里有一点点觉得不漂亮就想改 博客的评论系统用过好几家（虽然都没有人评论 比如gitalk，来必力 之前用的来必力，加载慢…"
+cover: assets/uploads/2026/05/用回valine评论系统valine评论框样式美化-2d5da13e-01.png
 origin:
   from: hexo
   url: https://flymysql.github.io/post/2d5da13e.html

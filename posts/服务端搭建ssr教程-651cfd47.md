@@ -7,6 +7,7 @@ tags:
   - "教程"
   - ssr
 summary: "教程很简单，整个教程分三步： 第一步：购买VPS服务器 第二步：一键部署VPS服务器 第三步：一键加速VPS服务器 （谷歌BBR加速；对速度要求不高的话，此步骤可省略） ¶第一步：…"
+cover: assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.png
 origin:
   from: hexo
   url: https://flymysql.github.io/post/651cfd47.html

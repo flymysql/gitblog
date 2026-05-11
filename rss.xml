@@ -5,7 +5,7 @@
     <link>https://flymysql.github.io/gitblog/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 11 May 2026 07:56:24 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 11 May 2026 08:03:51 GMT</lastBuildDate>
     <atom:link href="https://flymysql.github.io/gitblog/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>欢迎来到我的博客</title>
@@ -13,7 +13,7 @@
       <guid isPermaLink="false">welcome</guid>
       <pubDate>Mon, 11 May 2026 10:00:00 GMT</pubDate>
       <author>你的名字</author>
-      <category>介绍</category><category>GitHub Pages</category><category>在线编辑</category>
+      <category>随想</category><category>博客建站</category>
       <description><![CDATA[这是一个完全静态、托管在 GitHub Pages 的博客，但带有可在线编辑的伪后台。]]></description>
     </item>
     <item>
@@ -94,7 +94,7 @@
       <guid isPermaLink="false">模仿知乎的链接卡片-a714f04b</guid>
       <pubDate>Sun, 16 Dec 2018 09:13:47 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>教程</category><category>javascript</category><category>html</category><category>css</category>
+      <category>教程</category><category>前端</category><category>css</category>
       <description><![CDATA[今天逛知乎发现他们的链接卡片挺好看，就想写一个自己拿来博客用（扒下来知乎的代码），效果如下。 源码放在github，感兴趣的朋友可以自己拿。 兰州小红鸡的博客 小鸡背单词 gith…]]></description>
     </item>
     <item>
@@ -112,7 +112,7 @@
       <guid isPermaLink="false">12月6日杂谈-5027c817</guid>
       <pubDate>Thu, 06 Dec 2018 09:13:48 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>水文</category><category>日记</category>
+      <category>水文</category><category>随想</category>
       <description><![CDATA[今天是12月6日，周四，没课 小雪，温度零下好多度 早上去了会儿图书馆，没看下书，下午在宿舍荒废了一下午，满满的罪恶感。 18年就剩下20多天了，这学期开学前立下的目标，慢慢丢失的…]]></description>
     </item>
     <item>
@@ -130,7 +130,7 @@
       <guid isPermaLink="false">使用vue.js制作carousel跑马灯组件-456bc465</guid>
       <pubDate>Sun, 02 Dec 2018 07:53:59 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>javascript</category><category>html</category><category>vue.js</category>
+      <category>前端</category><category>vue.js</category>
       <description><![CDATA[前几天在掘金上看到一个开源项目(PyUI)在招人，一个基于vue.js的UI库，想着反正页闲着，就硬着头皮加入了（其实我都还没学vue.js) 两天速成了一下，学了点皮毛，就开始撸…]]></description>
     </item>
     <item>
@@ -139,7 +139,7 @@
       <guid isPermaLink="false">Dijkstra单源最短路径算法-15e41f53</guid>
       <pubDate>Fri, 23 Nov 2018 09:32:33 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>前端</category><category>javascript</category><category>html</category><category>算法</category><category>C++</category>
+      <category>前端</category><category>算法</category><category>C++</category>
       <description><![CDATA[算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。…]]></description>
     </item>
     <item>
@@ -148,7 +148,7 @@
       <guid isPermaLink="false">使用腾讯云cdn加速博客-1609338289</guid>
       <pubDate>Thu, 22 Nov 2018 11:41:45 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>教程</category><category>博客</category>
+      <category>教程</category><category>博客建站</category>
       <description><![CDATA[最近把博客搬到腾讯云后，使用腾讯云的COS存储 免费50G的存储空间，放个小博客还是够用的 而且，还可以使用免费的CDN加速 国内访问博客速度比放在GitHub上要快多了 申请腾讯…]]></description>
     </item>
     <item>
@@ -157,7 +157,7 @@
       <guid isPermaLink="false">hexo建站笔记之首页文章轮播图-6bf81741</guid>
       <pubDate>Wed, 14 Nov 2018 07:25:40 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>教程</category><category>前端</category><category>html</category><category>博客</category>
+      <category>教程</category><category>前端</category><category>博客建站</category>
       <description><![CDATA[¶设计特点 轮播图UI：模仿简书 可以直接在每篇文章的md文件里设置是否要设为轮播图的文章 就是我们每次新写一篇文章，用hexo生成一个md文件，我们只要在头部注明是否要作为轮播图…]]></description>
     </item>
     <item>
@@ -175,7 +175,7 @@
       <guid isPermaLink="false">hexo建站笔记之彩色标签云-d6caa003</guid>
       <pubDate>Wed, 07 Nov 2018 12:08:34 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>教程</category><category>前端</category><category>javascript</category><category>博客</category>
+      <category>教程</category><category>前端</category><category>博客建站</category>
       <description><![CDATA[方法比较简单，加个js脚本就好了，至于加载哪里都无所谓了，就放在标签云的页面。 就加在标签的那个页面好了。 1. 打开themes\\\\next\\\\layout\\\\page.swig…]]></description>
     </item>
     <item>
@@ -184,7 +184,7 @@
       <guid isPermaLink="false">用回valine评论系统valine评论框样式美化-2d5da13e</guid>
       <pubDate>Thu, 01 Nov 2018 00:52:05 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>教程</category><category>博客</category>
+      <category>教程</category><category>博客建站</category>
       <description><![CDATA[我感觉我一个处女座的就不应该搞前端，太吹毛求疵追求完美了，哪里有一点点觉得不漂亮就想改 博客的评论系统用过好几家（虽然都没有人评论 比如gitalk，来必力 之前用的来必力，加载慢…]]></description>
     </item>
     <item>
@@ -202,7 +202,7 @@
       <guid isPermaLink="false">手动修改博客css样式打造属于自己的博客样式-e17f6e4c</guid>
       <pubDate>Sun, 28 Oct 2018 22:39:31 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>教程</category><category>博客</category>
+      <category>教程</category><category>博客建站</category>
       <description><![CDATA[这两天花了点时间修改了下自己的next主题的博客 样式表放在了GitHub上喜欢的话可以直接使用 next博客主题样式修改 使用方法 直接下载样式表，然后复制到自己主题的theme…]]></description>
     </item>
     <item>
@@ -220,7 +220,7 @@
       <guid isPermaLink="false">解决来必力评论系统加载慢的问题-3453c710</guid>
       <pubDate>Sat, 13 Oct 2018 00:06:23 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>教程</category><category>博客</category>
+      <category>教程</category><category>博客建站</category>
       <description><![CDATA[解决来必力评论系统加载慢的方法 必力评论加载慢如何解决? 灵感：大家平常说的加载慢，其实是因为来必力这个框架它是等读者把滚动条拉到文末评论的位置的时候才开始加载。 如果是让他从我们…]]></description>
     </item>
     <item>
@@ -229,7 +229,7 @@
       <guid isPermaLink="false">hexo博客搭建以及next美化教程-e8d13fc</guid>
       <pubDate>Wed, 10 Oct 2018 00:41:50 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>教程</category><category>博客</category>
+      <category>教程</category><category>博客建站</category>
       <description><![CDATA[¶前言 本文虽然是非常详细的小白教程 但是也需要一点点的姿势，额，知识储量 ¶知识储量 了解css和html，会写一点html基础语句 用过GitHub，知道建仓库过程以及在命令行…]]></description>
     </item>
     <item>
@@ -247,7 +247,7 @@
       <guid isPermaLink="false">假期最后一天-1bde1150</guid>
       <pubDate>Sun, 07 Oct 2018 09:02:47 GMT</pubDate>
       <author>兰州小红鸡</author>
-      <category>随想</category><category>日记</category>
+      <category>随想</category>
       <description><![CDATA[啊啊啊啊，十天长假到了最后一天 明天还要交数值分析作业，然而我还没动，虽然只有三题… 这十天的计划都没有完成 高数没看完，甚至只看了一单元 英语也没做。。。 所有的考研复习都没有进…]]></description>
     </item>
     <item>

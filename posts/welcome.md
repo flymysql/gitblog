@@ -3,7 +3,9 @@ title: 欢迎来到我的博客
 date: "2026-05-11T10:00:00.000Z"
 updated: "2026-05-11T05:45:48.535Z"
 author: 你的名字
-tags: [介绍, GitHub Pages, 在线编辑]
+tags:
+  - 随想
+  - 博客建站
 cover: ../assets/uploads/2026/05/1778478312725-mrx0in-image.png
 summary: 这是一个完全静态、托管在 GitHub Pages 的博客，但带有可在线编辑的伪后台。
 ---

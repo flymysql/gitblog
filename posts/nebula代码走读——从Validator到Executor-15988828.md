@@ -6,6 +6,7 @@ author: "兰州小红鸡"
 tags:
   - "图数据库"
 summary: "整体架构 Nebula Graph Query Engine 主要分为四个模块，分别是 Parser、Validator、Optimizer 和 Executor。 Parser …"
+cover: assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.png
 origin:
   from: cnblogs
   url: https://www.cnblogs.com/gitpull/p/15988828.html

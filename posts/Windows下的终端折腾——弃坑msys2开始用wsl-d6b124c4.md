@@ -6,6 +6,7 @@ author: "兰州小红鸡"
 tags:
   - "教程"
 summary: "之前用了半年Linux，后来因为平常一些软件需要，只能在Windows下玩，就换回Windows了。 但还是万分想念Linux，然而Windows下的终端一直用的不爽，就一直在尝试…"
+cover: assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-03.gif
 origin:
   from: hexo
   url: https://flymysql.github.io/post/d6b124c4.html
