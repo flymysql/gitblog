@@ -73,7 +73,8 @@
         "图计算"
       ],
       "cover": "assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.png",
-      "path": "posts/置顶-nebula-graph-图计算数据库-15993772.md"
+      "path": "posts/置顶-nebula-graph-图计算数据库-15993772.md",
+      "carousel": true
     },
     {
       "slug": "nebula代码走读——从Validator到Executor-15988828",
