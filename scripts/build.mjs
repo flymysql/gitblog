@@ -1,5 +1,5 @@
 // 校验 + 重新生成 sitemap.xml 与 rss.xml
-import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
 import { join, basename } from 'node:path';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
@@ -15,6 +15,7 @@ const SITE_AUTHOR = getStr('author') || '';
 const SITE_LOCALE = getStr('locale') || 'zh-CN';
 const POSTS_DIR = 'posts';
 const INDEX_FILE = 'data/posts.json';
+const OG_DIR = 'assets/og';
 
 console.log('Site URL:', SITE_URL);
 
@@ -59,12 +60,18 @@ function extractSummary(content, max = 80) {
 // ---------- 扫描 posts/ 重建索引（同时校验 frontmatter） ----------
 const errors = [];
 const posts = [];
+let existingIndex = { posts: [] };
+try {
+  existingIndex = JSON.parse(readFileSync(INDEX_FILE, 'utf8'));
+} catch {}
+const existingBySlug = new Map((existingIndex.posts || []).map(p => [p.slug, p]));
 if (existsSync(POSTS_DIR)) {
   const files = readdirSync(POSTS_DIR).filter(f => f.endsWith('.md'));
   for (const f of files) {
     const slug = basename(f, '.md');
     const raw = readFileSync(join(POSTS_DIR, f), 'utf8');
     const { data, content } = parseFM(raw);
+    const old = existingBySlug.get(slug) || {};
     if (!data.title) errors.push(`[${f}] frontmatter 缺少 title`);
     if (!data.date) errors.push(`[${f}] frontmatter 缺少 date`);
     posts.push({
@@ -78,6 +85,7 @@ if (existsSync(POSTS_DIR)) {
       cover: data.cover || undefined,
       draft: !!data.draft,
       pinned: !!data.pinned,
+      pinnedOrder: data.pinnedOrder || old.pinnedOrder || undefined,
       path: `${POSTS_DIR}/${f}`,
       content,
     });
@@ -97,6 +105,7 @@ const indexJson = {
     if (!rest.cover) delete rest.cover;
     if (!rest.draft) delete rest.draft;
     if (!rest.pinned) delete rest.pinned;
+    if (!rest.pinnedOrder) delete rest.pinnedOrder;
     return rest;
   }),
 };
@@ -135,6 +144,36 @@ ${urls.map(u => `  <url>
 writeFileSync('sitemap.xml', sitemap);
 console.log('sitemap.xml 已生成（' + urls.length + ' 个 URL）');
 
+// ---------- robots.txt / manifest ----------
+writeFileSync('robots.txt', `User-agent: *
+Allow: /
+
+Sitemap: ${baseUrl}/sitemap.xml
+`);
+console.log('robots.txt 已生成');
+
+const manifest = {
+  name: SITE_TITLE,
+  short_name: SITE_TITLE.length > 8 ? SITE_TITLE.slice(0, 8) : SITE_TITLE,
+  description: SITE_DESC,
+  start_url: './',
+  scope: './',
+  display: 'standalone',
+  background_color: '#ffffff',
+  theme_color: '#ea6f5a',
+  lang: SITE_LOCALE,
+  icons: [
+    {
+      src: 'assets/icon.svg',
+      sizes: 'any',
+      type: 'image/svg+xml',
+      purpose: 'any maskable',
+    },
+  ],
+};
+writeFileSync('manifest.webmanifest', JSON.stringify(manifest, null, 2) + '\n');
+console.log('manifest.webmanifest 已生成');
+
 // ---------- rss.xml ----------
 function escCdata(s) { return String(s == null ? '' : s).replace(/]]>/g, ']]]]><![CDATA[>'); }
 
@@ -163,3 +202,51 @@ ${rssItems}
 `;
 writeFileSync('rss.xml', rss);
 console.log('rss.xml 已生成（' + Math.min(visiblePosts.length, 30) + ' 篇）');
+
+// ---------- 自动生成 OG 分享图（SVG，适合 GitHub Pages 无依赖构建） ----------
+mkdirSync(OG_DIR, { recursive: true });
+function svgEsc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+function wrapText(text, max = 18, lines = 3) {
+  const chars = [...String(text || '')];
+  const out = [];
+  for (let i = 0; i < chars.length && out.length < lines; i += max) {
+    out.push(chars.slice(i, i + max).join(''));
+  }
+  if (chars.length > max * lines && out.length) out[out.length - 1] = out[out.length - 1].replace(/.{1,2}$/, '…');
+  return out;
+}
+function ogSvg(post) {
+  const titleLines = wrapText(post.title || SITE_TITLE, 18, 3);
+  const tags = (post.tags || []).slice(0, 3).map(t => `#${t}`).join('  ');
+  const subtitle = tags || SITE_DESC || SITE_TITLE;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fff7f4"/>
+      <stop offset="52%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#ffe8e1"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#d35f4a" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1050" cy="80" r="170" fill="#ea6f5a" opacity="0.12"/>
+  <circle cx="125" cy="540" r="210" fill="#ea6f5a" opacity="0.10"/>
+  <rect x="74" y="74" width="1052" height="482" rx="34" fill="#fff" filter="url(#shadow)"/>
+  <text x="120" y="142" fill="#ea6f5a" font-size="30" font-weight="700" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${svgEsc(SITE_TITLE)}</text>
+  ${titleLines.map((line, i) => `<text x="120" y="${240 + i * 78}" fill="#222" font-size="58" font-weight="800" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${svgEsc(line)}</text>`).join('\n  ')}
+  <text x="120" y="500" fill="#777" font-size="28" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${svgEsc(subtitle)}</text>
+  <text x="1080" y="500" text-anchor="end" fill="#999" font-size="24" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${svgEsc(SITE_AUTHOR)}</text>
+</svg>`;
+}
+for (const post of visiblePosts) {
+  writeFileSync(join(OG_DIR, `${post.slug}.svg`), ogSvg(post));
+}
+console.log(`OG 分享图已生成：${visiblePosts.length} 张`);

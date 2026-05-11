@@ -17,6 +17,7 @@ function fmtDate(iso) {
 
 function topActions() {
   return `
+    <button class="btn btn-secondary" id="savePinnedOrder" type="button" title="拖动置顶文章后保存排序">保存置顶排序</button>
     <a class="btn btn-primary" href="editor.html">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:-2px"><path d="M12 5v14M5 12h14"/></svg>
       新建文章
@@ -41,9 +42,11 @@ async function renderDashboard(content) {
   `;
 
   let posts = [];
+  let indexSha = null;
   try {
     const idx = await readIndex();
     if (idx) {
+      indexSha = idx.sha;
       posts = Array.isArray(idx.data.posts) ? idx.data.posts : [];
     } else {
       const data = await fetchIndexPublic();
@@ -71,6 +74,9 @@ async function renderDashboard(content) {
     }
     filtered.sort((a, b) => {
       if ((b.pinned ? 1 : 0) !== (a.pinned ? 1 : 0)) return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+      if (a.pinned && b.pinned && Number(a.pinnedOrder || 0) !== Number(b.pinnedOrder || 0)) {
+        return Number(a.pinnedOrder || 9999) - Number(b.pinnedOrder || 9999);
+      }
       return new Date(b.date || 0) - new Date(a.date || 0);
     });
 
@@ -87,8 +93,9 @@ async function renderDashboard(content) {
         <div style="text-align:right">操作</div>
       </div>
       ${filtered.map(p => `
-        <div class="admin-row" data-slug="${escapeHtml(p.slug)}">
+        <div class="admin-row${p.pinned ? ' draggable' : ''}" data-slug="${escapeHtml(p.slug)}" draggable="${p.pinned ? 'true' : 'false'}">
           <div class="title">
+            ${p.pinned ? '<span class="drag-handle" title="拖拽调整置顶顺序">☰</span>' : ''}
             ${p.pinned ? '<span class="badge pinned">置顶</span>' : ''}
             ${escapeHtml(p.title || '无标题')}
           </div>
@@ -106,6 +113,64 @@ async function renderDashboard(content) {
   }
 
   refresh();
+
+  let draggingRow = null;
+  $('#list').addEventListener('dragstart', e => {
+    const row = e.target.closest('.admin-row.draggable');
+    if (!row) return;
+    draggingRow = row;
+    row.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  $('#list').addEventListener('dragend', () => {
+    if (draggingRow) draggingRow.classList.remove('dragging');
+    draggingRow = null;
+  });
+  $('#list').addEventListener('dragover', e => {
+    if (!draggingRow) return;
+    e.preventDefault();
+    const rows = [...$('#list').querySelectorAll('.admin-row.draggable:not(.dragging)')];
+    const after = rows.find(row => e.clientY <= row.getBoundingClientRect().top + row.offsetHeight / 2);
+    if (after) $('#list').insertBefore(draggingRow, after);
+    else $('#list').appendChild(draggingRow);
+  });
+
+  const savePinnedOrderBtn = $('#savePinnedOrder');
+  if (savePinnedOrderBtn) {
+    savePinnedOrderBtn.addEventListener('click', async () => {
+      const pinnedSlugs = [...$('#list').querySelectorAll('.admin-row.draggable')].map(row => row.dataset.slug);
+      if (!pinnedSlugs.length) {
+        showToast('当前没有置顶文章');
+        return;
+      }
+      pinnedSlugs.forEach((slug, i) => {
+        const item = posts.find(p => p.slug === slug);
+        if (item) item.pinnedOrder = i + 1;
+      });
+      savePinnedOrderBtn.disabled = true;
+      savePinnedOrderBtn.textContent = '保存中…';
+      try {
+        const idx = await readIndex();
+        indexSha = idx && idx.sha;
+        const data = idx ? idx.data : { posts };
+        data.posts = (data.posts || []).map(p => {
+          const local = posts.find(x => x.slug === p.slug);
+          if (local && local.pinned) return { ...p, pinnedOrder: local.pinnedOrder };
+          return p;
+        });
+        await writeIndex(data, 'index: 更新置顶排序', indexSha);
+        posts = data.posts;
+        showToast('置顶排序已保存');
+        refresh();
+      } catch (e) {
+        console.error(e);
+        showToast('保存失败：' + e.message, 'error');
+      } finally {
+        savePinnedOrderBtn.disabled = false;
+        savePinnedOrderBtn.textContent = '保存置顶排序';
+      }
+    });
+  }
 
   $('#search').addEventListener('input', e => {
     currentQuery = e.target.value.trim();

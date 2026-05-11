@@ -1,0 +1,19 @@
+{
+  "name": "春日野鬼",
+  "short_name": "春日野鬼",
+  "description": "一个用 GitHub Pages 托管、可在线编辑的极简博客",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ea6f5a",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

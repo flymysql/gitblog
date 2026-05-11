@@ -57,3 +57,27 @@ export function setMeta(opts = {}) {
 
   ensure('link[rel="canonical"]', { tag: 'link', rel: 'canonical', href: url });
 }
+
+export function setJsonLd(data, id = 'jsonld-main') {
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement('script');
+    el.type = 'application/ld+json';
+    el.id = id;
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify(stripUndefined(data), null, 2);
+}
+
+function stripUndefined(value) {
+  if (Array.isArray(value)) return value.map(stripUndefined).filter(v => v !== undefined);
+  if (value && typeof value === 'object') {
+    const out = {};
+    for (const [k, v] of Object.entries(value)) {
+      if (v === undefined || v === '') continue;
+      out[k] = stripUndefined(v);
+    }
+    return out;
+  }
+  return value;
+}

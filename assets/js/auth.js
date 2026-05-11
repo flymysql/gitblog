@@ -66,6 +66,55 @@ export async function loginWithToken(token, { remember = true } = {}) {
   return user;
 }
 
+export async function loginWithDeviceFlow({ remember = true, onCode } = {}) {
+  const cfg = CONFIG.auth && CONFIG.auth.githubDeviceFlow;
+  const clientId = cfg && cfg.clientId;
+  if (!clientId) {
+    throw new Error('尚未配置 GitHub Device Flow Client ID。请先在后台设置里填写 OAuth App 的 Client ID。');
+  }
+  const scope = (cfg.scope || 'repo read:user').trim();
+  const startRes = await fetch('https://github.com/login/device/code', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ client_id: clientId, scope }),
+  });
+  const start = await startRes.json();
+  if (!startRes.ok || start.error) throw new Error(start.error_description || start.error || '无法启动 Device Flow');
+  if (onCode) onCode(start);
+
+  const startedAt = Date.now();
+  let interval = Number(start.interval || 5) * 1000;
+  while (Date.now() - startedAt < Number(start.expires_in || 900) * 1000) {
+    await new Promise(r => setTimeout(r, interval));
+    const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        device_code: start.device_code,
+        grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
+      }),
+    });
+    const tokenData = await tokenRes.json();
+    if (tokenData.error === 'authorization_pending') continue;
+    if (tokenData.error === 'slow_down') {
+      interval += 5000;
+      continue;
+    }
+    if (tokenData.error) throw new Error(tokenData.error_description || tokenData.error);
+    if (tokenData.access_token) {
+      return loginWithToken(tokenData.access_token, { remember });
+    }
+  }
+  throw new Error('Device Flow 登录超时，请重试');
+}
+
 export function logout(returnTo) {
   clearAuth();
   sessionStorage.removeItem('gh_oauth_token_session');

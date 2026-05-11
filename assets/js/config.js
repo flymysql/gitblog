@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260511144415';
+export const VERSION = '20260511144416';
 
 export const CONFIG = {
   repo: {
@@ -60,12 +60,26 @@ export const CONFIG = {
     inputPosition: "top",
     lang: "zh-CN"
   },
+  analytics: {
+    enabled: false,
+    snippet: ""
+  },
+  auth: {
+    githubDeviceFlow: {
+      clientId: "",
+      scope: "repo read:user"
+    }
+  },
   paths: {
     posts: "posts",
     index: "data/posts.json",
     uploads: "assets/uploads"
   },
   theme: {
-    default: "auto"
+    default: "auto",
+    preset: "jianshu",
+    allowReaderPresetSwitch: true,
+    tokens: {},
+    customCss: ""
   }
 };

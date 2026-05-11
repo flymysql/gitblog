@@ -10,6 +10,7 @@
 import { CONFIG } from './config.js';
 import {
   loginWithToken,
+  loginWithDeviceFlow,
   logout,
   isAuthorized,
   getToken,
@@ -29,6 +30,7 @@ export function escapeHtml(s) {
 const NAV = [
   { id: 'posts', name: '文章管理', href: './', icon: iconList() },
   { id: 'editor', name: '写文章', href: 'editor.html', icon: iconPen() },
+  { id: 'images', name: '图片库', href: 'images.html', icon: iconImage() },
   { id: 'settings', name: '站点设置', href: 'settings.html', icon: iconCog() },
   { id: 'diagnose', name: '诊断', href: 'diagnose.html', icon: iconStethoscope() },
 ];
@@ -41,6 +43,9 @@ function iconPen() {
 }
 function iconCog() {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06A2 2 0 014.21 16.96l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06A2 2 0 017.04 4.21l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`;
+}
+function iconImage() {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`;
 }
 function iconStethoscope() {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6a4 4 0 008 0V3"/><line x1="6" y1="3" x2="3" y2="3"/><line x1="14" y1="3" x2="11" y2="3"/><path d="M10 13a4 4 0 014 4v0a4 4 0 008 0v-3"/><circle cx="20" cy="9" r="2"/></svg>`;
@@ -89,6 +94,8 @@ function renderLogin(host) {
               <input type="checkbox" id="remember" checked> 在此设备保持登录
             </label>
             <button type="submit" class="btn-github" id="btnLogin">验证并登录</button>
+            <button type="button" class="btn-device" id="btnDeviceLogin">使用 GitHub Device Flow 登录</button>
+            <div id="deviceLoginBox" class="device-login-box" hidden></div>
             <div id="loginError" style="display:none;margin-top:12px;color:#d9534f;font-size:13px;text-align:center"></div>
           </form>
           <div class="login-warn">
@@ -124,6 +131,41 @@ function renderLogin(host) {
       $err.style.display = '';
       $btn.disabled = false;
       $btn.textContent = '验证并登录';
+    }
+  });
+
+  const deviceBtn = $('#btnDeviceLogin');
+  const deviceBox = $('#deviceLoginBox');
+  const deviceEnabled = !!(CONFIG.auth && CONFIG.auth.githubDeviceFlow && CONFIG.auth.githubDeviceFlow.clientId);
+  if (!deviceEnabled) {
+    deviceBtn.disabled = true;
+    deviceBtn.title = '请先在 config.js / 后台设置中配置 auth.githubDeviceFlow.clientId';
+  }
+  deviceBtn.addEventListener('click', async () => {
+    const $err = $('#loginError');
+    $err.style.display = 'none';
+    deviceBtn.disabled = true;
+    deviceBtn.textContent = '等待 GitHub 授权…';
+    try {
+      await loginWithDeviceFlow({
+        remember: $('#remember').checked,
+        onCode: info => {
+          deviceBox.hidden = false;
+          deviceBox.innerHTML = `
+            <div>在新页面输入验证码：</div>
+            <strong>${escapeHtml(info.user_code)}</strong>
+            <a href="${escapeHtml(info.verification_uri)}" target="_blank" rel="noopener">打开 GitHub 授权页面 →</a>
+          `;
+        },
+      });
+      const back = popReturnTo();
+      if (back && back !== window.location.href) window.location.href = back;
+      else window.location.reload();
+    } catch (err) {
+      $err.textContent = err.message || String(err);
+      $err.style.display = '';
+      deviceBtn.disabled = !deviceEnabled;
+      deviceBtn.textContent = '使用 GitHub Device Flow 登录';
     }
   });
 }
