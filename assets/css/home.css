@@ -85,6 +85,15 @@
   overflow: hidden;
   background: var(--bg-soft);
   box-shadow: var(--shadow);
+  /* 纵向手势仍滚动页面，横向手势交给 JS 切换轮播；同时禁用拖蓝 / 长按图片菜单 */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.carousel-viewport.is-swiping .carousel-slide,
+.carousel-viewport.is-swiping img {
+  cursor: grabbing;
 }
 
 .carousel-slide {

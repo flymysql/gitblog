@@ -97,16 +97,102 @@ function renderCarousel(posts) {
   // 轮播图：第一张立即加载（LCP 关键），其它走视口懒加载
   bindLazyImages(root, { eagerCount: 1 });
 
-  root.querySelector('.prev').addEventListener('click', () => setActive(current - 1));
-  root.querySelector('.next').addEventListener('click', () => setActive(current + 1));
-  dots.forEach((dot, i) => dot.addEventListener('click', () => setActive(i)));
+  root.querySelector('.prev').addEventListener('click', () => { setActive(current - 1); restartAuto(); });
+  root.querySelector('.next').addEventListener('click', () => { setActive(current + 1); restartAuto(); });
+  dots.forEach((dot, i) => dot.addEventListener('click', () => { setActive(i); restartAuto(); }));
 
+  // -------- 自动播放（鼠标悬停 / 触摸拖动期间暂停） --------
+  let timer = null;
+  const startAuto = () => {
+    if (slides.length <= 1) return;
+    stopAuto();
+    timer = setInterval(() => setActive(current + 1), 4500);
+  };
+  const stopAuto = () => {
+    if (timer) { clearInterval(timer); timer = null; }
+  };
+  const restartAuto = () => { stopAuto(); startAuto(); };
+  startAuto();
+  root.addEventListener('mouseenter', stopAuto);
+  root.addEventListener('mouseleave', startAuto);
+
+  // -------- 触摸 / 鼠标拖动手势（移动端核心需求） --------
   if (slides.length > 1) {
-    let timer = setInterval(() => setActive(current + 1), 4500);
-    root.addEventListener('mouseenter', () => clearInterval(timer));
-    root.addEventListener('mouseleave', () => {
-      timer = setInterval(() => setActive(current + 1), 4500);
-    });
+    const viewport = root.querySelector('.carousel-viewport');
+    const SWIPE_DIST = 40;     // 至少滑这么多 px 才算切换
+    const MAX_OFF_AXIS = 60;   // 纵向偏移大于这个就认为是滚页面，不是 swipe
+    let startX = 0, startY = 0, startT = 0;
+    let tracking = false;      // 当前正在按住跟踪手势
+    let swiping = false;       // 这次按下是否构成"拖动"，用于阻止 <a> 的 click 跳转
+
+    const begin = (x, y) => {
+      tracking = true;
+      swiping = false;
+      startX = x; startY = y; startT = Date.now();
+      stopAuto();
+      viewport.classList.add('is-swiping');
+    };
+    const move = (x, y) => {
+      if (!tracking) return;
+      if (Math.abs(x - startX) > 8 && Math.abs(x - startX) > Math.abs(y - startY)) {
+        swiping = true;
+      }
+    };
+    const end = (x, y) => {
+      if (!tracking) { startAuto(); return; }
+      tracking = false;
+      viewport.classList.remove('is-swiping');
+      const dx = x - startX;
+      const dy = y - startY;
+      const dt = Date.now() - startT;
+      // 横向位移够大 + 纵向位移没超 + 不是长按（< 800ms 内的快速滑）
+      if (Math.abs(dx) >= SWIPE_DIST && Math.abs(dy) <= MAX_OFF_AXIS && dt < 800) {
+        setActive(current + (dx < 0 ? 1 : -1));
+      }
+      startAuto();
+    };
+
+    // Pointer Events 覆盖现代移动端 + 桌面鼠标拖动
+    if (window.PointerEvent) {
+      viewport.addEventListener('pointerdown', e => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        begin(e.clientX, e.clientY);
+      });
+      viewport.addEventListener('pointermove', e => move(e.clientX, e.clientY));
+      viewport.addEventListener('pointerup', e => end(e.clientX, e.clientY));
+      viewport.addEventListener('pointercancel', () => {
+        tracking = false; swiping = false;
+        viewport.classList.remove('is-swiping');
+        startAuto();
+      });
+    } else {
+      // 旧 iOS Safari 等不支持 Pointer Events
+      viewport.addEventListener('touchstart', e => {
+        const t = e.changedTouches[0];
+        begin(t.clientX, t.clientY);
+      }, { passive: true });
+      viewport.addEventListener('touchmove', e => {
+        const t = e.changedTouches[0];
+        move(t.clientX, t.clientY);
+      }, { passive: true });
+      viewport.addEventListener('touchend', e => {
+        const t = e.changedTouches[0];
+        end(t.clientX, t.clientY);
+      }, { passive: true });
+      viewport.addEventListener('touchcancel', () => {
+        tracking = false; swiping = false;
+        viewport.classList.remove('is-swiping');
+        startAuto();
+      });
+    }
+
+    // slide 是 <a>，如果刚才是 swipe 就不要触发跳转
+    viewport.addEventListener('click', e => {
+      if (!swiping) return;
+      e.preventDefault();
+      e.stopPropagation();
+      swiping = false;
+    }, true);
   }
 }
 
