@@ -129,6 +129,9 @@ if (existsSync(POSTS_DIR)) {
       pinned: !!data.pinned,
       pinnedOrder: data.pinnedOrder || old.pinnedOrder || undefined,
       carousel: !!data.carousel,
+      series: data.series || undefined,
+      seriesOrder: data.seriesOrder != null ? Number(data.seriesOrder) : undefined,
+      type: data.type || undefined,        // post | note（短动态）
       path: `${POSTS_DIR}/${f}`,
       content,
     };
@@ -158,14 +161,69 @@ const indexJson = {
     if (!rest.pinned) delete rest.pinned;
     if (!rest.pinnedOrder) delete rest.pinnedOrder;
     if (!rest.carousel) delete rest.carousel;
+    if (!rest.series) delete rest.series;
+    if (rest.seriesOrder == null) delete rest.seriesOrder;
+    if (!rest.type) delete rest.type;
     return rest;
   }),
 };
 writeFileSync(INDEX_FILE, JSON.stringify(indexJson, null, 2) + '\n');
 console.log(`索引已重建：${indexJson.posts.length} 篇文章`);
 
+function plainTextFor(content) {
+  return String(content || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/!\[.*?\]\(.*?\)/g, ' ')
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[#>*_~`>\-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 // ---------- sitemap.xml ----------
 const visiblePosts = posts.filter(p => !p.draft);
+
+// ---------- 全文搜索索引 search.json（前端 site.js 使用） ----------
+const searchDocs = [...visiblePosts, ...pages.filter(p => !p.draft)].map(p => {
+  const text = plainTextFor(p.content);
+  return {
+    slug: p.slug,
+    title: p.title,
+    summary: p.summary,
+    tags: p.tags || [],
+    date: p.date,
+    type: p.page ? 'page' : 'post',
+    text: text.length > 1500 ? text.slice(0, 1500) : text,
+  };
+});
+writeFileSync('data/search.json', JSON.stringify({
+  generated: new Date().toISOString(),
+  count: searchDocs.length,
+  docs: searchDocs,
+}, null, 2) + '\n');
+console.log(`search.json 已生成（${searchDocs.length} 篇）`);
+
+// ---------- 短动态 notes.json（type: note 的文章独立流） ----------
+const noteItems = posts
+  .filter(p => p.type === 'note' && !p.draft)
+  .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+  .map(p => ({
+    slug: p.slug,
+    title: p.title,
+    date: p.date,
+    updated: p.updated,
+    author: p.author,
+    tags: p.tags || [],
+    content: p.content,         // 短动态直接把正文打包进来，节省请求
+  }));
+writeFileSync('data/notes.json', JSON.stringify({
+  generated: new Date().toISOString(),
+  count: noteItems.length,
+  notes: noteItems,
+}, null, 2) + '\n');
+console.log(`notes.json 已生成（${noteItems.length} 条）`);
 function xmlEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
 const baseUrl = SITE_URL || '';

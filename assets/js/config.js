@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260512115652';
+export const VERSION = '20260512120000';
 
 export const CONFIG = {
   repo: {
@@ -34,6 +34,10 @@ export const CONFIG = {
       {
         name: "归档",
         href: "archives.html"
+      },
+      {
+        name: "随笔",
+        href: "notes.html"
       },
       {
         name: "关于",
@@ -83,11 +87,33 @@ export const CONFIG = {
     index: "data/posts.json",
     uploads: "assets/uploads"
   },
+  // 图片上传策略：默认把 PNG / JPEG 转 WebP 体积省 30%~70%
+  // GIF（含动图）、SVG、HEIC 等不会被转
+  upload: {
+    preferWebp: true,
+    webpQuality: 0.85,
+    maxWidth: 1920    // 超过这个宽度会缩放（避免 5MB 大图）
+  },
   theme: {
     default: "auto",
     preset: "jianshu",
     allowReaderPresetSwitch: true,
     tokens: {},
     customCss: ""
+  },
+  // 文章末尾的「分享 / 打赏 / 二维码」卡片
+  // 任意一个 url 不为空就显示对应按钮；都为空时打赏区折叠
+  share: {
+    enabled: true,
+    showInPosts: true,    // 文章页底部
+    showInPages: false,   // 独立页（如「关于」）默认不显示
+    qrcodeOfPage: true    // 渲染当前页面 URL 的二维码（PC 用户扫码到手机继续看）
+  },
+  donate: {
+    enabled: false,
+    title: "如果这篇文章对你有帮助，欢迎请我喝杯咖啡 ☕️",
+    wechat: "",           // 微信收款码图片 URL
+    alipay: "",           // 支付宝收款码图片 URL
+    paypal: ""            // PayPal 链接（如 https://paypal.me/xxx）
   }
 };

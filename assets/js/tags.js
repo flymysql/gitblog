@@ -95,7 +95,7 @@ function update() {
 
   try {
     const data = await fetchIndexPublic();
-    allPosts = (data.posts || []).filter(p => !p.draft);
+    allPosts = (data.posts || []).filter(p => !p.draft && p.type !== 'note');
     allPosts.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
   } catch (e) {
     $('#tagDesc').innerHTML = `<span style="color:#d9534f">加载失败：${escapeHtml(e.message)}</span>`;

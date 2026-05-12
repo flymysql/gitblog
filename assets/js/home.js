@@ -365,7 +365,8 @@ function applyFilter(posts, tab, q, tag) {
   let allPosts = [];
   try {
     const data = await fetchIndexPublic();
-    allPosts = (Array.isArray(data.posts) ? data.posts : []).filter(p => !p.draft);
+    // 短动态（type:note）单独入口 notes.html，不挤进首页文章流
+    allPosts = (Array.isArray(data.posts) ? data.posts : []).filter(p => !p.draft && p.type !== 'note');
   } catch (e) {
     $('#postList').innerHTML = `<li class="error">加载文章列表失败：${escapeHtml(e.message)}</li>`;
     return;

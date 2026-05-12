@@ -579,3 +579,263 @@
   .lightbox { padding: 18px; }
   .lightbox-close { right: 14px; top: 14px; }
 }
+
+/* ============================================================
+   代码块增强：语言徽标 / 行号 / 长代码折叠
+   ============================================================ */
+
+.article-body pre.has-line-numbers {
+  /* 行号 gutter 占用左侧空间 */
+  padding-left: 56px;
+  position: relative;
+}
+
+.code-line-numbers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 42px;
+  padding: 16px 6px 16px 0;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.32);
+  background: rgba(0, 0, 0, 0.18);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  user-select: none;
+  white-space: pre;
+  overflow: hidden;
+  border-top-left-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
+}
+
+.article-body pre.has-line-numbers.has-copy {
+  padding-top: 42px;
+}
+.article-body pre.has-line-numbers .code-line-numbers {
+  /* 给顶部 meta 条让一点空间 */
+  padding-top: 42px;
+}
+
+.code-lang {
+  position: absolute;
+  top: 10px;
+  left: 56px;
+  z-index: 2;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+}
+.article-body pre:not(.has-line-numbers) .code-lang {
+  left: 14px;
+}
+
+/* 长代码折叠：默认只显示前 ~22 行高度（约 22 * 1.7em） */
+.article-body pre.code-foldable.code-folded {
+  max-height: calc(1.7em * 22 + 56px);
+  overflow: hidden;
+  position: relative;
+}
+.article-body pre.code-foldable.code-folded::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 80px;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, var(--pre-bg) 70%);
+}
+.code-fold-toggle {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+.code-fold-toggle:hover { filter: brightness(1.1); }
+.article-body pre.code-foldable:not(.code-folded) {
+  max-height: none;
+}
+.article-body pre.code-foldable:not(.code-folded) .code-fold-toggle {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  margin: 12px auto 4px;
+  display: block;
+}
+
+/* ============================================================
+   数学公式（KaTeX）
+   ============================================================ */
+.article-body .math-block {
+  margin: 22px 0;
+  overflow-x: auto;
+  text-align: center;
+}
+.article-body .math-inline { display: inline-block; }
+.article-body .math:empty::before {
+  content: attr(data-tex);
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+}
+
+/* ============================================================
+   Mermaid
+   ============================================================ */
+.article-body .mermaid {
+  margin: 22px 0;
+  text-align: center;
+  overflow-x: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 12px;
+}
+.article-body .mermaid svg { max-width: 100%; height: auto; }
+.article-body .mermaid.mermaid-error pre {
+  text-align: left;
+  white-space: pre-wrap;
+  font-size: 12.5px;
+}
+
+/* ============================================================
+   分享 / 打赏 / 二维码 卡片
+   ============================================================ */
+.article-share {
+  margin: 36px 0 12px;
+  padding: 18px 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.article-share-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.article-share-label {
+  margin-right: 6px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+.article-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-main);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.article-share-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.article-share-btn.is-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.article-share-btn.is-primary:hover { color: #fff; filter: brightness(1.08); }
+.article-share-qr {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-start;
+}
+.article-share-qr canvas {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  padding: 6px;
+}
+.article-share-qr-info {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.article-share-qr-info code {
+  word-break: break-all;
+  font-size: 12px;
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+/* 系列文章侧栏 */
+.article-series {
+  margin: 28px 0;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+}
+.article-series-title {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--primary);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.article-series ol {
+  margin: 0;
+  padding-left: 22px;
+  font-size: 14px;
+}
+.article-series li { margin: 4px 0; line-height: 1.6; }
+.article-series li.is-current {
+  color: var(--text-main);
+  font-weight: 600;
+  list-style-type: '▸ ';
+}
+.article-series li.is-current a { color: var(--text-main); border-bottom: none; }
+
+/* PAT 即将过期 / 已失效 横幅（admin 顶部） */
+.pat-banner {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
+  background: #fff7e6;
+  color: #ad6800;
+  border-bottom: 1px solid #ffe7ba;
+}
+.pat-banner.is-error { background: #fff1f0; color: #a8071a; border-bottom-color: #ffccc7; }
+.pat-banner a { color: inherit; text-decoration: underline; }
+
+@media (max-width: 720px) {
+  .article-body pre.has-line-numbers { padding-left: 44px; }
+  .code-line-numbers { width: 34px; font-size: 12px; }
+  .code-lang { font-size: 10.5px; padding: 1px 6px; }
+  .article-share { padding: 14px 14px; }
+}
+

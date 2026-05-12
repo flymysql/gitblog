@@ -4,7 +4,8 @@
 
 import { CONFIG } from './config.js';
 import { getToken } from './auth.js';
-import { mountAdminShell, escapeHtml } from './admin-shell.js';
+import { mountAdminShell, escapeHtml, showToast } from './admin-shell.js';
+import { analyzeBrokenLinks, findOrphanImages, bulkDelete } from './admin-tools.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -192,13 +193,143 @@ function topActions() {
   return `<button class="btn btn-primary" id="rerun">重新检查</button>`;
 }
 
+function fmtSize(n) {
+  if (!n) return '0 B';
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / 1024 / 1024).toFixed(1)} MB`;
+}
+
+async function runBrokenLinks() {
+  const out = document.getElementById('brokenOut');
+  if (!out) return;
+  out.innerHTML = '<div class="loading">正在扫描所有 posts/*.md…</div>';
+  try {
+    const r = await analyzeBrokenLinks();
+    if (!r.broken.length) {
+      out.innerHTML = `<div class="diagnose-detail">扫描了 ${r.posts} 篇文章，所有内部资源（图片 / 站内链接）都存在。<br>外部链接（${r.externalCount} 个）未做活性检查（前端跨域限制无法判断）。</div>`;
+      return;
+    }
+    out.innerHTML = `
+      <div class="diagnose-detail">扫描 ${r.posts} 篇文章，发现 <b>${r.broken.length}</b> 处死链（指向仓库内不存在的文件）：</div>
+      <table class="tools-table">
+        <thead><tr><th>文章</th><th>引用 URL</th><th>归一化路径</th></tr></thead>
+        <tbody>
+          ${r.broken.map(b => `
+            <tr>
+              <td><a href="../post.html?slug=${encodeURIComponent(b.slug)}" target="_blank">${escapeHtml(b.slug)}</a></td>
+              <td><code>${escapeHtml(b.url)}</code></td>
+              <td><code>${escapeHtml(b.normalized)}</code></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch (e) {
+    out.innerHTML = `<div class="error">扫描失败：${escapeHtml(e.message || String(e))}</div>`;
+  }
+}
+
+async function runOrphanImages() {
+  const out = document.getElementById('orphanOut');
+  if (!out) return;
+  out.innerHTML = '<div class="loading">正在扫描 uploads/ 与所有 markdown 引用…</div>';
+  try {
+    const r = await findOrphanImages();
+    if (!r.orphans.length) {
+      out.innerHTML = `<div class="diagnose-detail">仓库里 ${r.total} 张图片，全部都被文章引用，没有孤儿图。</div>`;
+      return;
+    }
+    const totalBytes = r.orphans.reduce((s, x) => s + (x.size || 0), 0);
+    out.innerHTML = `
+      <div class="diagnose-detail">
+        共 ${r.total} 张图片，<b>${r.orphans.length}</b> 张未被任何文章引用（约 ${fmtSize(totalBytes)}）。
+        <br><span style="color:var(--text-tertiary);">删除会逐张产生一次 commit，请确认后再操作。</span>
+      </div>
+      <div style="margin:8px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <label class="settings-check"><input type="checkbox" id="orphanSelectAll"> 全选</label>
+        <button class="btn btn-danger" id="orphanDeleteBtn" type="button" disabled>删除选中</button>
+        <span class="settings-hint" id="orphanCount"></span>
+      </div>
+      <table class="tools-table" id="orphanTable">
+        <thead><tr><th><span class="sr-only">选</span></th><th>路径</th><th>大小</th><th>预览</th></tr></thead>
+        <tbody>
+          ${r.orphans.map(o => `
+            <tr data-path="${escapeHtml(o.path)}" data-sha="${escapeHtml(o.sha)}">
+              <td><input type="checkbox" class="orphan-pick"></td>
+              <td><code>${escapeHtml(o.path)}</code></td>
+              <td>${fmtSize(o.size)}</td>
+              <td><a href="../${escapeHtml(o.path)}" target="_blank">查看</a></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+    const checkboxes = () => out.querySelectorAll('.orphan-pick');
+    function updateCount() {
+      const selected = [...checkboxes()].filter(x => x.checked).length;
+      document.getElementById('orphanCount').textContent = selected ? `已选 ${selected} 项` : '';
+      document.getElementById('orphanDeleteBtn').disabled = selected === 0;
+    }
+    out.querySelector('#orphanSelectAll').addEventListener('change', e => {
+      checkboxes().forEach(cb => { cb.checked = e.target.checked; });
+      updateCount();
+    });
+    out.addEventListener('change', e => {
+      if (e.target.classList.contains('orphan-pick')) updateCount();
+    });
+    document.getElementById('orphanDeleteBtn').addEventListener('click', async () => {
+      const rows = [...out.querySelectorAll('tbody tr')].filter(tr => tr.querySelector('.orphan-pick').checked);
+      if (!rows.length) return;
+      const items = rows.map(tr => ({ path: tr.dataset.path, sha: tr.dataset.sha }));
+      if (!confirm(`确定删除选中的 ${items.length} 张图片？将产生 ${items.length} 次 commit。`)) return;
+      const btn = document.getElementById('orphanDeleteBtn');
+      btn.disabled = true; btn.textContent = '删除中… 0 / ' + items.length;
+      const { done, failed } = await bulkDelete(items, ({ done, total }) => {
+        btn.textContent = `删除中… ${done} / ${total}`;
+      });
+      btn.textContent = '删除选中';
+      if (failed.length) {
+        showToast(`完成：${done} 成功、${failed.length} 失败`, 'error');
+      } else {
+        showToast(`已删除 ${done} 张孤儿图`);
+      }
+      await runOrphanImages();
+    });
+  } catch (e) {
+    out.innerHTML = `<div class="error">扫描失败：${escapeHtml(e.message || String(e))}</div>`;
+  }
+}
+
 (async function init() {
   const ctx = await mountAdminShell({ active: 'diagnose', title: '系统诊断', actions: topActions() });
   if (!ctx) return;
 
-  ctx.content.innerHTML = `<div class="diagnose-list" id="list"></div>`;
+  ctx.content.innerHTML = `
+    <div class="diagnose-list" id="list"></div>
+
+    <section class="diagnose-tool">
+      <div class="diagnose-tool-title">
+        死链 / 死图自检
+        <button class="btn btn-secondary" id="runBroken" type="button">开始扫描</button>
+      </div>
+      <p class="diagnose-tool-hint">扫描所有文章里指向仓库内但实际不存在的图片 / 文件链接。外部 http 链接因跨域限制不做活性检查。</p>
+      <div id="brokenOut"></div>
+    </section>
+
+    <section class="diagnose-tool">
+      <div class="diagnose-tool-title">
+        孤儿图片清理
+        <button class="btn btn-secondary" id="runOrphan" type="button">开始扫描</button>
+      </div>
+      <p class="diagnose-tool-hint">列出 ${escapeHtml(CONFIG.paths.uploads || 'assets/uploads')} 下没有被任何 markdown 引用的图片，可勾选批量删除（每张图一次 commit）。</p>
+      <div id="orphanOut"></div>
+    </section>
+  `;
   await run();
 
   const btn = document.getElementById('rerun');
   if (btn) btn.addEventListener('click', run);
+  document.getElementById('runBroken').addEventListener('click', runBrokenLinks);
+  document.getElementById('runOrphan').addEventListener('click', runOrphanImages);
 })();

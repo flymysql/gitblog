@@ -157,6 +157,21 @@ function normalizeConfig(config) {
   config.theme.customCss = String(config.theme.customCss || '');
   config.analytics = config.analytics || { enabled: false, snippet: '' };
   config.pageviews = config.pageviews || { enabled: true, provider: 'busuanzi', showHomeStats: true, showPostViews: true, showFooterStats: true };
+  config.share = config.share || { enabled: true, showInPosts: true, showInPages: false, qrcodeOfPage: true };
+  config.share.enabled = config.share.enabled !== false;
+  config.share.showInPosts = config.share.showInPosts !== false;
+  config.share.showInPages = !!config.share.showInPages;
+  config.share.qrcodeOfPage = config.share.qrcodeOfPage !== false;
+  config.donate = config.donate || { enabled: false, title: '', wechat: '', alipay: '', paypal: '' };
+  config.donate.enabled = !!config.donate.enabled;
+  config.donate.title = String(config.donate.title || '').trim();
+  config.donate.wechat = String(config.donate.wechat || '').trim();
+  config.donate.alipay = String(config.donate.alipay || '').trim();
+  config.donate.paypal = String(config.donate.paypal || '').trim();
+  config.upload = config.upload || { preferWebp: true, webpQuality: 0.85, maxWidth: 1920 };
+  config.upload.preferWebp = config.upload.preferWebp !== false;
+  config.upload.webpQuality = Number(config.upload.webpQuality) || 0.85;
+  config.upload.maxWidth = Number(config.upload.maxWidth) || 1920;
   config.auth = config.auth || {};
   config.auth.githubDeviceFlow = config.auth.githubDeviceFlow || { clientId: '', scope: 'repo read:user' };
   if (!['auto', 'light', 'dark'].includes(config.theme.default)) config.theme.default = 'auto';
@@ -460,6 +475,36 @@ function settingsContentHtml() {
           <label class="settings-check"><input type="checkbox" name="pageviews.showHomeStats"> 首页 Hero 显示总访问 / 访客</label>
           <label class="settings-check"><input type="checkbox" name="pageviews.showPostViews"> 文章页显示阅读次数</label>
           <label class="settings-check"><input type="checkbox" name="pageviews.showFooterStats"> Footer 显示站点 PV / UV</label>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <h3>分享 / 打赏</h3>
+        <p class="settings-help">文章末尾是否展示分享按钮、二维码、打赏码。打赏图请上传后填写图片 URL。</p>
+        <div class="settings-grid">
+          <label class="settings-check"><input type="checkbox" name="share.enabled"> 启用文章分享卡</label>
+          <label class="settings-check"><input type="checkbox" name="share.showInPosts"> 在文章里显示</label>
+          <label class="settings-check"><input type="checkbox" name="share.showInPages"> 在独立页（关于等）显示</label>
+          <label class="settings-check"><input type="checkbox" name="share.qrcodeOfPage"> 显示当前页 URL 二维码</label>
+          <label class="settings-check"><input type="checkbox" name="donate.enabled"> 启用打赏区</label>
+          <label class="span-2">打赏标题 <input type="text" name="donate.title" placeholder="如果这篇文章对你有帮助，请作者一杯咖啡 ☕️"></label>
+          <label class="span-2">微信收款码 URL <input type="url" name="donate.wechat" placeholder="https://.../wechat-pay.png"></label>
+          <label class="span-2">支付宝收款码 URL <input type="url" name="donate.alipay" placeholder="https://.../alipay.png"></label>
+          <label class="span-2">PayPal 链接 <input type="url" name="donate.paypal" placeholder="https://paypal.me/yourname"></label>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <h3>图片上传策略</h3>
+        <p class="settings-help">编辑器拖拽 / 粘贴图片时会按这里的规则自动优化（GIF / SVG 不会被改）。WebP 通常比 PNG / JPEG 小 30%~70%。</p>
+        <div class="settings-grid">
+          <label class="settings-check"><input type="checkbox" name="upload.preferWebp"> 自动转换为 WebP</label>
+          <label>WebP 质量 <input type="number" name="upload.webpQuality" step="0.05" min="0.1" max="1.0">
+            <span class="settings-hint">0.85 是接近无损的体积平衡点。0.7 起更激进、0.95 起更保真。</span>
+          </label>
+          <label>最大宽度（像素） <input type="number" name="upload.maxWidth" min="320" step="10">
+            <span class="settings-hint">超过该宽度会自动缩放，保留比例。1920 适合大屏阅读。</span>
+          </label>
         </div>
       </section>
 

@@ -1,11 +1,70 @@
 // ============================================================================
 // Markdown 与 frontmatter 工具
 // 使用 CDN 上的 marked 进行渲染（编辑器和阅读页都会用到）
+// 集成：
+//   - 数学公式（$...$ 行内 / $$...$$ 块级，最终由 KaTeX 在 post.js 中渲染）
+//   - mermaid 代码块（``` mermaid ）保留为 .mermaid 容器，由 post.js 渲染
 // ============================================================================
 
 const MARKED_CDN = 'https://cdn.jsdelivr.net/npm/marked@12.0.2/lib/marked.umd.min.js';
 
 let markedReady = null;
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+  );
+}
+
+// ---------- marked 扩展：数学公式 + mermaid ----------
+function buildMathExtensions() {
+  // 块级公式：以 $$ 开头、$$ 结尾，独占行
+  const mathBlock = {
+    name: 'mathBlock',
+    level: 'block',
+    start(src) { return src.indexOf('\n$$'); },
+    tokenizer(src) {
+      const m = /^\s*\$\$([\s\S]+?)\$\$\s*(?:\n|$)/.exec(src);
+      if (m) return { type: 'mathBlock', raw: m[0], text: m[1].trim() };
+    },
+    renderer(token) {
+      // 把原始 LaTeX 包到 data-tex，KaTeX 在文章渲染后读取并渲染
+      return `<div class="math math-block" data-tex="${escapeHtml(token.text)}" data-display="1"></div>`;
+    },
+  };
+  // 行内公式：单 $ ... $（要求两端紧贴非空白，避免 $5.99 这类被误判）
+  const mathInline = {
+    name: 'mathInline',
+    level: 'inline',
+    start(src) {
+      const idx = src.indexOf('$');
+      return idx < 0 ? undefined : idx;
+    },
+    tokenizer(src) {
+      const m = /^\$([^\s$][^\n$]*?[^\s$]|[^\s$])\$(?!\d)/.exec(src);
+      if (m) return { type: 'mathInline', raw: m[0], text: m[1] };
+    },
+    renderer(token) {
+      return `<span class="math math-inline" data-tex="${escapeHtml(token.text)}"></span>`;
+    },
+  };
+  return [mathBlock, mathInline];
+}
+
+// 让 ```mermaid``` 代码块直接渲染成 .mermaid 容器（marked 默认会包成 <pre><code class="language-mermaid">）
+function patchMermaidRenderer(marked) {
+  const renderer = new marked.Renderer();
+  const original = renderer.code.bind(renderer);
+  renderer.code = function(code, infostring, escaped) {
+    const lang = (infostring || '').match(/^\S*/)[0].toLowerCase();
+    if (lang === 'mermaid') {
+      // 不要 escape，mermaid 自己会 parse 文本
+      return `<div class="mermaid" data-mermaid="${escapeHtml(code)}">${escapeHtml(code)}</div>`;
+    }
+    return original(code, infostring, escaped);
+  };
+  return renderer;
+}
 
 export function loadMarked() {
   if (window.marked) return Promise.resolve(window.marked);
@@ -15,8 +74,15 @@ export function loadMarked() {
     s.src = MARKED_CDN;
     s.onload = () => {
       try {
-        window.marked.setOptions({ gfm: true, breaks: false });
-      } catch {}
+        window.marked.setOptions({
+          gfm: true,
+          breaks: false,
+          renderer: patchMermaidRenderer(window.marked),
+        });
+        window.marked.use({ extensions: buildMathExtensions() });
+      } catch (e) {
+        console.warn('[markdown] extension setup failed', e);
+      }
       resolve(window.marked);
     };
     s.onerror = () => reject(new Error('Failed to load marked'));

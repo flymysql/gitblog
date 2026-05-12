@@ -253,8 +253,27 @@ let allPostsCache = null;
 async function getAllPosts() {
   if (allPostsCache) return allPostsCache;
   const data = await fetchIndexPublic();
-  allPostsCache = (data.posts || []).filter(p => !p.draft);
+  allPostsCache = (data.posts || []).filter(p => !p.draft && p.type !== 'note');
   return allPostsCache;
+}
+
+// data/search.json 含每篇文章的纯文本片段，由 build.mjs 生成。
+// 找不到就降级用 posts.json（没有正文）的标题/摘要做匹配。
+let searchIndexCache = null;
+async function getSearchIndex() {
+  if (searchIndexCache) return searchIndexCache;
+  try {
+    const r = await fetch('data/search.json?_=' + Date.now(), { cache: 'no-cache' });
+    if (r.ok) {
+      const j = await r.json();
+      if (Array.isArray(j.docs)) {
+        searchIndexCache = j.docs;
+        return searchIndexCache;
+      }
+    }
+  } catch {}
+  searchIndexCache = null;
+  return null;
 }
 
 function highlight(text, q) {
@@ -276,20 +295,59 @@ function renderResults(results, q) {
   box.innerHTML = results.slice(0, 30).map(p => `
     <a class="search-item" href="post.html?slug=${encodeURIComponent(p.slug)}">
       <div class="search-title">${highlight(p.title || '无标题', q)}</div>
-      <div class="search-summary">${highlight(p.summary || '', q)}</div>
+      <div class="search-summary">${highlight(p._snippet || p.summary || '', q)}</div>
       <div class="search-meta">${fmtDate(p.date)} · ${(p.tags || []).map(t => '#' + escapeHtml(t)).join(' ')}</div>
     </a>
   `).join('');
 }
 
-function searchPosts(posts, q) {
+// 简单的多关键词 AND 匹配 + 评分：标题命中 > 标签命中 > 摘要 > 正文
+// 支持多关键词空格分隔（"git pages" 同时匹配 git 和 pages）
+function searchPosts(posts, q, fullDocs) {
   if (!q) return [];
-  const lq = q.toLowerCase();
-  return posts.filter(p =>
-    String(p.title || '').toLowerCase().includes(lq) ||
-    String(p.summary || '').toLowerCase().includes(lq) ||
-    (p.tags || []).some(t => String(t).toLowerCase().includes(lq))
-  );
+  const tokens = String(q).toLowerCase().split(/\s+/).filter(Boolean);
+  if (!tokens.length) return [];
+  const docMap = fullDocs ? new Map(fullDocs.map(d => [d.slug, d])) : null;
+
+  function scoreItem(p) {
+    const title = String(p.title || '').toLowerCase();
+    const summary = String(p.summary || '').toLowerCase();
+    const tags = (p.tags || []).map(t => String(t).toLowerCase());
+    const doc = docMap ? docMap.get(p.slug) : null;
+    const body = doc ? String(doc.text || '').toLowerCase() : '';
+
+    let total = 0;
+    for (const t of tokens) {
+      let s = 0;
+      if (title.includes(t)) s += 50;
+      if (tags.some(tag => tag.includes(t))) s += 30;
+      if (summary.includes(t)) s += 18;
+      if (body && body.includes(t)) s += 10;
+      if (!s) return -1; // AND：任一 token 没命中就丢弃
+      total += s;
+    }
+    return total;
+  }
+
+  return posts
+    .map(p => ({ p, s: scoreItem(p) }))
+    .filter(x => x.s > 0)
+    .sort((a, b) => b.s - a.s)
+    .map(x => {
+      const doc = docMap ? docMap.get(x.p.slug) : null;
+      // 给结果带一个 "snippet"：从正文中取关键词附近的一段，渲染时高亮
+      let snippet = x.p.summary || '';
+      if (doc && doc.text) {
+        const lower = doc.text.toLowerCase();
+        const first = tokens.map(t => lower.indexOf(t)).filter(i => i >= 0).sort((a, b) => a - b)[0];
+        if (first != null && first >= 0) {
+          const start = Math.max(0, first - 28);
+          const end = Math.min(doc.text.length, first + 92);
+          snippet = (start > 0 ? '…' : '') + doc.text.slice(start, end) + (end < doc.text.length ? '…' : '');
+        }
+      }
+      return { ...x.p, _snippet: snippet };
+    });
 }
 
 function bindSearchOverlay() {
@@ -346,13 +404,17 @@ function bindSearchOverlay() {
     }
   });
 
+  // 第一次打开时静默拉一下 search.json（即使没输关键词），避免输入第一个字时再等 RTT
+  const warmIndex = () => { getSearchIndex(); };
+  $('#searchBtn').addEventListener('click', warmIndex);
+
   let timer = null;
   input.addEventListener('input', () => {
     clearTimeout(timer);
     timer = setTimeout(async () => {
       const q = input.value.trim();
-      const posts = await getAllPosts();
-      renderResults(searchPosts(posts, q), q);
+      const [posts, docs] = await Promise.all([getAllPosts(), getSearchIndex()]);
+      renderResults(searchPosts(posts, q, docs), q);
     }, 80);
   });
 }
@@ -418,4 +480,29 @@ export function initSite({ active = '' } = {}) {
   if ($('#year')) $('#year').textContent = new Date().getFullYear();
   injectAnalytics();
   initPageviews();
+  registerServiceWorker();
+}
+
+// PWA / 离线：把 sw.js 注册成根作用域（必须放在站点根目录，scope: ./）
+// admin/* 的写操作 sw 内部已经放过去不缓存了，避免出现"看起来发布成功了其实在缓存里"
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') return;
+  // 不在 admin 后台启用 sw（避免缓存登录页 / 后台资源），让 admin 永远是最新版本
+  if (location.pathname.includes('/admin/')) return;
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .then(reg => {
+        // 检查到新版本时静默更新；下次刷新自动生效
+        if (reg && reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+        reg && reg.addEventListener && reg.addEventListener('updatefound', () => {
+          const nw = reg.installing;
+          if (nw) nw.addEventListener('statechange', () => {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+              nw.postMessage('SKIP_WAITING');
+            }
+          });
+        });
+      }).catch(() => {});
+  });
 }

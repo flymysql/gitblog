@@ -55,7 +55,7 @@ function renderArchive(groups) {
   let posts = [];
   try {
     const data = await fetchIndexPublic();
-    posts = (data.posts || []).filter(p => !p.draft);
+    posts = (data.posts || []).filter(p => !p.draft && p.type !== 'note');
   } catch (e) {
     $('#archiveList').innerHTML = `<div class="error">加载失败：${escapeHtml(e.message)}</div>`;
     return;
