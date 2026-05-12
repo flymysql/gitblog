@@ -28,6 +28,9 @@ function topActions() {
 
 async function renderDashboard(content) {
   content.innerHTML = `
+    <section class="admin-dashboard" id="dashboardStats">
+      <div class="dashboard-loading">加载统计数据…</div>
+    </section>
     <div class="admin-toolbar">
       <div class="admin-tabs">
         <button data-tab="all" class="active">全部</button>
@@ -118,6 +121,9 @@ async function renderDashboard(content) {
   }
 
   refresh();
+
+  // 数据看板（统计 + PV Top）
+  renderDashboardStats(posts).catch(err => console.warn('[dashboard] stats fail', err));
 
   let draggingRow = null;
   $('#list').addEventListener('dragstart', e => {
@@ -267,6 +273,87 @@ async function renderDashboard(content) {
       btn.textContent = next ? '加入轮播' : '取消轮播';
     }
   }
+}
+
+async function renderDashboardStats(posts) {
+  const host = document.getElementById('dashboardStats');
+  if (!host) return;
+  const published = posts.filter(p => !p.draft);
+  const drafts = posts.filter(p => !!p.draft);
+  const tagSet = new Set();
+  published.forEach(p => (p.tags || []).forEach(t => tagSet.add(t)));
+  const now = Date.now();
+  const recent7 = published.filter(p => p.date && (now - new Date(p.date).getTime()) <= 7 * 86400 * 1000).length;
+  const recent30 = published.filter(p => p.date && (now - new Date(p.date).getTime()) <= 30 * 86400 * 1000).length;
+
+  host.innerHTML = `
+    <div class="dashboard-grid">
+      <div class="dashboard-card"><div class="dashboard-num">${published.length}</div><div class="dashboard-label">已发布</div></div>
+      <div class="dashboard-card"><div class="dashboard-num">${drafts.length}</div><div class="dashboard-label">草稿</div></div>
+      <div class="dashboard-card"><div class="dashboard-num">${tagSet.size}</div><div class="dashboard-label">标签数</div></div>
+      <div class="dashboard-card"><div class="dashboard-num">${recent7}</div><div class="dashboard-label">近 7 天</div></div>
+      <div class="dashboard-card"><div class="dashboard-num">${recent30}</div><div class="dashboard-label">近 30 天</div></div>
+    </div>
+    <div class="dashboard-pv" id="dashboardPv">
+      <div class="dashboard-pv-title">阅读量 Top 10 <span class="dashboard-pv-hint">数据来自 Page Views API（每次访问加 1）</span></div>
+      <div class="dashboard-pv-list" id="dashboardPvList">
+        <div class="dashboard-pv-empty">读取中…</div>
+      </div>
+    </div>
+  `;
+
+  // 拉每篇文章的 PV，按降序展示前 10
+  if ((CONFIG.pageviews || {}).articleProvider !== 'page-views-api') {
+    const pvList = document.getElementById('dashboardPvList');
+    if (pvList) pvList.innerHTML = '<div class="dashboard-pv-empty">站点未启用 Page Views API（在「站点设置 → 访问计数」选择该 provider 即可）</div>';
+    return;
+  }
+  await loadPvTop(published.slice(0, 200));
+}
+
+async function loadPvTop(posts) {
+  const PAGE_VIEWS_API = 'https://page-views-api.ratneshc.com/api/v1';
+  function siteKey() {
+    try {
+      const u = new URL(CONFIG.site.url || (location.origin + (location.pathname.replace(/\/admin\/.*/, '') || '/')));
+      return (u.host + u.pathname).replace(/\/+$/, '').replace(/\//g, '__') || u.host;
+    } catch {
+      return 'gitblog';
+    }
+  }
+  const key = siteKey();
+  const limit = 8; // 并发上限
+  const results = [];
+  let cursor = 0;
+  async function worker() {
+    while (cursor < posts.length) {
+      const i = cursor++;
+      const p = posts[i];
+      try {
+        const r = await fetch(`${PAGE_VIEWS_API}/${encodeURIComponent(key)}/${encodeURIComponent('post:' + p.slug)}/views`);
+        if (r.ok) {
+          const j = await r.json();
+          results.push({ p, views: Number(j.views || j.count || 0) });
+        }
+      } catch {}
+    }
+  }
+  await Promise.all(Array.from({ length: limit }, worker));
+  results.sort((a, b) => b.views - a.views);
+  const top = results.slice(0, 10);
+  const list = document.getElementById('dashboardPvList');
+  if (!list) return;
+  if (!top.length || !top.some(x => x.views > 0)) {
+    list.innerHTML = '<div class="dashboard-pv-empty">还没有访问数据 — 等读者来访问吧</div>';
+    return;
+  }
+  list.innerHTML = top.map((x, i) => `
+    <a class="dashboard-pv-row" href="../post.html?slug=${encodeURIComponent(x.p.slug)}" target="_blank">
+      <span class="dashboard-pv-rank">#${i + 1}</span>
+      <span class="dashboard-pv-title">${escapeHtml(x.p.title || x.p.slug)}</span>
+      <span class="dashboard-pv-count">${x.views}</span>
+    </a>
+  `).join('');
 }
 
 (async function init() {

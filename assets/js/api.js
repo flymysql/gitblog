@@ -183,8 +183,23 @@ export async function writeIndex(data, message, sha) {
 
 // ---------- 图片 / 二进制上传 ----------
 // blob 直接 PUT 到指定路径，返回相对路径用于插入 Markdown
+// 上传前会按 CONFIG.upload 自动：
+//   - 把 PNG/JPEG 转成 WebP（除非禁用），可大幅省体积
+//   - 超出 maxWidth 时按比例缩小
+//   - GIF / SVG / 其它格式保留原样
 export async function uploadImage(blob, suggestedName) {
-  const ext = (suggestedName && suggestedName.match(/\.([a-z0-9]+)$/i) || ['', 'png'])[1].toLowerCase();
+  const upCfg = CONFIG.upload || {};
+  const original = blob;
+  let working = blob;
+  let extOverride = null;
+  try {
+    working = await maybeOptimizeImage(blob, upCfg);
+    if (working !== original) extOverride = 'webp';
+  } catch (e) {
+    console.warn('[uploadImage] optimize failed, fallback to original', e);
+    working = original;
+  }
+  const ext = extOverride || (suggestedName && suggestedName.match(/\.([a-z0-9]+)$/i) || ['', 'png'])[1].toLowerCase();
   const safeExt = /^[a-z0-9]+$/i.test(ext) ? ext : 'png';
   const now = new Date();
   const yyyy = now.getFullYear();
@@ -192,7 +207,7 @@ export async function uploadImage(blob, suggestedName) {
   const random = Math.random().toString(36).slice(2, 8);
   const stem = (suggestedName || 'image').replace(/\.[^.]+$/, '').replace(/[^\w\u4e00-\u9fa5\-]/g, '-').slice(0, 24) || 'image';
   const path = `${CONFIG.paths.uploads}/${yyyy}/${mm}/${now.getTime()}-${random}-${stem}.${safeExt}`;
-  const b64 = await blobToBase64(blob);
+  const b64 = await blobToBase64(working);
   const body = {
     message: `upload: ${path.split('/').pop()}`,
     content: b64,
@@ -200,6 +215,49 @@ export async function uploadImage(blob, suggestedName) {
   };
   await ghFetch(repoPath(path), { method: 'PUT', body });
   return path;
+}
+
+// 静态图片（PNG / JPEG）：转 WebP + 缩放
+// 不动 GIF / SVG / WebP / AVIF 等特殊格式
+async function maybeOptimizeImage(blob, cfg) {
+  if (!blob || !blob.type) return blob;
+  const type = blob.type.toLowerCase();
+  if (type === 'image/gif' || type === 'image/svg+xml' || type === 'image/webp' || type === 'image/avif') return blob;
+  if (!type.startsWith('image/')) return blob;
+
+  const preferWebp = cfg.preferWebp !== false;
+  const maxWidth = Number(cfg.maxWidth) || 1920;
+  const quality = Math.max(0.1, Math.min(1, Number(cfg.webpQuality) || 0.85));
+
+  // 用 createImageBitmap 比 Image 更快、不会内存泄漏
+  let bitmap;
+  try {
+    bitmap = await createImageBitmap(blob);
+  } catch {
+    return blob;
+  }
+  const sw = bitmap.width;
+  const sh = bitmap.height;
+  if (!sw || !sh) return blob;
+  const scale = sw > maxWidth ? (maxWidth / sw) : 1;
+  const dw = Math.round(sw * scale);
+  const dh = Math.round(sh * scale);
+
+  // 没缩放也不转格式 → 保留原 blob
+  if (scale === 1 && !preferWebp) return blob;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = dw; canvas.height = dh;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(bitmap, 0, 0, dw, dh);
+  bitmap.close && bitmap.close();
+
+  const targetType = preferWebp ? 'image/webp' : type;
+  const out = await new Promise(resolve => canvas.toBlob(resolve, targetType, quality));
+  if (!out) return blob;
+  // 如果输出反而更大（小图很常见），保留原 blob
+  if (out.size >= blob.size && scale === 1) return blob;
+  return out;
 }
 
 function blobToBase64(blob) {

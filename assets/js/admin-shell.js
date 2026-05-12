@@ -16,6 +16,7 @@ import {
   getToken,
   getUser,
   popReturnTo,
+  checkPatStatus,
 } from './auth.js';
 import { initTheme, bindThemeToggle, themeToggleHtml } from './theme.js';
 
@@ -303,11 +304,42 @@ export async function mountAdminShell({ active = 'posts', title = '', actions = 
     if (e.key === 'Escape' && sidebar.classList.contains('is-open')) closeSide();
   });
 
+  // PAT 过期 / 无效 检测（异步、不阻塞 UI）
+  checkPatStatus().then(status => {
+    renderPatBanner(status);
+    if (status.state === 'invalid') {
+      showToast('登录凭证已失效，请重新登录', 'error');
+      setTimeout(() => logout(window.location.href), 1500);
+    }
+  }).catch(() => {});
+
   return {
     content: $('#adminContent'),
     actions: $('#adminTopActions'),
     showToast,
   };
+}
+
+function renderPatBanner(status) {
+  const main = document.querySelector('.admin-main');
+  if (!main) return;
+  const old = document.getElementById('patBanner');
+  if (old) old.remove();
+  if (status.state === 'ok' || status.state === 'no-token' || status.state === 'unknown') return;
+
+  const banner = document.createElement('div');
+  banner.id = 'patBanner';
+  banner.className = 'pat-banner' + (status.state === 'invalid' || status.state === 'expired' ? ' is-error' : '');
+  if (status.state === 'invalid') {
+    banner.innerHTML = `登录凭证（PAT）已失效或被吊销，正在跳转到登录页…`;
+  } else if (status.state === 'expired') {
+    banner.innerHTML = `你的 GitHub PAT 已过期（${escapeHtml(status.expiresAt || '')}）。<a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener">前往 GitHub 续期</a>，然后回到这里重新登录。`;
+  } else if (status.state === 'expiring') {
+    banner.innerHTML = `你的 GitHub PAT 还有 <b>${status.days}</b> 天就要过期（${escapeHtml(status.expiresAt || '')}）。<a href="https://github.com/settings/personal-access-tokens" target="_blank" rel="noopener">提前续期 →</a>`;
+  } else {
+    return;
+  }
+  main.insertBefore(banner, main.firstChild);
 }
 
 export { showToast };

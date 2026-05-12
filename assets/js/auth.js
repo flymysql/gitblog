@@ -145,3 +145,62 @@ export function popReturnTo() {
 }
 
 export { getToken, getUser, clearAuth };
+
+// ============================================================================
+// PAT 过期 / 无效 检测
+// 调一次 GET /user 检查 token 状态：
+//   - 200：还活着；如果响应里有 GitHub-Authentication-Token-Expiration（fine-grained PAT
+//          会带），把过期时间写入 localStorage 并按距离决定 banner 颜色
+//   - 401：token 已被吊销 / 过期 / 错误，立刻清掉登录状态
+// 因为 GitHub 不会主动通知前端 token 过期，我们 24h 主动复检一次即可，避免 rate-limit
+// ============================================================================
+const PAT_LAST_CHECK_KEY = 'gh_token_last_check';
+const PAT_EXPIRES_KEY = 'gh_token_expires_at';
+const PAT_CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+export async function checkPatStatus({ force = false } = {}) {
+  const token = getToken();
+  if (!token) return { state: 'no-token' };
+  const last = Number(localStorage.getItem(PAT_LAST_CHECK_KEY) || 0);
+  if (!force && last && Date.now() - last < PAT_CHECK_INTERVAL_MS) {
+    const expRaw = localStorage.getItem(PAT_EXPIRES_KEY);
+    if (expRaw) return classifyExpiry(expRaw);
+    return { state: 'ok' };
+  }
+  try {
+    // 用裸 fetch 拿到原始 headers
+    const res = await fetch('https://api.github.com/user', {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${token}`,
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    });
+    if (res.status === 401) {
+      clearAuth();
+      localStorage.removeItem(PAT_EXPIRES_KEY);
+      return { state: 'invalid' };
+    }
+    if (!res.ok) return { state: 'unknown', status: res.status };
+    const exp = res.headers.get('GitHub-Authentication-Token-Expiration') ||
+                res.headers.get('github-authentication-token-expiration') || '';
+    if (exp) localStorage.setItem(PAT_EXPIRES_KEY, exp);
+    else localStorage.removeItem(PAT_EXPIRES_KEY);
+    localStorage.setItem(PAT_LAST_CHECK_KEY, String(Date.now()));
+    return classifyExpiry(exp);
+  } catch (e) {
+    // 离线 / CORS 等错误不强制踢人
+    return { state: 'unknown', error: e.message || String(e) };
+  }
+}
+
+function classifyExpiry(expRaw) {
+  if (!expRaw) return { state: 'ok' };
+  const ts = Date.parse(expRaw);
+  if (!ts) return { state: 'ok' };
+  const ms = ts - Date.now();
+  const days = Math.floor(ms / (24 * 60 * 60 * 1000));
+  if (ms <= 0) return { state: 'expired', expiresAt: expRaw, days };
+  if (days <= 7) return { state: 'expiring', expiresAt: expRaw, days };
+  return { state: 'ok', expiresAt: expRaw, days };
+}

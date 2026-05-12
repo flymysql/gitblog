@@ -9,6 +9,8 @@ import { renderMarkdown, parseFrontmatter } from './markdown.js';
 import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages } from './site.js';
 import { initPageviews, bszPagePvHtml, trackAndRenderArticleView } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
+import { enhanceMath, enhanceMermaid, enhanceCodeAdvanced } from './enhancers.js';
+import { shareCardHtml, bindShareCard } from './share.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -369,6 +371,43 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
   }
 }
 
+// ---------- 系列文章目录 ----------
+function renderSeriesIndex(allPosts, currentSlug, seriesName) {
+  if (!seriesName) return;
+  const list = (allPosts || [])
+    .filter(p => !p.draft && p.series === seriesName && p.type !== 'note')
+    .sort((a, b) => {
+      const ao = a.seriesOrder, bo = b.seriesOrder;
+      if (ao != null && bo != null) return ao - bo;
+      if (ao != null) return -1;
+      if (bo != null) return 1;
+      return new Date(a.date || 0) - new Date(b.date || 0);
+    });
+  if (list.length < 2) return;
+  const article = $('#article');
+  if (!article) return;
+  // 插到正文（.article-body）之前，让读者一眼看到这是系列里的第几篇
+  const body = article.querySelector('.article-body');
+  const sec = document.createElement('aside');
+  sec.className = 'article-series';
+  sec.innerHTML = `
+    <div class="article-series-title">本文是「${escapeHtml(seriesName)}」系列的第 ${
+      Math.max(1, list.findIndex(p => p.slug === currentSlug) + 1)
+    } 篇 / 共 ${list.length} 篇</div>
+    <ol>
+      ${list.map(p => `
+        <li class="${p.slug === currentSlug ? 'is-current' : ''}">
+          ${p.slug === currentSlug
+            ? `<a>${escapeHtml(p.title || '无标题')}</a>`
+            : `<a href="post.html?slug=${encodeURIComponent(p.slug)}">${escapeHtml(p.title || '无标题')}</a>`}
+        </li>
+      `).join('')}
+    </ol>
+  `;
+  if (body) body.parentNode.insertBefore(sec, body);
+  else article.appendChild(sec);
+}
+
 (async function init() {
   initSite({ active: '' });
   bindReadingProgress();
@@ -467,18 +506,26 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
     ${tags.length ? `<footer class="article-footer">
       <div class="article-tags">${tags.map(t => tagHtml(t, { href: `tags.html#${encodeURIComponent(t)}` })).join('')}</div>
     </footer>` : ''}
+    ${shareCardHtml({ ...(meta || {}), ...data, slug, title, page: !!(meta && meta.page) || !!data.page })}
   `;
 
   // TOC
   const items = buildToc(article);
   if (items) renderToc(items);
 
-  // 增强：清布局 / 代码复制 / 标题锚点 / 图片懒加载+灯箱
+  // 增强：清布局 / 代码复制 / 标题锚点 / 图片懒加载+灯箱 / 数学 / Mermaid / 代码行号折叠
   sanitizeArticleLayout(article);
-  enhanceCodeBlocks(article);
+  enhanceCodeBlocks(article);          // 复制按钮（已存在）
+  enhanceCodeAdvanced(article);        // 行号 + 长代码折叠 + 语言徽标
   enhanceHeadings(article);
   enhanceImages(article);
   enhanceLinks(article);
+  enhanceMath(article);                // KaTeX 渲染 .math 节点（懒加载 KaTeX）
+  enhanceMermaid(article);             // Mermaid 渲染 .mermaid 节点（懒加载 mermaid.js）
+  bindShareCard(article, { ...data, slug, title });  // 分享 / 二维码 / 打赏
+
+  // 系列文章目录（如果属于某个系列）
+  renderSeriesIndex(allPosts, slug, (meta && meta.series) || data.series);
 
   // 上下篇 + 相关文章
   renderNeighborsAndRelated(allPosts, slug, tags);

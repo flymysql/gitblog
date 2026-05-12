@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <title>随笔 · 加载中…</title>
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
+  <link rel="stylesheet" href="assets/css/common.css?v=20260512120000">
+  <link rel="stylesheet" href="assets/css/home.css?v=20260512120000">
+  <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
+  <style>
+    .notes-page { max-width: 720px; margin: 28px auto; padding: 0 24px; }
+    .notes-page h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .notes-page .desc { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
+
+    .note-list { list-style: none; margin: 0; padding: 0; position: relative; }
+    .note-list::before {
+      content: '';
+      position: absolute;
+      left: 14px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--border);
+    }
+    .note-item {
+      position: relative;
+      padding: 0 0 22px 44px;
+    }
+    .note-item::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 6px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 3px solid var(--bg);
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+    .note-meta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin-bottom: 6px;
+    }
+    .note-content {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text-main);
+      word-break: break-word;
+    }
+    .note-content p { margin: 0 0 8px; }
+    .note-content p:last-child { margin: 0; }
+    .note-content img { max-width: 100%; border-radius: 6px; margin: 6px 0; }
+    .note-content code { background: var(--code-bg); color: var(--code-text); padding: 1px 6px; border-radius: 3px; font-size: 0.88em; }
+    .note-content pre { background: var(--pre-bg); color: var(--pre-text); padding: 10px 12px; border-radius: 6px; overflow-x: auto; font-size: 12.5px; }
+    .note-tags { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .notes-empty {
+      text-align: center;
+      color: var(--text-tertiary);
+      padding: 60px 20px;
+    }
+    @media (max-width: 720px) {
+      .notes-page { margin: 16px auto; padding: 0 14px; }
+      .notes-page h1 { font-size: 20px; }
+      .note-list::before { left: 8px; }
+      .note-item { padding-left: 32px; padding-bottom: 18px; }
+      .note-item::before { left: 2px; width: 12px; height: 12px; }
+      .note-content { padding: 12px 14px; font-size: 14px; }
+    }
+  </style>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#ea6f5a">
+  <link rel="apple-touch-icon" href="assets/icon.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main class="notes-page">
+    <h1>随笔</h1>
+    <p class="desc">不成体系的小想法、灵感与备忘 · 时间倒序展示</p>
+    <ul class="note-list" id="noteList">
+      <li class="notes-empty">加载中…</li>
+    </ul>
+  </main>
+
+  <div id="site-footer"></div>
+  <div id="site-overlays"></div>
+
+  <script type="module" src="assets/js/notes.js?v=20260512120000"></script>
+</body>
+</html>

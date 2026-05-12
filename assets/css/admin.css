@@ -1322,3 +1322,166 @@ html[data-mode="dark"] .editor-vditor-host .vditor-toolbar__item .vditor-tooltip
 @media (max-width: 720px) {
   .theme-tokens-grid { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   Admin 数据看板
+   ============================================================ */
+.admin-dashboard {
+  margin: 0 0 18px;
+}
+.dashboard-loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.dashboard-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 14px;
+  text-align: center;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.dashboard-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+.dashboard-num {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.1;
+}
+.dashboard-label {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.dashboard-pv {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.dashboard-pv-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+.dashboard-pv-hint {
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+.dashboard-pv-list { display: grid; gap: 6px; }
+.dashboard-pv-empty { color: var(--text-tertiary); font-size: 13px; padding: 12px 0; }
+.dashboard-pv-row {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-main);
+  border-bottom: none;
+}
+.dashboard-pv-row:hover { background: var(--bg-secondary); color: var(--primary); }
+.dashboard-pv-rank {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.dashboard-pv-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dashboard-pv-count {
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+@media (max-width: 880px) {
+  .dashboard-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 540px) {
+  .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+  .dashboard-num { font-size: 22px; }
+}
+
+/* ============================================================
+   诊断页：死链 / 孤儿图 工具卡片
+   ============================================================ */
+.diagnose-tool {
+  margin-top: 22px;
+  padding: 16px 18px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.diagnose-tool-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.diagnose-tool-hint {
+  margin: 0 0 10px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.tools-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 10px;
+}
+.tools-table th,
+.tools-table td {
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  word-break: break-word;
+}
+.tools-table th {
+  background: var(--bg-secondary);
+  font-weight: 600;
+  font-size: 12.5px;
+}
+.tools-table code { word-break: break-all; }
+.btn-danger {
+  background: #d9534f;
+  color: #fff;
+  border: 1px solid #d9534f;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.btn-danger:hover { background: #c9302c; }
+.btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
