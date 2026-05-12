@@ -15,7 +15,7 @@ const $ = (sel, root = document) => root.querySelector(sel);
 // 与原生 loading="lazy" 相比，浏览器一进页面不会预排队下载非首屏图，
 // 进入视口前 300px 才注入真实 src，对长文章 / 多图首页效果显著
 // ============================================================================
-const LAZY_PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E';
+export const LAZY_PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E';
 let _lazyObs = null;
 function getLazyObserver() {
   if (_lazyObs) return _lazyObs;
@@ -40,13 +40,18 @@ export function lazyImage(img, { eager = false } = {}) {
   if (!img || img.dataset.lazied) return;
   img.dataset.lazied = '1';
   img.decoding = img.decoding || 'async';
+  const pendingSrc = img.dataset.src;
   if (eager) {
     img.loading = 'eager';
     if (!img.getAttribute('fetchpriority')) img.setAttribute('fetchpriority', 'high');
+    if (pendingSrc) {
+      img.src = pendingSrc;
+      img.removeAttribute('data-src');
+    }
     return;
   }
-  const realSrc = img.getAttribute('src');
-  if (!realSrc || realSrc.startsWith('data:')) {
+  const realSrc = pendingSrc || img.getAttribute('src');
+  if (!realSrc || (realSrc.startsWith('data:') && !pendingSrc)) {
     img.loading = 'lazy';
     return;
   }

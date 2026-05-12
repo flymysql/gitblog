@@ -31,6 +31,9 @@ const STATE = {
   injected: false,
   fallbackTimer: null,
 };
+const VIEW_CACHE_KEY = 'article_view_cache_v1';
+const VIEW_CACHE_TTL = 10 * 60 * 1000;
+const LIST_VIEW_CONCURRENCY = 4;
 
 function hideAllBsz(root = document) {
   root.querySelectorAll('.bsz').forEach(el => {
@@ -107,6 +110,34 @@ async function fetchArticleViews(slug) {
   if (!res.ok) throw new Error(`views api ${res.status}`);
   const data = await res.json();
   return Number(data.views || 0);
+}
+
+function readViewCache() {
+  try {
+    const raw = sessionStorage.getItem(VIEW_CACHE_KEY);
+    const data = raw ? JSON.parse(raw) : {};
+    return data && typeof data === 'object' ? data : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeViewCache(cache) {
+  try {
+    sessionStorage.setItem(VIEW_CACHE_KEY, JSON.stringify(cache));
+  } catch {}
+}
+
+function getCachedArticleViews(slug) {
+  const item = readViewCache()[slug];
+  if (!item || Date.now() - Number(item.time || 0) > VIEW_CACHE_TTL) return null;
+  return Number(item.views || 0);
+}
+
+function setCachedArticleViews(slug, views) {
+  const cache = readViewCache();
+  cache[slug] = { views: Number(views || 0), time: Date.now() };
+  writeViewCache(cache);
 }
 
 async function trackArticleView(slug) {
@@ -207,15 +238,33 @@ export async function renderArticleListViews(root = document) {
   if (!nodes.length) return;
   const slugs = [...new Set(nodes.map(el => el.dataset.pvSlug).filter(Boolean))];
   nodes.forEach(el => { el.dataset.pvLoaded = '1'; });
-  await Promise.allSettled(slugs.map(async slug => {
-    try {
-      const views = await fetchArticleViews(slug);
-      setArticleView(slug, views);
-    } catch (e) {
-      console.warn('[pageviews] list view failed', slug, e);
-      hideArticleView(slug);
+  const pending = [];
+  for (const slug of slugs) {
+    const cached = getCachedArticleViews(slug);
+    if (cached != null) {
+      setArticleView(slug, cached);
+    } else {
+      pending.push(slug);
     }
-  }));
+  }
+  if (!pending.length) return;
+
+  // 首页冷启动优先把首屏内容和图片拉出来，阅读量延后、限流补齐即可。
+  scheduleIdle(async () => {
+    for (let i = 0; i < pending.length; i += LIST_VIEW_CONCURRENCY) {
+      const batch = pending.slice(i, i + LIST_VIEW_CONCURRENCY);
+      await Promise.allSettled(batch.map(async slug => {
+        try {
+          const views = await fetchArticleViews(slug);
+          setCachedArticleViews(slug, views);
+          setArticleView(slug, views);
+        } catch (e) {
+          console.warn('[pageviews] list view failed', slug, e);
+          hideArticleView(slug);
+        }
+      }));
+    }
+  });
 }
 
 export function isBusuanziOn() {
@@ -232,4 +281,12 @@ function escapeAttr(s) {
 function cssEscape(s) {
   if (window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(String(s));
   return String(s).replace(/["\\]/g, '\\$&');
+}
+
+function scheduleIdle(fn) {
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(fn, { timeout: 1800 });
+  } else {
+    setTimeout(fn, 900);
+  }
 }

@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260512120000';
+export const VERSION = '20260512132200';
 
 export const CONFIG = {
   repo: {
@@ -78,11 +78,30 @@ export const CONFIG = {
     index: "data/posts.json",
     uploads: "assets/uploads"
   },
+  upload: {
+    preferWebp: true,     // 自动把上传的 PNG/JPEG 转成 WebP，省 30%~70%
+    webpQuality: 0.85,
+    maxWidth: 1920        // 超过此宽度自动缩放
+  },
   theme: {
     default: "auto",      // auto / light / dark
     preset: "jianshu",    // jianshu / github / solarized / monokai
     allowReaderPresetSwitch: true,
     tokens: {},
     customCss: ""
+  },
+  // 文章末尾的「分享 / 打赏 / 二维码」卡片，默认关闭
+  share: {
+    enabled: false,
+    showInPosts: true,
+    showInPages: false,
+    qrcodeOfPage: true
+  },
+  donate: {
+    enabled: false,
+    title: "如果这篇文章对你有帮助，欢迎请我喝杯咖啡 ☕️",
+    wechat: "",           // 微信收款码图片 URL
+    alipay: "",           // 支付宝收款码图片 URL
+    paypal: ""            // PayPal 链接（如 https://paypal.me/xxx）
   }
 };
