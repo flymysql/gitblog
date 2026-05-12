@@ -3,13 +3,23 @@
 //
 // 不蒜子是一款国内静态博客生态常用的纯前端计数器：
 //   - 一段 CDN 脚本，不需要后端、不需要注册
-//   - 按 referer 自动区分站点，无需配置
+//   - 按 Referer 头自动区分站点 / 单页，无需配置
 //   - 在页面里放约定 id 的 span 占位，脚本会把数字填进去
 //
 // 我们做了三件加固：
 //   1. 没有任何占位元素时，不注入脚本（避免无意义请求）
 //   2. 加载失败 / 5 秒未拿到数字 → 把所有 .bsz 占位静默隐藏，避免布局裸奔
 //   3. config.pageviews.enabled = false 时不接入任何 provider
+//
+// ⚠ 单文 PV 必读：所有文章页 URL 都是 /post.html?slug=xxx，不蒜子靠跨域请求的
+//   Referer 头取「页面 URL」当 page_pv 的 key。现代浏览器默认 referrer-policy 是
+//   `strict-origin-when-cross-origin`，跨域时只发 origin（没有 path / query）→
+//   所有文章会被合并成同一个 page_pv。
+//   我们的修复是：在每个 HTML head 里加
+//     <meta name="referrer" content="no-referrer-when-downgrade">
+//   让同协议跨域请求带完整 URL（含 query），不蒜子就能按 ?slug=xxx 区分每篇文章。
+//   下面 script 标签的 referrerPolicy 也设了同样值作为兜底（虽然不蒜子内部
+//   `document.write` 出来的 jsonp script 受 meta 控制，与这里设置无关）。
 // ============================================================================
 
 import { CONFIG } from './config.js';
