@@ -5,19 +5,23 @@
 
 import { CONFIG } from './config.js';
 import { getToken } from './auth.js';
-import { readFile, fetchPostMarkdownPublic, deleteFile } from './api.js';
+import { readFile, fetchPostMarkdownPublic } from './api.js';
 
 const IMAGE_EXT = /\.(png|jpe?g|gif|webp|avif|svg|bmp|ico)$/i;
 
-async function gh(path) {
+async function gh(path, { method = 'GET', body } = {}) {
   const token = getToken();
-  const res = await fetch('https://api.github.com' + path, {
-    headers: {
-      Authorization: 'Bearer ' + token,
-      Accept: 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-    },
-  });
+  const headers = {
+    Authorization: 'Bearer ' + token,
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+  };
+  const init = { method, headers };
+  if (body !== undefined) {
+    headers['Content-Type'] = 'application/json';
+    init.body = JSON.stringify(body);
+  }
+  const res = await fetch('https://api.github.com' + path, init);
   const text = await res.text();
   let data;
   try { data = JSON.parse(text); } catch { data = text; }
@@ -193,18 +197,50 @@ export async function findOrphanImages() {
   };
 }
 
-// 批量删除（每个文件一次 commit；大批量请用户分批）
+// 批量删除：合并为 1 次 commit
+// 走 Git Data API（git/trees + git/commits + git/refs），一次清掉一批文件
+//   1. 取分支当前 commit / base tree
+//   2. 基于 base tree 创建一棵新 tree，把要删的 path 标记为 sha:null
+//   3. 用新 tree 创建新 commit
+//   4. 把分支 ref 指到新 commit
+// 几十张图也只产生 1 个 commit，比 Contents API 一图一 commit 快得多
 export async function bulkDelete(items, onProgress) {
-  let done = 0;
-  const failed = [];
-  for (const it of items) {
-    try {
-      await deleteFile(it.path, it.sha, `cleanup: 删除孤儿图 ${it.path.split('/').pop()}`);
-      done++;
-      onProgress && onProgress({ done, total: items.length, path: it.path });
-    } catch (e) {
-      failed.push({ path: it.path, error: e.message || String(e) });
-    }
-  }
-  return { done, failed };
+  if (!items.length) return { done: 0, failed: [], commit: null };
+  const { owner, name, branch } = CONFIG.repo;
+
+  onProgress && onProgress({ phase: 'tree', total: items.length });
+
+  const branchData = await gh(`/repos/${owner}/${name}/branches/${encodeURIComponent(branch)}`);
+  const parentCommitSha = branchData && branchData.commit && branchData.commit.sha;
+  const baseTreeSha = branchData && branchData.commit && branchData.commit.commit && branchData.commit.commit.tree && branchData.commit.commit.tree.sha;
+  if (!parentCommitSha || !baseTreeSha) throw new Error('无法解析仓库 branch / tree sha');
+
+  const treeEntries = items.map(it => ({
+    path: it.path,
+    mode: '100644',
+    type: 'blob',
+    sha: null,
+  }));
+  const newTree = await gh(`/repos/${owner}/${name}/git/trees`, {
+    method: 'POST',
+    body: { base_tree: baseTreeSha, tree: treeEntries },
+  });
+
+  onProgress && onProgress({ phase: 'commit', total: items.length });
+
+  const summary = items.length === 1
+    ? `cleanup: 删除孤儿图 ${items[0].path.split('/').pop()}`
+    : `cleanup: 批量删除 ${items.length} 张孤儿图`;
+  const newCommit = await gh(`/repos/${owner}/${name}/git/commits`, {
+    method: 'POST',
+    body: { message: summary, tree: newTree.sha, parents: [parentCommitSha] },
+  });
+
+  await gh(`/repos/${owner}/${name}/git/refs/heads/${encodeURIComponent(branch)}`, {
+    method: 'PATCH',
+    body: { sha: newCommit.sha },
+  });
+
+  onProgress && onProgress({ phase: 'done', total: items.length });
+  return { done: items.length, failed: [], commit: newCommit.sha };
 }
