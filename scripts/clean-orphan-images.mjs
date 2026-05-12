@@ -97,9 +97,12 @@ if (existsSync(POSTS_INDEX)) {
   try {
     const idx = JSON.parse(readFileSync(POSTS_INDEX, 'utf8'));
     for (const p of (idx.posts || [])) {
-      if (p.cover) {
-        const n = normalizeUrl(p.cover);
-        if (n) used.add(n);
+      // cover 和 thumbnail（build.mjs 自动配的小尺寸）都算引用
+      for (const field of ['cover', 'thumbnail']) {
+        if (p[field]) {
+          const n = normalizeUrl(p[field]);
+          if (n) used.add(n);
+        }
       }
     }
   } catch (e) {

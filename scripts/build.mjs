@@ -1,6 +1,6 @@
 // 校验 + 重新生成 sitemap.xml 与 rss.xml
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
-import { join, basename } from 'node:path';
+import { join, basename, extname } from 'node:path';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
 const cfgRaw = readFileSync('assets/js/config.js', 'utf8');
@@ -151,11 +151,31 @@ if (errors.length) {
   for (const e of errors) console.log('  -', e);
 }
 
+// 同目录有 <basename>.thumb.webp 时给 cover 自动配上 thumbnail
+// 缩略图由 scripts/build-thumbnails.mjs 单独生成（首页文章列表会优先用它）
+function thumbnailFor(cover) {
+  if (!cover) return undefined;
+  const raw = String(cover);
+  const local = raw.replace(/^\.?\/+/, '').replace(/^(\.\.\/)+/, '').split('?')[0].split('#')[0];
+  const ext = extname(local);
+  if (!ext || ext.toLowerCase() === '.svg') return undefined;
+  const thumbLocal = local.slice(0, -ext.length) + '.thumb.webp';
+  if (!existsSync(thumbLocal)) return undefined;
+  // 保留原 cover 的相对前缀风格（../assets/... 或 assets/...）
+  const m = raw.match(/^((?:\.\.\/|\.\/|\/)+)/);
+  const prefix = m ? m[1] : '';
+  return prefix + thumbLocal;
+}
+
 // 重建索引（不包含 content 字段）
 posts.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 const indexJson = {
   posts: posts.map(p => {
     const { content, ...rest } = p;
+    if (rest.cover) {
+      const t = thumbnailFor(rest.cover);
+      if (t) rest.thumbnail = t;
+    }
     if (!rest.cover) delete rest.cover;
     if (!rest.draft) delete rest.draft;
     if (!rest.pinned) delete rest.pinned;
