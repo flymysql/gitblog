@@ -581,7 +581,7 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
   display: inline-flex;
   flex-direction: row;
   align-items: center;
-  gap: 4px;
+  gap: 0;
 }
 .saobby-slot-stat .saobby-num {
   display: inline-flex;
@@ -597,6 +597,7 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
   font-size: 13px;
   color: var(--text-secondary);
   font-weight: normal;
+  margin-left: 2px;
 }
 
 /* footer 紧凑：把字号缩到正文小字一致 */
