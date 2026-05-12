@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260531';
+export const VERSION = '20260512112250';
 
 export const CONFIG = {
   repo: {
@@ -20,7 +20,7 @@ export const CONFIG = {
     favicon: "../assets/uploads/2026/05/1778481325586-x3zzx9-blog.svg",
     avatar: "https://avatars.githubusercontent.com/u/37113068?s=400&u=cf2b8a258ad1de5e9a23e3c72da6ca04e058dd46&v=4",
     description: "桃李春风一杯酒，江湖夜雨十年灯。",
-    url: "https://flymysql.github.io/gitblog",
+    url: "https://gitpull.cn",
     locale: "zh-CN",
     nav: [
       {
@@ -66,11 +66,11 @@ export const CONFIG = {
   },
   pageviews: {
     enabled: true,
-    provider: "busuanzi",   // busuanzi | none
-    articleProvider: "page-views-api", // page-views-api | busuanzi（busuanzi 仅支持文章页当前页，不支持首页列表）
-    showHomeStats: true,    // 首页 hero 显示总访问 / 访客
-    showPostViews: true,    // 文章页显示阅读次数
-    showFooterStats: true   // 全站 footer 显示 PV / UV
+    provider: "busuanzi",
+    articleProvider: "page-views-api",
+    showHomeStats: true,
+    showPostViews: true,
+    showFooterStats: true
   },
   auth: {
     githubDeviceFlow: {
@@ -87,7 +87,19 @@ export const CONFIG = {
     default: "auto",
     preset: "jianshu",
     allowReaderPresetSwitch: true,
-    tokens: {},
+    tokens: {
+      primary: "#000000",
+      "primary-hover": "#000000",
+      bg: "#000000",
+      "bg-soft": "#000000",
+      "bg-elev": "#000000",
+      "text-main": "#000000",
+      "text-secondary": "#000000",
+      "text-tertiary": "#000000",
+      border: "#000000",
+      "border-strong": "#000000",
+      highlight: "#000000"
+    },
     customCss: ""
   }
 };
