@@ -45,10 +45,11 @@
         "AI 基础设施",
         "python"
       ],
-      "cover": "assets/uploads/2026/05/smallpond-cover.svg",
+      "cover": "assets/uploads/2026/05/smallpond-cover.webp",
       "series": "DeepSeek 数据基础设施巡礼",
       "seriesOrder": 2,
-      "path": "posts/smallpond-source-walkthrough.md"
+      "path": "posts/smallpond-source-walkthrough.md",
+      "thumbnail": "assets/uploads/2026/05/smallpond-cover.thumb.webp"
     },
     {
       "slug": "3fs-usrbio-zero-copy",
@@ -62,7 +63,7 @@
         "AI 基础设施",
         "C++"
       ],
-      "cover": "assets/uploads/2026/05/3fs-usrbio-cover.svg",
+      "cover": "assets/uploads/2026/05/3fs-usrbio-cover.webp",
       "series": "DeepSeek 数据基础设施巡礼",
       "seriesOrder": 1,
       "path": "posts/3fs-usrbio-zero-copy.md"
