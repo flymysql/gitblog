@@ -56,6 +56,7 @@ const state = {
   editorMode: 'markdown',  // markdown | rich
   selectedTags: [],
   availableTags: [],
+  counter: { img: '', dashboard: '' }, // 文章独立 saobby 计数器
 };
 
 function getContent() {
@@ -114,6 +115,7 @@ async function loadPost(slug) {
     $('#draftToggle').checked = !!data.draft;
     $('#pinnedToggle').checked = !!data.pinned;
     $('#carouselToggle').checked = !!data.carousel;
+    setEditorCounter(data.counter || { img: '', dashboard: '' });
     setContent(content);
     document.title = `编辑：${data.title || slug}`;
     setStatus('已加载', 'saved');
@@ -187,6 +189,101 @@ function setEditorTags(tags) {
   state.availableTags = uniqueTags([...state.availableTags, ...state.selectedTags]).sort((a, b) => a.localeCompare(b, 'zh-CN'));
   syncTagsInput();
   renderTagPicker();
+}
+
+// ---------- 文章独立计数器（saobby 半自动） ----------
+function isSaobbyProviderOn() {
+  const cfg = CONFIG.pageviews || {};
+  return cfg.enabled !== false && cfg.provider === 'saobby';
+}
+
+function setEditorCounter(counter) {
+  state.counter = {
+    img: String((counter && counter.img) || '').trim(),
+    dashboard: String((counter && counter.dashboard) || '').trim(),
+  };
+  renderEditorCounter();
+}
+
+function renderEditorCounter() {
+  const field = $('#counterField');
+  if (!field) return;
+  if (!isSaobbyProviderOn()) {
+    field.hidden = true;
+    return;
+  }
+  field.hidden = false;
+  const summary = $('#counterSummary');
+  const clearBtn = $('#counterClearBtn');
+  const c = state.counter || {};
+  const has = !!(c.img || c.dashboard);
+  if (clearBtn) clearBtn.hidden = !has;
+  if (!summary) return;
+  if (!has) {
+    summary.innerHTML = '<span class="editor-counter-empty">本文还没有配置独立计数器。读者将看到「站点设置 → 文章页计数器」里设的全站共用计数器。</span>';
+    return;
+  }
+  summary.innerHTML = `
+    ${c.img ? `<div class="editor-counter-line"><span>图片</span> <a href="${escapeHtml(c.img)}" target="_blank" rel="noopener">${escapeHtml(c.img)}</a></div>` : ''}
+    ${c.dashboard ? `<div class="editor-counter-line"><span>控制面板</span> <a href="${escapeHtml(c.dashboard)}" target="_blank" rel="noopener">${escapeHtml(c.dashboard)}</a></div>` : ''}
+    ${c.img ? `<div class="editor-counter-line"><span>预览</span> <img src="${escapeHtml(c.img)}" alt="counter" referrerpolicy="no-referrer-when-downgrade" class="editor-counter-img"></div>` : ''}
+  `;
+}
+
+function buildSaobbyCreateUrl() {
+  // saobby 创建页本身没有 query string 配置入口（页面是富表单），
+  // 所以这里只是直跳过去，让用户用默认设置创建。
+  // 之所以经一次拼接，是为后续 saobby 提供更好集成时方便扩展。
+  return 'https://www.saobby.com/create_webcounter';
+}
+
+async function pasteCounterDialog() {
+  // 一个简单的双行输入对话框：让用户把 saobby 给的「图片 URL」和「控制面板 URL」粘进来
+  const cur = state.counter || {};
+  const imgIn = prompt(
+    '把 saobby 给你的「计数器图片 URL」粘到这里：\n（例如：https://www.saobby.com/w/abc123 或 .../webcounter/svg?id=...）',
+    cur.img || ''
+  );
+  if (imgIn == null) return; // 用户取消
+  const img = String(imgIn || '').trim();
+  if (img && !/^https?:\/\//i.test(img)) {
+    alert('图片 URL 看起来不对，请确认是 https:// 开头的完整地址');
+    return;
+  }
+  const dashIn = prompt(
+    '再把 saobby 给你的「控制面板 URL（含 access_token / key）」粘进来：\n（例如：https://www.saobby.com/webcounter_dashboard?access_token=xxx）',
+    cur.dashboard || ''
+  );
+  if (dashIn == null) return;
+  const dashboard = String(dashIn || '').trim();
+  if (dashboard && !/^https?:\/\//i.test(dashboard)) {
+    alert('控制面板 URL 看起来不对，请确认是 https:// 开头的完整地址');
+    return;
+  }
+  setEditorCounter({ img, dashboard });
+  showToast('已记录本文计数器，发布时会写入 frontmatter');
+}
+
+function bindCounterPanel() {
+  const createBtn = $('#counterCreateBtn');
+  const pasteBtn = $('#counterPasteBtn');
+  const clearBtn = $('#counterClearBtn');
+  if (createBtn) {
+    createBtn.addEventListener('click', () => {
+      const w = window.open(buildSaobbyCreateUrl(), '_blank', 'noopener,noreferrer');
+      if (!w) {
+        showToast('浏览器拦截了新窗口，请手动打开 saobby.com 创建', 'error');
+        return;
+      }
+      // 创建完成后用户回到本页面，提示去粘贴 URL
+      showToast('在新窗口中创建计数器后，回来点「粘贴 URL…」把图片 + 控制面板 URL 粘进来');
+    });
+  }
+  if (pasteBtn) pasteBtn.addEventListener('click', pasteCounterDialog);
+  if (clearBtn) clearBtn.addEventListener('click', () => {
+    if (!confirm('清除本文的独立计数器配置？')) return;
+    setEditorCounter({ img: '', dashboard: '' });
+  });
 }
 
 function addEditorTag(tag) {
@@ -307,6 +404,13 @@ async function publish() {
   if (draft) data.draft = true;
   if (pinned) data.pinned = true;
   if (carousel && cover) data.carousel = true;
+  const counter = state.counter || {};
+  if (counter.img || counter.dashboard) {
+    data.counter = {
+      img: counter.img || '',
+      dashboard: counter.dashboard || '',
+    };
+  }
 
   const md = stringifyFrontmatter(data, content);
   const path = `${CONFIG.paths.posts}/${slug}.md`;
@@ -367,6 +471,7 @@ async function publish() {
       draft,
       pinned,
       carousel: carousel && !!cover,
+      counter: data.counter,
       path: state.loadedPath,
       removeSlug: isRename ? state.loadedSlug : null,
     });
@@ -395,7 +500,7 @@ async function publish() {
   }
 }
 
-async function updateIndex({ slug, title, date, updated, author, summary, tags, cover, draft, pinned, carousel, path, removeSlug }) {
+async function updateIndex({ slug, title, date, updated, author, summary, tags, cover, draft, pinned, carousel, counter, path, removeSlug }) {
   const idx = await readIndex();
   const data = idx ? idx.data : { posts: [] };
   if (!Array.isArray(data.posts)) data.posts = [];
@@ -410,6 +515,12 @@ async function updateIndex({ slug, title, date, updated, author, summary, tags, 
   if (draft) entry.draft = true;
   if (pinned) entry.pinned = true;
   if (carousel && cover) entry.carousel = true;
+  if (counter && (counter.img || counter.dashboard)) {
+    entry.counter = {
+      img: String(counter.img || ''),
+      dashboard: String(counter.dashboard || ''),
+    };
+  }
   if (pinned && existing >= 0 && data.posts[existing].pinnedOrder) entry.pinnedOrder = data.posts[existing].pinnedOrder;
 
   if (existing >= 0) data.posts[existing] = entry;
@@ -762,6 +873,8 @@ function setupEasyMDE() {
   bindEditorModeSwitch();
   setupDragAndPaste();
   bindTagPicker();
+  bindCounterPanel();
+  renderEditorCounter();
   loadAvailableTags();
 
   ['title'].forEach(id => {

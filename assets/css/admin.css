@@ -763,6 +763,54 @@
   padding: 5px 12px;
   font-size: 12px;
 }
+
+/* ---------- 编辑器：文章独立计数器面板 ---------- */
+.editor-counter-field {
+  flex: 1 1 100%;
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+}
+.editor-counter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.editor-counter-row .btn { padding: 5px 12px; font-size: 12px; }
+.editor-counter-summary {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: grid;
+  gap: 4px;
+}
+.editor-counter-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.editor-counter-line span {
+  color: var(--text-tertiary);
+  min-width: 56px;
+}
+.editor-counter-line a {
+  color: var(--primary);
+  word-break: break-all;
+  flex: 1;
+  font-size: 12px;
+}
+.editor-counter-img {
+  height: 18px;
+  width: auto;
+  vertical-align: middle;
+}
+.editor-counter-empty {
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
 .editor-tag-chip {
   display: inline-flex;
   align-items: center;
@@ -1171,9 +1219,50 @@ html[data-mode="dark"] .editor-vditor-host .vditor-toolbar__item .vditor-tooltip
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+  align-items: center;
   border-bottom: 1px solid var(--border);
   padding-bottom: 6px;
   margin-bottom: 12px;
+}
+.analytics-post-select {
+  margin-left: auto;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-main);
+  font-size: 13px;
+  max-width: 280px;
+}
+.analytics-missing {
+  margin: 0 0 18px 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: var(--bg-soft);
+  font-size: 13px;
+}
+.analytics-missing summary {
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.analytics-missing-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 6px 14px;
+}
+.analytics-missing-list a {
+  color: var(--primary);
+  word-break: break-all;
+}
+.analytics-missing-meta {
+  margin-left: 6px;
+  color: var(--text-tertiary);
+  font-size: 12px;
 }
 .analytics-tab {
   padding: 8px 14px;

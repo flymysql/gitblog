@@ -446,6 +446,11 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   const cover = publicImageUrl((meta && meta.cover) || data.cover || '');
   const tags = (meta && meta.tags) || data.tags || [];
   const summary = (meta && meta.summary) || data.summary || '';
+  // 文章独立 saobby 计数器：frontmatter 优先，posts.json 索引兜底
+  const articleCounter = (data.counter && typeof data.counter === 'object')
+    ? data.counter
+    : ((meta && meta.counter) || null);
+  const articleCounterImg = articleCounter ? String(articleCounter.img || '').trim() : '';
 
   // SEO + 优先用 OG 自动图（assets/og/{slug}.svg）兜底
   const ogAuto = `${CONFIG.site.url || ''}/assets/og/${encodeURIComponent(slug)}.svg`;
@@ -498,7 +503,7 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
             <span>约 ${mins} 分钟</span>
             ${(() => {
               if ((CONFIG.pageviews || {}).showPostViews === false) return '';
-              const pv = bszPagePvHtml();
+              const pv = bszPagePvHtml({ articleCounterImg });
               return pv ? `<span class="dot"></span>${pv}` : '';
             })()}
           </div>

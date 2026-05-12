@@ -148,7 +148,22 @@ function parseYamlLite(text) {
       out[key] = '';
       continue;
     }
-    if (value.startsWith('[') && value.endsWith(']')) {
+    if (value.startsWith('{') && value.endsWith('}')) {
+      // inline JSON 对象，写入侧用 JSON.stringify 序列化
+      try {
+        out[key] = JSON.parse(value);
+      } catch {
+        out[key] = value;
+      }
+    } else if (value.startsWith('[') && value.endsWith(']')) {
+      // 注意：tags 之类的 inline 数组用空格分隔成员里逗号即可，
+      // 这里不进 JSON.parse，否则 [a, b] 会因为没引号失败
+      try {
+        if (/^\[\s*[\{"]/.test(value)) {
+          out[key] = JSON.parse(value);
+          continue;
+        }
+      } catch {}
       out[key] = value
         .slice(1, -1)
         .split(',')
