@@ -2,14 +2,14 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>小红鸡</title>
-    <link>https://flymysql.github.io/gitblog/</link>
+    <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 12 May 2026 03:19:19 GMT</lastBuildDate>
-    <atom:link href="https://flymysql.github.io/gitblog/rss.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 12 May 2026 03:23:02 GMT</lastBuildDate>
+    <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GitBlog：一个带伪后台的博客站点</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=welcome</link>
+      <link>https://gitpull.cn/post.html?slug=welcome</link>
       <guid isPermaLink="false">welcome</guid>
       <pubDate>Mon, 11 May 2026 08:50:00 GMT</pubDate>
       <author>Jimmy</author>
@@ -18,7 +18,7 @@
     </item>
     <item>
       <title>关于小红鸡</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=about</link>
+      <link>https://gitpull.cn/post.html?slug=about</link>
       <guid isPermaLink="false">about</guid>
       <pubDate>Mon, 11 May 2026 08:40:00 GMT</pubDate>
       <author>Jimmy</author>
@@ -27,7 +27,7 @@
     </item>
     <item>
       <title>多维数组的索引方案与内存设计</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E5%A4%9A%E7%BB%B4%E6%95%B0%E7%BB%84%E7%9A%84%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88%E4%B8%8E%E5%86%85%E5%AD%98%E8%AE%BE%E8%AE%A1-16000038</link>
+      <link>https://gitpull.cn/post.html?slug=%E5%A4%9A%E7%BB%B4%E6%95%B0%E7%BB%84%E7%9A%84%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88%E4%B8%8E%E5%86%85%E5%AD%98%E8%AE%BE%E8%AE%A1-16000038</link>
       <guid isPermaLink="false">多维数组的索引方案与内存设计-16000038</guid>
       <pubDate>Sun, 13 Mar 2022 04:08:00 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -36,7 +36,7 @@
     </item>
     <item>
       <title>推荐系统——推荐引擎的架构</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E2%80%94%E2%80%94%E6%8E%A8%E8%8D%90%E5%BC%95%E6%93%8E%E7%9A%84%E6%9E%B6%E6%9E%84-15996742</link>
+      <link>https://gitpull.cn/post.html?slug=%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E2%80%94%E2%80%94%E6%8E%A8%E8%8D%90%E5%BC%95%E6%93%8E%E7%9A%84%E6%9E%B6%E6%9E%84-15996742</link>
       <guid isPermaLink="false">推荐系统——推荐引擎的架构-15996742</guid>
       <pubDate>Sat, 12 Mar 2022 03:31:00 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -45,7 +45,7 @@
     </item>
     <item>
       <title>nebula graph 图计算数据库</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772</link>
+      <link>https://gitpull.cn/post.html?slug=%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772</link>
       <guid isPermaLink="false">置顶-nebula-graph-图计算数据库-15993772</guid>
       <pubDate>Fri, 11 Mar 2022 07:03:00 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -54,7 +54,7 @@
     </item>
     <item>
       <title>nebula代码走读——从Validator到Executor</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=nebula%E4%BB%A3%E7%A0%81%E8%B5%B0%E8%AF%BB%E2%80%94%E2%80%94%E4%BB%8EValidator%E5%88%B0Executor-15988828</link>
+      <link>https://gitpull.cn/post.html?slug=nebula%E4%BB%A3%E7%A0%81%E8%B5%B0%E8%AF%BB%E2%80%94%E2%80%94%E4%BB%8EValidator%E5%88%B0Executor-15988828</link>
       <guid isPermaLink="false">nebula代码走读——从Validator到Executor-15988828</guid>
       <pubDate>Thu, 10 Mar 2022 03:41:00 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -63,7 +63,7 @@
     </item>
     <item>
       <title>推荐召回-向量召回之U2I学习总结</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%8E%A8%E8%8D%90%E5%8F%AC%E5%9B%9E-%E5%90%91%E9%87%8F%E5%8F%AC%E5%9B%9E%E4%B9%8BU2I%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93-15986952</link>
+      <link>https://gitpull.cn/post.html?slug=%E6%8E%A8%E8%8D%90%E5%8F%AC%E5%9B%9E-%E5%90%91%E9%87%8F%E5%8F%AC%E5%9B%9E%E4%B9%8BU2I%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93-15986952</link>
       <guid isPermaLink="false">推荐召回-向量召回之U2I学习总结-15986952</guid>
       <pubDate>Wed, 09 Mar 2022 12:42:00 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -72,7 +72,7 @@
     </item>
     <item>
       <title>随笔杂谈</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E9%9A%8F%E7%AC%94%E6%9D%82%E8%B0%88-15995658</link>
+      <link>https://gitpull.cn/post.html?slug=%E9%9A%8F%E7%AC%94%E6%9D%82%E8%B0%88-15995658</link>
       <guid isPermaLink="false">随笔杂谈-15995658</guid>
       <pubDate>Tue, 31 Dec 2019 16:00:00 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -81,7 +81,7 @@
     </item>
     <item>
       <title>【PCC】一个用python写的ｃ语言编译器</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=PCC%E4%B8%80%E4%B8%AA%E7%94%A8python%E5%86%99%E7%9A%84%EF%BD%83%E8%AF%AD%E8%A8%80%E7%BC%96%E8%AF%91%E5%99%A8-15991910</link>
+      <link>https://gitpull.cn/post.html?slug=PCC%E4%B8%80%E4%B8%AA%E7%94%A8python%E5%86%99%E7%9A%84%EF%BD%83%E8%AF%AD%E8%A8%80%E7%BC%96%E8%AF%91%E5%99%A8-15991910</link>
       <guid isPermaLink="false">PCC一个用python写的ｃ语言编译器-15991910</guid>
       <pubDate>Mon, 31 Dec 2018 16:00:00 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -90,7 +90,7 @@
     </item>
     <item>
       <title>桃李春风一杯酒，江湖夜雨十年灯</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%A1%83%E6%9D%8E%E6%98%A5%E9%A3%8E%E4%B8%80%E6%9D%AF%E9%85%92%E6%B1%9F%E6%B9%96%E5%A4%9C%E9%9B%A8%E5%8D%81%E5%B9%B4%E7%81%AF-15995716</link>
+      <link>https://gitpull.cn/post.html?slug=%E6%A1%83%E6%9D%8E%E6%98%A5%E9%A3%8E%E4%B8%80%E6%9D%AF%E9%85%92%E6%B1%9F%E6%B9%96%E5%A4%9C%E9%9B%A8%E5%8D%81%E5%B9%B4%E7%81%AF-15995716</link>
       <guid isPermaLink="false">桃李春风一杯酒江湖夜雨十年灯-15995716</guid>
       <pubDate>Mon, 31 Dec 2018 16:00:00 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -99,7 +99,7 @@
     </item>
     <item>
       <title>模仿知乎的链接卡片</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%A8%A1%E4%BB%BF%E7%9F%A5%E4%B9%8E%E7%9A%84%E9%93%BE%E6%8E%A5%E5%8D%A1%E7%89%87-a714f04b</link>
+      <link>https://gitpull.cn/post.html?slug=%E6%A8%A1%E4%BB%BF%E7%9F%A5%E4%B9%8E%E7%9A%84%E9%93%BE%E6%8E%A5%E5%8D%A1%E7%89%87-a714f04b</link>
       <guid isPermaLink="false">模仿知乎的链接卡片-a714f04b</guid>
       <pubDate>Sun, 16 Dec 2018 09:13:47 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -108,7 +108,7 @@
     </item>
     <item>
       <title>Windows下的终端折腾——弃坑msys2，开始用wsl</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=Windows%E4%B8%8B%E7%9A%84%E7%BB%88%E7%AB%AF%E6%8A%98%E8%85%BE%E2%80%94%E2%80%94%E5%BC%83%E5%9D%91msys2%E5%BC%80%E5%A7%8B%E7%94%A8wsl-d6b124c4</link>
+      <link>https://gitpull.cn/post.html?slug=Windows%E4%B8%8B%E7%9A%84%E7%BB%88%E7%AB%AF%E6%8A%98%E8%85%BE%E2%80%94%E2%80%94%E5%BC%83%E5%9D%91msys2%E5%BC%80%E5%A7%8B%E7%94%A8wsl-d6b124c4</link>
       <guid isPermaLink="false">Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4</guid>
       <pubDate>Fri, 14 Dec 2018 02:50:18 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -117,7 +117,7 @@
     </item>
     <item>
       <title>12月6日杂谈</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=12%E6%9C%886%E6%97%A5%E6%9D%82%E8%B0%88-5027c817</link>
+      <link>https://gitpull.cn/post.html?slug=12%E6%9C%886%E6%97%A5%E6%9D%82%E8%B0%88-5027c817</link>
       <guid isPermaLink="false">12月6日杂谈-5027c817</guid>
       <pubDate>Thu, 06 Dec 2018 09:13:48 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -126,7 +126,7 @@
     </item>
     <item>
       <title>小程序开发之接入Bmob后端云作为后端数据库</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91%E4%B9%8B%E6%8E%A5%E5%85%A5Bmob%E5%90%8E%E7%AB%AF%E4%BA%91%E4%BD%9C%E4%B8%BA%E5%90%8E%E7%AB%AF%E6%95%B0%E6%8D%AE%E5%BA%93-93621394</link>
+      <link>https://gitpull.cn/post.html?slug=%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91%E4%B9%8B%E6%8E%A5%E5%85%A5Bmob%E5%90%8E%E7%AB%AF%E4%BA%91%E4%BD%9C%E4%B8%BA%E5%90%8E%E7%AB%AF%E6%95%B0%E6%8D%AE%E5%BA%93-93621394</link>
       <guid isPermaLink="false">小程序开发之接入Bmob后端云作为后端数据库-93621394</guid>
       <pubDate>Sun, 02 Dec 2018 23:37:40 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -135,7 +135,7 @@
     </item>
     <item>
       <title>使用vue.js制作carousel跑马灯组件</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E4%BD%BF%E7%94%A8vue.js%E5%88%B6%E4%BD%9Ccarousel%E8%B7%91%E9%A9%AC%E7%81%AF%E7%BB%84%E4%BB%B6-456bc465</link>
+      <link>https://gitpull.cn/post.html?slug=%E4%BD%BF%E7%94%A8vue.js%E5%88%B6%E4%BD%9Ccarousel%E8%B7%91%E9%A9%AC%E7%81%AF%E7%BB%84%E4%BB%B6-456bc465</link>
       <guid isPermaLink="false">使用vue.js制作carousel跑马灯组件-456bc465</guid>
       <pubDate>Sun, 02 Dec 2018 07:53:59 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -144,7 +144,7 @@
     </item>
     <item>
       <title>Dijkstra单源最短路径算法</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95-15e41f53</link>
+      <link>https://gitpull.cn/post.html?slug=Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95-15e41f53</link>
       <guid isPermaLink="false">Dijkstra单源最短路径算法-15e41f53</guid>
       <pubDate>Fri, 23 Nov 2018 09:32:33 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -153,7 +153,7 @@
     </item>
     <item>
       <title>使用腾讯云cdn加速博客</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E4%BD%BF%E7%94%A8%E8%85%BE%E8%AE%AF%E4%BA%91cdn%E5%8A%A0%E9%80%9F%E5%8D%9A%E5%AE%A2-1609338289</link>
+      <link>https://gitpull.cn/post.html?slug=%E4%BD%BF%E7%94%A8%E8%85%BE%E8%AE%AF%E4%BA%91cdn%E5%8A%A0%E9%80%9F%E5%8D%9A%E5%AE%A2-1609338289</link>
       <guid isPermaLink="false">使用腾讯云cdn加速博客-1609338289</guid>
       <pubDate>Thu, 22 Nov 2018 11:41:45 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -162,7 +162,7 @@
     </item>
     <item>
       <title>hexo建站笔记之首页文章轮播图</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=hexo%E5%BB%BA%E7%AB%99%E7%AC%94%E8%AE%B0%E4%B9%8B%E9%A6%96%E9%A1%B5%E6%96%87%E7%AB%A0%E8%BD%AE%E6%92%AD%E5%9B%BE-6bf81741</link>
+      <link>https://gitpull.cn/post.html?slug=hexo%E5%BB%BA%E7%AB%99%E7%AC%94%E8%AE%B0%E4%B9%8B%E9%A6%96%E9%A1%B5%E6%96%87%E7%AB%A0%E8%BD%AE%E6%92%AD%E5%9B%BE-6bf81741</link>
       <guid isPermaLink="false">hexo建站笔记之首页文章轮播图-6bf81741</guid>
       <pubDate>Wed, 14 Nov 2018 07:25:40 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -171,7 +171,7 @@
     </item>
     <item>
       <title>将公众号文章爬到hexo博客</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E5%B0%86%E5%85%AC%E4%BC%97%E5%8F%B7%E6%96%87%E7%AB%A0%E7%88%AC%E5%88%B0hexo%E5%8D%9A%E5%AE%A2-fb598031</link>
+      <link>https://gitpull.cn/post.html?slug=%E5%B0%86%E5%85%AC%E4%BC%97%E5%8F%B7%E6%96%87%E7%AB%A0%E7%88%AC%E5%88%B0hexo%E5%8D%9A%E5%AE%A2-fb598031</link>
       <guid isPermaLink="false">将公众号文章爬到hexo博客-fb598031</guid>
       <pubDate>Sun, 11 Nov 2018 14:00:15 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -180,7 +180,7 @@
     </item>
     <item>
       <title>hexo建站笔记之彩色标签云</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=hexo%E5%BB%BA%E7%AB%99%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%BD%A9%E8%89%B2%E6%A0%87%E7%AD%BE%E4%BA%91-d6caa003</link>
+      <link>https://gitpull.cn/post.html?slug=hexo%E5%BB%BA%E7%AB%99%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%BD%A9%E8%89%B2%E6%A0%87%E7%AD%BE%E4%BA%91-d6caa003</link>
       <guid isPermaLink="false">hexo建站笔记之彩色标签云-d6caa003</guid>
       <pubDate>Wed, 07 Nov 2018 12:08:34 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -189,7 +189,7 @@
     </item>
     <item>
       <title>用回valine评论系统,valine评论框样式美化</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E7%94%A8%E5%9B%9Evaline%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9Fvaline%E8%AF%84%E8%AE%BA%E6%A1%86%E6%A0%B7%E5%BC%8F%E7%BE%8E%E5%8C%96-2d5da13e</link>
+      <link>https://gitpull.cn/post.html?slug=%E7%94%A8%E5%9B%9Evaline%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9Fvaline%E8%AF%84%E8%AE%BA%E6%A1%86%E6%A0%B7%E5%BC%8F%E7%BE%8E%E5%8C%96-2d5da13e</link>
       <guid isPermaLink="false">用回valine评论系统valine评论框样式美化-2d5da13e</guid>
       <pubDate>Thu, 01 Nov 2018 00:52:05 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -198,7 +198,7 @@
     </item>
     <item>
       <title>sql学习笔记2</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=sql%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B02-5f5ec841</link>
+      <link>https://gitpull.cn/post.html?slug=sql%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B02-5f5ec841</link>
       <guid isPermaLink="false">sql学习笔记2-5f5ec841</guid>
       <pubDate>Tue, 30 Oct 2018 09:21:21 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -207,7 +207,7 @@
     </item>
     <item>
       <title>手动修改博客css样式，打造属于自己的博客样式</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%89%8B%E5%8A%A8%E4%BF%AE%E6%94%B9%E5%8D%9A%E5%AE%A2css%E6%A0%B7%E5%BC%8F%E6%89%93%E9%80%A0%E5%B1%9E%E4%BA%8E%E8%87%AA%E5%B7%B1%E7%9A%84%E5%8D%9A%E5%AE%A2%E6%A0%B7%E5%BC%8F-e17f6e4c</link>
+      <link>https://gitpull.cn/post.html?slug=%E6%89%8B%E5%8A%A8%E4%BF%AE%E6%94%B9%E5%8D%9A%E5%AE%A2css%E6%A0%B7%E5%BC%8F%E6%89%93%E9%80%A0%E5%B1%9E%E4%BA%8E%E8%87%AA%E5%B7%B1%E7%9A%84%E5%8D%9A%E5%AE%A2%E6%A0%B7%E5%BC%8F-e17f6e4c</link>
       <guid isPermaLink="false">手动修改博客css样式打造属于自己的博客样式-e17f6e4c</guid>
       <pubDate>Sun, 28 Oct 2018 22:39:31 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -216,7 +216,7 @@
     </item>
     <item>
       <title>服务端搭建ssr教程</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%90%AD%E5%BB%BAssr%E6%95%99%E7%A8%8B-651cfd47</link>
+      <link>https://gitpull.cn/post.html?slug=%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%90%AD%E5%BB%BAssr%E6%95%99%E7%A8%8B-651cfd47</link>
       <guid isPermaLink="false">服务端搭建ssr教程-651cfd47</guid>
       <pubDate>Thu, 25 Oct 2018 13:32:17 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -225,7 +225,7 @@
     </item>
     <item>
       <title>解决来必力评论系统加载慢的问题</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E8%A7%A3%E5%86%B3%E6%9D%A5%E5%BF%85%E5%8A%9B%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F%E5%8A%A0%E8%BD%BD%E6%85%A2%E7%9A%84%E9%97%AE%E9%A2%98-3453c710</link>
+      <link>https://gitpull.cn/post.html?slug=%E8%A7%A3%E5%86%B3%E6%9D%A5%E5%BF%85%E5%8A%9B%E8%AF%84%E8%AE%BA%E7%B3%BB%E7%BB%9F%E5%8A%A0%E8%BD%BD%E6%85%A2%E7%9A%84%E9%97%AE%E9%A2%98-3453c710</link>
       <guid isPermaLink="false">解决来必力评论系统加载慢的问题-3453c710</guid>
       <pubDate>Sat, 13 Oct 2018 00:06:23 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -234,7 +234,7 @@
     </item>
     <item>
       <title>hexo博客搭建以及next美化教程</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E4%BB%A5%E5%8F%8Anext%E7%BE%8E%E5%8C%96%E6%95%99%E7%A8%8B-e8d13fc</link>
+      <link>https://gitpull.cn/post.html?slug=hexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E4%BB%A5%E5%8F%8Anext%E7%BE%8E%E5%8C%96%E6%95%99%E7%A8%8B-e8d13fc</link>
       <guid isPermaLink="false">hexo博客搭建以及next美化教程-e8d13fc</guid>
       <pubDate>Wed, 10 Oct 2018 00:41:50 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -243,7 +243,7 @@
     </item>
     <item>
       <title>sql语言学习笔记</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=sql%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1406270f</link>
+      <link>https://gitpull.cn/post.html?slug=sql%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1406270f</link>
       <guid isPermaLink="false">sql语言学习笔记-1406270f</guid>
       <pubDate>Mon, 08 Oct 2018 13:16:09 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -252,7 +252,7 @@
     </item>
     <item>
       <title>假期最后一天</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=%E5%81%87%E6%9C%9F%E6%9C%80%E5%90%8E%E4%B8%80%E5%A4%A9-1bde1150</link>
+      <link>https://gitpull.cn/post.html?slug=%E5%81%87%E6%9C%9F%E6%9C%80%E5%90%8E%E4%B8%80%E5%A4%A9-1bde1150</link>
       <guid isPermaLink="false">假期最后一天-1bde1150</guid>
       <pubDate>Sun, 07 Oct 2018 09:02:47 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -261,7 +261,7 @@
     </item>
     <item>
       <title>MarkDown的用法学习笔记</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=MarkDown%E7%9A%84%E7%94%A8%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-93e22221</link>
+      <link>https://gitpull.cn/post.html?slug=MarkDown%E7%9A%84%E7%94%A8%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-93e22221</link>
       <guid isPermaLink="false">MarkDown的用法学习笔记-93e22221</guid>
       <pubDate>Sat, 06 Oct 2018 05:12:16 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -270,7 +270,7 @@
     </item>
     <item>
       <title>windows上的vim配置，打造超级舒心又有逼格的编辑器</title>
-      <link>https://flymysql.github.io/gitblog/post.html?slug=windows%E4%B8%8A%E7%9A%84vim%E9%85%8D%E7%BD%AE%E6%89%93%E9%80%A0%E8%B6%85%E7%BA%A7%E8%88%92%E5%BF%83%E5%8F%88%E6%9C%89%E9%80%BC%E6%A0%BC%E7%9A%84%E7%BC%96%E8%BE%91%E5%99%A8-1a3fd97</link>
+      <link>https://gitpull.cn/post.html?slug=windows%E4%B8%8A%E7%9A%84vim%E9%85%8D%E7%BD%AE%E6%89%93%E9%80%A0%E8%B6%85%E7%BA%A7%E8%88%92%E5%BF%83%E5%8F%88%E6%9C%89%E9%80%BC%E6%A0%BC%E7%9A%84%E7%BC%96%E8%BE%91%E5%99%A8-1a3fd97</link>
       <guid isPermaLink="false">windows上的vim配置打造超级舒心又有逼格的编辑器-1a3fd97</guid>
       <pubDate>Thu, 21 Jun 2018 01:03:49 GMT</pubDate>
       <author>兰州小红鸡</author>
