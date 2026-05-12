@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260530';
+export const VERSION = '20260531';
 
 export const CONFIG = {
   repo: {
@@ -67,6 +67,7 @@ export const CONFIG = {
   pageviews: {
     enabled: true,
     provider: "busuanzi",   // busuanzi | none
+    articleProvider: "page-views-api", // page-views-api | busuanzi（busuanzi 仅支持文章页当前页，不支持首页列表）
     showHomeStats: true,    // 首页 hero 显示总访问 / 访客
     showPostViews: true,    // 文章页显示阅读次数
     showFooterStats: true   // 全站 footer 显示 PV / UV

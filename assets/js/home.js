@@ -5,7 +5,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
 import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages } from './site.js';
-import { initPageviews, bszSiteStatsHtml, isBusuanziOn } from './pageviews.js';
+import { initPageviews, bszSiteStatsHtml, isBusuanziOn, articleListPvHtml, renderArticleListViews } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -127,6 +127,7 @@ function postItemHtml(p, author, avatar) {
         <p class="post-summary">${escapeHtml(p.summary || '')}</p>
         <div class="post-meta">
           ${(p.tags || []).slice(0, 3).map(t => tagHtml(t)).join('')}
+          ${articleListPvHtml(p.slug)}
         </div>
       </a>
       ${p.cover ? `<a href="post.html?slug=${encodeURIComponent(p.slug)}" class="post-thumbnail"><img src="${escapeHtml(publicImageUrl(p.cover))}" alt="${escapeHtml(p.title || '')}" loading="lazy"></a>` : ''}
@@ -162,6 +163,7 @@ function renderList(posts) {
       : `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`);
   // 列表缩略图全部走视口懒加载（首屏前几张视口可见时会立刻加载）
   bindLazyImages(ul, { eagerCount: 0 });
+  renderArticleListViews(ul);
 
   let loaded = firstChunk.length;
   const sentinel = document.getElementById('loadMoreSentinel');
@@ -174,6 +176,7 @@ function renderList(posts) {
     const inserted = [...frag.children];
     inserted.forEach(node => ul.insertBefore(node, sentinel));
     inserted.forEach(node => bindLazyImages(node, { eagerCount: 0 }));
+    inserted.forEach(node => renderArticleListViews(node));
     loaded += nextChunk.length;
     if (loaded >= posts.length) {
       // 全部加载完，把 sentinel 替换成"到底"提示
