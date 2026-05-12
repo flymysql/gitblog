@@ -126,7 +126,7 @@
     background: #fff;
     border-color: rgba(0, 0, 0, 0.08);
     padding: 4px 10px 4px 6px;
-    gap: 6px;
+    gap: 0;
   }
   .hero-stats .stat.saobby-slot-stat .saobby-counter {
     background: transparent;
