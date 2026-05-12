@@ -5,7 +5,7 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 12 May 2026 04:38:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 12 May 2026 04:56:14 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GitBlog：一个带伪后台的博客站点</title>
@@ -24,6 +24,15 @@
       <author>Jimmy</author>
       <category>杂七杂八</category>
       <description><![CDATA[关于这个博客和写它的人 —— 一名做系统软件与数据库系统的程序员，业余写点代码、读点书、记点流水账。]]></description>
+    </item>
+    <item>
+      <title>3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的</title>
+      <link>https://gitpull.cn/post.html?slug=3fs-usrbio-zero-copy</link>
+      <guid isPermaLink="false">3fs-usrbio-zero-copy</guid>
+      <pubDate>Wed, 11 Mar 2026 00:00:00 GMT</pubDate>
+      <author>Jimmy</author>
+      <category>分布式存储</category><category>AI 基础设施</category><category>C++</category>
+      <description><![CDATA[DeepSeek 开源的 3FS 在 180 节点集群上实测聚合读取吞吐约 6.6 TiB/s。本文从 FUSE 的性能瓶颈讲起，拆解 3FS 如何通过共享内存、io_uring 风格的环形队列、以及 RDMA 直接传输三层叠加，把数据通路上的每一次拷贝都抠掉。]]></description>
     </item>
     <item>
       <title>多维数组的索引方案与内存设计</title>
@@ -267,15 +276,6 @@
       <author>兰州小红鸡</author>
       <category>前端</category>
       <description><![CDATA[标题 一级标题 ¶二级标题 ¶三级标题 ¶四级标题 ¶五级标题 ¶六级标题 列表 无序列表用 \\ 1. 有序列表用 1. 2. 3. 引用 只需要在文本前加入 这种尖括号（大于号）…]]></description>
-    </item>
-    <item>
-      <title>windows上的vim配置，打造超级舒心又有逼格的编辑器</title>
-      <link>https://gitpull.cn/post.html?slug=windows%E4%B8%8A%E7%9A%84vim%E9%85%8D%E7%BD%AE%E6%89%93%E9%80%A0%E8%B6%85%E7%BA%A7%E8%88%92%E5%BF%83%E5%8F%88%E6%9C%89%E9%80%BC%E6%A0%BC%E7%9A%84%E7%BC%96%E8%BE%91%E5%99%A8-1a3fd97</link>
-      <guid isPermaLink="false">windows上的vim配置打造超级舒心又有逼格的编辑器-1a3fd97</guid>
-      <pubDate>Thu, 21 Jun 2018 01:03:49 GMT</pubDate>
-      <author>兰州小红鸡</author>
-      <category>教程</category><category>前端</category>
-      <description><![CDATA[之前用的是spf13的方案 不过自己也删删减减了好多 就修改成比较适合自己的 其中vim scripts是vim的一些基本插件，包括语法高亮的支持、缩进等等。 当然我也可以使用其他…]]></description>
     </item>
   </channel>
 </rss>
