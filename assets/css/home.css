@@ -122,10 +122,32 @@
     border: 1px solid color-mix(in srgb, var(--border), var(--primary) 18%);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   }
+  .hero-stats .stat.saobby-slot-stat {
+    background: #fff;
+    border-color: rgba(0, 0, 0, 0.08);
+    padding: 4px 10px 4px 6px;
+    gap: 6px;
+  }
+  .hero-stats .stat.saobby-slot-stat .saobby-counter {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+  }
   .hero-stats .stat strong {
     font-size: 14px;
     line-height: 1;
   }
+}
+
+[data-mode="dark"] .hero-stats .stat.saobby-slot-stat {
+  background: #ececec;
+  border-color: rgba(0, 0, 0, 0.18);
+}
+[data-mode="dark"] .hero-stats .stat.saobby-slot-stat .saobby-label {
+  color: #555;
+}
+[data-mode="dark"] .hero-stats .stat.saobby-slot-stat .saobby-counter {
+  filter: none;
 }
 
 /* ---------- 首页轮播 ---------- */
