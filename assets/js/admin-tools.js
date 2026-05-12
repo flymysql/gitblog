@@ -175,15 +175,18 @@ export async function findOrphanImages() {
       if (n && n.internal) used.add(n.path);
     }
   }
-  // 也认为 frontmatter 里的 cover 字段（在索引里）算引用：保险起见再读一次 posts.json
+  // 也认为 frontmatter 里的 cover / thumbnail 字段（在索引里）算引用
+  // thumbnail 是 build.mjs 自动生成的小尺寸版本，不会出现在 markdown 里，必须从索引读
   try {
     const idxFile = await readFile(CONFIG.paths.index);
     if (idxFile) {
       const idx = JSON.parse(idxFile.content);
       for (const p of (idx.posts || [])) {
-        if (p.cover) {
-          const n = normalizeUrl(p.cover);
-          if (n && n.internal) used.add(n.path);
+        for (const field of ['cover', 'thumbnail']) {
+          if (p[field]) {
+            const n = normalizeUrl(p[field]);
+            if (n && n.internal) used.add(n.path);
+          }
         }
       }
     }

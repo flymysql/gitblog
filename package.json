@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "build:thumbs": "node scripts/build-thumbnails.mjs",
     "migrate:cnblogs": "node scripts/migrate-cnblogs.mjs",
     "migrate:hexo": "node scripts/migrate-hexo.mjs",
     "fix:hexo-codeblocks": "node scripts/fix-hexo-codeblocks.mjs",
@@ -14,6 +15,7 @@
   },
   "devDependencies": {
     "cheerio": "^1.0.0",
+    "sharp": "^0.34.5",
     "turndown": "^7.2.0",
     "turndown-plugin-gfm": "^1.0.2"
   }

@@ -16,7 +16,8 @@
       "pinned": true,
       "pinnedOrder": 1,
       "carousel": true,
-      "path": "posts/welcome.md"
+      "path": "posts/welcome.md",
+      "thumbnail": "../assets/uploads/2026/05/1778490605877-blwjij-image.thumb.webp"
     },
     {
       "slug": "about",
@@ -190,7 +191,8 @@
         "教程"
       ],
       "cover": "assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-03.gif",
-      "path": "posts/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4.md"
+      "path": "posts/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4.md",
+      "thumbnail": "assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-03.thumb.webp"
     },
     {
       "slug": "12月6日杂谈-5027c817",
@@ -243,7 +245,8 @@
         "C++"
       ],
       "cover": "assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.png",
-      "path": "posts/Dijkstra单源最短路径算法-15e41f53.md"
+      "path": "posts/Dijkstra单源最短路径算法-15e41f53.md",
+      "thumbnail": "assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.thumb.webp"
     },
     {
       "slug": "使用腾讯云cdn加速博客-1609338289",
@@ -257,7 +260,8 @@
         "博客建站"
       ],
       "cover": "assets/uploads/2026/05/使用腾讯云cdn加速博客-1609338289-01.png",
-      "path": "posts/使用腾讯云cdn加速博客-1609338289.md"
+      "path": "posts/使用腾讯云cdn加速博客-1609338289.md",
+      "thumbnail": "assets/uploads/2026/05/使用腾讯云cdn加速博客-1609338289-01.thumb.webp"
     },
     {
       "slug": "hexo建站笔记之首页文章轮播图-6bf81741",
@@ -272,7 +276,8 @@
         "博客建站"
       ],
       "cover": "assets/uploads/2026/05/hexo建站笔记之首页文章轮播图-6bf81741-01.png",
-      "path": "posts/hexo建站笔记之首页文章轮播图-6bf81741.md"
+      "path": "posts/hexo建站笔记之首页文章轮播图-6bf81741.md",
+      "thumbnail": "assets/uploads/2026/05/hexo建站笔记之首页文章轮播图-6bf81741-01.thumb.webp"
     },
     {
       "slug": "将公众号文章爬到hexo博客-fb598031",
@@ -297,7 +302,8 @@
         "博客建站"
       ],
       "cover": "assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-01.png",
-      "path": "posts/hexo建站笔记之彩色标签云-d6caa003.md"
+      "path": "posts/hexo建站笔记之彩色标签云-d6caa003.md",
+      "thumbnail": "assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-01.thumb.webp"
     },
     {
       "slug": "用回valine评论系统valine评论框样式美化-2d5da13e",
@@ -337,7 +343,8 @@
         "博客建站"
       ],
       "cover": "assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-06.png",
-      "path": "posts/手动修改博客css样式打造属于自己的博客样式-e17f6e4c.md"
+      "path": "posts/手动修改博客css样式打造属于自己的博客样式-e17f6e4c.md",
+      "thumbnail": "assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-06.thumb.webp"
     },
     {
       "slug": "服务端搭建ssr教程-651cfd47",
@@ -351,7 +358,8 @@
         "前端"
       ],
       "cover": "assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.png",
-      "path": "posts/服务端搭建ssr教程-651cfd47.md"
+      "path": "posts/服务端搭建ssr教程-651cfd47.md",
+      "thumbnail": "assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.thumb.webp"
     },
     {
       "slug": "解决来必力评论系统加载慢的问题-3453c710",
@@ -378,7 +386,8 @@
         "博客建站"
       ],
       "cover": "assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-04.png",
-      "path": "posts/hexo博客搭建以及next美化教程-e8d13fc.md"
+      "path": "posts/hexo博客搭建以及next美化教程-e8d13fc.md",
+      "thumbnail": "assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-04.thumb.webp"
     },
     {
       "slug": "sql语言学习笔记-1406270f",
@@ -415,7 +424,8 @@
         "前端"
       ],
       "cover": "assets/uploads/2026/05/MarkDown的用法学习笔记-93e22221-02.png",
-      "path": "posts/MarkDown的用法学习笔记-93e22221.md"
+      "path": "posts/MarkDown的用法学习笔记-93e22221.md",
+      "thumbnail": "assets/uploads/2026/05/MarkDown的用法学习笔记-93e22221-02.thumb.webp"
     },
     {
       "slug": "windows上的vim配置打造超级舒心又有逼格的编辑器-1a3fd97",
@@ -553,7 +563,8 @@
         "杂七杂八"
       ],
       "cover": "assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-01.png",
-      "path": "posts/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676.md"
+      "path": "posts/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676.md",
+      "thumbnail": "assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-01.thumb.webp"
     },
     {
       "slug": "我现在没有喜欢的人-68bc5da3",
@@ -900,7 +911,8 @@
       "tags": [],
       "cover": "assets/uploads/2026/05/用python做一个C类编译器——语法翻译器-15995704-01.png",
       "carousel": true,
-      "path": "posts/用python做一个C类编译器——语法翻译器-15995704.md"
+      "path": "posts/用python做一个C类编译器——语法翻译器-15995704.md",
+      "thumbnail": "assets/uploads/2026/05/用python做一个C类编译器——语法翻译器-15995704-01.thumb.webp"
     }
   ]
 }

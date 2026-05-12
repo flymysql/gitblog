@@ -221,7 +221,7 @@ function postItemHtml(p, author, avatar) {
           ${articleListPvHtml(p.slug)}
         </div>
       </a>
-      ${p.cover ? `<a href="post.html?slug=${encodeURIComponent(p.slug)}" class="post-thumbnail"><img src="${LAZY_PLACEHOLDER}" data-src="${escapeHtml(publicImageUrl(p.cover))}" alt="${escapeHtml(p.title || '')}" loading="lazy" decoding="async" fetchpriority="low"></a>` : ''}
+      ${p.cover ? `<a href="post.html?slug=${encodeURIComponent(p.slug)}" class="post-thumbnail"><img src="${LAZY_PLACEHOLDER}" data-src="${escapeHtml(publicImageUrl(p.thumbnail || p.cover))}" alt="${escapeHtml(p.title || '')}" loading="lazy" decoding="async" fetchpriority="low"></a>` : ''}
     </li>
   `;
 }
