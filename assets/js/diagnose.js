@@ -244,7 +244,7 @@ async function runOrphanImages() {
     out.innerHTML = `
       <div class="diagnose-detail">
         共 ${r.total} 张图片，<b>${r.orphans.length}</b> 张未被任何文章引用（约 ${fmtSize(totalBytes)}）。
-        <br><span style="color:var(--text-tertiary);">删除会逐张产生一次 commit，请确认后再操作。</span>
+        <br><span style="color:var(--text-tertiary);">所选图片会被合并为 <b>1 次 commit</b> 一次性删除。</span>
       </div>
       <div style="margin:8px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <label class="settings-check"><input type="checkbox" id="orphanSelectAll"> 全选</label>
@@ -282,17 +282,20 @@ async function runOrphanImages() {
       const rows = [...out.querySelectorAll('tbody tr')].filter(tr => tr.querySelector('.orphan-pick').checked);
       if (!rows.length) return;
       const items = rows.map(tr => ({ path: tr.dataset.path, sha: tr.dataset.sha }));
-      if (!confirm(`确定删除选中的 ${items.length} 张图片？将产生 ${items.length} 次 commit。`)) return;
+      if (!confirm(`确定删除选中的 ${items.length} 张图片？将合并为 1 次 commit。`)) return;
       const btn = document.getElementById('orphanDeleteBtn');
-      btn.disabled = true; btn.textContent = '删除中… 0 / ' + items.length;
-      const { done, failed } = await bulkDelete(items, ({ done, total }) => {
-        btn.textContent = `删除中… ${done} / ${total}`;
-      });
-      btn.textContent = '删除选中';
-      if (failed.length) {
-        showToast(`完成：${done} 成功、${failed.length} 失败`, 'error');
-      } else {
-        showToast(`已删除 ${done} 张孤儿图`);
+      btn.disabled = true;
+      btn.textContent = `删除中… 准备 ${items.length} 项`;
+      try {
+        const { done, commit } = await bulkDelete(items, ({ phase }) => {
+          if (phase === 'tree') btn.textContent = '删除中… 生成 tree';
+          else if (phase === 'commit') btn.textContent = '删除中… 创建 commit';
+        });
+        btn.textContent = '删除选中';
+        showToast(`已删除 ${done} 张孤儿图（commit ${String(commit || '').slice(0, 7)}）`);
+      } catch (err) {
+        btn.textContent = '删除选中';
+        showToast('删除失败：' + (err.message || String(err)), 'error');
       }
       await runOrphanImages();
     });
@@ -322,7 +325,7 @@ async function runOrphanImages() {
         孤儿图片清理
         <button class="btn btn-secondary" id="runOrphan" type="button">开始扫描</button>
       </div>
-      <p class="diagnose-tool-hint">列出 ${escapeHtml(CONFIG.paths.uploads || 'assets/uploads')} 下没有被任何 markdown 引用的图片，可勾选批量删除（每张图一次 commit）。</p>
+      <p class="diagnose-tool-hint">列出 ${escapeHtml(CONFIG.paths.uploads || 'assets/uploads')} 下没有被任何 markdown 引用的图片，可勾选批量删除（合并为 1 次 commit）。</p>
       <div id="orphanOut"></div>
     </section>
   `;
