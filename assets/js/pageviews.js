@@ -159,12 +159,12 @@ function injectSaobby(root = document) {
   const sitePrefix = siteSlotPrefix();
   const articlePrefix = articleSlotPrefix();
   root.querySelectorAll('[data-saobby-slot="site"]').forEach(el => {
-    if (!el.dataset.saobbyPrefix) el.dataset.saobbyPrefix = sitePrefix;
+    if (!el.dataset.saobbyPrefix && !el.dataset.saobbySuffix) el.dataset.saobbyPrefix = sitePrefix;
     const override = (el.dataset.saobbyImg || '').trim();
     fillSaobbyImage(el, override || siteImg, sitePrefix);
   });
   root.querySelectorAll('[data-saobby-slot="article"]').forEach(el => {
-    if (!el.dataset.saobbyPrefix) el.dataset.saobbyPrefix = articlePrefix;
+    if (!el.dataset.saobbyPrefix && !el.dataset.saobbySuffix) el.dataset.saobbyPrefix = articlePrefix;
     // 文章页可以通过 data-saobby-img 提供本文专属计数器（来自 frontmatter.counter.img）
     const override = (el.dataset.saobbyImg || '').trim();
     fillSaobbyImage(el, override || articleImg, articlePrefix);
@@ -216,7 +216,7 @@ export function bszSiteStatsHtml({ compact = false } = {}) {
   if (isSaobbyOn() && saobbySiteImg()) {
     const prefix = siteSlotPrefix();
     if (compact) {
-      return `<span class="saobby-slot saobby-slot-compact" data-saobby-slot="site" data-saobby-prefix="${escapeAttr(prefix)}" hidden></span>`;
+      return `<span class="saobby-slot saobby-slot-compact" data-saobby-slot="site" data-saobby-suffix="${escapeAttr(prefix)}" hidden></span>`;
     }
     return `<div class="stat saobby-slot saobby-slot-stat" data-saobby-slot="site" data-saobby-prefix="${escapeAttr(prefix)}" hidden></div>`;
   }
