@@ -3,7 +3,7 @@
 // 与 ?v=VERSION 的 cache-busting 协同：CACHE_NAME 用 release VERSION 区分批次
 // ============================================================================
 
-const SW_VERSION = '20260512144200';
+const SW_VERSION = '20260512145600';
 const STATIC_CACHE = `static-${SW_VERSION}`;
 const PAGE_CACHE = `pages-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
@@ -33,11 +33,14 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys
+    Promise.all([
+      self.registration.navigationPreload ? self.registration.navigationPreload.enable().catch(() => {}) : null,
+      caches.keys().then(keys =>
+        Promise.all(keys
         .filter(k => ![STATIC_CACHE, PAGE_CACHE, RUNTIME_CACHE].includes(k))
         .map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+      ),
+    ]).then(() => self.clients.claim())
   );
 });
 
@@ -60,16 +63,7 @@ self.addEventListener('fetch', event => {
                  (request.headers.get('accept') || '').includes('text/html');
 
   if (isHTML) {
-    // 网络优先，失败则缓存兜底，最后给 offline.html
-    event.respondWith(
-      fetch(request).then(res => {
-        const copy = res.clone();
-        caches.open(PAGE_CACHE).then(c => c.put(request, copy)).catch(() => {});
-        return res;
-      }).catch(() =>
-        caches.match(request).then(r => r || caches.match(OFFLINE_URL))
-      )
-    );
+    event.respondWith(handleHtml(request, event));
     return;
   }
 
@@ -89,6 +83,52 @@ self.addEventListener('fetch', event => {
     );
   }
 });
+
+async function handleHtml(request, event) {
+  const cached = await matchHtmlShell(request);
+  const network = (event.preloadResponse || Promise.resolve(null))
+    .then(preload => preload || fetch(request))
+    .then(res => {
+      if (res && res.status === 200) {
+        const copy = res.clone();
+        caches.open(PAGE_CACHE).then(c => c.put(request, copy)).catch(() => {});
+      }
+      return res;
+    });
+
+  // 导航页最影响 DCL。已有缓存时立刻返回页面壳，后台静默更新，避免慢 304 卡住首屏。
+  if (cached) {
+    event.waitUntil(network.catch(() => {}));
+    return cached;
+  }
+
+  // 首次访问且没有缓存时才等网络；最多等 2 秒，随后降级到离线页。
+  return Promise.race([
+    network.catch(() => null),
+    delay(2000).then(() => null),
+  ]).then(res => res || caches.match(OFFLINE_URL));
+}
+
+async function matchHtmlShell(request) {
+  const direct = await caches.match(request);
+  if (direct) return direct;
+
+  const url = new URL(request.url);
+  const path = url.pathname.replace(/\/+$/, '');
+  const name = path.split('/').pop() || 'index.html';
+  const shell = name === '' ? 'index.html' : name;
+
+  // post.html?slug=xxx / tags.html#xxx 这类页面壳相同，query 不应该影响命中。
+  for (const key of [shell, './' + shell, 'index.html', './']) {
+    const hit = await caches.match(key);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 // 让页面在 deploy 后能立刻 reload 到新版本
 self.addEventListener('message', event => {
