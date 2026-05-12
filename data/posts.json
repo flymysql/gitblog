@@ -33,6 +33,23 @@
       "path": "posts/about.md"
     },
     {
+      "slug": "smallpond-source-walkthrough",
+      "title": "Smallpond 源码走读：DuckDB × 3FS × Ray 是如何拼成一台分布式数据处理机的",
+      "date": "2026-04-15",
+      "updated": "2026-05-12",
+      "author": "Jimmy",
+      "summary": "Smallpond 是 DeepSeek 开源的轻量级分布式数据处理框架，专为 10 TB 到 PB 量级的 AI / 数据场景设计。它把 DuckDB 的列式向量化执行、3FS 的高带宽存储、Ray 的任务调度三块拼到一起，做成了\"一台机器\"。本文从架构分层、端到端工作流、Parquet 基础到核心源码走读，把这台\"机器\"的工作原理说清楚。",
+      "tags": [
+        "分布式存储",
+        "AI 基础设施",
+        "python"
+      ],
+      "cover": "assets/uploads/2026/05/smallpond-cover.svg",
+      "series": "DeepSeek 数据基础设施巡礼",
+      "seriesOrder": 2,
+      "path": "posts/smallpond-source-walkthrough.md"
+    },
+    {
       "slug": "3fs-usrbio-zero-copy",
       "title": "3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的",
       "date": "2026-03-11",
@@ -45,6 +62,8 @@
         "C++"
       ],
       "cover": "assets/uploads/2026/05/3fs-usrbio-cover.svg",
+      "series": "DeepSeek 数据基础设施巡礼",
+      "seriesOrder": 1,
       "path": "posts/3fs-usrbio-zero-copy.md"
     },
     {

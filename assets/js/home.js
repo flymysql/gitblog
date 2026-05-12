@@ -4,7 +4,7 @@
 
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
-import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages } from './site.js';
+import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER } from './site.js';
 import { initPageviews, bszSiteStatsHtml, isBusuanziOn, articleListPvHtml, renderArticleListViews } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 
@@ -69,7 +69,12 @@ function renderCarousel(posts) {
     <div class="carousel-viewport">
       ${items.map((p, i) => `
         <a class="carousel-slide${i === 0 ? ' active' : ''}" href="post.html?slug=${encodeURIComponent(p.slug)}" aria-label="${escapeHtml(p.title || '文章')}">
-          <img src="${escapeHtml(publicImageUrl(p.cover))}" alt="${escapeHtml(p.title || '')}" loading="${i === 0 ? 'eager' : 'lazy'}">
+          <img
+            src="${escapeHtml(i === 0 ? publicImageUrl(p.cover) : LAZY_PLACEHOLDER)}"
+            ${i === 0 ? 'fetchpriority="high"' : `data-src="${escapeHtml(publicImageUrl(p.cover))}" fetchpriority="low"`}
+            alt="${escapeHtml(p.title || '')}"
+            loading="${i === 0 ? 'eager' : 'lazy'}"
+            decoding="async">
           <span class="carousel-shade"></span>
           <span class="carousel-content">
             ${p.pinned ? '<span class="carousel-badge">置顶推荐</span>' : '<span class="carousel-badge">精选文章</span>'}
@@ -216,7 +221,7 @@ function postItemHtml(p, author, avatar) {
           ${articleListPvHtml(p.slug)}
         </div>
       </a>
-      ${p.cover ? `<a href="post.html?slug=${encodeURIComponent(p.slug)}" class="post-thumbnail"><img src="${escapeHtml(publicImageUrl(p.cover))}" alt="${escapeHtml(p.title || '')}" loading="lazy"></a>` : ''}
+      ${p.cover ? `<a href="post.html?slug=${encodeURIComponent(p.slug)}" class="post-thumbnail"><img src="${LAZY_PLACEHOLDER}" data-src="${escapeHtml(publicImageUrl(p.cover))}" alt="${escapeHtml(p.title || '')}" loading="lazy" decoding="async" fetchpriority="low"></a>` : ''}
     </li>
   `;
 }

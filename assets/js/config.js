@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260512120000';
+export const VERSION = '20260512132200';
 
 export const CONFIG = {
   repo: {
@@ -102,12 +102,12 @@ export const CONFIG = {
     customCss: ""
   },
   // 文章末尾的「分享 / 打赏 / 二维码」卡片
-  // 任意一个 url 不为空就显示对应按钮；都为空时打赏区折叠
+  // 默认关掉，需要时去 admin/settings 把 enabled 勾上即可
   share: {
-    enabled: true,
-    showInPosts: true,    // 文章页底部
-    showInPages: false,   // 独立页（如「关于」）默认不显示
-    qrcodeOfPage: true    // 渲染当前页面 URL 的二维码（PC 用户扫码到手机继续看）
+    enabled: false,
+    showInPosts: true,
+    showInPages: false,
+    qrcodeOfPage: true
   },
   donate: {
     enabled: false,
