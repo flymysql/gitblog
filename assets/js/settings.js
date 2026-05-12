@@ -210,6 +210,7 @@ function normalizeConfig(config) {
     const slot = config.pageviews.saobby[k];
     slot.img = String(slot.img || '').trim();
     slot.dashboard = String(slot.dashboard || '').trim();
+    slot.label = String(slot.label || (k === 'site' ? '总访问' : '阅读')).trim() || (k === 'site' ? '总访问' : '阅读');
   });
   config.pageviews.saobby.extra = config.pageviews.saobby.extra
     .map(it => ({
@@ -585,11 +586,13 @@ function settingsContentHtml() {
         <div class="settings-grid">
           <label class="span-2">图片 URL <input name="pageviews.saobby.site.img" placeholder="https://www.saobby.com/webcounter/svg?id=..."></label>
           <label class="span-2">控制面板 URL <input name="pageviews.saobby.site.dashboard" placeholder="https://www.saobby.com/webcounter_dashboard?key=..."></label>
+          <label>前缀文字 <input name="pageviews.saobby.site.label" placeholder="总访问"><span class="settings-hint">显示在数字图前面，例如「总访问」「访客数」</span></label>
         </div>
         <div class="settings-row-title" style="margin-top:14px"><span>文章页计数器（每篇文章共用一张图）</span></div>
         <div class="settings-grid">
           <label class="span-2">图片 URL <input name="pageviews.saobby.article.img" placeholder="可选，留空则文章页不显示阅读次数"></label>
           <label class="span-2">控制面板 URL <input name="pageviews.saobby.article.dashboard" placeholder="https://www.saobby.com/webcounter_dashboard?key=..."></label>
+          <label>前缀文字 <input name="pageviews.saobby.article.label" placeholder="阅读"><span class="settings-hint">显示在数字图前面，例如「阅读」「访问」</span></label>
         </div>
         <div class="settings-row-title" style="margin-top:14px">
           <span>额外计数器（仅在后台「访问数据」展示）</span>

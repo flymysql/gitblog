@@ -547,7 +547,8 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
   display: inline-block;
 }
 
-/* ---------- saobby 计数器（图片即数字） ---------- */
+/* ---------- saobby 计数器（图片即数字）---------- */
+/* 内联版：[前缀] [小图] [后缀] —— 用于 footer / 文章 meta */
 .saobby-slot {
   display: inline-flex;
   align-items: center;
@@ -555,16 +556,56 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
   line-height: 1;
 }
 .saobby-slot[hidden] { display: none; }
-.saobby-counter {
-  height: 1em;
-  width: auto;
-  vertical-align: -0.15em;
-  display: inline-block;
+.saobby-prefix,
+.saobby-suffix {
+  color: inherit;
+  font-size: inherit;
 }
-.hero-stats .saobby-slot { gap: 6px; }
-.hero-stats .saobby-slot .saobby-counter { height: 22px; }
-.footer-stats .saobby-slot.saobby-slot-compact .saobby-counter { height: 14px; }
-.article-author .meta .saobby-slot-inline .saobby-counter { height: 14px; }
+.saobby-counter {
+  height: 1.05em;
+  width: auto;
+  display: inline-block;
+  border-radius: 4px;
+  vertical-align: -0.15em;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+[data-mode="dark"] .saobby-counter {
+  /* 让白底图在暗色背景上不那么刺眼 */
+  filter: brightness(0.92) contrast(0.95);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 卡片版：用于首页 hero 区，和其它 stat 卡片对齐 —— 和 .stat <strong>N</strong>label 一致的横向布局 */
+.saobby-slot-stat {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+.saobby-slot-stat .saobby-num {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+}
+.saobby-slot-stat .saobby-num .saobby-counter {
+  height: 18px;
+  border-radius: 4px;
+  vertical-align: -0.18em;
+}
+.saobby-slot-stat .saobby-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: normal;
+}
+
+/* footer 紧凑：把字号缩到正文小字一致 */
+.footer-stats .saobby-slot { gap: 4px; font-size: 12px; }
+.footer-stats .saobby-slot .saobby-counter { height: 14px; border-radius: 3px; }
+
+/* 文章 meta 内联版：和「字数 / 分钟」一行 */
+.article-author .meta .saobby-slot-inline { gap: 4px; }
+.article-author .meta .saobby-slot-inline .saobby-counter { height: 14px; border-radius: 3px; }
 
 .footer-social {
   display: flex;
