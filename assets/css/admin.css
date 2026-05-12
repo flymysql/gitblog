@@ -1161,6 +1161,136 @@ html[data-mode="dark"] .editor-vditor-host .vditor-toolbar__item .vditor-tooltip
   font-size: 12px;
 }
 
+/* ---------- 后台访问数据（saobby dashboard 嵌入） ---------- */
+.analytics-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 60vh;
+}
+.analytics-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+.analytics-tab {
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.analytics-tab:hover { color: var(--text-main); background: var(--bg-soft); }
+.analytics-tab.active {
+  color: var(--primary);
+  background: var(--bg);
+  border-color: var(--border);
+  border-bottom-color: transparent;
+  margin-bottom: -7px;
+  font-weight: 600;
+}
+.analytics-panels { flex: 1; }
+.analytics-panel { display: none; }
+.analytics-panel.active { display: block; }
+.analytics-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.analytics-panel-head h3 { margin: 0 0 4px 0; }
+.analytics-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.saobby-counter-preview {
+  height: 28px;
+  width: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  padding: 2px 6px;
+}
+.analytics-frame-wrap {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+  min-height: 600px;
+}
+.analytics-frame {
+  display: block;
+  width: 100%;
+  min-height: 700px;
+  border: 0;
+}
+.analytics-frame-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-soft);
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+.analytics-frame-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-secondary);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: var(--bg-soft);
+}
+.admin-empty-card {
+  max-width: 640px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+.admin-empty-card h2 { margin-top: 0; }
+
+/* ---------- 设置页：saobby 额外计数器编辑器 ---------- */
+.saobby-extra-editor {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+.saobby-extra-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.7fr) minmax(220px, 1fr) minmax(220px, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+}
+.saobby-extra-row label {
+  display: grid;
+  gap: 5px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+@media (max-width: 768px) {
+  .saobby-extra-row {
+    grid-template-columns: 1fr;
+  }
+  .saobby-extra-row .btn {
+    justify-self: start;
+  }
+}
+
 .image-library {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

@@ -5,7 +5,8 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
 import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER } from './site.js';
-import { initPageviews, bszSiteStatsHtml, isBusuanziOn, articleListPvHtml, renderArticleListViews } from './pageviews.js';
+// 注：列表逐篇阅读数在 saobby provider 下会自动返回空，不影响渲染
+import { initPageviews, bszSiteStatsHtml, articleListPvHtml, renderArticleListViews } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -31,7 +32,7 @@ function renderHero(posts) {
           <div class="stat"><strong>${posts.length}</strong>篇文章</div>
           <div class="stat"><strong>${tagCount.size}</strong>个标签</div>
           ${posts.length ? `<div class="stat">最近更新 ${timeAgo(posts[0].date)}</div>` : ''}
-          ${(CONFIG.pageviews || {}).showHomeStats !== false && isBusuanziOn() ? bszSiteStatsHtml() : ''}
+          ${(CONFIG.pageviews || {}).showHomeStats !== false ? bszSiteStatsHtml() : ''}
         </div>
       </div>
       <span class="hero-arrow" aria-hidden="true">›</span>

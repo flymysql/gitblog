@@ -496,7 +496,11 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
             <span>${(content || '').length} 字</span>
             <span class="dot"></span>
             <span>约 ${mins} 分钟</span>
-            ${(CONFIG.pageviews || {}).showPostViews !== false ? `<span class="dot"></span>${bszPagePvHtml()}` : ''}
+            ${(() => {
+              if ((CONFIG.pageviews || {}).showPostViews === false) return '';
+              const pv = bszPagePvHtml();
+              return pv ? `<span class="dot"></span>${pv}` : '';
+            })()}
           </div>
         </div>
         <a class="article-edit" href="admin/editor.html?slug=${encodeURIComponent(slug)}" title="编辑此文">编辑</a>
