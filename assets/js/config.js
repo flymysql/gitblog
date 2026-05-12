@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260512162000';
+export const VERSION = '20260512165352';
 
 export const CONFIG = {
   repo: {
@@ -70,7 +70,7 @@ export const CONFIG = {
   },
   pageviews: {
     enabled: true,
-    provider: "busuanzi",
+    provider: "saobby",
     articleProvider: "page-views-api",
     showHomeStats: true,
     showPostViews: true,
@@ -78,12 +78,12 @@ export const CONFIG = {
     showListPostViews: true,
     saobby: {
       site: {
-        img: "",
-        dashboard: ""
+        img: "https://w.saobby.com/w/ivywp8ie",
+        dashboard: "https://www.saobby.com/webcounter_dashboard?access_token=59nv7dkv"
       },
       article: {
-        img: "",
-        dashboard: ""
+        img: "https://w.saobby.com/w/qabb4byw",
+        dashboard: "https://www.saobby.com/webcounter_dashboard?access_token=xxnc4lgt"
       },
       extra: []
     }
@@ -99,12 +99,10 @@ export const CONFIG = {
     index: "data/posts.json",
     uploads: "assets/uploads"
   },
-  // 图片上传策略：默认把 PNG / JPEG 转 WebP 体积省 30%~70%
-  // GIF（含动图）、SVG、HEIC 等不会被转
   upload: {
     preferWebp: true,
     webpQuality: 0.85,
-    maxWidth: 1920    // 超过这个宽度会缩放（避免 5MB 大图）
+    maxWidth: 1920
   },
   theme: {
     default: "auto",
@@ -113,8 +111,6 @@ export const CONFIG = {
     tokens: {},
     customCss: ""
   },
-  // 文章末尾的「分享 / 打赏 / 二维码」卡片
-  // 默认关掉，需要时去 admin/settings 把 enabled 勾上即可
   share: {
     enabled: false,
     showInPosts: true,
@@ -124,8 +120,8 @@ export const CONFIG = {
   donate: {
     enabled: false,
     title: "如果这篇文章对你有帮助，欢迎请我喝杯咖啡 ☕️",
-    wechat: "",           // 微信收款码图片 URL
-    alipay: "",           // 支付宝收款码图片 URL
-    paypal: ""            // PayPal 链接（如 https://paypal.me/xxx）
+    wechat: "",
+    alipay: "",
+    paypal: ""
   }
 };
