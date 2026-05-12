@@ -91,6 +91,9 @@
   background: linear-gradient(135deg, #55c9ff, #69a7ff);
   font-size: 24px;
 }
+.tool-icon.icon-heart {
+  background: linear-gradient(135deg, #ff8aa1, #ff5d8f);
+}
 
 .tool-meta {
   display: grid;
