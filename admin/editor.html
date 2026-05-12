@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
   <title>编辑文章</title>
-  <link rel="stylesheet" href="../assets/css/common.css?v=20260529">
-  <link rel="stylesheet" href="../assets/css/admin.css?v=20260529">
-  <link rel="stylesheet" href="../assets/css/post.css?v=20260529">
+  <link rel="stylesheet" href="../assets/css/common.css?v=20260530">
+  <link rel="stylesheet" href="../assets/css/admin.css?v=20260530">
+  <link rel="stylesheet" href="../assets/css/post.css?v=20260530">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
 </head>
@@ -17,11 +17,11 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       返回
     </a>
-    <span class="editor-status" id="status">未登录</span>
     <div class="editor-mode-switch" role="tablist" aria-label="编辑模式">
       <button type="button" class="editor-mode-btn is-active" data-mode="markdown" role="tab" aria-selected="true" title="Markdown 源码模式（适合熟悉 Markdown 的写作者）">Markdown</button>
       <button type="button" class="editor-mode-btn" data-mode="rich" role="tab" aria-selected="false" title="所见即所得富文本模式（不需要懂 Markdown 也能写）">富文本</button>
     </div>
+    <span class="editor-status" id="status">未登录</span>
     <div class="editor-toggle-row">
       <label><input type="checkbox" id="draftToggle"> 草稿</label>
       <label><input type="checkbox" id="pinnedToggle"> 置顶</label>
@@ -69,6 +69,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
-  <script type="module" src="../assets/js/editor.js?v=20260529"></script>
+  <script type="module" src="../assets/js/editor.js?v=20260530"></script>
 </body>
 </html>
