@@ -2,7 +2,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, sep } from 'node:path';
 
-const NEW = '20260512144200';
+const NEW = '20260512145600';
 
 let cfg = readFileSync('assets/js/config.js', 'utf8');
 cfg = cfg.replace(/(VERSION\s*=\s*')(\d+)(')/, `$1${NEW}$3`);
