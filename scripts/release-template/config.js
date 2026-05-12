@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260512162000';
+export const VERSION = '20260512170800';
 
 export const CONFIG = {
   repo: {
@@ -72,14 +72,16 @@ export const CONFIG = {
     // 把生成的图片 URL 和控制面板（dashboard）URL 粘进来即可
     saobby: {
       site: {
-        img: "",        // 站点级计数器图片 URL（首页 / footer 展示）
-        dashboard: ""   // 站点计数器控制面板完整 URL（含 key），后台「访问数据」会嵌入
+        img: "",          // 站点级计数器图片 URL（首页 / footer 展示）
+        dashboard: "",    // 站点计数器控制面板完整 URL（含 key），后台「访问数据」会嵌入
+        label: "总访问"    // 前缀文字，例如改成「访客数」「累计访问」
       },
       article: {
-        img: "",        // 文章页计数器（每篇文章共用一张图，统计全站文章总阅读）
-        dashboard: ""
+        img: "",          // 文章页计数器（每篇文章共用一张图，统计全站文章总阅读）
+        dashboard: "",
+        label: "阅读"
       },
-      extra: []         // [{ name, img, dashboard }] 额外计数器，仅在后台「访问数据」展示
+      extra: []           // [{ name, img, dashboard }] 额外计数器，仅在后台「访问数据」展示
     }
   },
   auth: {

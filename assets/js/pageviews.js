@@ -119,25 +119,55 @@ function fillSaobbyImage(slotEl, src, label = '访问') {
   if (slotEl.dataset.saobbyDone === '1') return;
   slotEl.dataset.saobbyDone = '1';
   slotEl.hidden = false;
-  // 加 referrerPolicy 让 saobby 服务可以按完整 URL 区分页面
-  slotEl.innerHTML = `<img src="${escapeAttr(src)}" alt="${escapeAttr(label)}" referrerpolicy="no-referrer-when-downgrade" loading="eager" decoding="async" class="saobby-counter">`;
+  // 用 data-saobby-prefix / data-saobby-suffix 给纯数字图加上"访问量"/"次"等文字
+  // 让纯数字图配合页面排版有可读性，并在主题切换时和正文一致
+  const prefix = String(slotEl.dataset.saobbyPrefix || '').trim();
+  const suffix = String(slotEl.dataset.saobbySuffix || '').trim();
+  const isStat = slotEl.classList.contains('saobby-slot-stat');
+  const numHtml = `<img src="${escapeAttr(src)}" alt="${escapeAttr(label)}" referrerpolicy="no-referrer-when-downgrade" loading="eager" decoding="async" class="saobby-counter">`;
+  if (isStat) {
+    // 首页 hero 统一卡片：上面大数字图，下面 label
+    slotEl.innerHTML = `
+      <strong class="saobby-num">${numHtml}</strong>
+      <span class="saobby-label">${escapeAttr(prefix || label)}${suffix ? ' / ' + escapeAttr(suffix) : ''}</span>
+    `.trim();
+  } else {
+    // 内联（footer / 文章 meta）：[前缀]+[图]+[后缀]
+    slotEl.innerHTML = [
+      prefix ? `<span class="saobby-prefix">${escapeAttr(prefix)}</span>` : '',
+      numHtml,
+      suffix ? `<span class="saobby-suffix">${escapeAttr(suffix)}</span>` : '',
+    ].join('');
+  }
   const img = slotEl.querySelector('img');
   if (img) {
     img.addEventListener('error', () => { slotEl.hidden = true; }, { once: true });
   }
 }
 
+function siteSlotPrefix() {
+  return String(((saobbyCfg().site || {}).label || '总访问')).trim() || '总访问';
+}
+
+function articleSlotPrefix() {
+  return String(((saobbyCfg().article || {}).label || '阅读')).trim() || '阅读';
+}
+
 function injectSaobby(root = document) {
   const siteImg = saobbySiteImg();
   const articleImg = saobbyArticleImg();
+  const sitePrefix = siteSlotPrefix();
+  const articlePrefix = articleSlotPrefix();
   root.querySelectorAll('[data-saobby-slot="site"]').forEach(el => {
+    if (!el.dataset.saobbyPrefix) el.dataset.saobbyPrefix = sitePrefix;
     const override = (el.dataset.saobbyImg || '').trim();
-    fillSaobbyImage(el, override || siteImg, '总访问量');
+    fillSaobbyImage(el, override || siteImg, sitePrefix);
   });
   root.querySelectorAll('[data-saobby-slot="article"]').forEach(el => {
+    if (!el.dataset.saobbyPrefix) el.dataset.saobbyPrefix = articlePrefix;
     // 文章页可以通过 data-saobby-img 提供本文专属计数器（来自 frontmatter.counter.img）
     const override = (el.dataset.saobbyImg || '').trim();
-    fillSaobbyImage(el, override || articleImg, '阅读次数');
+    fillSaobbyImage(el, override || articleImg, articlePrefix);
   });
 }
 
@@ -184,10 +214,11 @@ export function bszSiteStatsHtml({ compact = false } = {}) {
     `;
   }
   if (isSaobbyOn() && saobbySiteImg()) {
+    const prefix = siteSlotPrefix();
     if (compact) {
-      return `<span class="saobby-slot saobby-slot-compact" data-saobby-slot="site" hidden></span>`;
+      return `<span class="saobby-slot saobby-slot-compact" data-saobby-slot="site" data-saobby-prefix="${escapeAttr(prefix)}" hidden></span>`;
     }
-    return `<div class="stat saobby-slot" data-saobby-slot="site" hidden></div>`;
+    return `<div class="stat saobby-slot saobby-slot-stat" data-saobby-slot="site" data-saobby-prefix="${escapeAttr(prefix)}" hidden></div>`;
   }
   return '';
 }
@@ -206,7 +237,8 @@ export function bszPagePvHtml({ articleCounterImg = '' } = {}) {
     const customImg = String(articleCounterImg || '').trim();
     if (!customImg && !saobbyArticleImg()) return '';
     const dataAttr = customImg ? ` data-saobby-img="${escapeAttr(customImg)}"` : '';
-    return `<span class="saobby-slot saobby-slot-inline" data-saobby-slot="article"${dataAttr} hidden></span>`;
+    const prefix = articleSlotPrefix();
+    return `<span class="saobby-slot saobby-slot-inline" data-saobby-slot="article" data-saobby-prefix="${escapeAttr(prefix)}" data-saobby-suffix="次"${dataAttr} hidden></span>`;
   }
   return '';
 }
