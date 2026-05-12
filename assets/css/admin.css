@@ -593,11 +593,12 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  height: 56px;
-  padding: 0 20px;
+  min-height: 56px;
+  padding: 8px 20px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  flex-wrap: nowrap;
+  /* 允许窄桌面端 wrap，避免「模式切换」「草稿/置顶/轮播」等被推到视口外裁掉 */
+  flex-wrap: wrap;
 }
 
 .editor-bar .back {
@@ -611,13 +612,16 @@
 .editor-bar .back:hover { color: var(--primary); }
 
 .editor-status {
-  flex: 1;
-  text-align: center;
+  /* 之前是 flex:1，会把"模式切换 / 草稿/置顶/轮播 / 主题 / 预览 / 删除 / 发布"全推到右边，
+     窄桌面端配合 nowrap 直接被挤出视口看不到。改成自适应 + 上限。 */
+  flex: 0 1 auto;
+  max-width: 240px;
   font-size: 12px;
   color: var(--text-tertiary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-right: auto;       /* 把右侧按钮组推到 bar 末端 */
 }
 .editor-status.saving { color: var(--text-secondary); }
 .editor-status.saved { color: #67C23A; }
@@ -645,24 +649,26 @@
   border-radius: 6px;
   overflow: hidden;
   background: var(--bg-soft);
-  height: 28px;
+  height: 30px;
+  flex-shrink: 0;          /* 永远不被压缩，保证用户能点到 */
 }
 .editor-mode-btn {
   appearance: none;
   background: transparent;
   border: none;
   color: var(--text-secondary);
-  font-size: 12px;
-  padding: 0 12px;
+  font-size: 12.5px;
+  padding: 0 14px;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
   letter-spacing: 0.2px;
+  white-space: nowrap;
 }
 .editor-mode-btn + .editor-mode-btn { border-left: 1px solid var(--border); }
-.editor-mode-btn:hover { color: var(--text-main); }
+.editor-mode-btn:hover { color: var(--text-main); background: var(--bg-elev); }
 .editor-mode-btn.is-active {
-  background: var(--bg-elev);
-  color: var(--primary);
+  background: var(--primary);
+  color: #fff;
   font-weight: 600;
 }
 .editor-mode-btn.is-loading {
