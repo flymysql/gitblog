@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260512170800';
+export const VERSION = '20260512171637';
 
 export const CONFIG = {
   repo: {
@@ -80,7 +80,7 @@ export const CONFIG = {
       site: {
         img: "https://w.saobby.com/w/ivywp8ie",
         dashboard: "https://www.saobby.com/webcounter_dashboard?access_token=59nv7dkv",
-        label: "总访问"
+        label: "人来过"
       },
       article: {
         img: "https://w.saobby.com/w/qabb4byw",
