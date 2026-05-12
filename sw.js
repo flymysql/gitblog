@@ -3,7 +3,7 @@
 // 与 ?v=VERSION 的 cache-busting 协同：CACHE_NAME 用 release VERSION 区分批次
 // ============================================================================
 
-const SW_VERSION = '20260512170800';
+const SW_VERSION = '20260512172500';
 const STATIC_CACHE = `static-${SW_VERSION}`;
 const PAGE_CACHE = `pages-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
@@ -17,6 +17,8 @@ const PRECACHE_URLS = [
   'index.html',
   'tags.html',
   'archives.html',
+  'tools.html',
+  'tool-air-conditioner.html',
   'notes.html',
   'post.html',
   'offline.html',

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <title>在线小空调 · 加载中…</title>
+  <meta name="description" content="一个可以开关、调温、切模式和留言的在线小空调。">
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
+  <link rel="stylesheet" href="assets/css/common.css?v=20260512172500">
+  <link rel="stylesheet" href="assets/css/tools.css?v=20260512172500">
+  <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#ea6f5a">
+  <link rel="apple-touch-icon" href="assets/icon.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+  <div id="site-nav"></div>
+
+  <main class="ac-page">
+    <section class="ac-stage" aria-label="在线小空调">
+      <div class="ac-copy">
+        <p class="eyebrow">Mini Air Conditioner</p>
+        <h1>在线小空调</h1>
+        <p>热了就开一会儿，冷了就调高两度。一个没有压缩机、但是很有仪式感的小玩具。</p>
+      </div>
+
+      <div class="air-wrap" id="airWrap">
+        <div class="aircon" id="aircon">
+          <div class="aircon-top">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="aircon-body">
+            <div class="brand">Little AC</div>
+            <div class="screen" id="screen" aria-live="polite">
+              <span class="screen-mode" id="screenMode">待机</span>
+              <strong><span id="tempValue">26</span>°C</strong>
+              <span class="screen-speed" id="screenSpeed">轻风</span>
+            </div>
+            <button class="power-led" id="powerBtn" type="button" aria-pressed="false" title="开关">
+              <span></span>
+            </button>
+          </div>
+          <div class="vent">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="wind" id="wind">
+            <i></i><i></i><i></i><i></i><i></i>
+          </div>
+        </div>
+
+        <div class="remote" aria-label="遥控器">
+          <button class="remote-power" id="remotePower" type="button">开 / 关</button>
+          <div class="temp-pad">
+            <button id="tempUp" type="button" aria-label="升高温度">＋</button>
+            <strong><span id="remoteTemp">26</span>°</strong>
+            <button id="tempDown" type="button" aria-label="降低温度">－</button>
+          </div>
+          <div class="remote-grid">
+            <button data-mode="cool" type="button">制冷</button>
+            <button data-mode="dry" type="button">除湿</button>
+            <button data-mode="fan" type="button">送风</button>
+            <button data-mode="sleep" type="button">睡眠</button>
+            <button id="speedBtn" type="button">风速</button>
+            <button id="swingBtn" type="button">摆风</button>
+            <button id="soundBtn" type="button">声音</button>
+            <button id="ecoBtn" type="button">节能</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="ac-tip" id="acTip">点击开关启动小空调。</p>
+    </section>
+
+    <section class="tool-actions">
+      <a class="btn-home" href="./">返回首页</a>
+      <a class="btn-ghost" href="tools.html">查看工具箱</a>
+    </section>
+
+    <section class="tool-comments" id="toolComments">
+      <h2>留言板</h2>
+      <p>开空调之前，留下今天的温度吧。</p>
+      <div id="toolGiscus"></div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+  <div id="site-overlays"></div>
+
+  <script type="module" src="assets/js/air-conditioner.js?v=20260512172500"></script>
+</body>
+</html>
