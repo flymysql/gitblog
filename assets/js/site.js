@@ -6,7 +6,7 @@
 import { CONFIG } from './config.js';
 import { initTheme, bindThemeToggle, themeToggleHtml } from './theme.js';
 import { fetchIndexPublic } from './api.js';
-import { initPageviews, bszSiteStatsHtml, isBusuanziOn } from './pageviews.js';
+import { initPageviews, bszSiteStatsHtml } from './pageviews.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
@@ -221,9 +221,8 @@ function footerHtml() {
       const href = k === 'email' ? `mailto:${v}` : v;
       return `<a class="social-link" href="${escapeHtml(href)}" target="_blank" rel="noopener" title="${escapeHtml(k)}">${icon}</a>`;
     }).join('');
-  const pv = (CONFIG.pageviews || {}).showFooterStats !== false && isBusuanziOn()
-    ? `<div class="footer-stats">${bszSiteStatsHtml({ compact: true })}</div>`
-    : '';
+  const pvHtml = (CONFIG.pageviews || {}).showFooterStats !== false ? bszSiteStatsHtml({ compact: true }) : '';
+  const pv = pvHtml ? `<div class="footer-stats">${pvHtml}</div>` : '';
   return `
     <footer class="footer">
       ${links ? `<div class="footer-social">${links}</div>` : ''}

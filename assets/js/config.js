@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260512145600';
+export const VERSION = '20260512152800';
 
 export const CONFIG = {
   repo: {
@@ -74,7 +74,19 @@ export const CONFIG = {
     articleProvider: "page-views-api",
     showHomeStats: true,
     showPostViews: true,
-    showFooterStats: true
+    showFooterStats: true,
+    showListPostViews: true,
+    saobby: {
+      site: {
+        img: "",
+        dashboard: ""
+      },
+      article: {
+        img: "",
+        dashboard: ""
+      },
+      extra: []
+    }
   },
   auth: {
     githubDeviceFlow: {

@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260512145600';
+export const VERSION = '20260512152800';
 
 export const CONFIG = {
   repo: {
@@ -60,11 +60,27 @@ export const CONFIG = {
   },
   pageviews: {
     enabled: true,
-    provider: "busuanzi",   // busuanzi | none
+    // busuanzi（不蒜子，零配置）/ saobby（saobby.com 计数器，需注册）/ none
+    provider: "busuanzi",
+    // busuanzi 模式下首页文章列表的逐篇阅读量来源
     articleProvider: "page-views-api",
     showHomeStats: true,
     showPostViews: true,
-    showFooterStats: true
+    showFooterStats: true,
+    showListPostViews: true,
+    // saobby 计数器：在 https://www.saobby.com/create_webcounter 创建，
+    // 把生成的图片 URL 和控制面板（dashboard）URL 粘进来即可
+    saobby: {
+      site: {
+        img: "",        // 站点级计数器图片 URL（首页 / footer 展示）
+        dashboard: ""   // 站点计数器控制面板完整 URL（含 key），后台「访问数据」会嵌入
+      },
+      article: {
+        img: "",        // 文章页计数器（每篇文章共用一张图，统计全站文章总阅读）
+        dashboard: ""
+      },
+      extra: []         // [{ name, img, dashboard }] 额外计数器，仅在后台「访问数据」展示
+    }
   },
   auth: {
     githubDeviceFlow: {
