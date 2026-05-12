@@ -130,8 +130,15 @@ function fillSaobbyImage(slotEl, src, label = '访问') {
 function injectSaobby(root = document) {
   const siteImg = saobbySiteImg();
   const articleImg = saobbyArticleImg();
-  root.querySelectorAll('[data-saobby-slot="site"]').forEach(el => fillSaobbyImage(el, siteImg, '总访问量'));
-  root.querySelectorAll('[data-saobby-slot="article"]').forEach(el => fillSaobbyImage(el, articleImg, '阅读次数'));
+  root.querySelectorAll('[data-saobby-slot="site"]').forEach(el => {
+    const override = (el.dataset.saobbyImg || '').trim();
+    fillSaobbyImage(el, override || siteImg, '总访问量');
+  });
+  root.querySelectorAll('[data-saobby-slot="article"]').forEach(el => {
+    // 文章页可以通过 data-saobby-img 提供本文专属计数器（来自 frontmatter.counter.img）
+    const override = (el.dataset.saobbyImg || '').trim();
+    fillSaobbyImage(el, override || articleImg, '阅读次数');
+  });
 }
 
 // ---------- public API -----------------------------------------------------
@@ -186,15 +193,20 @@ export function bszSiteStatsHtml({ compact = false } = {}) {
 }
 
 // 文章页阅读次数占位
-export function bszPagePvHtml() {
+//   articleCounterImg 可选：传入本文专属 saobby 图片 URL（来自 frontmatter.counter.img），
+//   优先级高于全站默认 saobby.article.img
+export function bszPagePvHtml({ articleCounterImg = '' } = {}) {
   if (isBusuanziOn()) {
     if (pageViewsApiOn()) {
       return `<span class="pvapi" data-pv-current="1">阅读 <span class="pvapi-num"></span></span>`;
     }
     return `<span class="bsz" id="busuanzi_container_page_pv">阅读 <span id="busuanzi_value_page_pv" class="bsz-num"></span></span>`;
   }
-  if (isSaobbyOn() && saobbyArticleImg()) {
-    return `<span class="saobby-slot saobby-slot-inline" data-saobby-slot="article" hidden></span>`;
+  if (isSaobbyOn()) {
+    const customImg = String(articleCounterImg || '').trim();
+    if (!customImg && !saobbyArticleImg()) return '';
+    const dataAttr = customImg ? ` data-saobby-img="${escapeAttr(customImg)}"` : '';
+    return `<span class="saobby-slot saobby-slot-inline" data-saobby-slot="article"${dataAttr} hidden></span>`;
   }
   return '';
 }

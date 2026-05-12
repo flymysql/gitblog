@@ -23,7 +23,14 @@ console.log('Site URL:', SITE_URL);
 function coerceScalar(v) {
   if (v == null) return '';
   v = String(v).replace(/\s+$/, '');
+  // inline JSON 对象（编辑器写入 counter 字段时使用）
+  if (v.startsWith('{') && v.endsWith('}')) {
+    try { return JSON.parse(v); } catch { return v; }
+  }
   if (v.startsWith('[') && v.endsWith(']')) {
+    if (/^\[\s*[\{"]/.test(v)) {
+      try { return JSON.parse(v); } catch {}
+    }
     return v.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, '')).filter(Boolean);
   }
   if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
@@ -132,6 +139,10 @@ if (existsSync(POSTS_DIR)) {
       series: data.series || undefined,
       seriesOrder: data.seriesOrder != null ? Number(data.seriesOrder) : undefined,
       type: data.type || undefined,        // post | note（短动态）
+      counter: (data.counter && typeof data.counter === 'object') ? {
+        img: String(data.counter.img || ''),
+        dashboard: String(data.counter.dashboard || ''),
+      } : undefined,
       path: `${POSTS_DIR}/${f}`,
       content,
     };
@@ -184,6 +195,7 @@ const indexJson = {
     if (!rest.series) delete rest.series;
     if (rest.seriesOrder == null) delete rest.seriesOrder;
     if (!rest.type) delete rest.type;
+    if (!rest.counter || (!rest.counter.img && !rest.counter.dashboard)) delete rest.counter;
     return rest;
   }),
 };

@@ -1,11 +1,13 @@
 // ============================================================================
 // 后台「访问数据」：把已配置的 saobby 计数器控制面板用 iframe 嵌入
 //   - 站点级 / 文章页 / 自建额外计数器各占一个 tab
+//   - 每篇带 frontmatter.counter 的文章也单独一个 tab
 //   - 没有配置 saobby 时，引导用户去站点设置 / saobby.com
 //   - 兼容 saobby 控制面板若禁止被 iframe 嵌入的情况：错误时给出"在新页面打开"按钮
 // ============================================================================
 
 import { CONFIG } from './config.js';
+import { fetchIndexPublic, readIndex } from './api.js';
 import { mountAdminShell, escapeHtml, showToast } from './admin-shell.js';
 
 const $ = sel => document.querySelector(sel);
@@ -24,7 +26,7 @@ function saobbyCfg() {
   return pvCfg().saobby || {};
 }
 
-function listCounters() {
+function listCounters(posts = []) {
   const sb = saobbyCfg();
   const items = [];
   const site = sb.site || {};
@@ -33,7 +35,7 @@ function listCounters() {
   }
   const article = sb.article || {};
   if (article.img || article.dashboard) {
-    items.push({ id: 'article', name: '文章页计数器', img: article.img, dashboard: article.dashboard, kind: 'article' });
+    items.push({ id: 'article', name: '文章页（全站共用）', img: article.img, dashboard: article.dashboard, kind: 'article' });
   }
   (sb.extra || []).forEach((it, i) => {
     if (!it) return;
@@ -41,7 +43,37 @@ function listCounters() {
       items.push({ id: `extra-${i}`, name: it.name || `自建计数器 ${i + 1}`, img: it.img, dashboard: it.dashboard, kind: 'extra' });
     }
   });
+  // 每篇带 frontmatter.counter 的文章
+  posts.forEach(p => {
+    if (!p || !p.counter) return;
+    const c = p.counter;
+    if (!c.img && !c.dashboard) return;
+    items.push({
+      id: `post-${p.slug}`,
+      name: `文章：${p.title || p.slug}`,
+      img: c.img,
+      dashboard: c.dashboard,
+      kind: 'post',
+      slug: p.slug,
+    });
+  });
   return items;
+}
+
+async function loadPosts() {
+  try {
+    const idx = await readIndex().catch(() => null);
+    if (idx && idx.data && Array.isArray(idx.data.posts)) return idx.data.posts;
+  } catch {}
+  try {
+    const idx = await fetchIndexPublic();
+    if (idx && Array.isArray(idx.posts)) return idx.posts;
+  } catch {}
+  return [];
+}
+
+function articlesWithoutCounter(posts) {
+  return posts.filter(p => !p.draft && !p.page && !(p.counter && (p.counter.img || p.counter.dashboard)));
 }
 
 function emptyHtml() {
@@ -65,13 +97,23 @@ function emptyHtml() {
 }
 
 function counterTabsHtml(items) {
+  // 把文章计数器折叠到一个二级 select，避免几十篇文章把 tab 撑爆
+  const pinned = items.filter(it => it.kind !== 'post');
+  const posts = items.filter(it => it.kind === 'post');
+  const firstId = items[0] ? items[0].id : '';
   return `
     <div class="analytics-tabs" role="tablist">
-      ${items.map((it, i) => `
-        <button type="button" class="analytics-tab${i === 0 ? ' active' : ''}" data-tab-id="${escapeHtml(it.id)}" role="tab">
+      ${pinned.map(it => `
+        <button type="button" class="analytics-tab${it.id === firstId ? ' active' : ''}" data-tab-id="${escapeHtml(it.id)}" role="tab">
           ${escapeHtml(it.name)}
         </button>
       `).join('')}
+      ${posts.length ? `
+        <select class="analytics-post-select" id="analyticsPostSelect">
+          <option value="">— 文章独立计数器（${posts.length}）—</option>
+          ${posts.map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join('')}
+        </select>
+      ` : ''}
     </div>
   `;
 }
@@ -117,14 +159,24 @@ function topActions() {
   `;
 }
 
+function activatePanel(id) {
+  document.querySelectorAll('.analytics-tab').forEach(t => t.classList.toggle('active', t.dataset.tabId === id));
+  document.querySelectorAll('.analytics-panel').forEach(p => p.classList.toggle('active', p.dataset.panelId === id));
+}
+
 function bindTabs() {
   document.querySelectorAll('.analytics-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      const id = tab.dataset.tabId;
-      document.querySelectorAll('.analytics-tab').forEach(t => t.classList.toggle('active', t === tab));
-      document.querySelectorAll('.analytics-panel').forEach(p => p.classList.toggle('active', p.dataset.panelId === id));
-    });
+    tab.addEventListener('click', () => activatePanel(tab.dataset.tabId));
   });
+  const sel = document.getElementById('analyticsPostSelect');
+  if (sel) {
+    sel.addEventListener('change', () => {
+      const id = sel.value;
+      if (!id) return;
+      activatePanel(id);
+      document.querySelectorAll('.analytics-tab').forEach(t => t.classList.remove('active'));
+    });
+  }
 }
 
 function watchIframeLoadFailures() {
@@ -144,10 +196,33 @@ function watchIframeLoadFailures() {
   });
 }
 
+function postsWithoutCounterHtml(posts) {
+  const missing = articlesWithoutCounter(posts);
+  if (!missing.length) return '';
+  return `
+    <details class="analytics-missing">
+      <summary>${missing.length} 篇文章还没有独立计数器（点击展开）</summary>
+      <p class="settings-hint" style="margin:6px 0 10px 0">
+        在文章编辑器里点「为本文创建计数器…」即可补上。每篇创建后回到本页能看到对应控制面板。
+      </p>
+      <ul class="analytics-missing-list">
+        ${missing.slice(0, 50).map(p => `
+          <li>
+            <a href="editor.html?slug=${encodeURIComponent(p.slug)}">${escapeHtml(p.title || p.slug)}</a>
+            <span class="analytics-missing-meta">${escapeHtml(String(p.date || '').slice(0, 10))}</span>
+          </li>
+        `).join('')}
+      </ul>
+      ${missing.length > 50 ? `<p class="settings-hint">…共 ${missing.length} 篇，先列前 50 篇</p>` : ''}
+    </details>
+  `;
+}
+
 (async function init() {
   const ctx = await mountAdminShell({ active: 'analytics', title: '访问数据', actions: topActions() });
   if (!ctx) return;
-  const items = listCounters();
+  const posts = await loadPosts();
+  const items = listCounters(posts);
   if (!items.length) {
     ctx.content.innerHTML = emptyHtml();
     return;
@@ -158,6 +233,7 @@ function watchIframeLoadFailures() {
         以下控制面板由 <a href="https://www.saobby.com" target="_blank" rel="noopener">saobby.com</a> 提供。每张图片即一个独立计数器，加载页面就会 +1；首屏数字延迟一两秒属于正常现象。
       </p>
       ${counterTabsHtml(items)}
+      ${postsWithoutCounterHtml(posts)}
       <div class="analytics-panels">
         ${items.map((it, i) => counterPanelHtml(it, i === 0)).join('')}
       </div>

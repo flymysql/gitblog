@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
   <title>编辑文章</title>
-  <link rel="stylesheet" href="../assets/css/common.css?v=20260512152800">
-  <link rel="stylesheet" href="../assets/css/admin.css?v=20260512152800">
-  <link rel="stylesheet" href="../assets/css/post.css?v=20260512152800">
+  <link rel="stylesheet" href="../assets/css/common.css?v=20260512162000">
+  <link rel="stylesheet" href="../assets/css/admin.css?v=20260512162000">
+  <link rel="stylesheet" href="../assets/css/post.css?v=20260512162000">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
   <link rel="manifest" href="../manifest.webmanifest">
@@ -58,6 +58,15 @@
         </div>
         <label>封面 <input id="cover" placeholder="封面图 URL，可选"></label>
         <label>slug <input id="slug" placeholder="自动生成"></label>
+        <div class="editor-counter-field" id="counterField" hidden>
+          <span class="editor-meta-label">独立计数器（saobby）</span>
+          <div class="editor-counter-row">
+            <button type="button" class="btn btn-secondary" id="counterCreateBtn" title="去 saobby.com 为这篇文章创建一个独立计数器">为本文创建计数器…</button>
+            <button type="button" class="btn" id="counterPasteBtn" title="把 saobby 给的图片 URL + 控制面板 URL 粘进来">粘贴 URL…</button>
+            <button type="button" class="btn" id="counterClearBtn" hidden title="清除计数器配置">清除</button>
+          </div>
+          <div class="editor-counter-summary" id="counterSummary"></div>
+        </div>
       </div>
       <textarea class="editor-textarea" id="content" placeholder="开始用 Markdown 写作。支持拖拽 / 粘贴上传图片"></textarea>
       <!-- 富文本（WYSIWYG）模式宿主：默认隐藏，首次切到「富文本」时才懒加载 Vditor -->
@@ -73,6 +82,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
-  <script type="module" src="../assets/js/editor.js?v=20260512152800"></script>
+  <script type="module" src="../assets/js/editor.js?v=20260512162000"></script>
 </body>
 </html>
