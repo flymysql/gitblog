@@ -637,6 +637,39 @@
   cursor: pointer;
 }
 
+/* ---------- Markdown / 富文本 模式切换 ---------- */
+.editor-mode-switch {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-soft);
+  height: 28px;
+}
+.editor-mode-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 0 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  letter-spacing: 0.2px;
+}
+.editor-mode-btn + .editor-mode-btn { border-left: 1px solid var(--border); }
+.editor-mode-btn:hover { color: var(--text-main); }
+.editor-mode-btn.is-active {
+  background: var(--bg-elev);
+  color: var(--primary);
+  font-weight: 600;
+}
+.editor-mode-btn.is-loading {
+  pointer-events: none;
+  opacity: 0.65;
+}
+
 .editor-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -837,11 +870,65 @@
 }
 .EasyMDEContainer .CodeMirror-cursor { border-left-color: var(--text-main); }
 
+/* ---------- 富文本（Vditor / WYSIWYG）模式 ---------- */
+/* Vditor 默认 fixed 高度，我们让它继承 .editor-pane 的 flex:1 高度链 */
+.editor-vditor-host {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 32px 32px;
+  overflow: hidden;
+}
+.editor-vditor-host[hidden] { display: none !important; }
+
+/* 富文本模式下隐藏 EasyMDE / textarea */
+.editor-pane.is-rich .EasyMDEContainer,
+.editor-pane.is-rich .editor-textarea { display: none !important; }
+
+/* Vditor 实例本体填满容器 */
+.editor-vditor-host .vditor {
+  flex: 1;
+  min-height: 0;
+  display: flex !important;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg);
+}
+.editor-vditor-host .vditor-toolbar {
+  flex-shrink: 0;
+  background: var(--bg-elev) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+.editor-vditor-host .vditor-content {
+  flex: 1;
+  min-height: 0;
+}
+.editor-vditor-host .vditor-wysiwyg,
+.editor-vditor-host .vditor-ir,
+.editor-vditor-host .vditor-sv {
+  height: 100% !important;
+}
+.editor-vditor-host .vditor-wysiwyg__pre,
+.editor-vditor-host .vditor-wysiwyg__post,
+.editor-vditor-host .vditor-reset {
+  background: var(--bg) !important;
+  color: var(--text-main) !important;
+}
+/* 暗色模式下 Vditor 需要切到 dark 主题；JS 会处理 setTheme，这里给一些 fallback */
+html[data-mode="dark"] .editor-vditor-host .vditor-toolbar__item .vditor-tooltipped {
+  color: var(--text-secondary);
+}
+
 @media (max-width: 880px) {
   .editor-body { grid-template-columns: 1fr; }
   .editor-pane { border-right: none; }
   .editor-preview { display: none; }
-  .editor-pane.preview-mode .editor-textarea { display: none; }
+  .editor-pane.preview-mode .editor-textarea,
+  .editor-pane.preview-mode .EasyMDEContainer,
+  .editor-pane.preview-mode .editor-vditor-host { display: none !important; }
   .editor-pane.preview-mode .editor-preview { display: block; }
 }
 
