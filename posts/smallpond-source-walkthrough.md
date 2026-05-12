@@ -4,7 +4,7 @@ date: 2026-04-15
 updated: 2026-05-12
 author: Jimmy
 tags: [分布式存储, AI 基础设施, python]
-cover: assets/uploads/2026/05/smallpond-cover.svg
+cover: assets/uploads/2026/05/smallpond-cover.webp
 series: "DeepSeek 数据基础设施巡礼"
 seriesOrder: 2
 summary: Smallpond 是 DeepSeek 开源的轻量级分布式数据处理框架，专为 10 TB 到 PB 量级的 AI / 数据场景设计。它把 DuckDB 的列式向量化执行、3FS 的高带宽存储、Ray 的任务调度三块拼到一起，做成了"一台机器"。本文从架构分层、端到端工作流、Parquet 基础到核心源码走读，把这台"机器"的工作原理说清楚。
@@ -111,9 +111,7 @@ graph LR
 
 各层严格遵循"下层为上层提供服务"的原则，通过标准化接口降低耦合度。**Platform 层是整套架构里最"重"的一层**——它同时承担着"连接计算框架（Ray / MPI）"和"连接存储系统（3FS）"的双重职责，可以说是整个 smallpond 的运行时枢纽。
 
-把这四层画在一张图里，方便后面查阅：
-
-![smallpond 四层架构](assets/uploads/2026/05/smallpond-architecture.svg)
+简单画一下层次关系：`Logical (优化器) → Execution (执行计划) → Platform (运行时 + 资源) → IO (数据格式)`，上层只依赖下层暴露的接口，互不耦合。
 
 ---
 
@@ -239,9 +237,23 @@ Parquet 支持嵌套和重复结构，以及数组、映射（map）、结构（
 
 ## 2.1 文件布局
 
-理解 Parquet 的布局基本等价于理解它的性能模型：
+理解 Parquet 的布局基本等价于理解它的性能模型，自上而下大致是这样：
 
-![Parquet 文件布局](assets/uploads/2026/05/parquet-layout.svg)
+```
+Parquet File
+├── Magic Number "PAR1"
+├── Row Group #1
+│   ├── Column Chunk: ticker     → Page Page Page ...   (RLE / Dict)
+│   ├── Column Chunk: price      → Page Page Page ...   (Snappy)
+│   └── Column Chunk: timestamp  → Page Page Page ...   (Delta)
+├── Row Group #2
+├── ... (一个文件可以有 N 个 Row Group)
+└── Footer · Metadata
+    ├── schema / 行数 / 创建工具
+    ├── 每个 row group / column chunk 的偏移与编码
+    ├── zone maps（page 级 min/max/count，做谓词下推）
+    └── Bloom Filter（可选，column chunk 级精确判存在）
+```
 
 一个完整的 Parquet 文件包含数据和元数据两部分：
 
