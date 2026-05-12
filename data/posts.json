@@ -33,6 +33,21 @@
       "path": "posts/about.md"
     },
     {
+      "slug": "3fs-usrbio-zero-copy",
+      "title": "3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的",
+      "date": "2026-03-11",
+      "updated": "2026-05-12",
+      "author": "Jimmy",
+      "summary": "DeepSeek 开源的 3FS 在 180 节点集群上实测聚合读取吞吐约 6.6 TiB/s。本文从 FUSE 的性能瓶颈讲起，拆解 3FS 如何通过共享内存、io_uring 风格的环形队列、以及 RDMA 直接传输三层叠加，把数据通路上的每一次拷贝都抠掉。",
+      "tags": [
+        "分布式存储",
+        "AI 基础设施",
+        "C++"
+      ],
+      "cover": "assets/uploads/2026/05/3fs-usrbio-cover.svg",
+      "path": "posts/3fs-usrbio-zero-copy.md"
+    },
+    {
       "slug": "多维数组的索引方案与内存设计-16000038",
       "title": "多维数组的索引方案与内存设计",
       "date": "2022-03-13T12:08:00+08:00",
