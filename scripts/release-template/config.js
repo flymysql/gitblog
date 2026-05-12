@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260512170800';
+export const VERSION = '20260512172500';
 
 export const CONFIG = {
   repo: {
@@ -29,6 +29,7 @@ export const CONFIG = {
       { name: "首页", href: "./" },
       { name: "标签", href: "tags.html" },
       { name: "归档", href: "archives.html" },
+      { name: "工具", href: "tools.html" },
       { name: "关于", href: "post.html?slug=about" }
     ],
     social: {
