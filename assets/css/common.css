@@ -600,8 +600,10 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
 }
 
 /* footer 紧凑：把字号缩到正文小字一致 */
-.footer-stats .saobby-slot { gap: 4px; font-size: 12px; }
+.footer-stats .saobby-slot { gap: 2px; font-size: 12px; align-items: center; }
 .footer-stats .saobby-slot .saobby-counter { height: 14px; border-radius: 3px; }
+.footer-stats .saobby-slot .saobby-prefix { margin-right: 1px; }
+.footer-stats .saobby-slot .saobby-suffix { margin-left: 2px; }
 
 /* 文章 meta 内联版：和「字数 / 分钟」一行 */
 .article-author .meta .saobby-slot-inline { gap: 4px; }
