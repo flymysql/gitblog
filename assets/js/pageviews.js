@@ -25,6 +25,7 @@
 import { CONFIG } from './config.js';
 
 const BUSUANZI_SRC = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+const PAGE_VIEWS_API = 'https://page-views-api.ratneshc.com/api/v1';
 
 const STATE = {
   injected: false,
@@ -62,6 +63,73 @@ function hasBszContainer() {
   return !!document.querySelector(
     '#busuanzi_container_site_pv, #busuanzi_container_site_uv, #busuanzi_container_page_pv'
   );
+}
+
+function articleProvider() {
+  const cfg = CONFIG.pageviews || {};
+  // busuanzi 只能拿“当前页面”的 page_pv，不能在首页一次查询多篇文章。
+  // 首页文章列表阅读量默认走 Page Views API；全站 PV / UV 仍保留 busuanzi。
+  return cfg.articleProvider || 'page-views-api';
+}
+
+function pageViewsApiOn() {
+  const cfg = CONFIG.pageviews || {};
+  return !!cfg.enabled && articleProvider() === 'page-views-api';
+}
+
+function siteKey() {
+  try {
+    const u = new URL(CONFIG.site.url || location.origin);
+    return u.host;
+  } catch {
+    return location.host;
+  }
+}
+
+function basePath() {
+  try {
+    const u = new URL(CONFIG.site.url || location.origin);
+    return u.pathname.replace(/\/+$/, '');
+  } catch {
+    return '';
+  }
+}
+
+function articlePath(slug) {
+  const prefix = basePath();
+  const path = `${prefix}/post.html?slug=${encodeURIComponent(slug || '')}`;
+  return path.startsWith('/') ? path : `/${path}`;
+}
+
+async function fetchArticleViews(slug) {
+  const url = `${PAGE_VIEWS_API}/views?site=${encodeURIComponent(siteKey())}&path=${encodeURIComponent(articlePath(slug))}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`views api ${res.status}`);
+  const data = await res.json();
+  return Number(data.views || 0);
+}
+
+async function trackArticleView(slug) {
+  const url = `${PAGE_VIEWS_API}/track?site=${encodeURIComponent(siteKey())}&path=${encodeURIComponent(articlePath(slug))}`;
+  try {
+    await fetch(url, { cache: 'no-store', keepalive: true });
+  } catch (e) {
+    console.warn('[pageviews] track failed', e);
+  }
+}
+
+function setArticleView(slug, views) {
+  document.querySelectorAll(`[data-pv-slug="${cssEscape(slug)}"]`).forEach(el => {
+    const num = el.querySelector('.pvapi-num');
+    if (num) num.textContent = String(views || 0);
+    el.hidden = false;
+  });
+}
+
+function hideArticleView(slug) {
+  document.querySelectorAll(`[data-pv-slug="${cssEscape(slug)}"]`).forEach(el => {
+    el.hidden = true;
+  });
 }
 
 // 在每个页面的入口 / 渲染完成后调用一次。
@@ -103,11 +171,65 @@ export function bszSiteStatsHtml({ compact = false } = {}) {
 }
 
 export function bszPagePvHtml() {
+  if (pageViewsApiOn()) {
+    return `<span class="pvapi" data-pv-current="1">阅读 <span class="pvapi-num"></span></span>`;
+  }
   if (!isBusuanziOn()) return '';
   return `<span class="bsz" id="busuanzi_container_page_pv">阅读 <span id="busuanzi_value_page_pv" class="bsz-num"></span></span>`;
+}
+
+export function articleListPvHtml(slug) {
+  if (!pageViewsApiOn() || !slug || (CONFIG.pageviews || {}).showPostViews === false) return '';
+  return `<span class="post-views pvapi" data-pv-slug="${escapeAttr(slug)}" hidden>阅读 <span class="pvapi-num"></span></span>`;
+}
+
+export async function trackAndRenderArticleView(slug) {
+  if (!pageViewsApiOn() || !slug) {
+    initPageviews();
+    return;
+  }
+  document.querySelectorAll('[data-pv-current]').forEach(el => {
+    el.dataset.pvSlug = slug;
+  });
+  try {
+    await trackArticleView(slug);
+    const views = await fetchArticleViews(slug);
+    setArticleView(slug, views);
+  } catch (e) {
+    console.warn('[pageviews] render article view failed', e);
+    hideArticleView(slug);
+  }
+}
+
+export async function renderArticleListViews(root = document) {
+  if (!pageViewsApiOn()) return;
+  const nodes = [...root.querySelectorAll('[data-pv-slug]')].filter(el => !el.dataset.pvLoaded);
+  if (!nodes.length) return;
+  const slugs = [...new Set(nodes.map(el => el.dataset.pvSlug).filter(Boolean))];
+  nodes.forEach(el => { el.dataset.pvLoaded = '1'; });
+  await Promise.allSettled(slugs.map(async slug => {
+    try {
+      const views = await fetchArticleViews(slug);
+      setArticleView(slug, views);
+    } catch (e) {
+      console.warn('[pageviews] list view failed', slug, e);
+      hideArticleView(slug);
+    }
+  }));
 }
 
 export function isBusuanziOn() {
   const cfg = CONFIG.pageviews || {};
   return !!cfg.enabled && cfg.provider === 'busuanzi';
+}
+
+function escapeAttr(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+  );
+}
+
+function cssEscape(s) {
+  if (window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(String(s));
+  return String(s).replace(/["\\]/g, '\\$&');
 }

@@ -406,6 +406,24 @@
   gap: 4px;
 }
 
+.post-views {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--text-tertiary);
+}
+.post-views::before {
+  content: "";
+  width: 1px;
+  height: 12px;
+  background: var(--border);
+  margin-right: 2px;
+}
+.post-views .pvapi-num {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
 .tag {
   background: var(--bg-soft);
   color: var(--text-secondary);

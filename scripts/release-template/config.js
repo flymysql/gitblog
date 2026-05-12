@@ -61,6 +61,7 @@ export const CONFIG = {
   pageviews: {
     enabled: true,
     provider: "busuanzi",   // busuanzi | none
+    articleProvider: "page-views-api",
     showHomeStats: true,
     showPostViews: true,
     showFooterStats: true

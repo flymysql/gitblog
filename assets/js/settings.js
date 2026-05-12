@@ -165,6 +165,7 @@ function normalizeConfig(config) {
   config.analytics.snippet = String(config.analytics.snippet || '').trim();
   config.pageviews.enabled = config.pageviews.enabled !== false;
   config.pageviews.provider = config.pageviews.provider || 'busuanzi';
+  config.pageviews.articleProvider = config.pageviews.articleProvider || 'page-views-api';
   config.pageviews.showHomeStats = config.pageviews.showHomeStats !== false;
   config.pageviews.showPostViews = config.pageviews.showPostViews !== false;
   config.pageviews.showFooterStats = config.pageviews.showFooterStats !== false;
@@ -444,6 +445,13 @@ function settingsContentHtml() {
               <option value="none">none（仅占位禁用）</option>
             </select>
             <span class="settings-hint">推荐 busuanzi，无需注册、按 referer 自动隔离站点</span>
+          </label>
+          <label>文章阅读数 provider
+            <select name="pageviews.articleProvider">
+              <option value="page-views-api">Page Views API（支持首页文章列表）</option>
+              <option value="busuanzi">busuanzi（仅文章页当前页）</option>
+            </select>
+            <span class="settings-hint">首页要展示每篇文章阅读量时，推荐 Page Views API；它按 slug 查询，不会因首页展示而增加阅读数。</span>
           </label>
           <label class="settings-check"><input type="checkbox" name="pageviews.showHomeStats"> 首页 Hero 显示总访问 / 访客</label>
           <label class="settings-check"><input type="checkbox" name="pageviews.showPostViews"> 文章页显示阅读次数</label>

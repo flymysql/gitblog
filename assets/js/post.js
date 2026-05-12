@@ -7,7 +7,7 @@ import { CONFIG } from './config.js';
 import { fetchIndexPublic, fetchPostMarkdownPublic } from './api.js';
 import { renderMarkdown, parseFrontmatter } from './markdown.js';
 import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages } from './site.js';
-import { initPageviews, bszPagePvHtml } from './pageviews.js';
+import { initPageviews, bszPagePvHtml, trackAndRenderArticleView } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -486,6 +486,7 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
   // 评论
   renderGiscus(slug, title);
 
-  // 文章 author meta 里的「阅读 N」占位是这里渲染的，再触发一次以注入不蒜子脚本
+  // 文章 author meta 里的「阅读 N」占位是这里渲染的；按 slug 计数，首页列表只读不增。
   initPageviews();
+  trackAndRenderArticleView(slug);
 })();

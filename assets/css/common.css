@@ -535,6 +535,17 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
 }
 .hero-stats .stat.bsz strong.bsz-num { color: var(--primary); }
 .article-author .meta .bsz { color: var(--text-tertiary); }
+.pvapi {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.pvapi .pvapi-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  min-width: 0.6em;
+  display: inline-block;
+}
 
 .footer-social {
   display: flex;
