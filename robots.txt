@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://flymysql.github.io/gitblog/sitemap.xml
+Sitemap: https://gitpull.cn/sitemap.xml
