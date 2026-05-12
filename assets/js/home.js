@@ -5,6 +5,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
 import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages } from './site.js';
+import { initPageviews, bszSiteStatsHtml, isBusuanziOn } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -30,6 +31,7 @@ function renderHero(posts) {
           <div class="stat"><strong>${posts.length}</strong>篇文章</div>
           <div class="stat"><strong>${tagCount.size}</strong>个标签</div>
           ${posts.length ? `<div class="stat">最近更新 ${timeAgo(posts[0].date)}</div>` : ''}
+          ${(CONFIG.pageviews || {}).showHomeStats !== false && isBusuanziOn() ? bszSiteStatsHtml() : ''}
         </div>
       </div>
       <span class="hero-arrow" aria-hidden="true">›</span>
@@ -284,6 +286,8 @@ function applyFilter(posts, tab, q, tag) {
   renderCarousel(allPosts);
   renderTags(allPosts);
   renderRecent(allPosts);
+  // hero-stats 是渲染完才出现的，重新触发一次（pageviews 内部幂等）
+  initPageviews();
 
   let tab = 'latest';
   let activeTag = '';

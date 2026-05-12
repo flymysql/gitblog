@@ -58,6 +58,13 @@ export const CONFIG = {
     enabled: false,
     snippet: ""
   },
+  pageviews: {
+    enabled: true,
+    provider: "busuanzi",   // busuanzi | none
+    showHomeStats: true,
+    showPostViews: true,
+    showFooterStats: true
+  },
   auth: {
     githubDeviceFlow: {
       // 可选：如果想用 GitHub Device Flow 登录而非 PAT，填一个 OAuth App 的 clientId

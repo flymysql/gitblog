@@ -152,6 +152,7 @@ function normalizeConfig(config) {
   config.theme.tokens = config.theme.tokens && typeof config.theme.tokens === 'object' ? config.theme.tokens : {};
   config.theme.customCss = String(config.theme.customCss || '');
   config.analytics = config.analytics || { enabled: false, snippet: '' };
+  config.pageviews = config.pageviews || { enabled: true, provider: 'busuanzi', showHomeStats: true, showPostViews: true, showFooterStats: true };
   config.auth = config.auth || {};
   config.auth.githubDeviceFlow = config.auth.githubDeviceFlow || { clientId: '', scope: 'repo read:user' };
   if (!['auto', 'light', 'dark'].includes(config.theme.default)) config.theme.default = 'auto';
@@ -162,6 +163,11 @@ function normalizeConfig(config) {
   config.giscus.inputPosition = config.giscus.inputPosition || 'top';
   config.analytics.enabled = !!config.analytics.enabled;
   config.analytics.snippet = String(config.analytics.snippet || '').trim();
+  config.pageviews.enabled = config.pageviews.enabled !== false;
+  config.pageviews.provider = config.pageviews.provider || 'busuanzi';
+  config.pageviews.showHomeStats = config.pageviews.showHomeStats !== false;
+  config.pageviews.showPostViews = config.pageviews.showPostViews !== false;
+  config.pageviews.showFooterStats = config.pageviews.showFooterStats !== false;
   config.auth.githubDeviceFlow.clientId = String(config.auth.githubDeviceFlow.clientId || '').trim();
   config.auth.githubDeviceFlow.scope = String(config.auth.githubDeviceFlow.scope || 'repo read:user').trim();
 }
@@ -424,6 +430,24 @@ function settingsContentHtml() {
         <div class="settings-grid">
           <label class="settings-check"><input type="checkbox" name="analytics.enabled"> 启用访问统计代码</label>
           <label class="span-2">统计代码片段 <textarea name="analytics.snippet" rows="7" spellcheck="false" placeholder="&lt;script async src=&quot;...&quot;&gt;&lt;/script&gt;"></textarea></label>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <h3>访问计数（前台展示）</h3>
+        <p class="settings-help">在首页、文章页、Footer 上展示阅读 / 访客数字。默认接入「不蒜子（busuanzi）」：纯前端 CDN，零后端、零运维；如服务暂时挂掉，所有计数会自动隐藏，不影响布局。</p>
+        <div class="settings-grid">
+          <label class="settings-check"><input type="checkbox" name="pageviews.enabled"> 启用访问计数</label>
+          <label>provider
+            <select name="pageviews.provider">
+              <option value="busuanzi">busuanzi（不蒜子）</option>
+              <option value="none">none（仅占位禁用）</option>
+            </select>
+            <span class="settings-hint">推荐 busuanzi，无需注册、按 referer 自动隔离站点</span>
+          </label>
+          <label class="settings-check"><input type="checkbox" name="pageviews.showHomeStats"> 首页 Hero 显示总访问 / 访客</label>
+          <label class="settings-check"><input type="checkbox" name="pageviews.showPostViews"> 文章页显示阅读次数</label>
+          <label class="settings-check"><input type="checkbox" name="pageviews.showFooterStats"> Footer 显示站点 PV / UV</label>
         </div>
       </section>
 

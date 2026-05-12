@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260525';
+export const VERSION = '20260527';
 
 export const CONFIG = {
   repo: {
@@ -63,6 +63,13 @@ export const CONFIG = {
   analytics: {
     enabled: false,
     snippet: ""
+  },
+  pageviews: {
+    enabled: true,
+    provider: "busuanzi",   // busuanzi | none
+    showHomeStats: true,    // 首页 hero 显示总访问 / 访客
+    showPostViews: true,    // 文章页显示阅读次数
+    showFooterStats: true   // 全站 footer 显示 PV / UV
   },
   auth: {
     githubDeviceFlow: {

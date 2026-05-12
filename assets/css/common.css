@@ -507,6 +507,35 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
 }
 .footer p { margin: 0; }
 .footer a:hover { color: var(--primary); }
+.footer-stats {
+  margin-top: 10px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+.footer-stats .bsz-sep { color: var(--border); }
+
+/* ---------- 不蒜子访问计数通用占位 ---------- */
+/* 在不蒜子脚本拿到数据前 .bsz-num 会是空，我们让它至少占住 0.5em，避免数字"咚"地一下蹦出来 */
+.bsz {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.bsz .bsz-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 0.6em;
+  display: inline-block;
+}
+.hero-stats .stat.bsz strong.bsz-num { color: var(--primary); }
+.article-author .meta .bsz { color: var(--text-tertiary); }
+
 .footer-social {
   display: flex;
   justify-content: center;
