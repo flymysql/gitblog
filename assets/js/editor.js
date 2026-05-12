@@ -50,16 +50,29 @@ const state = {
   data: {},
   loading: false,
   mde: null,
+  vditor: null,            // Vditor 实例（懒加载，第一次切「富文本」时初始化）
+  vditorReady: false,      // Vditor after() 回调里翻 true
+  vditorPendingValue: '',  // ready 之前 setContent 过来的值，ready 后兜底回填
+  editorMode: 'markdown',  // markdown | rich
   selectedTags: [],
   availableTags: [],
 };
 
 function getContent() {
+  if (state.editorMode === 'rich' && state.vditor && state.vditorReady) {
+    return state.vditor.getValue() || '';
+  }
   return state.mde ? state.mde.value() : ($('#content').value || '');
 }
 function setContent(v) {
-  if (state.mde) state.mde.value(v || '');
-  else $('#content').value = v || '';
+  const md = v || '';
+  // EasyMDE 也同步保留一份，切回去时不丢
+  if (state.mde) state.mde.value(md);
+  else $('#content').value = md;
+  if (state.vditor) {
+    if (state.vditorReady) state.vditor.setValue(md);
+    else state.vditorPendingValue = md;
+  }
 }
 
 function goLogin() {
@@ -454,7 +467,10 @@ async function handleImageFiles(files) {
 }
 
 function insertAtCursor(text) {
-  if (state.mde) {
+  if (state.editorMode === 'rich' && state.vditor && state.vditorReady) {
+    state.vditor.insertValue(text);
+    state.vditor.focus();
+  } else if (state.mde) {
     const cm = state.mde.codemirror;
     const doc = cm.getDoc();
     const pos = doc.getCursor();
@@ -490,6 +506,8 @@ function setupDragAndPaste() {
   );
   pane.addEventListener('drop', async e => {
     e.preventDefault();
+    // 富文本模式：让 Vditor 自己处理 drop（它的 upload.handler 会走 GitHub 上传）
+    if (state.editorMode === 'rich') return;
     if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
       await handleImageFiles([...e.dataTransfer.files]);
     }
@@ -497,6 +515,9 @@ function setupDragAndPaste() {
 
   document.addEventListener('paste', async e => {
     if (!e.clipboardData) return;
+    // 富文本模式让 Vditor 自己接管粘贴（它的 upload.handler 会走我们的 uploadImage），
+    // 不要在 document 层重复处理，否则同一张图会被上传两次
+    if (state.editorMode === 'rich') return;
     const files = [...e.clipboardData.items]
       .filter(i => i.kind === 'file' && i.type.startsWith('image/'))
       .map(i => i.getAsFile())
@@ -506,6 +527,177 @@ function setupDragAndPaste() {
       await handleImageFiles(files);
     }
   });
+}
+
+// ---------- 富文本（WYSIWYG）模式：Vditor 懒加载 + 初始化 + 模式切换 ----------
+const VDITOR_VERSION = '3.10.6';
+const VDITOR_CDN_BASE = `https://cdn.jsdelivr.net/npm/vditor@${VDITOR_VERSION}`;
+
+let vditorAssetPromise = null;
+function loadVditorAssets() {
+  if (vditorAssetPromise) return vditorAssetPromise;
+  vditorAssetPromise = new Promise((resolve, reject) => {
+    if (typeof window.Vditor !== 'undefined') {
+      resolve();
+      return;
+    }
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `${VDITOR_CDN_BASE}/dist/index.css`;
+    document.head.appendChild(link);
+
+    const script = document.createElement('script');
+    script.src = `${VDITOR_CDN_BASE}/dist/index.min.js`;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('富文本编辑器（Vditor）加载失败，请检查网络'));
+    document.head.appendChild(script);
+  });
+  return vditorAssetPromise;
+}
+
+function currentDarkMode() {
+  return document.documentElement.getAttribute('data-mode') === 'dark';
+}
+
+async function setupVditor(initialMd) {
+  await loadVditorAssets();
+  const host = $('#vditorHost');
+  if (!host) return;
+  host.hidden = false;
+
+  return new Promise(resolve => {
+    state.vditor = new window.Vditor('vditorHost', {
+      mode: 'wysiwyg',  // 默认所见即所得；用户可以用工具栏切到 ir / sv
+      height: '100%',
+      width: '100%',
+      theme: currentDarkMode() ? 'dark' : 'classic',
+      preview: { theme: { current: currentDarkMode() ? 'dark' : 'light' } },
+      cdn: VDITOR_CDN_BASE,
+      cache: { enable: false },
+      placeholder: '所见即所得：直接输入文字 / 粘贴图片，无需懂 Markdown',
+      toolbar: [
+        'emoji', 'headings', 'bold', 'italic', 'strike', 'link', '|',
+        'list', 'ordered-list', 'check', 'outdent', 'indent', '|',
+        'quote', 'line', 'code', 'inline-code', 'insert-before', 'insert-after', '|',
+        'upload', 'table', '|',
+        'undo', 'redo', '|',
+        'edit-mode', 'preview', 'fullscreen', '|',
+        { name: 'help', tipPosition: 'nw' },
+      ],
+      toolbarConfig: { pin: true },
+      counter: { enable: false },
+      hint: { emoji: {} },
+      upload: {
+        accept: 'image/*',
+        multiple: true,
+        // 自定义上传：拦截 Vditor 自带 multipart 上传，走我们既有的 uploadImage（写入 GitHub）
+        // 返回 null = 我们自己负责把图片插到编辑器里，Vditor 不要再做任何事
+        handler: async (files) => {
+          if (!gateAuth()) return '未授权';
+          for (const file of files) {
+            try {
+              setStatus(`上传 ${file.name}…`, 'saving');
+              const path = await uploadImage(file, file.name);
+              const url = '../' + path;
+              state.vditor.insertValue(`![${file.name}](${url})\n`);
+              setStatus(`已上传 ${file.name}`, 'saved');
+            } catch (e) {
+              console.error(e);
+              setStatus('上传失败：' + e.message, 'error');
+              showToast('上传失败：' + e.message, 'error');
+            }
+          }
+          return null;
+        },
+      },
+      input: () => updatePreview(),
+      after: () => {
+        state.vditorReady = true;
+        const v = state.vditorPendingValue || initialMd || '';
+        if (v) state.vditor.setValue(v);
+        state.vditorPendingValue = '';
+        resolve();
+      },
+    });
+  });
+}
+
+async function switchEditorMode(target) {
+  if (!target || target === state.editorMode) return;
+  const buttons = document.querySelectorAll('.editor-mode-btn');
+
+  if (target === 'rich') {
+    // 1. 把当前 Markdown 内容暂存
+    const md = state.mde ? state.mde.value() : ($('#content').value || '');
+
+    // 2. 第一次切：懒加载 Vditor 资源 + 初始化
+    const targetBtn = document.querySelector('.editor-mode-btn[data-mode="rich"]');
+    if (!state.vditor) {
+      try {
+        targetBtn && targetBtn.classList.add('is-loading');
+        targetBtn && (targetBtn.textContent = '加载中…');
+        setStatus('加载富文本编辑器…', 'saving');
+        await setupVditor(md);
+        setStatus('已切换到富文本', 'saved');
+      } catch (e) {
+        console.error(e);
+        showToast(e.message || '富文本加载失败', 'error');
+        setStatus('富文本加载失败', 'error');
+        targetBtn && targetBtn.classList.remove('is-loading');
+        targetBtn && (targetBtn.textContent = '富文本');
+        return;
+      }
+      targetBtn && targetBtn.classList.remove('is-loading');
+      targetBtn && (targetBtn.textContent = '富文本');
+    } else {
+      // 已经初始化过：把最新 Markdown 同步过去
+      if (state.vditorReady) state.vditor.setValue(md);
+      else state.vditorPendingValue = md;
+      $('#vditorHost').hidden = false;
+    }
+
+    state.editorMode = 'rich';
+    document.querySelector('.editor-pane').classList.add('is-rich');
+  } else {
+    // 富文本 → Markdown：取 Vditor markdown 灌回 EasyMDE
+    if (state.vditor && state.vditorReady) {
+      const md = state.vditor.getValue() || '';
+      if (state.mde) state.mde.value(md);
+      else $('#content').value = md;
+    }
+    $('#vditorHost').hidden = true;
+    state.editorMode = 'markdown';
+    document.querySelector('.editor-pane').classList.remove('is-rich');
+    setStatus('已切换到 Markdown', 'saved');
+    if (state.mde && state.mde.codemirror) state.mde.codemirror.refresh();
+  }
+
+  buttons.forEach(b => {
+    const active = b.dataset.mode === state.editorMode;
+    b.classList.toggle('is-active', active);
+    b.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  updatePreview();
+}
+
+function bindEditorModeSwitch() {
+  document.querySelectorAll('.editor-mode-btn').forEach(b => {
+    b.addEventListener('click', () => switchEditorMode(b.dataset.mode));
+  });
+  // 跟随主题切换：富文本编辑器在 dark/light 之间换皮
+  const obs = new MutationObserver(() => {
+    if (!state.vditor || !state.vditorReady) return;
+    try {
+      const dark = currentDarkMode();
+      state.vditor.setTheme(
+        dark ? 'dark' : 'classic',
+        dark ? 'dark' : 'light',
+        dark ? 'native' : 'github'
+      );
+    } catch (_) { /* Vditor 老版本无 setTheme，忽略 */ }
+  });
+  obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode'] });
 }
 
 function setupEasyMDE() {
@@ -542,7 +734,10 @@ function setupEasyMDE() {
       'guide',
     ],
   });
-  state.mde.codemirror.on('change', updatePreview);
+  state.mde.codemirror.on('change', () => {
+    // 富文本模式下 EasyMDE 是被动同步 buffer，不要回头触发预览（以富文本 input 为准）
+    if (state.editorMode === 'markdown') updatePreview();
+  });
 }
 
 (async function init() {
@@ -564,6 +759,7 @@ function setupEasyMDE() {
   $('#author').value = (getUser() && getUser().name) || CONFIG.site.author || '';
 
   setupEasyMDE();
+  bindEditorModeSwitch();
   setupDragAndPaste();
   bindTagPicker();
   loadAvailableTags();
