@@ -56,7 +56,7 @@ function render() {
   $('#screenSpeed').textContent = state.power ? SPEEDS[state.speed] : '未启动';
   $('#powerBtn').setAttribute('aria-pressed', String(state.power));
 
-  document.querySelectorAll('[data-mode]').forEach(btn => {
+  document.querySelectorAll('.remote [data-mode]').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.mode === state.mode);
   });
   $('#swingBtn').classList.toggle('active', state.swing);
@@ -139,9 +139,10 @@ function bindControls() {
     render();
   });
 
-  document.querySelectorAll('[data-mode]').forEach(btn => {
+  document.querySelectorAll('.remote [data-mode]').forEach(btn => {
     btn.addEventListener('click', () => {
       state.mode = btn.dataset.mode;
+      if (!state.power) state.power = true;
       if (state.mode === 'sleep') state.speed = 0;
       if (state.mode === 'fan' && state.temp < 24) state.temp = 24;
       render();
