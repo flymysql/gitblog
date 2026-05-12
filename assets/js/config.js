@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260512112250';
+export const VERSION = '20260512112800';
 
 export const CONFIG = {
   repo: {
@@ -87,19 +87,7 @@ export const CONFIG = {
     default: "auto",
     preset: "jianshu",
     allowReaderPresetSwitch: true,
-    tokens: {
-      primary: "#000000",
-      "primary-hover": "#000000",
-      bg: "#000000",
-      "bg-soft": "#000000",
-      "bg-elev": "#000000",
-      "text-main": "#000000",
-      "text-secondary": "#000000",
-      "text-tertiary": "#000000",
-      border: "#000000",
-      "border-strong": "#000000",
-      highlight: "#000000"
-    },
+    tokens: {},
     customCss: ""
   }
 };

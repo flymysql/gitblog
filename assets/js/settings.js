@@ -128,7 +128,11 @@ function readThemeTokens() {
   THEME_TOKEN_FIELDS.forEach(f => {
     const el = document.querySelector(`[data-token="${f.key}"]`);
     if (!el) return;
-    const v = (el.value || '').trim();
+    // color input 无法真正清空：空值会被浏览器变成 #000000。
+    // 因此颜色字段只以旁边的文本框为准；文本框为空 = 不覆盖预设。
+    const textEl = document.querySelector(`[data-token-text="${f.key}"]`);
+    const source = f.type === 'color' && textEl ? textEl : el;
+    const v = (source.value || '').trim();
     if (v) tokens[f.key] = v;
   });
   return tokens;
@@ -587,8 +591,8 @@ function bindThemePanel() {
     const textEl  = document.querySelector(`[data-token-text="${f.key}"]`);
     if (!colorEl) return;
     if (f.type === 'color' && textEl) {
-      // 初始化文本
-      textEl.value = colorEl.value || '';
+      // 不要把 color input 的默认 #000000 写回文本框。
+      // 文本框为空代表“使用主题预设原色”，只有用户选色时才写入。
       colorEl.addEventListener('input', () => {
         textEl.value = colorEl.value;
         previewTokens();
@@ -605,7 +609,7 @@ function bindThemePanel() {
     const clearBtn = document.querySelector(`[data-token-clear="${f.key}"]`);
     if (clearBtn) {
       clearBtn.addEventListener('click', () => {
-        colorEl.value = f.type === 'color' ? '#000000' : '';
+        if (f.type !== 'color') colorEl.value = '';
         if (textEl) textEl.value = '';
         // 删除 inline 后退到 preset 默认
         document.documentElement.style.removeProperty('--' + f.key);
