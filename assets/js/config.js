@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260512113944';
+export const VERSION = '20260512114228';
 
 export const CONFIG = {
   repo: {
@@ -16,7 +16,7 @@ export const CONFIG = {
     title: "小红鸡",
     subtitle: "记录想法与代码",
     author: "Jimmy",
-    logo: "",
+    logo: "https://gitpull.cn/assets/uploads/2026/05/%E9%A3%9E%E6%9C%BA.png",
     favicon: "https://gitpull.cn/assets/uploads/2026/05/%E9%A3%9E%E6%9C%BA.png",
     avatar: "https://avatars.githubusercontent.com/u/37113068?s=400&u=cf2b8a258ad1de5e9a23e3c72da6ca04e058dd46&v=4",
     description: "桃李春风一杯酒，江湖夜雨十年灯。",
