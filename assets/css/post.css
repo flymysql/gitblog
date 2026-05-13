@@ -794,13 +794,28 @@
   border-radius: var(--radius);
   background: var(--bg-secondary);
 }
+.article-series-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
 .article-series-title {
   font-size: 13px;
   letter-spacing: 0.04em;
   color: var(--primary);
-  margin-bottom: 10px;
+  margin-bottom: 0;
   font-weight: 600;
 }
+.article-series-all {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.article-series-all:hover { color: var(--primary); }
 .article-series ol {
   margin: 0;
   padding-left: 22px;

@@ -265,6 +265,7 @@ const urls = [
   { loc: baseUrl + '/', lastmod: today, changefreq: 'daily', priority: '1.0' },
   { loc: baseUrl + '/tags.html', lastmod: today, changefreq: 'weekly', priority: '0.8' },
   { loc: baseUrl + '/archives.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
+  { loc: baseUrl + '/series.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
   { loc: baseUrl + '/tools.html', lastmod: today, changefreq: 'monthly', priority: '0.7' },
   { loc: baseUrl + '/tool-air-conditioner.html', lastmod: today, changefreq: 'monthly', priority: '0.6' },
   ...pages.filter(p => !p.draft).map(p => ({
