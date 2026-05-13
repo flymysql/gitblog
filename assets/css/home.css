@@ -450,6 +450,17 @@
   font-weight: 500;
 }
 
+.post-note-badge {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 500;
+}
+
 .post-title {
   font-size: 18px;
   font-weight: 700;

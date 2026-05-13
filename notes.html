@@ -6,8 +6,8 @@
   <meta name="referrer" content="no-referrer-when-downgrade">
   <title>随笔 · 加载中…</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
-  <link rel="stylesheet" href="assets/css/common.css?v=20260512184000">
-  <link rel="stylesheet" href="assets/css/home.css?v=20260512184000">
+  <link rel="stylesheet" href="assets/css/common.css?v=20260513180000">
+  <link rel="stylesheet" href="assets/css/home.css?v=20260513180000">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
   <style>
     .notes-page { max-width: 720px; margin: 28px auto; padding: 0 24px; }
@@ -69,6 +69,80 @@
       color: var(--text-tertiary);
       padding: 60px 20px;
     }
+    .note-login-hint {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      padding: 12px 14px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      background: var(--bg-secondary);
+    }
+    .note-login-hint a { color: var(--primary); font-weight: 600; }
+    .note-composer-wrap { margin-bottom: 28px; }
+    .note-composer {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      background: var(--bg-secondary);
+    }
+    .note-composer-hd {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--text-main);
+    }
+    .note-composer-label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .note-composer-label .hint { font-weight: 400; color: var(--text-tertiary); font-size: 12px; }
+    .note-composer-input {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      background: var(--bg);
+      color: var(--text-main);
+    }
+    .note-composer-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 140px;
+      resize: vertical;
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-mono, ui-monospace, monospace);
+    }
+    .note-composer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .note-composer-actions .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .note-composer-actions .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .note-composer-tip { font-size: 12px; color: var(--text-tertiary); margin: 0; min-height: 1.2em; }
+    .note-composer-tip.error { color: #c0392b; }
+    .note-composer-tip.ok { color: var(--primary); }
     @media (max-width: 720px) {
       .notes-page { margin: 16px auto; padding: 0 14px; }
       .notes-page h1 { font-size: 20px; }
@@ -89,6 +163,24 @@
   <main class="notes-page">
     <h1>随笔</h1>
     <p class="desc">不成体系的小想法、灵感与备忘 · 时间倒序展示</p>
+    <p class="note-login-hint" id="noteLoginHint" hidden>登录后可在此直接发布随笔（写入仓库后由 GitHub Actions 重建索引）。<a href="admin/index.html" id="noteLoginLink">去登录</a></p>
+    <div class="note-composer-wrap" id="noteComposerWrap" hidden>
+      <div class="note-composer">
+        <div class="note-composer-hd">发条随笔</div>
+        <label class="note-composer-label">标题 <span class="hint">（可选）</span></label>
+        <input type="text" id="noteComposeTitle" class="note-composer-input" maxlength="120" placeholder="留空则使用「随笔 · 日期时间」" autocomplete="off" />
+        <label class="note-composer-label">标签 <span class="hint">（逗号分隔，默认 随笔）</span></label>
+        <input type="text" id="noteComposeTags" class="note-composer-input" placeholder="随笔" autocomplete="off" />
+        <label class="note-composer-label">正文 <span class="hint">（支持 Markdown；可粘贴或拖拽图片）</span></label>
+        <textarea id="noteComposeBody" class="note-composer-textarea" rows="7"></textarea>
+        <div class="note-composer-actions">
+          <button type="button" class="btn btn-secondary" id="noteComposePickImg">插入图片</button>
+          <input type="file" id="noteComposeFile" accept="image/*" multiple hidden />
+          <button type="button" class="btn btn-primary" id="noteComposePublish">发送</button>
+        </div>
+        <p class="note-composer-tip" id="noteComposeStatus"></p>
+      </div>
+    </div>
     <ul class="note-list" id="noteList">
       <li class="notes-empty">加载中…</li>
     </ul>
@@ -97,6 +189,6 @@
   <div id="site-footer"></div>
   <div id="site-overlays"></div>
 
-  <script type="module" src="assets/js/notes.js?v=20260512184000"></script>
+  <script type="module" src="assets/js/notes.js?v=20260513180000"></script>
 </body>
 </html>
