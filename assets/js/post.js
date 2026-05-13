@@ -6,7 +6,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic, fetchPostMarkdownPublic } from './api.js';
 import { renderMarkdown, parseFrontmatter } from './markdown.js';
-import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages, postPath, rootPath } from './site.js';
+import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages, postPath, postPathFromPost, rootPath, POST_URL_KEY_RE } from './site.js';
 import { initPageviews, bszPagePvHtml, trackAndRenderArticleView } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { enhanceMath, enhanceMermaid, enhanceCodeAdvanced } from './enhancers.js';
@@ -271,7 +271,7 @@ function rewriteLegacyPostLinks(article) {
       const u = new URL(href, base);
       if (!String(u.pathname || '').endsWith('post.html')) return;
       const s = u.searchParams.get('slug');
-      if (s) a.setAttribute('href', postPath(s));
+      if (s) a.setAttribute('href', `${rootPath('post.html')}?slug=${encodeURIComponent(s)}`);
     } catch { /* */ }
   });
 }
@@ -309,12 +309,12 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
     nav.className = 'post-neighbors';
     nav.innerHTML = `
       ${prev ? `
-        <a class="post-neighbor prev" href="${postPath(prev.slug)}">
+        <a class="post-neighbor prev" href="${postPathFromPost(prev)}">
           <span class="label">← 上一篇</span>
           <span class="title">${escapeHtml(prev.title || '无标题')}</span>
         </a>` : '<span></span>'}
       ${next ? `
-        <a class="post-neighbor next" href="${postPath(next.slug)}">
+        <a class="post-neighbor next" href="${postPathFromPost(next)}">
           <span class="label">下一篇 →</span>
           <span class="title">${escapeHtml(next.title || '无标题')}</span>
         </a>` : '<span></span>'}
@@ -330,7 +330,7 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
       <ul class="post-related-list">
         ${related.map(p => `
           <li>
-            <a href="${postPath(p.slug)}">
+            <a href="${postPathFromPost(p)}">
               <span class="t">${escapeHtml(p.title || '无标题')}</span>
               <span class="meta">${fmtDate(p.date)} · ${(p.tags || []).slice(0, 3).map(t => '#' + escapeHtml(t)).join(' ')}</span>
             </a>
@@ -373,7 +373,7 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
         <li class="${p.slug === currentSlug ? 'is-current' : ''}">
           ${p.slug === currentSlug
             ? `<a>${escapeHtml(p.title || '无标题')}</a>`
-            : `<a href="${postPath(p.slug)}">${escapeHtml(p.title || '无标题')}</a>`}
+            : `<a href="${postPathFromPost(p)}">${escapeHtml(p.title || '无标题')}</a>`}
         </li>
       `).join('')}
     </ol>
@@ -388,29 +388,21 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   bindBackToTop();
 
   const params = new URLSearchParams(window.location.search);
-  let slug = (params.get('slug') || '').trim();
-  if (!slug) {
-    const m = window.location.pathname.match(/\/post\/([^/]+)\/?$/);
-    if (m) {
-      try {
-        slug = decodeURIComponent(m[1]).trim();
-      } catch {
-        slug = m[1].trim();
-      }
-    }
-  }
-  const article = $('#article');
-  if (!slug) {
-    article.innerHTML = '<div class="error">未找到文章地址（需要 /post/{slug}/ 或 post.html?slug=）</div>';
-    return;
-  }
-
-  if (params.get('slug') && window.history && window.history.replaceState) {
+  const pathMatch = window.location.pathname.match(/\/post\/([^/]+)\/?$/);
+  let pathSeg = '';
+  if (pathMatch) {
     try {
-      window.history.replaceState(null, '', postPath(slug));
+      pathSeg = decodeURIComponent(pathMatch[1]).trim();
     } catch {
-      /* 部分 WebView 对 replaceState 较严格 */
+      pathSeg = pathMatch[1].trim();
     }
+  }
+  const qSlug = (params.get('slug') || '').trim();
+
+  const article = $('#article');
+  if (!qSlug && !pathSeg) {
+    article.innerHTML = '<div class="error">未找到文章地址（请使用 /post/YYYYMMDD/ 或 post.html?slug=）</div>';
+    return;
   }
 
   let meta = null;
@@ -418,8 +410,38 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   try {
     const idx = await fetchIndexPublic();
     allPosts = idx.posts || [];
-    meta = allPosts.find(p => p.slug === slug) || null;
+    if (qSlug) {
+      meta = allPosts.find(p => p.slug === qSlug) || null;
+    } else if (pathSeg) {
+      if (POST_URL_KEY_RE.test(pathSeg)) {
+        meta = allPosts.find(p => p.urlKey === pathSeg) || null;
+      } else {
+        meta = allPosts.find(p => p.slug === pathSeg) || null;
+      }
+    }
   } catch {}
+
+  const slug = (meta && meta.slug) || qSlug || pathSeg;
+  if (!slug) {
+    article.innerHTML = '<div class="error">未找到对应文章</div>';
+    return;
+  }
+
+  if (!meta && pathSeg && POST_URL_KEY_RE.test(pathSeg)) {
+    article.innerHTML = `<div class="error">未找到日期路径「${escapeHtml(pathSeg)}」对应的文章</div>`;
+    return;
+  }
+
+  if (window.history && window.history.replaceState && meta && meta.urlKey && POST_URL_KEY_RE.test(meta.urlKey)) {
+    const canon = postPath(meta.urlKey);
+    try {
+      if (params.get('slug') || (pathSeg && pathSeg !== meta.urlKey)) {
+        window.history.replaceState(null, '', canon);
+      }
+    } catch {
+      /* 部分 WebView 对 replaceState 较严格 */
+    }
+  }
 
   let raw = '';
   try {
@@ -441,7 +463,10 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   // SEO + 优先用 OG 自动图（assets/og/{slug}.svg）兜底
   const ogAuto = `${CONFIG.site.url || ''}/assets/og/${encodeURIComponent(slug)}.svg`;
   const baseSite = String(CONFIG.site.url || '').replace(/\/+$/, '');
-  const canonical = baseSite ? `${baseSite}${postPath(slug)}` : `${window.location.origin}${postPath(slug)}`;
+  const canonPathRel = (meta && meta.urlKey && POST_URL_KEY_RE.test(meta.urlKey))
+    ? postPath(meta.urlKey)
+    : `${rootPath('post.html')}?slug=${encodeURIComponent(slug)}`;
+  const canonical = baseSite ? `${baseSite}${canonPathRel}` : `${window.location.origin}${canonPathRel}`;
   setMeta({
     title,
     description: summary,

@@ -49,7 +49,7 @@ export const CONFIG = {
       },
       {
         name: "关于",
-        href: "post/about/"
+        href: "post.html?slug=about"
       }
     ],
     social: {

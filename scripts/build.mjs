@@ -39,10 +39,15 @@ function siteOriginFromBuild() {
 }
 const SITE_ORIGIN = siteOriginFromBuild();
 
-function postPublicAbsUrl(slug) {
-  const s = String(slug || '').trim();
-  const seg = encodeURIComponent(s);
-  return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post/${seg}/`;
+function postPublicAbsUrl(entry) {
+  const k = typeof entry === 'string' ? entry : (entry && entry.urlKey);
+  const s = String(k || '').trim();
+  if (!/^\d{8}(-\d+)?$/.test(s)) {
+    const slug = typeof entry === 'object' && entry && entry.slug ? String(entry.slug) : '';
+    if (slug) return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post.html?slug=${encodeURIComponent(slug)}`;
+    return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post.html`;
+  }
+  return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post/${s}/`;
 }
 
 // ---------- 解析 frontmatter ----------
@@ -190,6 +195,45 @@ if (errors.length) {
   for (const e of errors) console.log('  -', e);
 }
 
+// ---------- 对外 URL 用 YYYYMMDD（同日多篇：第二篇起 YYYYMMDD-2、-3 …）----------
+function calendarKeyFromDate(iso) {
+  const s = String(iso || '').trim();
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return m[1] + m[2] + m[3];
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return '';
+  const y = d.getFullYear();
+  const mo = String(d.getMonth() + 1).padStart(2, '0');
+  const da = String(d.getDate()).padStart(2, '0');
+  return `${y}${mo}${da}`;
+}
+
+function assignPostUrlKeys(entries) {
+  const byDay = new Map();
+  for (const p of entries) {
+    const day = calendarKeyFromDate(p.date);
+    if (!day) continue;
+    if (!byDay.has(day)) byDay.set(day, []);
+    byDay.get(day).push(p);
+  }
+  for (const [day, arr] of byDay) {
+    arr.sort((a, b) => {
+      const ta = new Date(a.date || 0).getTime();
+      const tb = new Date(b.date || 0).getTime();
+      if (ta !== tb) return ta - tb;
+      return String(a.slug).localeCompare(String(b.slug));
+    });
+    arr.forEach((p, i) => {
+      p.urlKey = i === 0 ? day : `${day}-${i + 1}`;
+    });
+  }
+}
+
+assignPostUrlKeys([
+  ...posts.filter(p => !p.draft),
+  ...pages.filter(p => !p.draft),
+]);
+
 // 同目录有 <basename>.thumb.webp 时给 cover 自动配上 thumbnail
 // 缩略图由 scripts/build-thumbnails.mjs 单独生成（首页文章列表会优先用它）
 function thumbnailFor(cover) {
@@ -223,6 +267,7 @@ const indexJson = {
     if (!rest.series) delete rest.series;
     if (rest.seriesOrder == null) delete rest.seriesOrder;
     if (!rest.counter || (!rest.counter.img && !rest.counter.dashboard)) delete rest.counter;
+    if (!rest.urlKey) delete rest.urlKey;
     return rest;
   }),
 };
@@ -249,6 +294,7 @@ const searchDocs = [...visiblePosts, ...pages.filter(p => !p.draft)].map(p => {
   const text = plainTextFor(p.content);
   return {
     slug: p.slug,
+    urlKey: p.urlKey || undefined,
     title: p.title,
     summary: p.summary,
     tags: p.tags || [],
@@ -279,13 +325,13 @@ const urls = [
   { loc: baseUrl + '/tools.html', lastmod: today, changefreq: 'monthly', priority: '0.7' },
   { loc: baseUrl + '/tool-air-conditioner.html', lastmod: today, changefreq: 'monthly', priority: '0.6' },
   ...pages.filter(p => !p.draft).map(p => ({
-    loc: postPublicAbsUrl(p.slug),
+    loc: postPublicAbsUrl(p),
     lastmod: new Date(p.updated || p.date || today).toISOString(),
     changefreq: 'monthly',
     priority: '0.7',
   })),
   ...visiblePosts.map(p => ({
-    loc: postPublicAbsUrl(p.slug),
+    loc: postPublicAbsUrl(p),
     lastmod: new Date(p.updated || p.date || today).toISOString(),
     changefreq: 'monthly',
     priority: p.pinned ? '0.9' : '0.6',
@@ -340,7 +386,7 @@ function escCdata(s) { return String(s == null ? '' : s).replace(/]]>/g, ']]]]><
 
 const rssItems = visiblePosts.slice(0, 30).map(p => `    <item>
       <title>${xmlEsc(p.title)}</title>
-      <link>${xmlEsc(postPublicAbsUrl(p.slug))}</link>
+      <link>${xmlEsc(postPublicAbsUrl(p))}</link>
       <guid isPermaLink="false">${xmlEsc(p.slug)}</guid>
       <pubDate>${new Date(p.date || today).toUTCString()}</pubDate>
       <author>${xmlEsc(p.author || SITE_AUTHOR)}</author>
@@ -412,7 +458,7 @@ for (const post of [...visiblePosts, ...pages.filter(p => !p.draft)]) {
 }
 console.log(`OG 分享图已生成：${visiblePosts.length + pages.filter(p => !p.draft).length} 张`);
 
-// ---------- post/{slug}/index.html（/post/{slug}/ 简洁 URL，与 post.js 一致） ----------
+// ---------- post/{urlKey}/index.html（/post/YYYYMMDD/ 与 post.js 一致） ----------
 function rewritePostShellHtml(html) {
   return html
     .replace(/\bhref="assets\//g, 'href="../../assets/')
@@ -423,23 +469,23 @@ function rewritePostShellHtml(html) {
 }
 const POST_SHELL = rewritePostShellHtml(readFileSync('post.html', 'utf8'));
 const POST_ROOT = 'post';
-function safeFsPostSlug(slug) {
-  const s = String(slug || '').trim();
-  if (!s || s.includes('..') || s.includes('/') || s.includes('\\')) return '';
+function safePostUrlKeyDir(urlKey) {
+  const s = String(urlKey || '').trim();
+  if (!/^\d{8}(-\d+)?$/.test(s)) return '';
   return s;
 }
 if (existsSync(POST_ROOT)) rmSync(POST_ROOT, { recursive: true, force: true });
 mkdirSync(POST_ROOT, { recursive: true });
 let postShellCount = 0;
 for (const p of [...visiblePosts, ...pages.filter(x => !x.draft)]) {
-  const dirSlug = safeFsPostSlug(p.slug);
-  if (!dirSlug) {
-    console.warn('[build] 跳过非法 slug，无法生成 post 目录：', p.slug);
+  const dirKey = safePostUrlKeyDir(p.urlKey);
+  if (!dirKey) {
+    console.warn('[build] 跳过缺少或非法 urlKey，无法生成 post 目录：', p.slug);
     continue;
   }
-  const dir = join(POST_ROOT, dirSlug);
+  const dir = join(POST_ROOT, dirKey);
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, 'index.html'), POST_SHELL);
   postShellCount++;
 }
-console.log(`post/{{slug}}/ 已生成（${postShellCount} 个 HTML shell）`);
+console.log(`post/{{urlKey}}/ 已生成（${postShellCount} 个 HTML shell）`);
