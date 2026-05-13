@@ -3,7 +3,7 @@
 // 与 ?v=VERSION 的 cache-busting 协同：CACHE_NAME 用 release VERSION 区分批次
 // ============================================================================
 
-const SW_VERSION = '20260515210000';
+const SW_VERSION = '20260515220000';
 const STATIC_CACHE = `static-${SW_VERSION}`;
 const PAGE_CACHE = `pages-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
@@ -114,10 +114,10 @@ async function handleHtml(request, event) {
     return cached;
   }
 
-  // 首次访问且没有缓存时才等网络；最多等 2 秒，随后降级到离线页。
+  // 首次访问且没有缓存时才等网络；多等几秒避免慢网/冷启动时误落到离线页
   return Promise.race([
     network.catch(() => null),
-    delay(2000).then(() => null),
+    delay(6000).then(() => null),
   ]).then(res => res || caches.match(OFFLINE_URL));
 }
 

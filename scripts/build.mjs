@@ -472,13 +472,21 @@ for (const post of [...visiblePosts, ...pages.filter(p => !p.draft)]) {
 console.log(`OG 分享图已生成：${visiblePosts.length + pages.filter(p => !p.draft).length} 张`);
 
 // ---------- post/{urlKey}/index.html（/post/YYYYMMDD/ 与 post.js 一致） ----------
+/** 壳内 href/src 用站点根绝对路径，避免在 /post/xxx/ 下相对路径变成 /post/xxx/assets/… 或 SW 缓存旧壳错位 */
+function postShellRootHref(relPath) {
+  const p = String(relPath || '').replace(/^\/+/, '');
+  if (!SITE_PATH_PREFIX) return `/${p}`;
+  return `${SITE_PATH_PREFIX.replace(/\/+$/, '')}/${p}`.replace(/\/{2,}/g, '/');
+}
+
 function rewritePostShellHtml(html) {
+  const a = postShellRootHref('assets');
   return html
-    .replace(/\bhref="assets\//g, 'href="../../assets/')
-    .replace(/\bsrc="assets\//g, 'src="../../assets/')
-    .replace(/\bhref="manifest\.webmanifest"/g, 'href="../../manifest.webmanifest"')
-    .replace(/\bhref="rss\.xml"/g, 'href="../../rss.xml"')
-    .replace(/\blink rel="apple-touch-icon" href="assets\//g, 'link rel="apple-touch-icon" href="../../assets/');
+    .replace(/\bhref="assets\//g, `href="${a}/`)
+    .replace(/\bsrc="assets\//g, `src="${a}/`)
+    .replace(/\bhref="manifest\.webmanifest"/g, `href="${postShellRootHref('manifest.webmanifest')}"`)
+    .replace(/\bhref="rss\.xml"/g, `href="${postShellRootHref('rss.xml')}"`)
+    .replace(/\blink rel="apple-touch-icon" href="assets\//g, `link rel="apple-touch-icon" href="${a}/`);
 }
 const POST_SHELL = rewritePostShellHtml(readFileSync('post.html', 'utf8'));
 const POST_ROOT = 'post';
