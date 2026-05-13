@@ -6,6 +6,7 @@
 import { CONFIG } from './config.js';
 import { readIndex, fetchIndexPublic, deleteFile, readFile, writeFile, writeIndex } from './api.js';
 import { mountAdminShell, escapeHtml, showToast } from './admin-shell.js';
+import { postPathFromAdminPost } from './site.js';
 import { parseFrontmatter, stringifyFrontmatter } from './markdown.js';
 
 const $ = sel => document.querySelector(sel);
@@ -108,7 +109,7 @@ async function renderDashboard(content) {
           <div class="meta">${(p.tags || []).slice(0, 2).map(t => '#' + escapeHtml(t)).join(' ') || '—'}</div>
           <div class="meta">${p.draft ? '<span class="badge draft">草稿</span>' : '已发布'}</div>
           <div class="actions">
-            ${p.draft ? '' : `<a href="../post.html?slug=${encodeURIComponent(p.slug)}" target="_blank">查看</a>`}
+            ${p.draft ? '' : `<a href="${postPathFromAdminPost(p)}" target="_blank">查看</a>`}
             <a href="editor.html?slug=${encodeURIComponent(p.slug)}">编辑</a>
             ${p.cover
               ? `<button data-action="toggle-carousel" data-slug="${escapeHtml(p.slug)}" title="${p.carousel ? '从首页轮播移除' : '加入首页轮播'}">${p.carousel ? '取消轮播' : '加入轮播'}</button>`

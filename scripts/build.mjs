@@ -1,5 +1,5 @@
 // 校验 + 重新生成 sitemap.xml 与 rss.xml
-import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { join, basename, extname } from 'node:path';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
@@ -18,6 +18,46 @@ const INDEX_FILE = 'data/posts.json';
 const OG_DIR = 'assets/og';
 
 console.log('Site URL:', SITE_URL);
+
+function sitePathPrefixFromBuild() {
+  if (!SITE_URL) return '';
+  try {
+    const o = new URL(SITE_URL.endsWith('/') ? SITE_URL : `${SITE_URL}/`);
+    const p = o.pathname.replace(/\/+$/, '');
+    return p === '/' || !p ? '' : p;
+  } catch {
+    return '';
+  }
+}
+const SITE_PATH_PREFIX = sitePathPrefixFromBuild();
+function siteOriginFromBuild() {
+  try {
+    return new URL(SITE_URL || 'https://example.com').origin;
+  } catch {
+    return '';
+  }
+}
+const SITE_ORIGIN = siteOriginFromBuild();
+
+/** 固定用 /post/{slug}/ 的短文（不走日期 urlKey），须与 assets/js/site.js 中 POST_PATH_SLUGS 一致 */
+const POST_PATH_BY_SLUG = new Set(['welcome', 'about']);
+
+function postPublicAbsUrl(entry) {
+  const slug = typeof entry === 'object' && entry && entry.slug ? String(entry.slug) : '';
+  const k = typeof entry === 'string' ? String(entry).trim() : String((entry && entry.urlKey) || '').trim();
+  if (!k) {
+    if (slug) return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post.html?slug=${encodeURIComponent(slug)}`;
+    return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post.html`;
+  }
+  if (/^\d{8}(-\d+)?$/.test(k)) {
+    return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post/${k}/`;
+  }
+  if (POST_PATH_BY_SLUG.has(slug) && k === slug) {
+    return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post/${encodeURIComponent(k)}/`;
+  }
+  if (slug) return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post.html?slug=${encodeURIComponent(slug)}`;
+  return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post.html`;
+}
 
 // ---------- 解析 frontmatter ----------
 function coerceScalar(v) {
@@ -164,6 +204,49 @@ if (errors.length) {
   for (const e of errors) console.log('  -', e);
 }
 
+// ---------- 对外 URL 用 YYYYMMDD（同日多篇：第二篇起 YYYYMMDD-2、-3 …）----------
+function calendarKeyFromDate(iso) {
+  const s = String(iso || '').trim();
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return m[1] + m[2] + m[3];
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return '';
+  const y = d.getFullYear();
+  const mo = String(d.getMonth() + 1).padStart(2, '0');
+  const da = String(d.getDate()).padStart(2, '0');
+  return `${y}${mo}${da}`;
+}
+
+function assignPostUrlKeys(entries) {
+  const dated = entries.filter(p => !POST_PATH_BY_SLUG.has(p.slug));
+  const byDay = new Map();
+  for (const p of dated) {
+    const day = calendarKeyFromDate(p.date);
+    if (!day) continue;
+    if (!byDay.has(day)) byDay.set(day, []);
+    byDay.get(day).push(p);
+  }
+  for (const [day, arr] of byDay) {
+    arr.sort((a, b) => {
+      const ta = new Date(a.date || 0).getTime();
+      const tb = new Date(b.date || 0).getTime();
+      if (ta !== tb) return ta - tb;
+      return String(a.slug).localeCompare(String(b.slug));
+    });
+    arr.forEach((p, i) => {
+      p.urlKey = i === 0 ? day : `${day}-${i + 1}`;
+    });
+  }
+  for (const p of entries) {
+    if (POST_PATH_BY_SLUG.has(p.slug)) p.urlKey = p.slug;
+  }
+}
+
+assignPostUrlKeys([
+  ...posts.filter(p => !p.draft),
+  ...pages.filter(p => !p.draft),
+]);
+
 // 同目录有 <basename>.thumb.webp 时给 cover 自动配上 thumbnail
 // 缩略图由 scripts/build-thumbnails.mjs 单独生成（首页文章列表会优先用它）
 function thumbnailFor(cover) {
@@ -197,6 +280,7 @@ const indexJson = {
     if (!rest.series) delete rest.series;
     if (rest.seriesOrder == null) delete rest.seriesOrder;
     if (!rest.counter || (!rest.counter.img && !rest.counter.dashboard)) delete rest.counter;
+    if (!rest.urlKey) delete rest.urlKey;
     return rest;
   }),
 };
@@ -223,6 +307,7 @@ const searchDocs = [...visiblePosts, ...pages.filter(p => !p.draft)].map(p => {
   const text = plainTextFor(p.content);
   return {
     slug: p.slug,
+    urlKey: p.urlKey || undefined,
     title: p.title,
     summary: p.summary,
     tags: p.tags || [],
@@ -253,13 +338,13 @@ const urls = [
   { loc: baseUrl + '/tools.html', lastmod: today, changefreq: 'monthly', priority: '0.7' },
   { loc: baseUrl + '/tool-air-conditioner.html', lastmod: today, changefreq: 'monthly', priority: '0.6' },
   ...pages.filter(p => !p.draft).map(p => ({
-    loc: `${baseUrl}/post.html?slug=${encodeURIComponent(p.slug)}`,
+    loc: postPublicAbsUrl(p),
     lastmod: new Date(p.updated || p.date || today).toISOString(),
     changefreq: 'monthly',
     priority: '0.7',
   })),
   ...visiblePosts.map(p => ({
-    loc: `${baseUrl}/post.html?slug=${encodeURIComponent(p.slug)}`,
+    loc: postPublicAbsUrl(p),
     lastmod: new Date(p.updated || p.date || today).toISOString(),
     changefreq: 'monthly',
     priority: p.pinned ? '0.9' : '0.6',
@@ -314,7 +399,7 @@ function escCdata(s) { return String(s == null ? '' : s).replace(/]]>/g, ']]]]><
 
 const rssItems = visiblePosts.slice(0, 30).map(p => `    <item>
       <title>${xmlEsc(p.title)}</title>
-      <link>${xmlEsc(`${baseUrl}/post.html?slug=${encodeURIComponent(p.slug)}`)}</link>
+      <link>${xmlEsc(postPublicAbsUrl(p))}</link>
       <guid isPermaLink="false">${xmlEsc(p.slug)}</guid>
       <pubDate>${new Date(p.date || today).toUTCString()}</pubDate>
       <author>${xmlEsc(p.author || SITE_AUTHOR)}</author>
@@ -385,3 +470,37 @@ for (const post of [...visiblePosts, ...pages.filter(p => !p.draft)]) {
   writeFileSync(join(OG_DIR, `${post.slug}.svg`), ogSvg(post));
 }
 console.log(`OG 分享图已生成：${visiblePosts.length + pages.filter(p => !p.draft).length} 张`);
+
+// ---------- post/{urlKey}/index.html（/post/YYYYMMDD/ 与 post.js 一致） ----------
+function rewritePostShellHtml(html) {
+  return html
+    .replace(/\bhref="assets\//g, 'href="../../assets/')
+    .replace(/\bsrc="assets\//g, 'src="../../assets/')
+    .replace(/\bhref="manifest\.webmanifest"/g, 'href="../../manifest.webmanifest"')
+    .replace(/\bhref="rss\.xml"/g, 'href="../../rss.xml"')
+    .replace(/\blink rel="apple-touch-icon" href="assets\//g, 'link rel="apple-touch-icon" href="../../assets/');
+}
+const POST_SHELL = rewritePostShellHtml(readFileSync('post.html', 'utf8'));
+const POST_ROOT = 'post';
+function safePostUrlKeyDir(p) {
+  const slug = String(p.slug || '');
+  const k = String(p.urlKey || '').trim();
+  if (/^\d{8}(-\d+)?$/.test(k)) return k;
+  if (POST_PATH_BY_SLUG.has(slug) && k === slug) return k;
+  return '';
+}
+if (existsSync(POST_ROOT)) rmSync(POST_ROOT, { recursive: true, force: true });
+mkdirSync(POST_ROOT, { recursive: true });
+let postShellCount = 0;
+for (const p of [...visiblePosts, ...pages.filter(x => !x.draft)]) {
+  const dirKey = safePostUrlKeyDir(p);
+  if (!dirKey) {
+    console.warn('[build] 跳过缺少或非法 urlKey，无法生成 post 目录：', p.slug);
+    continue;
+  }
+  const dir = join(POST_ROOT, dirKey);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, 'index.html'), POST_SHELL);
+  postShellCount++;
+}
+console.log(`post/{{urlKey}}/ 已生成（${postShellCount} 个 HTML shell）`);

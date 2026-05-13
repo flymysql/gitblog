@@ -83,6 +83,61 @@ export function fmtDate(iso) {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
+/** 从 site.url 推断的路径前缀（GitHub Pages 子路径仓库时为例如 /gitblog） */
+export function siteBasePath() {
+  try {
+    const u = String(CONFIG.site.url || '').trim();
+    if (!u) return '';
+    const o = new URL(u.endsWith('/') ? u : `${u}/`);
+    const p = o.pathname.replace(/\/+$/, '');
+    return p === '/' || !p ? '' : p;
+  } catch {
+    return '';
+  }
+}
+
+/** 对外文章 path：/post/YYYYMMDD/、/post/YYYYMMDD-2/，或固定 /post/welcome/、/post/about/ */
+export const POST_URL_KEY_RE = /^\d{8}(-\d+)?$/;
+/** 与 scripts/build.mjs 中 POST_PATH_BY_SLUG 保持一致 */
+export const POST_PATH_SLUGS = new Set(['welcome', 'about']);
+
+export function isPostPublicPathKey(seg) {
+  const s = String(seg || '').trim();
+  return POST_URL_KEY_RE.test(s) || POST_PATH_SLUGS.has(s);
+}
+
+export function postPath(urlKey) {
+  const s = String(urlKey || '').trim();
+  const bp = siteBasePath();
+  if (!isPostPublicPathKey(s)) return bp ? `${bp}/post.html` : '/post.html';
+  const enc = encodeURIComponent(s);
+  return `${bp}/post/${enc}/`;
+}
+
+/** 列表 / 搜索：有 urlKey 用规范地址，否则退回 post.html?slug= */
+export function postPathFromPost(p) {
+  if (!p || !p.slug) return rootPath('post.html');
+  const k = String(p.urlKey || '').trim();
+  if (isPostPublicPathKey(k)) return postPath(k);
+  return `${rootPath('post.html')}?slug=${encodeURIComponent(p.slug)}`;
+}
+
+/** admin 目录下打开前台文章 */
+export function postPathFromAdminPost(p) {
+  if (!p || !p.slug) return '../post.html';
+  const k = String(p.urlKey || '').trim();
+  if (isPostPublicPathKey(k)) return `..${postPath(k)}`;
+  return `../post.html?slug=${encodeURIComponent(p.slug)}`;
+}
+
+/** 站点根下的路径（以 / 开头），用于从 post/{slug}/ 子目录链接到 /admin、/assets 等 */
+export function rootPath(pathRel) {
+  const r = String(pathRel || '').replace(/^\//, '');
+  const bp = siteBasePath();
+  if (bp) return `${bp}/${r}`;
+  return `/${r}`;
+}
+
 // 估算阅读时间（中文按 350 字/分钟，英文按 250 词/分钟，混排取较大者）
 export function readingMinutes(text) {
   const s = String(text || '');
@@ -162,15 +217,24 @@ function applyFavicon() {
   link.href = CONFIG.site.favicon || CONFIG.site.logo || CONFIG.site.avatar;
 }
 
+function navResolveHref(href) {
+  const h = String(href || '').trim();
+  if (!h || /^https?:\/\//i.test(h) || h.startsWith('//')) return h;
+  if (h.startsWith('/')) return h;
+  return rootPath(h);
+}
+
 function navHtml(active) {
   const navItems = CONFIG.site.nav || [];
   const links = navItems.map(n => {
-    const isActive = active && (n.href === active || (active === 'home' && (n.href === './' || n.href === 'index.html')));
-    return `<a class="nav-link${isActive ? ' active' : ''}" href="${escapeHtml(n.href)}">${escapeHtml(n.name)}</a>`;
+    const res = navResolveHref(n.href);
+    const isActive = active && (n.href === active || res === active || (active === 'home' && (n.href === './' || n.href === 'index.html')));
+    return `<a class="nav-link${isActive ? ' active' : ''}" href="${escapeHtml(res)}">${escapeHtml(n.name)}</a>`;
   }).join('');
   const drawerLinks = navItems.map(n => {
-    const isActive = active && (n.href === active || (active === 'home' && (n.href === './' || n.href === 'index.html')));
-    return `<a class="nav-drawer-link${isActive ? ' active' : ''}" href="${escapeHtml(n.href)}">${escapeHtml(n.name)}</a>`;
+    const res = navResolveHref(n.href);
+    const isActive = active && (n.href === active || res === active || (active === 'home' && (n.href === './' || n.href === 'index.html')));
+    return `<a class="nav-drawer-link${isActive ? ' active' : ''}" href="${escapeHtml(res)}">${escapeHtml(n.name)}</a>`;
   }).join('');
   return `
     <nav class="nav">
@@ -178,7 +242,7 @@ function navHtml(active) {
         <button id="navMenuBtn" class="icon-btn nav-menu-btn" type="button" aria-label="菜单">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <a class="nav-logo" href="./">
+        <a class="nav-logo" href="${escapeHtml(rootPath(''))}">
           ${logoSvg()}
           <span>${escapeHtml(CONFIG.site.title)}</span>
         </a>
@@ -188,7 +252,7 @@ function navHtml(active) {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </button>
         ${themeToggleHtml()}
-        <a class="btn-write" href="admin/" title="进入创作后台">
+        <a class="btn-write" href="${escapeHtml(rootPath('admin/'))}" title="进入创作后台">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
           <span class="btn-write-label">创作</span>
         </a>
@@ -203,7 +267,7 @@ function navHtml(active) {
           </button>
         </div>
         <div class="nav-drawer-links">${drawerLinks}</div>
-        <a class="nav-drawer-cta" href="admin/">
+        <a class="nav-drawer-cta" href="${escapeHtml(rootPath('admin/'))}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           进入创作后台
         </a>
@@ -228,7 +292,7 @@ function footerHtml({ omitSitePv = false } = {}) {
   return `
     <footer class="footer">
       ${links ? `<div class="footer-social">${links}</div>` : ''}
-      <p>© <span id="year"></span> <span>${escapeHtml(CONFIG.site.title)}</span> · 由 <a href="https://pages.github.com/" target="_blank">GitHub Pages</a> 托管 · <a href="admin/">写文章</a></p>
+      <p>© <span id="year"></span> <span>${escapeHtml(CONFIG.site.title)}</span> · 由 <a href="https://pages.github.com/" target="_blank">GitHub Pages</a> 托管 · <a href="${escapeHtml(rootPath('admin/'))}">写文章</a></p>
       ${pv}
     </footer>
   `;
@@ -299,7 +363,7 @@ function renderResults(results, q) {
     return;
   }
   box.innerHTML = results.slice(0, 30).map(p => `
-    <a class="search-item" href="post.html?slug=${encodeURIComponent(p.slug)}">
+    <a class="search-item" href="${postPathFromPost(p)}">
       <div class="search-title">${highlight(p.title || '无标题', q)}</div>
       <div class="search-summary">${highlight(p._snippet || p.summary || '', q)}</div>
       <div class="search-meta">${fmtDate(p.date)} · ${(p.tags || []).map(t => '#' + escapeHtml(t)).join(' ')}</div>
@@ -499,7 +563,10 @@ function registerServiceWorker() {
   // 不在 admin 后台启用 sw（避免缓存登录页 / 后台资源），让 admin 永远是最新版本
   if (location.pathname.includes('/admin/')) return;
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js', { scope: './' })
+    const bp = siteBasePath();
+    const scope = bp ? `${bp}/` : '/';
+    const swUrl = bp ? `${bp}/sw.js` : '/sw.js';
+    navigator.serviceWorker.register(swUrl, { scope })
       .then(reg => {
         // 检查到新版本时静默更新；下次刷新自动生效
         if (reg && reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
