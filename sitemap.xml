@@ -2,31 +2,31 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://gitpull.cn/</loc>
-    <lastmod>2026-05-13T07:09:29.258Z</lastmod>
+    <lastmod>2026-05-13T07:10:36.426Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tags.html</loc>
-    <lastmod>2026-05-13T07:09:29.258Z</lastmod>
+    <lastmod>2026-05-13T07:10:36.426Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/archives.html</loc>
-    <lastmod>2026-05-13T07:09:29.258Z</lastmod>
+    <lastmod>2026-05-13T07:10:36.426Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools.html</loc>
-    <lastmod>2026-05-13T07:09:29.258Z</lastmod>
+    <lastmod>2026-05-13T07:10:36.426Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tool-air-conditioner.html</loc>
-    <lastmod>2026-05-13T07:09:29.258Z</lastmod>
+    <lastmod>2026-05-13T07:10:36.426Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -307,12 +307,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://gitpull.cn/post.html?slug=%E6%88%91%E7%8E%B0%E5%9C%A8%E6%B2%A1%E6%9C%89%E5%96%9C%E6%AC%A2%E7%9A%84%E4%BA%BA-68bc5da3</loc>
-    <lastmod>2017-07-06T00:52:05.000Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://gitpull.cn/post.html?slug=%E5%85%B0%E5%B7%9E%E6%97%B6%E9%97%B4%E8%BF%98%E9%95%BF%E6%95%85%E4%BA%8B%E8%BF%98%E5%BE%88%E5%A4%9A-bb0e3aeb</loc>
     <lastmod>2017-07-05T00:52:05.000Z</lastmod>
     <changefreq>monthly</changefreq>
@@ -337,12 +331,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://gitpull.cn/post.html?slug=%E4%B8%80%E4%B8%AA%E9%82%A3%E4%B9%88%E7%88%B1%E4%BD%A0%E7%9A%84%E4%BA%BA%E4%BD%A0%E5%90%8E%E6%82%94%E4%B9%88-be3a0f1e</loc>
-    <lastmod>2017-07-01T00:52:05.000Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://gitpull.cn/post.html?slug=%E4%BD%A0%E7%A7%80%E6%81%A9%E7%88%B1%E7%9A%84%E6%A0%B7%E5%AD%90%E6%88%91%E6%80%BB%E8%A7%89%E5%BE%97%E6%98%AF%E4%B8%80%E8%BE%88%E5%AD%90-adee7c8b</loc>
     <lastmod>2017-06-27T00:52:05.000Z</lastmod>
     <changefreq>monthly</changefreq>
@@ -355,26 +343,8 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://gitpull.cn/post.html?slug=%E5%A4%A7%E8%AF%9D%E8%A5%BF%E6%B8%B8%E6%94%BE%E5%BC%83%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%BF%83%E5%96%9C%E6%AC%A2%E7%9A%84%E4%BA%BA%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%9F%E5%8F%97-a156ffe4</loc>
-    <lastmod>2017-06-24T00:52:05.000Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://gitpull.cn/post.html?slug=%E9%9D%92%E6%A2%85%E4%B8%8D%E5%9C%A8%E7%AB%B9%E9%A9%AC%E8%80%81%E5%8E%BB%E4%BB%8E%E6%AD%A4%E6%88%91%E7%88%B1%E4%B8%8A%E7%9A%84%E6%AF%8F%E4%B8%80%E4%B8%AA%E4%BA%BA%E9%83%BD%E5%BE%88%E5%83%8F%E4%BD%A0-2ed35e3b</loc>
     <lastmod>2017-06-22T00:52:05.000Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://gitpull.cn/post.html?slug=%E4%BB%A5%E5%89%8D%E6%9C%9F%E5%BE%85%E5%BF%AB%E7%82%B9%E9%95%BF%E5%A4%A7%E7%8E%B0%E5%9C%A8%E5%B8%8C%E6%9C%9B%E6%97%B6%E5%85%89%E5%80%92%E6%B5%81-d2b83ef0</loc>
-    <lastmod>2017-06-21T00:52:05.000Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://gitpull.cn/post.html?slug=%E4%B8%80%E7%94%9F%E5%A4%AA%E7%9F%AD%E5%8F%AA%E5%A4%9F%E7%94%A8%E6%9D%A5%E7%88%B1%E4%BD%A0%E4%B8%80%E4%BA%BA-f2c32ea3</loc>
-    <lastmod>2017-06-20T00:52:05.000Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
