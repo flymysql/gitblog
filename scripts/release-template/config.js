@@ -61,28 +61,22 @@ export const CONFIG = {
   },
   pageviews: {
     enabled: true,
-    // busuanzi（不蒜子，零配置）/ saobby（saobby.com 计数器，需注册）/ none
-    provider: "busuanzi",
-    // busuanzi 模式下首页文章列表的逐篇阅读量来源
-    articleProvider: "page-views-api",
     showHomeStats: true,
     showPostViews: true,
     showFooterStats: true,
-    showListPostViews: true,
-    // saobby 计数器：在 https://www.saobby.com/create_webcounter 创建，
-    // 把生成的图片 URL 和控制面板（dashboard）URL 粘进来即可
+    // 站点总访问：Saobby 计数图（首页 Hero / Footer）
     saobby: {
       site: {
-        img: "",          // 站点级计数器图片 URL（首页 / footer 展示）
-        dashboard: "",    // 站点计数器控制面板完整 URL（含 key），后台「访问数据」会嵌入
-        label: "总访问"    // 前缀文字，例如改成「访客数」「累计访问」
+        img: "",          // 站点级计数器图片 URL
+        dashboard: "",    // 控制面板 URL（后台「访问数据」iframe）
+        label: "总访问"
       },
-      article: {
-        img: "",          // 文章页计数器（每篇文章共用一张图，统计全站文章总阅读）
-        dashboard: "",
-        label: "阅读"
-      },
-      extra: []           // [{ name, img, dashboard }] 额外计数器，仅在后台「访问数据」展示
+      extra: []           // [{ name, img, dashboard }] 额外计数器
+    },
+    // 文章 / 独立页阅读：Vercount（https://vercount.one），按当前页面 URL 区分
+    vercount: {
+      scriptSrc: "",      // 默认可留空，使用 https://events.vercount.one/js
+      label: "阅读"       // 显示在数字前的文案
     }
   },
   auth: {
