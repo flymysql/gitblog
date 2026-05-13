@@ -36,6 +36,10 @@ export const CONFIG = {
         href: "archives.html"
       },
       {
+        name: "系列",
+        href: "series.html"
+      },
+      {
         name: "工具",
         href: "tools.html"
       },

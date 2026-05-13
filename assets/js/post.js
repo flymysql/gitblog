@@ -391,9 +391,12 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   const sec = document.createElement('aside');
   sec.className = 'article-series';
   sec.innerHTML = `
-    <div class="article-series-title">本文是「${escapeHtml(seriesName)}」系列的第 ${
+    <div class="article-series-head">
+      <div class="article-series-title">本文是「${escapeHtml(seriesName)}」系列的第 ${
       Math.max(1, list.findIndex(p => p.slug === currentSlug) + 1)
     } 篇 / 共 ${list.length} 篇</div>
+      <a class="article-series-all" href="series.html">全部系列</a>
+    </div>
     <ol>
       ${list.map(p => `
         <li class="${p.slug === currentSlug ? 'is-current' : ''}">
