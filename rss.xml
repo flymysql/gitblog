@@ -5,7 +5,7 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 12 May 2026 10:21:01 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 13 May 2026 06:39:06 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GitBlog：一个带伪后台的博客站点</title>
@@ -32,7 +32,7 @@
       <pubDate>Wed, 15 Apr 2026 00:00:00 GMT</pubDate>
       <author>Jimmy</author>
       <category>分布式存储</category><category>AI 基础设施</category><category>python</category>
-      <description><![CDATA[Smallpond 是 DeepSeek 开源的轻量级分布式数据处理框架，专为 10 TB 到 PB 量级的 AI / 数据场景设计。它把 DuckDB 的列式向量化执行、3FS 的高带宽存储、Ray 的任务调度三块拼到一起，做成了"一台机器"。本文从架构分层、端到端工作流、Parquet 基础到核心源码走读，把这台"机器"的工作原理说清楚。]]></description>
+      <description><![CDATA[Smallpond 是 DeepSeek 开源的轻量级分布式数据处理框架，专为 10 TB 到 PB 量级的 AI / 数据场景设计。它把 DuckDB 的列式向量化执行、3FS 的高带宽存储、Ray 的任务调度三块拼到一起，做成了\"一台机器\"。本文从架构分层、端到端工作流、Parquet 基础到核心源码走读，把这台\"机器\"的工作原理说清楚。]]></description>
     </item>
     <item>
       <title>3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的</title>
