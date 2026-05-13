@@ -16,7 +16,19 @@ import { mountGiscusScript } from './giscus-embed.js';
 const $ = sel => document.querySelector(sel);
 
 function publicImageUrl(url) {
-  return String(url || '').replace(/^\.\.\/assets\//, 'assets/');
+  const s = String(url || '').trim();
+  if (!s) return '';
+  if (/^https?:\/\//i.test(s) || s.startsWith('//')) return s;
+  if (s.startsWith('data:') || s.startsWith('blob:')) return s;
+
+  let rel = s.replace(/^\.\//, '');
+  rel = rel.replace(/^\/+/, '');
+  while (rel.startsWith('../')) rel = rel.slice(3);
+
+  if (rel.startsWith('assets/') || rel.startsWith('posts/')) {
+    return rootPath(rel);
+  }
+  return s;
 }
 
 function buildToc(article) {
@@ -166,8 +178,15 @@ function enhanceImages(article) {
 
   article.querySelectorAll('img').forEach(img => {
     const rawSrc = img.getAttribute('src') || '';
-    if (/^\.\.\/assets\//.test(rawSrc)) {
-      img.setAttribute('src', publicImageUrl(rawSrc));
+    if (
+      rawSrc
+      && !/^https?:\/\//i.test(rawSrc)
+      && !rawSrc.startsWith('//')
+      && !rawSrc.startsWith('data:')
+      && !rawSrc.startsWith('blob:')
+    ) {
+      const fixed = publicImageUrl(rawSrc);
+      if (fixed) img.setAttribute('src', fixed);
     }
     // 清除老内容里的固定 width / height（公众号常见 width="600"），让图按容器宽度自适应
     if (img.hasAttribute('width')) img.removeAttribute('width');
