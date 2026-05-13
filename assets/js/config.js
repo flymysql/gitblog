@@ -74,24 +74,20 @@ export const CONFIG = {
   },
   pageviews: {
     enabled: true,
-    provider: "saobby",
-    articleProvider: "page-views-api",
     showHomeStats: true,
     showPostViews: true,
     showFooterStats: true,
-    showListPostViews: true,
     saobby: {
       site: {
         img: "https://w.saobby.com/w/ivywp8ie",
         dashboard: "https://www.saobby.com/webcounter_dashboard?access_token=59nv7dkv",
         label: "人来过"
       },
-      article: {
-        img: "https://w.saobby.com/w/qabb4byw",
-        dashboard: "https://www.saobby.com/webcounter_dashboard?access_token=xxnc4lgt",
-        label: "阅读"
-      },
       extra: []
+    },
+    vercount: {
+      scriptSrc: "",
+      label: "阅读"
     }
   },
   auth: {
