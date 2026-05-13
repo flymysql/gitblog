@@ -347,7 +347,8 @@ function applyFilter(posts, tab, q, tag) {
 }
 
 (async function init() {
-  initSite({ active: './' });
+  // 避免 hero 与 footer 各有一份站点计数（saobby 会加载两张图 +2；不蒜子会重复容器）
+  initSite({ active: './', skipDuplicateSitePv: true });
   setMeta({ title: '', description: CONFIG.site.description, type: 'website' });
   setJsonLd({
     '@context': 'https://schema.org',
