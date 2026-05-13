@@ -20,7 +20,7 @@
 /* 让整块 hero 可点击跳转到关于页 */
 .hero-link {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 26px;
   padding: 32px 24px;
   color: inherit;
@@ -30,6 +30,30 @@
 .hero-link > .hero-arrow {
   align-self: center;
 }
+
+/* 拉伸到与右侧内容同高，内层头像保持 1:1 */
+.hero-avatar-wrap {
+  flex-shrink: 0;
+  align-self: stretch;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.hero-avatar {
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-height: 0;
+  width: auto;
+  aspect-ratio: 1;
+  align-self: flex-start;
+  max-width: none;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--bg-soft);
+  border: 3px solid var(--bg);
+  box-shadow: var(--shadow);
+}
 .hero-arrow {
   flex-shrink: 0;
   font-size: 28px;
@@ -38,18 +62,6 @@
   transition: transform 0.2s, color 0.2s;
 }
 .hero:hover .hero-arrow { color: var(--primary); transform: translateX(4px); }
-
-.hero-avatar {
-  width: 88px;
-  height: 88px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-  background-color: var(--bg-soft);
-  border: 3px solid var(--bg);
-  box-shadow: var(--shadow);
-}
 
 .hero-info {
   flex: 1;
@@ -90,7 +102,7 @@
     box-shadow: 0 8px 22px rgba(234, 111, 90, 0.07);
   }
   .hero-link {
-    align-items: flex-start;
+    align-items: stretch;
     padding: 9px 12px 9px;
     gap: 10px;
   }
@@ -108,9 +120,6 @@
   }
   .hero:hover .hero-arrow { transform: translateY(-50%) translateX(3px); }
   .hero-avatar {
-    width: 48px;
-    height: 48px;
-    margin-top: 0;
     border-width: 2px;
   }
   .hero-subtitle {
