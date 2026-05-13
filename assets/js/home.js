@@ -4,7 +4,7 @@
 
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
-import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPathFromPost, rootPath } from './site.js';
+import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPathFromPost, postPath } from './site.js';
 import { initPageviews, bszSiteStatsHtml } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { isGiscusReady, mountGiscusScript, notesFeedTerm } from './giscus-embed.js';
@@ -41,7 +41,7 @@ function renderHero(posts) {
   posts.forEach(p => (p.tags || []).forEach(t => tagCount.add(t)));
   // 整块 hero 包一层 <a> 跳转到「关于」页面：支持点击 / 右键新标签 / 中键新窗口
   hero.innerHTML = `
-    <a class="hero-link" href="${rootPath('post.html')}?slug=about" aria-label="进入关于页">
+    <a class="hero-link" href="${postPath('about')}" aria-label="进入关于页">
       <div class="hero-avatar" style="background-image:url(${escapeHtml(CONFIG.site.avatar || '')})"></div>
       <div class="hero-info">
         <div class="hero-title">${escapeHtml(CONFIG.site.title)}</div>

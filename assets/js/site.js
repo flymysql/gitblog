@@ -96,21 +96,29 @@ export function siteBasePath() {
   }
 }
 
-/** 对外文章 path：/post/YYYYMMDD/ 或 /post/YYYYMMDD-2/（同日多篇自增，首篇无 -2） */
+/** 对外文章 path：/post/YYYYMMDD/、/post/YYYYMMDD-2/，或固定 /post/welcome/、/post/about/ */
 export const POST_URL_KEY_RE = /^\d{8}(-\d+)?$/;
+/** 与 scripts/build.mjs 中 POST_PATH_BY_SLUG 保持一致 */
+export const POST_PATH_SLUGS = new Set(['welcome', 'about']);
+
+export function isPostPublicPathKey(seg) {
+  const s = String(seg || '').trim();
+  return POST_URL_KEY_RE.test(s) || POST_PATH_SLUGS.has(s);
+}
 
 export function postPath(urlKey) {
   const s = String(urlKey || '').trim();
   const bp = siteBasePath();
-  if (!POST_URL_KEY_RE.test(s)) return bp ? `${bp}/post.html` : '/post.html';
-  return `${bp}/post/${s}/`;
+  if (!isPostPublicPathKey(s)) return bp ? `${bp}/post.html` : '/post.html';
+  const enc = encodeURIComponent(s);
+  return `${bp}/post/${enc}/`;
 }
 
 /** 列表 / 搜索：有 urlKey 用规范地址，否则退回 post.html?slug= */
 export function postPathFromPost(p) {
   if (!p || !p.slug) return rootPath('post.html');
   const k = String(p.urlKey || '').trim();
-  if (POST_URL_KEY_RE.test(k)) return postPath(k);
+  if (isPostPublicPathKey(k)) return postPath(k);
   return `${rootPath('post.html')}?slug=${encodeURIComponent(p.slug)}`;
 }
 
@@ -118,7 +126,7 @@ export function postPathFromPost(p) {
 export function postPathFromAdminPost(p) {
   if (!p || !p.slug) return '../post.html';
   const k = String(p.urlKey || '').trim();
-  if (POST_URL_KEY_RE.test(k)) return `..${postPath(k)}`;
+  if (isPostPublicPathKey(k)) return `..${postPath(k)}`;
   return `../post.html?slug=${encodeURIComponent(p.slug)}`;
 }
 
