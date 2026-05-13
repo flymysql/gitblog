@@ -212,7 +212,7 @@ function navHtml(active) {
   `;
 }
 
-function footerHtml() {
+function footerHtml({ omitSitePv = false } = {}) {
   const social = CONFIG.site.social || {};
   const links = Object.entries(social)
     .filter(([, v]) => v)
@@ -221,7 +221,9 @@ function footerHtml() {
       const href = k === 'email' ? `mailto:${v}` : v;
       return `<a class="social-link" href="${escapeHtml(href)}" target="_blank" rel="noopener" title="${escapeHtml(k)}">${icon}</a>`;
     }).join('');
-  const pvHtml = (CONFIG.pageviews || {}).showFooterStats !== false ? bszSiteStatsHtml({ compact: true }) : '';
+  const pvCfg = CONFIG.pageviews || {};
+  const wantFooterPv = pvCfg.showFooterStats !== false && !omitSitePv;
+  const pvHtml = wantFooterPv ? bszSiteStatsHtml({ compact: true }) : '';
   const pv = pvHtml ? `<div class="footer-stats">${pvHtml}</div>` : '';
   return `
     <footer class="footer">
@@ -468,13 +470,15 @@ function injectAnalytics() {
   });
 }
 
-export function initSite({ active = '' } = {}) {
+export function initSite({ active = '', skipDuplicateSitePv = false } = {}) {
   initTheme();
   applyFavicon();
   const navHost = $('#site-nav');
   if (navHost) navHost.innerHTML = navHtml(active);
   const footerHost = $('#site-footer');
-  if (footerHost) footerHost.innerHTML = footerHtml();
+  const pvCfg = CONFIG.pageviews || {};
+  const omitFooterSitePv = skipDuplicateSitePv && pvCfg.showHomeStats !== false;
+  if (footerHost) footerHost.innerHTML = footerHtml({ omitSitePv: omitFooterSitePv });
   const overlayHost = $('#site-overlays');
   if (overlayHost) overlayHost.innerHTML = searchOverlayHtml();
 
