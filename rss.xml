@@ -5,11 +5,11 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Wed, 13 May 2026 08:22:20 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 13 May 2026 08:30:45 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>GitBlog：一个带伪后台的博客站点</title>
-      <link>https://gitpull.cn/post/20260511-2/</link>
+      <link>https://gitpull.cn/post/welcome/</link>
       <guid isPermaLink="false">welcome</guid>
       <pubDate>Mon, 11 May 2026 08:50:00 GMT</pubDate>
       <author>Jimmy</author>
@@ -18,7 +18,7 @@
     </item>
     <item>
       <title>关于小红鸡</title>
-      <link>https://gitpull.cn/post/20260511/</link>
+      <link>https://gitpull.cn/post/about/</link>
       <guid isPermaLink="false">about</guid>
       <pubDate>Mon, 11 May 2026 08:40:00 GMT</pubDate>
       <author>Jimmy</author>

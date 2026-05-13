@@ -6,7 +6,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic, fetchPostMarkdownPublic } from './api.js';
 import { renderMarkdown, parseFrontmatter } from './markdown.js';
-import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages, postPath, postPathFromPost, rootPath, POST_URL_KEY_RE } from './site.js';
+import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages, postPath, postPathFromPost, rootPath, isPostPublicPathKey } from './site.js';
 import { initPageviews, bszPagePvHtml, trackAndRenderArticleView } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { enhanceMath, enhanceMermaid, enhanceCodeAdvanced } from './enhancers.js';
@@ -401,7 +401,7 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
 
   const article = $('#article');
   if (!qSlug && !pathSeg) {
-    article.innerHTML = '<div class="error">未找到文章地址（请使用 /post/YYYYMMDD/ 或 post.html?slug=）</div>';
+    article.innerHTML = '<div class="error">未找到文章地址（请使用 /post/YYYYMMDD/、/post/welcome/ 等或 post.html?slug=）</div>';
     return;
   }
 
@@ -413,11 +413,9 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
     if (qSlug) {
       meta = allPosts.find(p => p.slug === qSlug) || null;
     } else if (pathSeg) {
-      if (POST_URL_KEY_RE.test(pathSeg)) {
-        meta = allPosts.find(p => p.urlKey === pathSeg) || null;
-      } else {
-        meta = allPosts.find(p => p.slug === pathSeg) || null;
-      }
+      meta = allPosts.find(p => p.urlKey === pathSeg)
+        || allPosts.find(p => p.slug === pathSeg)
+        || null;
     }
   } catch {}
 
@@ -427,12 +425,12 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
     return;
   }
 
-  if (!meta && pathSeg && POST_URL_KEY_RE.test(pathSeg)) {
-    article.innerHTML = `<div class="error">未找到日期路径「${escapeHtml(pathSeg)}」对应的文章</div>`;
+  if (!meta && pathSeg && isPostPublicPathKey(pathSeg)) {
+    article.innerHTML = `<div class="error">未找到路径「${escapeHtml(pathSeg)}」对应的文章</div>`;
     return;
   }
 
-  if (window.history && window.history.replaceState && meta && meta.urlKey && POST_URL_KEY_RE.test(meta.urlKey)) {
+  if (window.history && window.history.replaceState && meta && meta.urlKey && isPostPublicPathKey(meta.urlKey)) {
     const canon = postPath(meta.urlKey);
     try {
       if (params.get('slug') || (pathSeg && pathSeg !== meta.urlKey)) {
@@ -463,7 +461,7 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   // SEO + 优先用 OG 自动图（assets/og/{slug}.svg）兜底
   const ogAuto = `${CONFIG.site.url || ''}/assets/og/${encodeURIComponent(slug)}.svg`;
   const baseSite = String(CONFIG.site.url || '').replace(/\/+$/, '');
-  const canonPathRel = (meta && meta.urlKey && POST_URL_KEY_RE.test(meta.urlKey))
+  const canonPathRel = (meta && meta.urlKey && isPostPublicPathKey(meta.urlKey))
     ? postPath(meta.urlKey)
     : `${rootPath('post.html')}?slug=${encodeURIComponent(slug)}`;
   const canonical = baseSite ? `${baseSite}${canonPathRel}` : `${window.location.origin}${canonPathRel}`;

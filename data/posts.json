@@ -17,7 +17,7 @@
       "pinnedOrder": 1,
       "carousel": true,
       "path": "posts/welcome.md",
-      "urlKey": "20260511-2",
+      "urlKey": "welcome",
       "thumbnail": "../assets/uploads/2026/05/1778490605877-blwjij-image.thumb.webp"
     },
     {
@@ -33,7 +33,7 @@
       "cover": "../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.jpg",
       "pinned": true,
       "path": "posts/about.md",
-      "urlKey": "20260511"
+      "urlKey": "about"
     },
     {
       "slug": "smallpond-source-walkthrough",

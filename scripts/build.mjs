@@ -39,15 +39,24 @@ function siteOriginFromBuild() {
 }
 const SITE_ORIGIN = siteOriginFromBuild();
 
+/** 固定用 /post/{slug}/ 的短文（不走日期 urlKey），须与 assets/js/site.js 中 POST_PATH_SLUGS 一致 */
+const POST_PATH_BY_SLUG = new Set(['welcome', 'about']);
+
 function postPublicAbsUrl(entry) {
-  const k = typeof entry === 'string' ? entry : (entry && entry.urlKey);
-  const s = String(k || '').trim();
-  if (!/^\d{8}(-\d+)?$/.test(s)) {
-    const slug = typeof entry === 'object' && entry && entry.slug ? String(entry.slug) : '';
+  const slug = typeof entry === 'object' && entry && entry.slug ? String(entry.slug) : '';
+  const k = typeof entry === 'string' ? String(entry).trim() : String((entry && entry.urlKey) || '').trim();
+  if (!k) {
     if (slug) return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post.html?slug=${encodeURIComponent(slug)}`;
     return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post.html`;
   }
-  return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post/${s}/`;
+  if (/^\d{8}(-\d+)?$/.test(k)) {
+    return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post/${k}/`;
+  }
+  if (POST_PATH_BY_SLUG.has(slug) && k === slug) {
+    return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post/${encodeURIComponent(k)}/`;
+  }
+  if (slug) return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post.html?slug=${encodeURIComponent(slug)}`;
+  return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post.html`;
 }
 
 // ---------- 解析 frontmatter ----------
@@ -209,8 +218,9 @@ function calendarKeyFromDate(iso) {
 }
 
 function assignPostUrlKeys(entries) {
+  const dated = entries.filter(p => !POST_PATH_BY_SLUG.has(p.slug));
   const byDay = new Map();
-  for (const p of entries) {
+  for (const p of dated) {
     const day = calendarKeyFromDate(p.date);
     if (!day) continue;
     if (!byDay.has(day)) byDay.set(day, []);
@@ -226,6 +236,9 @@ function assignPostUrlKeys(entries) {
     arr.forEach((p, i) => {
       p.urlKey = i === 0 ? day : `${day}-${i + 1}`;
     });
+  }
+  for (const p of entries) {
+    if (POST_PATH_BY_SLUG.has(p.slug)) p.urlKey = p.slug;
   }
 }
 
@@ -469,16 +482,18 @@ function rewritePostShellHtml(html) {
 }
 const POST_SHELL = rewritePostShellHtml(readFileSync('post.html', 'utf8'));
 const POST_ROOT = 'post';
-function safePostUrlKeyDir(urlKey) {
-  const s = String(urlKey || '').trim();
-  if (!/^\d{8}(-\d+)?$/.test(s)) return '';
-  return s;
+function safePostUrlKeyDir(p) {
+  const slug = String(p.slug || '');
+  const k = String(p.urlKey || '').trim();
+  if (/^\d{8}(-\d+)?$/.test(k)) return k;
+  if (POST_PATH_BY_SLUG.has(slug) && k === slug) return k;
+  return '';
 }
 if (existsSync(POST_ROOT)) rmSync(POST_ROOT, { recursive: true, force: true });
 mkdirSync(POST_ROOT, { recursive: true });
 let postShellCount = 0;
 for (const p of [...visiblePosts, ...pages.filter(x => !x.draft)]) {
-  const dirKey = safePostUrlKeyDir(p.urlKey);
+  const dirKey = safePostUrlKeyDir(p);
   if (!dirKey) {
     console.warn('[build] 跳过缺少或非法 urlKey，无法生成 post 目录：', p.slug);
     continue;
