@@ -450,18 +450,6 @@
   font-weight: 500;
 }
 
-.post-note-badge {
-  display: inline-block;
-  margin-right: 6px;
-  padding: 1px 6px;
-  border-radius: 3px;
-  border: 1px solid var(--border);
-  color: var(--text-tertiary);
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.post-title {
   font-size: 18px;
   font-weight: 700;
   color: var(--text-main);
@@ -649,3 +637,36 @@
   cursor: pointer;
 }
 .load-more:hover { color: var(--primary); }
+
+/* ---------- 首页「随笔」Tab：仅 giscus ---------- */
+.post-list.post-list--giscus {
+  list-style: none;
+}
+.post-list.post-list--giscus .home-giscus-only {
+  list-style: none;
+  width: 100%;
+  padding: 0;
+  border: none;
+}
+.home-notes-lead {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 16px;
+}
+.home-notes-lead a { color: var(--primary); font-weight: 600; }
+.home-notes-lead code {
+  font-size: 12px;
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.home-notes-giscus {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  background: var(--bg-secondary);
+  min-height: 100px;
+}
+.post-list.post-list--giscus .empty a { color: var(--primary); }

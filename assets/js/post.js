@@ -11,6 +11,7 @@ import { initPageviews, bszPagePvHtml, trackAndRenderArticleView } from './pagev
 import { setMeta, setJsonLd } from './seo.js';
 import { enhanceMath, enhanceMermaid, enhanceCodeAdvanced } from './enhancers.js';
 import { shareCardHtml, bindShareCard } from './share.js';
+import { mountGiscusScript } from './giscus-embed.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -66,7 +67,7 @@ function renderToc(items) {
   });
 }
 
-function renderGiscus(slug, title) {
+function renderGiscus(slug) {
   const g = CONFIG.giscus;
   if (!g || !g.enabled) return;
   const article = $('#article');
@@ -74,61 +75,8 @@ function renderGiscus(slug, title) {
   wrap.className = 'comments';
   article.appendChild(wrap);
 
-  if (!g.repoId || !g.categoryId) {
-    wrap.innerHTML = `
-      <div class="comments-title">评论</div>
-      <div class="comments-hint">
-        评论功能已启用，但缺少 <code>repoId</code> 或 <code>categoryId</code>。<br>
-        请到 <a href="https://giscus.app" target="_blank" rel="noopener">giscus.app</a> 生成配置，再到
-        <a href="admin/settings.html">后台 · 设置</a> 里填写后保存。
-      </div>
-    `;
-    return;
-  }
-
   wrap.innerHTML = `<div class="comments-title">评论</div><div id="giscusBox"></div>`;
-
-  const html = document.documentElement;
-  const choice = html.dataset.themeChoice || 'auto';
-  const resolved = choice === 'auto'
-    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-    : choice;
-
-  // 决定 mapping 与 term：
-  // 由于所有文章页的 pathname 都是 /post.html（只是 ?slug=xxx 不同，giscus 不读 query），
-  // 'pathname' / 'url' 在本站会让所有文章共享同一个 Discussion → 评论看起来全一样。
-  // 这里强制：'specific' 走 slug；'pathname'/'url' 也回退到 specific+slug，确保每篇文章独立。
-  let mapping = (g.mapping || 'specific').toLowerCase();
-  let term = '';
-  if (mapping === 'pathname' || mapping === 'url' || mapping === '') {
-    mapping = 'specific';
-    term = slug;
-    console.warn('[giscus] mapping=pathname/url 在本站会让所有文章共用同一条 Discussion，已自动切换为 specific + slug');
-  } else if (mapping === 'specific') {
-    term = slug;
-  }
-
-  const s = document.createElement('script');
-  s.src = 'https://giscus.app/client.js';
-  s.crossOrigin = 'anonymous';
-  s.async = true;
-  const attrs = {
-    'data-repo': g.repo,
-    'data-repo-id': g.repoId,
-    'data-category': g.category,
-    'data-category-id': g.categoryId,
-    'data-mapping': mapping,
-    'data-strict': g.strict || '0',
-    'data-reactions-enabled': g.reactionsEnabled || '1',
-    'data-emit-metadata': g.emitMetadata || '0',
-    'data-input-position': g.inputPosition || 'top',
-    'data-theme': resolved,
-    'data-lang': g.lang || 'zh-CN',
-    'data-loading': 'lazy',
-  };
-  if (term) attrs['data-term'] = term;
-  Object.entries(attrs).forEach(([k, v]) => s.setAttribute(k, v));
-  $('#giscusBox').appendChild(s);
+  mountGiscusScript($('#giscusBox'), slug);
 }
 
 // ---------- 阅读进度条 ----------
@@ -537,7 +485,7 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   renderNeighborsAndRelated(allPosts, slug, tags);
 
   // 评论
-  renderGiscus(slug, title);
+  renderGiscus(slug);
 
   // 文章 author meta 里的「阅读 N」占位是这里渲染的；按 slug 计数，首页列表只读不增。
   initPageviews();

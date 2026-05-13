@@ -200,6 +200,7 @@ function normalizeConfig(config) {
   config.giscus.reactionsEnabled = String(config.giscus.reactionsEnabled ?? '1');
   config.giscus.emitMetadata = String(config.giscus.emitMetadata ?? '0');
   config.giscus.inputPosition = config.giscus.inputPosition || 'top';
+  config.giscus.notesTerm = String(config.giscus.notesTerm || 'gitblog-notes-feed').trim() || 'gitblog-notes-feed';
   config.analytics.enabled = !!config.analytics.enabled;
   config.analytics.snippet = String(config.analytics.snippet || '').trim();
   config.pageviews.enabled = config.pageviews.enabled !== false;
@@ -618,7 +619,10 @@ function settingsContentHtml() {
             <span class="settings-hint">推荐 <code>specific</code>：每篇文章按 slug 独立绑定一个 Discussion；本站不要用 <code>pathname</code>/<code>url</code>，会让所有文章共用同一条评论流。</span>
           </label>
           <label>language <input name="giscus.lang" placeholder="zh-CN"></label>
-        </div>
+          <label class="span-2">随笔讨论标识（notesTerm）
+            <input name="giscus.notesTerm" placeholder="gitblog-notes-feed">
+            <span class="settings-hint">首页「随笔」与「随笔」页面共用这一条 giscus 讨论（<code>data-term</code>）。须与 giscus 的 <code>specific</code> mapping 一致；首次留言后会自动创建讨论串。</span>
+          </label>
       </section>
 
       <section class="settings-card">

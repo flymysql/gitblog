@@ -7,6 +7,7 @@ import { fetchIndexPublic } from './api.js';
 import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER } from './site.js';
 import { initPageviews, bszSiteStatsHtml } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
+import { isGiscusReady, mountGiscusScript, notesFeedTerm } from './giscus-embed.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -235,7 +236,6 @@ function postItemHtml(p, author, avatar) {
         <h3 class="post-title">${escapeHtml(p.title || '无标题')}</h3>
         <p class="post-summary">${escapeHtml(p.summary || '')}</p>
         <div class="post-meta">
-          ${p.isNote ? '<span class="post-note-badge">随笔</span>' : ''}
           ${(p.tags || []).slice(0, 3).map(t => tagHtml(t)).join('')}
         </div>
       </a>
@@ -255,9 +255,7 @@ function renderList(posts, tab = 'latest') {
   if (!posts.length) {
     const emptyMsg = tab === 'series'
       ? '暂无归入系列的文章（在文章 frontmatter 里设置 series 即可）'
-      : tab === 'notes'
-        ? '还没有随笔。登录后可在「随笔」页直接发布～'
-        : '还没有文章。点击右上角"写文章"开始第一篇～';
+      : '还没有文章。点击右上角"写文章"开始第一篇～';
     ul.innerHTML = `<li class="empty">${emptyMsg}</li>`;
     listState = null;
     return;
@@ -342,39 +340,9 @@ function renderRecent(posts) {
   `).join('');
 }
 
-function plainSnippetFromMd(md, max = 160) {
-  return String(md || '')
-    .replace(/```[\s\S]*?```/g, ' ')
-    .replace(/!\[.*?\]\(.*?\)/g, ' ')
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-    .replace(/[#>*_`~]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, max);
-}
-
-function noteEntriesForHome(notes) {
-  return (notes || []).map(n => ({
-    slug: n.slug,
-    title: n.title || plainSnippetFromMd(n.content, 48) || '随笔',
-    summary: plainSnippetFromMd(n.content, 220),
-    tags: n.tags || [],
-    date: n.date,
-    author: n.author,
-    pinned: false,
-    cover: null,
-    isNote: true,
-  }));
-}
-
-function buildHomeList({ allPosts, noteRows, tab, q, tag }) {
-  let r;
-  if (tab === 'notes') {
-    r = noteEntriesForHome(noteRows);
-  } else {
-    r = [...allPosts];
-    if (tab === 'series') r = r.filter(p => String(p.series || '').trim());
-  }
+function buildHomeList({ allPosts, tab, q, tag }) {
+  let r = [...allPosts];
+  if (tab === 'series') r = r.filter(p => String(p.series || '').trim());
   if (q) {
     const lq = q.toLowerCase();
     r = r.filter(p =>
@@ -384,17 +352,13 @@ function buildHomeList({ allPosts, noteRows, tab, q, tag }) {
     );
   }
   if (tag) r = r.filter(p => (p.tags || []).includes(tag));
-  if (tab === 'notes') {
-    r.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-  } else {
-    r.sort((a, b) => {
-      if ((b.pinned ? 1 : 0) !== (a.pinned ? 1 : 0)) return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
-      if (a.pinned && b.pinned && Number(a.pinnedOrder || 0) !== Number(b.pinnedOrder || 0)) {
-        return Number(a.pinnedOrder || 9999) - Number(b.pinnedOrder || 9999);
-      }
-      return new Date(b.date || 0) - new Date(a.date || 0);
-    });
-  }
+  r.sort((a, b) => {
+    if ((b.pinned ? 1 : 0) !== (a.pinned ? 1 : 0)) return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+    if (a.pinned && b.pinned && Number(a.pinnedOrder || 0) !== Number(b.pinnedOrder || 0)) {
+      return Number(a.pinnedOrder || 9999) - Number(b.pinnedOrder || 9999);
+    }
+    return new Date(b.date || 0) - new Date(a.date || 0);
+  });
   return r;
 }
 
@@ -422,23 +386,12 @@ function buildHomeList({ allPosts, noteRows, tab, q, tag }) {
   });
 
   let allPosts = [];
-  let noteRows = [];
   try {
     const data = await fetchIndexPublic();
-    // 短动态（type:note）单独入口 notes.html；首页「随笔」tab 另拉 notes.json 展示
     allPosts = (Array.isArray(data.posts) ? data.posts : []).filter(p => !p.draft && p.type !== 'note');
   } catch (e) {
     $('#postList').innerHTML = `<li class="error">加载文章列表失败：${escapeHtml(e.message)}</li>`;
     return;
-  }
-  try {
-    const r = await fetch('data/notes.json?_=' + Date.now(), { cache: 'no-cache' });
-    if (r.ok) {
-      const j = await r.json();
-      noteRows = Array.isArray(j.notes) ? j.notes : [];
-    }
-  } catch {
-    noteRows = [];
   }
 
   renderHero(allPosts);
@@ -470,18 +423,41 @@ function buildHomeList({ allPosts, noteRows, tab, q, tag }) {
   }
 
   function refresh() {
-    const filtered = buildHomeList({ allPosts, noteRows, tab, q: '', tag: activeTag });
-    renderList(filtered, tab);
+    const ul = $('#postList');
+    if (tab === 'notes') {
+      if (listState && listState.observer) listState.observer.disconnect();
+      listState = null;
+      ul.classList.add('post-list--giscus');
+      if (!isGiscusReady()) {
+        ul.innerHTML = `<li class="empty">请先在后台启用 giscus 并填写完整配置。随笔内容通过评论发布（与 <a href="notes.html">随笔页</a> 同一条讨论）。</li>`;
+      } else {
+        ul.innerHTML = `
+          <li class="home-giscus-only">
+            <p class="home-notes-lead">在下方发表评论即可发布随笔（与 <a href="notes.html">随笔页</a> 共用同一条 giscus 讨论，标识为 <code>${escapeHtml(notesFeedTerm())}</code>）。</p>
+            <div class="home-notes-giscus" id="homeNotesGiscusRoot"></div>
+          </li>`;
+        const root = $('#homeNotesGiscusRoot');
+        if (root) mountGiscusScript(root, notesFeedTerm());
+      }
+    } else {
+      ul.classList.remove('post-list--giscus');
+      const filtered = buildHomeList({ allPosts, tab, q: '', tag: activeTag });
+      renderList(filtered, tab);
+    }
+
     if (pendingRestore) {
       const pr = pendingRestore;
       pendingRestore = null;
-      const targetLoaded = Math.min(
-        Math.max(Number(pr.loaded) || PAGE_SIZE, PAGE_SIZE),
-        filtered.length,
-      );
-      let guard = 0;
-      while (listState && typeof listState.loadNext === 'function' && listState.loaded < targetLoaded && guard++ < 250) {
-        listState.loadNext();
+      if (tab !== 'notes' && listState && typeof listState.loadNext === 'function') {
+        const filtered = buildHomeList({ allPosts, tab, q: '', tag: activeTag });
+        const targetLoaded = Math.min(
+          Math.max(Number(pr.loaded) || PAGE_SIZE, PAGE_SIZE),
+          filtered.length,
+        );
+        let guard = 0;
+        while (listState.loaded < targetLoaded && guard++ < 250) {
+          listState.loadNext();
+        }
       }
       scheduleRestoreHomeScroll(pr.y);
     }
