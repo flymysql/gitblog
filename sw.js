@@ -3,7 +3,7 @@
 // 与 ?v=VERSION 的 cache-busting 协同：CACHE_NAME 用 release VERSION 区分批次
 // ============================================================================
 
-const SW_VERSION = '20260512184000';
+const SW_VERSION = '20260513120000';
 const STATIC_CACHE = `static-${SW_VERSION}`;
 const PAGE_CACHE = `pages-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
@@ -120,8 +120,13 @@ async function matchHtmlShell(request) {
   const name = path.split('/').pop() || 'index.html';
   const shell = name === '' ? 'index.html' : name;
 
-  // post.html?slug=xxx / tags.html#xxx 这类页面壳相同，query 不应该影响命中。
-  for (const key of [shell, './' + shell, 'index.html', './']) {
+  // post.html?slug=xxx / tags.html#xxx 等：query/hash 不同仍共用同一 HTML 壳，只匹配该壳。
+  // 切勿对 post.html 等回落到 index.html，否则微信等环境下会「点文章却看到首页」。
+  const keys = [shell, './' + shell];
+  if (shell === 'index.html') {
+    keys.push('./', 'index.html');
+  }
+  for (const key of keys) {
     const hit = await caches.match(key);
     if (hit) return hit;
   }
