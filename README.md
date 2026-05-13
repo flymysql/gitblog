@@ -4,7 +4,7 @@
 
 **没有任何后端服务、没有 OAuth、没有数据库。** 鉴权直接用 GitHub Fine-grained Personal Access Token，调用 GitHub Contents / Repos API 完成所有操作。
 
-[在线 Demo](https://flymysql.github.io/gitblog) · [项目欢迎页](https://flymysql.github.io/gitblog/post.html?slug=welcome) · [关于页](https://flymysql.github.io/gitblog/post.html?slug=about)
+[在线 Demo](https://flymysql.github.io/gitblog) · [项目欢迎页](https://flymysql.github.io/gitblog/post/welcome/) · [关于页](https://flymysql.github.io/gitblog/post/about/)（其余文章为 `/post/YYYYMMDD/` 或同日多篇 `/post/YYYYMMDD-2/` 等）
 
 ---
 

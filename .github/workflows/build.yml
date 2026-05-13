@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'posts/**'
+      - 'post/**'
       - 'data/posts.json'
       - 'assets/js/config.js'
       - 'scripts/build.mjs'
@@ -36,7 +37,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add sitemap.xml rss.xml robots.txt manifest.webmanifest data/posts.json data/search.json assets/og
+          git add sitemap.xml rss.xml robots.txt manifest.webmanifest data/posts.json data/search.json assets/og post
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else

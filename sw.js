@@ -3,7 +3,7 @@
 // 与 ?v=VERSION 的 cache-busting 协同：CACHE_NAME 用 release VERSION 区分批次
 // ============================================================================
 
-const SW_VERSION = '20260513220000';
+const SW_VERSION = '20260514220000';
 const STATIC_CACHE = `static-${SW_VERSION}`;
 const PAGE_CACHE = `pages-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
@@ -117,17 +117,43 @@ async function matchHtmlShell(request) {
   if (direct) return direct;
 
   const url = new URL(request.url);
-  const path = url.pathname.replace(/\/+$/, '');
+  let path = url.pathname.replace(/\/+$/, '');
+  if (path === '') path = '/';
+
+  let postSlug = null;
+  let m = path.match(/\/post\/([^/]+)\/index\.html$/);
+  if (m) postSlug = m[1];
+  else {
+    m = path.match(/\/post\/([^/]+)\/?$/);
+    if (m) postSlug = m[1];
+  }
+  if (postSlug) {
+    let slug = postSlug;
+    try {
+      slug = decodeURIComponent(slug);
+    } catch {
+      /* 保持原样 */
+    }
+    const postKeys = [
+      `post/${slug}/index.html`,
+      `./post/${slug}/index.html`,
+    ];
+    for (const key of postKeys) {
+      const hit = await caches.match(key);
+      if (hit) return hit;
+    }
+  }
+
   const name = path.split('/').pop() || 'index.html';
   const shell = name === '' ? 'index.html' : name;
 
   // post.html?slug=xxx / tags.html#xxx 等：query/hash 不同仍共用同一 HTML 壳，只匹配该壳。
   // 切勿对 post.html 等回落到 index.html，否则微信等环境下会「点文章却看到首页」。
-  const keys = [shell, './' + shell];
+  const shellKeys = [shell, './' + shell];
   if (shell === 'index.html') {
-    keys.push('./', 'index.html');
+    shellKeys.push('./', 'index.html');
   }
-  for (const key of keys) {
+  for (const key of shellKeys) {
     const hit = await caches.match(key);
     if (hit) return hit;
   }
