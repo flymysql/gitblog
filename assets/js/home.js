@@ -42,9 +42,11 @@ function renderHero(posts) {
   // 整块 hero 包一层 <a> 跳转到「关于」页面：支持点击 / 右键新标签 / 中键新窗口
   hero.innerHTML = `
     <a class="hero-link" href="${postPath('about')}" aria-label="进入关于页">
-      <div class="hero-avatar" style="background-image:url(${escapeHtml(CONFIG.site.avatar || '')})"></div>
-      <div class="hero-info">
+      <div class="hero-brand">
+        <div class="hero-avatar" style="background-image:url(${escapeHtml(CONFIG.site.avatar || '')})"></div>
         <div class="hero-title">${escapeHtml(CONFIG.site.title)}</div>
+      </div>
+      <div class="hero-info">
         <div class="hero-subtitle">${escapeHtml(CONFIG.site.description || CONFIG.site.subtitle || '')}</div>
         <div class="hero-stats">
           <div class="stat"><strong>${posts.length}</strong>篇文章</div>
