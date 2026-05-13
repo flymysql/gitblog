@@ -1,5 +1,5 @@
 // 校验 + 重新生成 sitemap.xml 与 rss.xml
-import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { join, basename, extname } from 'node:path';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
@@ -18,6 +18,32 @@ const INDEX_FILE = 'data/posts.json';
 const OG_DIR = 'assets/og';
 
 console.log('Site URL:', SITE_URL);
+
+function sitePathPrefixFromBuild() {
+  if (!SITE_URL) return '';
+  try {
+    const o = new URL(SITE_URL.endsWith('/') ? SITE_URL : `${SITE_URL}/`);
+    const p = o.pathname.replace(/\/+$/, '');
+    return p === '/' || !p ? '' : p;
+  } catch {
+    return '';
+  }
+}
+const SITE_PATH_PREFIX = sitePathPrefixFromBuild();
+function siteOriginFromBuild() {
+  try {
+    return new URL(SITE_URL || 'https://example.com').origin;
+  } catch {
+    return '';
+  }
+}
+const SITE_ORIGIN = siteOriginFromBuild();
+
+function postPublicAbsUrl(slug) {
+  const s = String(slug || '').trim();
+  const seg = encodeURIComponent(s);
+  return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post/${seg}/`;
+}
 
 // ---------- 解析 frontmatter ----------
 function coerceScalar(v) {
@@ -253,13 +279,13 @@ const urls = [
   { loc: baseUrl + '/tools.html', lastmod: today, changefreq: 'monthly', priority: '0.7' },
   { loc: baseUrl + '/tool-air-conditioner.html', lastmod: today, changefreq: 'monthly', priority: '0.6' },
   ...pages.filter(p => !p.draft).map(p => ({
-    loc: `${baseUrl}/post.html?slug=${encodeURIComponent(p.slug)}`,
+    loc: postPublicAbsUrl(p.slug),
     lastmod: new Date(p.updated || p.date || today).toISOString(),
     changefreq: 'monthly',
     priority: '0.7',
   })),
   ...visiblePosts.map(p => ({
-    loc: `${baseUrl}/post.html?slug=${encodeURIComponent(p.slug)}`,
+    loc: postPublicAbsUrl(p.slug),
     lastmod: new Date(p.updated || p.date || today).toISOString(),
     changefreq: 'monthly',
     priority: p.pinned ? '0.9' : '0.6',
@@ -314,7 +340,7 @@ function escCdata(s) { return String(s == null ? '' : s).replace(/]]>/g, ']]]]><
 
 const rssItems = visiblePosts.slice(0, 30).map(p => `    <item>
       <title>${xmlEsc(p.title)}</title>
-      <link>${xmlEsc(`${baseUrl}/post.html?slug=${encodeURIComponent(p.slug)}`)}</link>
+      <link>${xmlEsc(postPublicAbsUrl(p.slug))}</link>
       <guid isPermaLink="false">${xmlEsc(p.slug)}</guid>
       <pubDate>${new Date(p.date || today).toUTCString()}</pubDate>
       <author>${xmlEsc(p.author || SITE_AUTHOR)}</author>
@@ -385,3 +411,35 @@ for (const post of [...visiblePosts, ...pages.filter(p => !p.draft)]) {
   writeFileSync(join(OG_DIR, `${post.slug}.svg`), ogSvg(post));
 }
 console.log(`OG 分享图已生成：${visiblePosts.length + pages.filter(p => !p.draft).length} 张`);
+
+// ---------- post/{slug}/index.html（/post/{slug}/ 简洁 URL，与 post.js 一致） ----------
+function rewritePostShellHtml(html) {
+  return html
+    .replace(/\bhref="assets\//g, 'href="../../assets/')
+    .replace(/\bsrc="assets\//g, 'src="../../assets/')
+    .replace(/\bhref="manifest\.webmanifest"/g, 'href="../../manifest.webmanifest"')
+    .replace(/\bhref="rss\.xml"/g, 'href="../../rss.xml"')
+    .replace(/\blink rel="apple-touch-icon" href="assets\//g, 'link rel="apple-touch-icon" href="../../assets/');
+}
+const POST_SHELL = rewritePostShellHtml(readFileSync('post.html', 'utf8'));
+const POST_ROOT = 'post';
+function safeFsPostSlug(slug) {
+  const s = String(slug || '').trim();
+  if (!s || s.includes('..') || s.includes('/') || s.includes('\\')) return '';
+  return s;
+}
+if (existsSync(POST_ROOT)) rmSync(POST_ROOT, { recursive: true, force: true });
+mkdirSync(POST_ROOT, { recursive: true });
+let postShellCount = 0;
+for (const p of [...visiblePosts, ...pages.filter(x => !x.draft)]) {
+  const dirSlug = safeFsPostSlug(p.slug);
+  if (!dirSlug) {
+    console.warn('[build] 跳过非法 slug，无法生成 post 目录：', p.slug);
+    continue;
+  }
+  const dir = join(POST_ROOT, dirSlug);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, 'index.html'), POST_SHELL);
+  postShellCount++;
+}
+console.log(`post/{{slug}}/ 已生成（${postShellCount} 个 HTML shell）`);

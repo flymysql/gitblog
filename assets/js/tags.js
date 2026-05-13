@@ -5,7 +5,7 @@
 
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
-import { initSite, escapeHtml, fmtDate, tagHtml, tagStyle } from './site.js';
+import { initSite, escapeHtml, fmtDate, tagHtml, tagStyle, postPath } from './site.js';
 import { setMeta } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -68,7 +68,7 @@ function renderFiltered(posts, tag) {
 function postCard(p) {
   return `
     <li class="post-item">
-      <a class="post-content" href="post.html?slug=${encodeURIComponent(p.slug)}">
+      <a class="post-content" href="${postPath(p.slug)}">
         <h3 class="post-title">${escapeHtml(p.title || '无标题')}</h3>
         <p class="post-summary">${escapeHtml(p.summary || '')}</p>
         <div class="post-meta">

@@ -6,7 +6,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic, fetchPostMarkdownPublic } from './api.js';
 import { renderMarkdown, parseFrontmatter } from './markdown.js';
-import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages } from './site.js';
+import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages, postPath, rootPath } from './site.js';
 import { initPageviews, bszPagePvHtml, trackAndRenderArticleView } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { enhanceMath, enhanceMermaid, enhanceCodeAdvanced } from './enhancers.js';
@@ -253,6 +253,29 @@ function enhanceLinks(article) {
   });
 }
 
+function legacyPostLinkBase() {
+  try {
+    const u = String(CONFIG.site.url || '').trim();
+    if (u) return u.endsWith('/') ? u : `${u}/`;
+  } catch { /* */ }
+  return `${window.location.origin}/`;
+}
+
+/** 正文里旧的 post.html?slug= 链接改写成 /post/{slug}/，避免在 /post/当前/ 下相对路径断裂 */
+function rewriteLegacyPostLinks(article) {
+  const base = legacyPostLinkBase();
+  article.querySelectorAll('.article-body a[href]').forEach(a => {
+    const href = a.getAttribute('href') || '';
+    if (!href || href.startsWith('#')) return;
+    try {
+      const u = new URL(href, base);
+      if (!String(u.pathname || '').endsWith('post.html')) return;
+      const s = u.searchParams.get('slug');
+      if (s) a.setAttribute('href', postPath(s));
+    } catch { /* */ }
+  });
+}
+
 // ---------- 上一篇 / 下一篇 + 相关文章 ----------
 function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
   const visible = (allPosts || []).filter(p => !p.draft && p.slug !== currentSlug);
@@ -286,12 +309,12 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
     nav.className = 'post-neighbors';
     nav.innerHTML = `
       ${prev ? `
-        <a class="post-neighbor prev" href="post.html?slug=${encodeURIComponent(prev.slug)}">
+        <a class="post-neighbor prev" href="${postPath(prev.slug)}">
           <span class="label">← 上一篇</span>
           <span class="title">${escapeHtml(prev.title || '无标题')}</span>
         </a>` : '<span></span>'}
       ${next ? `
-        <a class="post-neighbor next" href="post.html?slug=${encodeURIComponent(next.slug)}">
+        <a class="post-neighbor next" href="${postPath(next.slug)}">
           <span class="label">下一篇 →</span>
           <span class="title">${escapeHtml(next.title || '无标题')}</span>
         </a>` : '<span></span>'}
@@ -307,7 +330,7 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
       <ul class="post-related-list">
         ${related.map(p => `
           <li>
-            <a href="post.html?slug=${encodeURIComponent(p.slug)}">
+            <a href="${postPath(p.slug)}">
               <span class="t">${escapeHtml(p.title || '无标题')}</span>
               <span class="meta">${fmtDate(p.date)} · ${(p.tags || []).slice(0, 3).map(t => '#' + escapeHtml(t)).join(' ')}</span>
             </a>
@@ -350,7 +373,7 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
         <li class="${p.slug === currentSlug ? 'is-current' : ''}">
           ${p.slug === currentSlug
             ? `<a>${escapeHtml(p.title || '无标题')}</a>`
-            : `<a href="post.html?slug=${encodeURIComponent(p.slug)}">${escapeHtml(p.title || '无标题')}</a>`}
+            : `<a href="${postPath(p.slug)}">${escapeHtml(p.title || '无标题')}</a>`}
         </li>
       `).join('')}
     </ol>
@@ -365,11 +388,29 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   bindBackToTop();
 
   const params = new URLSearchParams(window.location.search);
-  const slug = params.get('slug');
+  let slug = (params.get('slug') || '').trim();
+  if (!slug) {
+    const m = window.location.pathname.match(/\/post\/([^/]+)\/?$/);
+    if (m) {
+      try {
+        slug = decodeURIComponent(m[1]).trim();
+      } catch {
+        slug = m[1].trim();
+      }
+    }
+  }
   const article = $('#article');
   if (!slug) {
-    article.innerHTML = '<div class="error">缺少 slug 参数</div>';
+    article.innerHTML = '<div class="error">未找到文章地址（需要 /post/{slug}/ 或 post.html?slug=）</div>';
     return;
+  }
+
+  if (params.get('slug') && window.history && window.history.replaceState) {
+    try {
+      window.history.replaceState(null, '', postPath(slug));
+    } catch {
+      /* 部分 WebView 对 replaceState 较严格 */
+    }
   }
 
   let meta = null;
@@ -399,6 +440,8 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   const summary = (meta && meta.summary) || data.summary || '';
   // SEO + 优先用 OG 自动图（assets/og/{slug}.svg）兜底
   const ogAuto = `${CONFIG.site.url || ''}/assets/og/${encodeURIComponent(slug)}.svg`;
+  const baseSite = String(CONFIG.site.url || '').replace(/\/+$/, '');
+  const canonical = baseSite ? `${baseSite}${postPath(slug)}` : `${window.location.origin}${postPath(slug)}`;
   setMeta({
     title,
     description: summary,
@@ -408,6 +451,7 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
     modifiedTime: updated,
     author,
     tags,
+    url: canonical,
   });
 
   setJsonLd({
@@ -424,7 +468,7 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
       name: CONFIG.site.title,
       logo: CONFIG.site.logo || CONFIG.site.avatar ? { '@type': 'ImageObject', url: CONFIG.site.logo || CONFIG.site.avatar } : undefined,
     },
-    mainEntityOfPage: window.location.href.replace(/#.*$/, ''),
+    mainEntityOfPage: canonical,
     keywords: (tags || []).join(','),
   });
 
@@ -433,7 +477,7 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
 
   article.innerHTML = `
     <header class="article-header">
-      ${tags.length ? `<div class="article-tags-top">${tags.map(t => tagHtml(t, { href: `tags.html#${encodeURIComponent(t)}` })).join('')}</div>` : ''}
+      ${tags.length ? `<div class="article-tags-top">${tags.map(t => tagHtml(t, { href: `${rootPath('tags.html')}#${encodeURIComponent(t)}` })).join('')}</div>` : ''}
       <h1 class="article-title">${escapeHtml(title)}</h1>
       <div class="article-author">
         <div class="avatar" style="background-image:url(${escapeHtml(avatar || '')})"></div>
@@ -453,12 +497,12 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
             })()}
           </div>
         </div>
-        <a class="article-edit" href="admin/editor.html?slug=${encodeURIComponent(slug)}" title="编辑此文">编辑</a>
+        <a class="article-edit" href="${rootPath(`admin/editor.html?slug=${encodeURIComponent(slug)}`)}" title="编辑此文">编辑</a>
       </div>
     </header>
     <div class="article-body">${html}</div>
-    ${tags.length ? `<footer class="article-footer">
-      <div class="article-tags">${tags.map(t => tagHtml(t, { href: `tags.html#${encodeURIComponent(t)}` })).join('')}</div>
+      ${tags.length ? `<footer class="article-footer">
+      <div class="article-tags">${tags.map(t => tagHtml(t, { href: `${rootPath('tags.html')}#${encodeURIComponent(t)}` })).join('')}</div>
     </footer>` : ''}
     ${shareCardHtml({ ...(meta || {}), ...data, slug, title, page: !!(meta && meta.page) || !!data.page })}
   `;
@@ -474,6 +518,7 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   enhanceHeadings(article);
   enhanceImages(article);
   enhanceLinks(article);
+  rewriteLegacyPostLinks(article);
   enhanceMath(article);                // KaTeX 渲染 .math 节点（懒加载 KaTeX）
   enhanceMermaid(article);             // Mermaid 渲染 .mermaid 节点（懒加载 mermaid.js）
   bindShareCard(article, { ...data, slug, title });  // 分享 / 二维码 / 打赏
