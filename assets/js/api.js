@@ -140,6 +140,27 @@ export async function listDir(path) {
   }
 }
 
+// ---------- 站点根路径（与 site.js 中 siteBasePath 一致，避免 api ↔ site 循环依赖）----------
+function siteBasePathFromConfig() {
+  try {
+    const u = String(CONFIG.site.url || '').trim();
+    if (!u) return '';
+    const o = new URL(u.endsWith('/') ? u : `${u}/`);
+    const p = o.pathname.replace(/\/+$/, '');
+    return p === '/' || !p ? '' : p;
+  } catch {
+    return '';
+  }
+}
+
+/** 从 /post/.../ 等子路径发起 fetch 时须用站点根下的绝对 path（以 / 开头） */
+function publicAssetAbsPath(relPath) {
+  const r = String(relPath || '').replace(/^\//, '');
+  const bp = siteBasePathFromConfig();
+  if (!bp) return `/${r}`;
+  return `${bp}/${r}`.replace(/\/{2,}/g, '/');
+}
+
 // ---------- 文章索引 ----------
 // posts.json 形如：
 // { posts: [ { slug, title, date, summary, tags, author, cover, path } ] }
@@ -158,7 +179,7 @@ export async function readIndex() {
 
 // 用 fetch 直接拿静态文件版本（首页未登录时使用，避免 API 限流）
 export async function fetchIndexPublic() {
-  const url = `./${CONFIG.paths.index}?t=${Date.now()}`;
+  const url = `${publicAssetAbsPath(CONFIG.paths.index)}?t=${Date.now()}`;
   try {
     const res = await fetch(url, { cache: 'no-cache' });
     if (!res.ok) return { posts: [] };
@@ -169,7 +190,8 @@ export async function fetchIndexPublic() {
 }
 
 export async function fetchPostMarkdownPublic(slug) {
-  const url = `./${CONFIG.paths.posts}/${encodeURIComponent(slug)}.md?t=${Date.now()}`;
+  const rel = `${CONFIG.paths.posts}/${encodeURIComponent(slug)}.md`;
+  const url = `${publicAssetAbsPath(rel)}?t=${Date.now()}`;
   const res = await fetch(url, { cache: 'no-cache' });
   if (!res.ok) throw new Error(`无法加载文章 ${slug}`);
   return await res.text();
