@@ -30,17 +30,6 @@
 .hero-link > .hero-arrow {
   align-self: center;
 }
-
-/* 头像与站点名同一竖列，右侧为简介与统计 */
-.hero-brand {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-  max-width: 9em;
-  text-align: center;
-}
 .hero-arrow {
   flex-shrink: 0;
   font-size: 28px;
@@ -62,16 +51,28 @@
   box-shadow: var(--shadow);
 }
 
-.hero-info { flex: 1; min-width: 0; }
-.hero-title {
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0;
-  line-height: 1.2;
-  word-break: break-word;
+.hero-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 10px;
+  text-align: left;
 }
-.hero-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.6; }
-.hero-stats { display: flex; gap: 18px; font-size: 13px; color: var(--text-secondary); }
+.hero-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
 .hero-stats .stat {
   flex: 0 0 auto;
   white-space: nowrap;
@@ -90,12 +91,12 @@
   }
   .hero-link {
     align-items: flex-start;
-    padding: 11px 12px 10px;
+    padding: 9px 12px 9px;
     gap: 10px;
   }
-  .hero-brand {
+  .hero-info {
     gap: 5px;
-    max-width: 5.5rem;
+    padding-right: 22px;
   }
   .hero-arrow {
     position: absolute;
@@ -112,30 +113,22 @@
     margin-top: 0;
     border-width: 2px;
   }
-  .hero-title {
-    font-size: 15px;
-    line-height: 1.2;
-    margin: 0;
-    padding-right: 0;
-  }
   .hero-subtitle {
     font-size: 12px;
     line-height: 1.45;
-    margin-bottom: 7px;
-    padding-right: 16px;
+    margin: 0;
+    padding-right: 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
   .hero-stats {
-    display: flex;
-    flex-wrap: wrap;
     row-gap: 5px;
     column-gap: 5px;
     font-size: 11px;
     line-height: 1;
-    padding-right: 6px;
+    padding-right: 0;
   }
   .hero-stats .stat {
     display: inline-flex;
