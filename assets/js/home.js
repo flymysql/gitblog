@@ -11,6 +11,24 @@ import { setMeta, setJsonLd } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
 
+// 从文章页返回首页时恢复列表滚动位置（配合无限加载先铺到离开前的条数）
+const HOME_SCROLL_KEY = 'gitblog_home_scroll_v1';
+
+function navEntryType() {
+  const n = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+  return (n && n.type) || 'navigate';
+}
+
+function scheduleRestoreHomeScroll(y) {
+  const apply = () => {
+    const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    window.scrollTo(0, Math.min(Math.max(0, Number(y) || 0), max));
+  };
+  requestAnimationFrame(() => requestAnimationFrame(apply));
+  setTimeout(apply, 80);
+  setTimeout(apply, 320);
+}
+
 function publicImageUrl(url) {
   return String(url || '').replace(/^\.\.\/assets\//, 'assets/');
 }
@@ -257,11 +275,11 @@ function renderList(posts) {
   bindLazyImages(ul, { eagerCount: 0 });
   renderArticleListViews(ul);
 
-  let loaded = firstChunk.length;
+  const state = { loaded: firstChunk.length, observer: null, loadNext: null };
   const sentinel = document.getElementById('loadMoreSentinel');
 
   function loadNext() {
-    const nextChunk = posts.slice(loaded, loaded + PAGE_SIZE);
+    const nextChunk = posts.slice(state.loaded, state.loaded + PAGE_SIZE);
     if (!nextChunk.length) return;
     const frag = document.createElement('div');
     frag.innerHTML = nextChunk.map(p => postItemHtml(p, author, avatar)).join('');
@@ -269,13 +287,15 @@ function renderList(posts) {
     inserted.forEach(node => ul.insertBefore(node, sentinel));
     inserted.forEach(node => bindLazyImages(node, { eagerCount: 0 }));
     inserted.forEach(node => renderArticleListViews(node));
-    loaded += nextChunk.length;
-    if (loaded >= posts.length) {
+    state.loaded += nextChunk.length;
+    if (state.loaded >= posts.length) {
       // 全部加载完，把 sentinel 替换成"到底"提示
-      if (listState && listState.observer) listState.observer.disconnect();
+      if (state.observer) state.observer.disconnect();
       sentinel.outerHTML = `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`;
     }
   }
+
+  state.loadNext = loadNext;
 
   let observer = null;
   if (sentinel && 'IntersectionObserver' in window) {
@@ -288,7 +308,8 @@ function renderList(posts) {
     sentinel.addEventListener('click', loadNext);
   }
 
-  listState = { posts, loaded, observer };
+  state.observer = observer;
+  listState = state;
 }
 
 function renderTags(posts) {
@@ -388,9 +409,40 @@ function applyFilter(posts, tab, q, tag) {
 
   let tab = 'latest';
   let activeTag = '';
+  let pendingRestore = null;
+
+  if (navEntryType() === 'back_forward') {
+    try {
+      const raw = sessionStorage.getItem(HOME_SCROLL_KEY);
+      if (raw) {
+        const o = JSON.parse(raw);
+        if (typeof o.y === 'number' && o.y >= 0 && Number.isFinite(o.y)) {
+          pendingRestore = o;
+          if (o.tab === 'hot' || o.tab === 'all' || o.tab === 'latest') tab = o.tab;
+          if (typeof o.tag === 'string') activeTag = o.tag;
+        }
+      }
+    } catch {}
+  } else {
+    try { sessionStorage.removeItem(HOME_SCROLL_KEY); } catch {}
+  }
 
   function refresh() {
-    renderList(applyFilter(allPosts, tab, '', activeTag));
+    const filtered = applyFilter(allPosts, tab, '', activeTag);
+    renderList(filtered);
+    if (pendingRestore) {
+      const pr = pendingRestore;
+      pendingRestore = null;
+      const targetLoaded = Math.min(
+        Math.max(Number(pr.loaded) || PAGE_SIZE, PAGE_SIZE),
+        filtered.length,
+      );
+      let guard = 0;
+      while (listState && typeof listState.loadNext === 'function' && listState.loaded < targetLoaded && guard++ < 250) {
+        listState.loadNext();
+      }
+      scheduleRestoreHomeScroll(pr.y);
+    }
   }
 
   document.querySelectorAll('.tab').forEach(el => {
@@ -400,6 +452,21 @@ function applyFilter(posts, tab, q, tag) {
       tab = el.dataset.tab;
       refresh();
     });
+  });
+
+  document.querySelectorAll('.tab').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+
+  window.addEventListener('pagehide', () => {
+    try {
+      sessionStorage.setItem(HOME_SCROLL_KEY, JSON.stringify({
+        y: window.scrollY || document.documentElement.scrollTop || 0,
+        tab,
+        tag: activeTag,
+        loaded: listState && typeof listState.loaded === 'number' ? listState.loaded : PAGE_SIZE,
+      }));
+    } catch {}
   });
 
   refresh();
