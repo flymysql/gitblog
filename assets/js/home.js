@@ -235,6 +235,7 @@ function postItemHtml(p, author, avatar) {
         <h3 class="post-title">${escapeHtml(p.title || '无标题')}</h3>
         <p class="post-summary">${escapeHtml(p.summary || '')}</p>
         <div class="post-meta">
+          ${p.isNote ? '<span class="post-note-badge">随笔</span>' : ''}
           ${(p.tags || []).slice(0, 3).map(t => tagHtml(t)).join('')}
         </div>
       </a>
@@ -246,13 +247,18 @@ function postItemHtml(p, author, avatar) {
 // 懒加载状态：每次切 tab/筛选都会被替换
 let listState = null;
 
-function renderList(posts) {
+function renderList(posts, tab = 'latest') {
   const ul = $('#postList');
   // 销毁上一次的观察器
   if (listState && listState.observer) listState.observer.disconnect();
 
   if (!posts.length) {
-    ul.innerHTML = '<li class="empty">还没有文章。点击右上角"写文章"开始第一篇～</li>';
+    const emptyMsg = tab === 'series'
+      ? '暂无归入系列的文章（在文章 frontmatter 里设置 series 即可）'
+      : tab === 'notes'
+        ? '还没有随笔。登录后可在「随笔」页直接发布～'
+        : '还没有文章。点击右上角"写文章"开始第一篇～';
+    ul.innerHTML = `<li class="empty">${emptyMsg}</li>`;
     listState = null;
     return;
   }
@@ -336,8 +342,39 @@ function renderRecent(posts) {
   `).join('');
 }
 
-function applyFilter(posts, tab, q, tag) {
-  let r = [...posts];
+function plainSnippetFromMd(md, max = 160) {
+  return String(md || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/!\[.*?\]\(.*?\)/g, ' ')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[#>*_`~]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, max);
+}
+
+function noteEntriesForHome(notes) {
+  return (notes || []).map(n => ({
+    slug: n.slug,
+    title: n.title || plainSnippetFromMd(n.content, 48) || '随笔',
+    summary: plainSnippetFromMd(n.content, 220),
+    tags: n.tags || [],
+    date: n.date,
+    author: n.author,
+    pinned: false,
+    cover: null,
+    isNote: true,
+  }));
+}
+
+function buildHomeList({ allPosts, noteRows, tab, q, tag }) {
+  let r;
+  if (tab === 'notes') {
+    r = noteEntriesForHome(noteRows);
+  } else {
+    r = [...allPosts];
+    if (tab === 'series') r = r.filter(p => String(p.series || '').trim());
+  }
   if (q) {
     const lq = q.toLowerCase();
     r = r.filter(p =>
@@ -347,10 +384,8 @@ function applyFilter(posts, tab, q, tag) {
     );
   }
   if (tag) r = r.filter(p => (p.tags || []).includes(tag));
-  if (tab === 'hot') {
-    r.sort((a, b) => (b.views || 0) - (a.views || 0));
-  } else if (tab === 'all') {
-    r.sort((a, b) => String(a.title || '').localeCompare(String(b.title || ''), 'zh-CN'));
+  if (tab === 'notes') {
+    r.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
   } else {
     r.sort((a, b) => {
       if ((b.pinned ? 1 : 0) !== (a.pinned ? 1 : 0)) return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
@@ -387,13 +422,23 @@ function applyFilter(posts, tab, q, tag) {
   });
 
   let allPosts = [];
+  let noteRows = [];
   try {
     const data = await fetchIndexPublic();
-    // 短动态（type:note）单独入口 notes.html，不挤进首页文章流
+    // 短动态（type:note）单独入口 notes.html；首页「随笔」tab 另拉 notes.json 展示
     allPosts = (Array.isArray(data.posts) ? data.posts : []).filter(p => !p.draft && p.type !== 'note');
   } catch (e) {
     $('#postList').innerHTML = `<li class="error">加载文章列表失败：${escapeHtml(e.message)}</li>`;
     return;
+  }
+  try {
+    const r = await fetch('data/notes.json?_=' + Date.now(), { cache: 'no-cache' });
+    if (r.ok) {
+      const j = await r.json();
+      noteRows = Array.isArray(j.notes) ? j.notes : [];
+    }
+  } catch {
+    noteRows = [];
   }
 
   renderHero(allPosts);
@@ -414,7 +459,8 @@ function applyFilter(posts, tab, q, tag) {
         const o = JSON.parse(raw);
         if (typeof o.y === 'number' && o.y >= 0 && Number.isFinite(o.y)) {
           pendingRestore = o;
-          if (o.tab === 'hot' || o.tab === 'all' || o.tab === 'latest') tab = o.tab;
+          if (o.tab === 'latest' || o.tab === 'series' || o.tab === 'notes') tab = o.tab;
+          else if (o.tab === 'hot' || o.tab === 'all') tab = 'latest';
           if (typeof o.tag === 'string') activeTag = o.tag;
         }
       }
@@ -424,8 +470,8 @@ function applyFilter(posts, tab, q, tag) {
   }
 
   function refresh() {
-    const filtered = applyFilter(allPosts, tab, '', activeTag);
-    renderList(filtered);
+    const filtered = buildHomeList({ allPosts, noteRows, tab, q: '', tag: activeTag });
+    renderList(filtered, tab);
     if (pendingRestore) {
       const pr = pendingRestore;
       pendingRestore = null;
