@@ -75,7 +75,7 @@
 .hero-subtitle {
   font-size: 18px;
   font-weight: 700;
-  color: var(--text-main);
+  color: #614e4e;
   line-height: 1.5;
   margin: 0;
   display: -webkit-box;
@@ -132,7 +132,7 @@
   .hero-subtitle {
     font-size: 15.5px;
     font-weight: 700;
-    color: var(--text-main);
+    color: #614e4e;
     line-height: 1.45;
     margin: 0;
     padding-right: 0;
