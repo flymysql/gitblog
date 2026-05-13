@@ -67,7 +67,8 @@
       "cover": "assets/uploads/2026/05/3fs-usrbio-cover.webp",
       "series": "DeepSeek 数据基础设施巡礼",
       "seriesOrder": 1,
-      "path": "posts/3fs-usrbio-zero-copy.md"
+      "path": "posts/3fs-usrbio-zero-copy.md",
+      "carousel": true
     },
     {
       "slug": "多维数组的索引方案与内存设计-16000038",
