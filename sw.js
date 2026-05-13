@@ -3,7 +3,7 @@
 // 与 ?v=VERSION 的 cache-busting 协同：CACHE_NAME 用 release VERSION 区分批次
 // ============================================================================
 
-const SW_VERSION = '20260515190000';
+const SW_VERSION = '20260515200000';
 const STATIC_CACHE = `static-${SW_VERSION}`;
 const PAGE_CACHE = `pages-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
@@ -62,8 +62,17 @@ self.addEventListener('fetch', event => {
   if (!shouldHandle(request)) return;
 
   const url = new URL(request.url);
-  const isHTML = request.mode === 'navigate' ||
-                 (request.headers.get('accept') || '').includes('text/html');
+  const pathname = url.pathname;
+  // 地址栏直接打开 sitemap.xml / rss.xml 时仍是 navigate，且 Accept 常带 text/html，
+  // 不能走 handleHtml，否则无缓存时会落到 offline.html。
+  const isNonHtmlDocument = /\.xml$/i.test(pathname)
+    || /\/robots\.txt$/i.test(pathname)
+    || /\.txt$/i.test(pathname);
+
+  const isHTML = !isNonHtmlDocument && (
+    request.mode === 'navigate'
+    || (request.headers.get('accept') || '').includes('text/html')
+  );
 
   if (isHTML) {
     event.respondWith(handleHtml(request, event));
@@ -71,7 +80,7 @@ self.addEventListener('fetch', event => {
   }
 
   // 静态资源：stale-while-revalidate
-  if (/\.(?:css|js|svg|png|jpg|jpeg|gif|webp|ico|woff2?|ttf|json|xml|webmanifest)$/i.test(url.pathname)) {
+  if (/\.(?:css|js|svg|png|jpg|jpeg|gif|webp|ico|woff2?|ttf|json|xml|txt|webmanifest)$/i.test(pathname)) {
     event.respondWith(
       caches.match(request).then(cached => {
         const network = fetch(request).then(res => {
