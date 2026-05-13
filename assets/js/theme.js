@@ -139,12 +139,17 @@ export function initTheme() {
 
 // ---------- giscus 同步 ----------
 function notifyGiscus(mode) {
-  const iframe = document.querySelector('iframe.giscus-frame');
-  if (!iframe) return;
-  iframe.contentWindow.postMessage(
-    { giscus: { setConfig: { theme: mode === 'dark' ? 'dark' : 'light' } } },
-    'https://giscus.app'
-  );
+  const theme = mode === 'dark' ? 'dark' : 'light';
+  document.querySelectorAll('iframe.giscus-frame').forEach(iframe => {
+    try {
+      iframe.contentWindow.postMessage(
+        { giscus: { setConfig: { theme } } },
+        'https://giscus.app'
+      );
+    } catch {
+      /* cross-origin / 未就绪 */
+    }
+  });
 }
 
 // ---------- 顶部导航主题按钮 ----------
