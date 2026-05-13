@@ -59,9 +59,31 @@ function renderHero(posts) {
   `;
 }
 
-/** 防 WebView 占位塌缩：按 .hero-info 总高度设正方形；签名单行不换行后高度随文案与统计区自适应 */
+/** 签名单行：在可用宽度内通过缩小字号展示全文（无省略号）；再按 .hero-info 总高度设头像正方形 */
 let heroAvatarResizeObserver = null;
 let heroAvatarResizeFallbackBound = false;
+
+function fitHeroSubtitleFont() {
+  const sub = document.querySelector('#hero .hero-subtitle');
+  if (!sub) return;
+  sub.style.fontSize = '';
+  const cw = sub.clientWidth;
+  if (cw < 4) return;
+  const base = parseFloat(getComputedStyle(sub).fontSize);
+  if (!Number.isFinite(base) || base < 1) return;
+  const minPx = 6;
+  if (sub.scrollWidth <= cw) return;
+
+  let lo = minPx;
+  let hi = base;
+  for (let i = 0; i < 40 && hi - lo > 0.2; i += 1) {
+    const mid = (lo + hi) / 2;
+    sub.style.fontSize = `${mid}px`;
+    if (sub.scrollWidth <= cw) lo = mid;
+    else hi = mid;
+  }
+  sub.style.fontSize = `${lo}px`;
+}
 
 function bindHeroAvatarSizeSync() {
   const link = document.querySelector('#hero .hero-link');
@@ -71,6 +93,7 @@ function bindHeroAvatarSizeSync() {
   if (!info || !wrap) return;
 
   const apply = () => {
+    fitHeroSubtitleFont();
     const h = Math.ceil(info.getBoundingClientRect().height);
     const side = Math.min(160, Math.max(48, h || 72));
     wrap.style.width = `${side}px`;
@@ -80,6 +103,9 @@ function bindHeroAvatarSizeSync() {
   };
 
   apply();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => apply());
+  }
 
   if (typeof ResizeObserver === 'undefined') {
     if (!heroAvatarResizeFallbackBound) {
