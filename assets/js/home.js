@@ -59,6 +59,40 @@ function renderHero(posts) {
   `;
 }
 
+/** 头像列占位：部分 WebView 下纯 CSS 宽度会塌成 0，导致正文叠在头像上；按右侧内容高度设正方形边长 */
+let heroAvatarResizeObserver = null;
+let heroAvatarResizeFallbackBound = false;
+
+function bindHeroAvatarSizeSync() {
+  const link = document.querySelector('#hero .hero-link');
+  if (!link) return;
+  const info = link.querySelector('.hero-info');
+  const wrap = link.querySelector('.hero-avatar-wrap');
+  if (!info || !wrap) return;
+
+  const apply = () => {
+    const h = Math.ceil(info.getBoundingClientRect().height);
+    const side = Math.min(160, Math.max(48, h || 72));
+    wrap.style.width = `${side}px`;
+    wrap.style.minWidth = `${side}px`;
+    wrap.style.height = `${side}px`;
+    wrap.style.boxSizing = 'border-box';
+  };
+
+  apply();
+
+  if (typeof ResizeObserver === 'undefined') {
+    if (!heroAvatarResizeFallbackBound) {
+      heroAvatarResizeFallbackBound = true;
+      window.addEventListener('resize', apply, { passive: true });
+    }
+    return;
+  }
+  if (heroAvatarResizeObserver) heroAvatarResizeObserver.disconnect();
+  heroAvatarResizeObserver = new ResizeObserver(() => apply());
+  heroAvatarResizeObserver.observe(info);
+}
+
 function renderCarousel(posts) {
   const root = $('#homeCarousel');
   if (!root) return;
@@ -396,11 +430,15 @@ function buildHomeList({ allPosts, tab, q, tag }) {
   }
 
   renderHero(allPosts);
+  bindHeroAvatarSizeSync();
   renderCarousel(allPosts);
   renderTags(allPosts);
   renderRecent(allPosts);
-  // hero-stats 是渲染完才出现的，重新触发一次（pageviews 内部幂等）
+  // hero-stats 异步插入后高度会变，需重新对齐头像占位
   initPageviews();
+  bindHeroAvatarSizeSync();
+  requestAnimationFrame(() => bindHeroAvatarSizeSync());
+  setTimeout(bindHeroAvatarSizeSync, 120);
 
   let tab = 'latest';
   let activeTag = '';
