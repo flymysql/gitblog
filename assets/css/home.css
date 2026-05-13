@@ -60,45 +60,45 @@
 
 @media (max-width: 720px) {
   .hero {
-    margin: 12px 14px 0;
-    border-radius: 16px;
+    margin: 8px 12px 0;
+    border-radius: 14px;
     background:
       radial-gradient(circle at 12% 8%, rgba(234, 111, 90, 0.12), transparent 34%),
       linear-gradient(135deg, rgba(234, 111, 90, 0.07), rgba(255, 255, 255, 0.55));
     border: 1px solid color-mix(in srgb, var(--primary), var(--border) 76%);
-    box-shadow: 0 10px 30px rgba(234, 111, 90, 0.08);
+    box-shadow: 0 8px 22px rgba(234, 111, 90, 0.07);
   }
   .hero-link {
     align-items: flex-start;
-    padding: 20px 18px 18px;
-    gap: 14px;
+    padding: 11px 12px 10px;
+    gap: 10px;
   }
   .hero-arrow {
     position: absolute;
-    right: 14px;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 22px;
+    font-size: 20px;
     opacity: 0.72;
   }
   .hero:hover .hero-arrow { transform: translateY(-50%) translateX(3px); }
   .hero-avatar {
-    width: 58px;
-    height: 58px;
-    margin-top: 22px;
+    width: 48px;
+    height: 48px;
+    margin-top: 2px;
     border-width: 2px;
   }
   .hero-title {
-    font-size: 20px;
-    line-height: 1.25;
-    margin-bottom: 6px;
-    padding-right: 22px;
+    font-size: 17px;
+    line-height: 1.2;
+    margin-bottom: 3px;
+    padding-right: 20px;
   }
   .hero-subtitle {
-    font-size: 13px;
-    line-height: 1.55;
-    margin-bottom: 12px;
-    padding-right: 18px;
+    font-size: 12px;
+    line-height: 1.45;
+    margin-bottom: 7px;
+    padding-right: 16px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -107,16 +107,17 @@
   .hero-stats {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    font-size: 12px;
+    row-gap: 5px;
+    column-gap: 5px;
+    font-size: 11px;
     line-height: 1;
-    padding-right: 8px;
+    padding-right: 6px;
   }
   .hero-stats .stat {
     display: inline-flex;
     align-items: center;
-    min-height: 26px;
-    padding: 6px 9px;
+    min-height: 22px;
+    padding: 3px 7px;
     border-radius: 999px;
     background: color-mix(in srgb, var(--bg-elev), var(--primary) 5%);
     border: 1px solid color-mix(in srgb, var(--border), var(--primary) 18%);
@@ -125,7 +126,7 @@
   .hero-stats .stat.saobby-slot-stat {
     background: #fff;
     border-color: rgba(0, 0, 0, 0.08);
-    padding: 4px 10px 4px 6px;
+    padding: 2px 7px 2px 5px;
     gap: 0;
   }
   .hero-stats .stat.saobby-slot-stat .saobby-counter {
@@ -134,8 +135,9 @@
     border-radius: 0;
   }
   .hero-stats .stat strong {
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1;
+    margin-right: 3px;
   }
 }
 
