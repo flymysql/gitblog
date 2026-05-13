@@ -80,8 +80,7 @@
   margin: 0;
   min-width: 0;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
 }
 .hero-stats {
   display: flex;
@@ -136,8 +135,7 @@
     padding-right: 0;
     min-width: 0;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
   }
   .hero-stats {
     row-gap: 5px;
