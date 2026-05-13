@@ -5,9 +5,10 @@ updated: 2026-05-12
 author: Jimmy
 tags: [分布式存储, AI 基础设施, C++]
 cover: assets/uploads/2026/05/3fs-usrbio-cover.webp
-series: "DeepSeek 数据基础设施巡礼"
+series: DeepSeek 数据基础设施巡礼
 seriesOrder: 1
 summary: DeepSeek 开源的 3FS 在 180 节点集群上实测聚合读取吞吐约 6.6 TiB/s。本文从 FUSE 的性能瓶颈讲起，拆解 3FS 如何通过共享内存、io_uring 风格的环形队列、以及 RDMA 直接传输三层叠加，把数据通路上的每一次拷贝都抠掉。
+carousel: true
 ---
 
 > **项目地址**：[github.com/deepseek-ai/3FS](https://github.com/deepseek-ai/3FS)
