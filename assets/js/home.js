@@ -4,7 +4,7 @@
 
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
-import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPath } from './site.js';
+import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPathFromPost, rootPath } from './site.js';
 import { initPageviews, bszSiteStatsHtml } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { isGiscusReady, mountGiscusScript, notesFeedTerm } from './giscus-embed.js';
@@ -41,7 +41,7 @@ function renderHero(posts) {
   posts.forEach(p => (p.tags || []).forEach(t => tagCount.add(t)));
   // 整块 hero 包一层 <a> 跳转到「关于」页面：支持点击 / 右键新标签 / 中键新窗口
   hero.innerHTML = `
-    <a class="hero-link" href="${postPath('about')}" aria-label="进入关于页">
+    <a class="hero-link" href="${rootPath('post.html')}?slug=about" aria-label="进入关于页">
       <div class="hero-avatar" style="background-image:url(${escapeHtml(CONFIG.site.avatar || '')})"></div>
       <div class="hero-info">
         <div class="hero-title">${escapeHtml(CONFIG.site.title)}</div>
@@ -87,7 +87,7 @@ function renderCarousel(posts) {
   root.innerHTML = `
     <div class="carousel-viewport">
       ${items.map((p, i) => `
-        <a class="carousel-slide${i === 0 ? ' active' : ''}" href="${postPath(p.slug)}" aria-label="${escapeHtml(p.title || '文章')}">
+        <a class="carousel-slide${i === 0 ? ' active' : ''}" href="${postPathFromPost(p)}" aria-label="${escapeHtml(p.title || '文章')}">
           <img
             src="${escapeHtml(i === 0 ? publicImageUrl(p.cover) : LAZY_PLACEHOLDER)}"
             ${i === 0 ? 'fetchpriority="high"' : `data-src="${escapeHtml(publicImageUrl(p.cover))}" fetchpriority="low"`}
@@ -225,7 +225,7 @@ const PAGE_SIZE = 15;
 function postItemHtml(p, author, avatar) {
   return `
     <li class="post-item" data-slug="${escapeHtml(p.slug)}">
-      <a class="post-content" href="${postPath(p.slug)}">
+      <a class="post-content" href="${postPathFromPost(p)}">
         <div class="post-author-row">
           <div class="avatar" style="background-image:url(${escapeHtml(p.avatar || avatar || '')})"></div>
           <span class="name">${escapeHtml(p.author || author || '')}</span>
@@ -239,7 +239,7 @@ function postItemHtml(p, author, avatar) {
           ${(p.tags || []).slice(0, 3).map(t => tagHtml(t)).join('')}
         </div>
       </a>
-      ${p.cover ? `<a href="${postPath(p.slug)}" class="post-thumbnail"><img src="${LAZY_PLACEHOLDER}" data-src="${escapeHtml(publicImageUrl(p.thumbnail || p.cover))}" alt="${escapeHtml(p.title || '')}" loading="lazy" decoding="async" fetchpriority="low"></a>` : ''}
+      ${p.cover ? `<a href="${postPathFromPost(p)}" class="post-thumbnail"><img src="${LAZY_PLACEHOLDER}" data-src="${escapeHtml(publicImageUrl(p.thumbnail || p.cover))}" alt="${escapeHtml(p.title || '')}" loading="lazy" decoding="async" fetchpriority="low"></a>` : ''}
     </li>
   `;
 }
@@ -336,7 +336,7 @@ function renderRecent(posts) {
     return;
   }
   list.innerHTML = recent.map(p => `
-    <li><a href="${postPath(p.slug)}">${escapeHtml(p.title || '无标题')}</a></li>
+    <li><a href="${postPathFromPost(p)}">${escapeHtml(p.title || '无标题')}</a></li>
   `).join('');
 }
 

@@ -31,7 +31,7 @@ export const CONFIG = {
       { name: "归档", href: "archives.html" },
       { name: "系列", href: "series.html" },
       { name: "工具", href: "tools.html" },
-      { name: "关于", href: "post/about/" }
+      { name: "关于", href: "post.html?slug=about" }
     ],
     social: {
       github: "",

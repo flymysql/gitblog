@@ -96,21 +96,30 @@ export function siteBasePath() {
   }
 }
 
-/**
- * 文章 / 独立页的站内 path（以 / 开头，末尾 /），对应 build 生成的 post/{slug}/index.html
- * 仍保留根目录 post.html?slug= 作为兼容入口。
- */
-export function postPath(slug) {
-  const s = String(slug || '').trim();
+/** 对外文章 path：/post/YYYYMMDD/ 或 /post/YYYYMMDD-2/（同日多篇自增，首篇无 -2） */
+export const POST_URL_KEY_RE = /^\d{8}(-\d+)?$/;
+
+export function postPath(urlKey) {
+  const s = String(urlKey || '').trim();
   const bp = siteBasePath();
-  if (!s) return bp ? `${bp}/post.html` : '/post.html';
-  const seg = encodeURIComponent(s);
-  return `${bp}/post/${seg}/`;
+  if (!POST_URL_KEY_RE.test(s)) return bp ? `${bp}/post.html` : '/post.html';
+  return `${bp}/post/${s}/`;
 }
 
-/** 从 admin/ 目录打开前台文章预览时的相对路径 */
-export function postPathFromAdmin(slug) {
-  return `..${postPath(slug)}`;
+/** 列表 / 搜索：有 urlKey 用规范地址，否则退回 post.html?slug= */
+export function postPathFromPost(p) {
+  if (!p || !p.slug) return rootPath('post.html');
+  const k = String(p.urlKey || '').trim();
+  if (POST_URL_KEY_RE.test(k)) return postPath(k);
+  return `${rootPath('post.html')}?slug=${encodeURIComponent(p.slug)}`;
+}
+
+/** admin 目录下打开前台文章 */
+export function postPathFromAdminPost(p) {
+  if (!p || !p.slug) return '../post.html';
+  const k = String(p.urlKey || '').trim();
+  if (POST_URL_KEY_RE.test(k)) return `..${postPath(k)}`;
+  return `../post.html?slug=${encodeURIComponent(p.slug)}`;
 }
 
 /** 站点根下的路径（以 / 开头），用于从 post/{slug}/ 子目录链接到 /admin、/assets 等 */
@@ -346,7 +355,7 @@ function renderResults(results, q) {
     return;
   }
   box.innerHTML = results.slice(0, 30).map(p => `
-    <a class="search-item" href="${postPath(p.slug)}">
+    <a class="search-item" href="${postPathFromPost(p)}">
       <div class="search-title">${highlight(p.title || '无标题', q)}</div>
       <div class="search-summary">${highlight(p._snippet || p.summary || '', q)}</div>
       <div class="search-meta">${fmtDate(p.date)} · ${(p.tags || []).map(t => '#' + escapeHtml(t)).join(' ')}</div>

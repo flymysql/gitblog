@@ -3,7 +3,7 @@
 // ============================================================================
 
 import { fetchIndexPublic } from './api.js';
-import { initSite, escapeHtml, postPath } from './site.js';
+import { initSite, escapeHtml, postPathFromPost } from './site.js';
 import { setMeta } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -38,7 +38,7 @@ function renderArchive(groups) {
           return `
             <li class="archive-item">
               <span class="date">${md}</span>
-              <a class="title" href="${postPath(p.slug)}">${escapeHtml(p.title || '无标题')}</a>
+              <a class="title" href="${postPathFromPost(p)}">${escapeHtml(p.title || '无标题')}</a>
               <span class="tags">${(p.tags || []).slice(0, 3).map(t => '#' + escapeHtml(t)).join(' ')}</span>
             </li>
           `;

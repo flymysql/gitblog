@@ -17,6 +17,7 @@
       "pinnedOrder": 1,
       "carousel": true,
       "path": "posts/welcome.md",
+      "urlKey": "20260511-2",
       "thumbnail": "../assets/uploads/2026/05/1778490605877-blwjij-image.thumb.webp"
     },
     {
@@ -31,7 +32,8 @@
       ],
       "cover": "../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.jpg",
       "pinned": true,
-      "path": "posts/about.md"
+      "path": "posts/about.md",
+      "urlKey": "20260511"
     },
     {
       "slug": "smallpond-source-walkthrough",
@@ -50,6 +52,7 @@
       "series": "DeepSeek 数据基础设施巡礼",
       "seriesOrder": 2,
       "path": "posts/smallpond-source-walkthrough.md",
+      "urlKey": "20260415",
       "thumbnail": "assets/uploads/2026/05/smallpond-cover.thumb.webp"
     },
     {
@@ -68,7 +71,8 @@
       "carousel": true,
       "series": "DeepSeek 数据基础设施巡礼",
       "seriesOrder": 1,
-      "path": "posts/3fs-usrbio-zero-copy.md"
+      "path": "posts/3fs-usrbio-zero-copy.md",
+      "urlKey": "20260311"
     },
     {
       "slug": "多维数组的索引方案与内存设计-16000038",
@@ -79,7 +83,8 @@
       "summary": "多维数组的内存结构 类似ndarray之类的多维数组，实际上是一个连续的内存地址+一种索引方案。我们可以将一个多维数组对象分为两部分，一部分是实际存储数组数据的连续内存段，另一部分…",
       "tags": [],
       "cover": "assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.png",
-      "path": "posts/多维数组的索引方案与内存设计-16000038.md"
+      "path": "posts/多维数组的索引方案与内存设计-16000038.md",
+      "urlKey": "20220313"
     },
     {
       "slug": "推荐系统——推荐引擎的架构-15996742",
@@ -91,7 +96,8 @@
       "tags": [],
       "cover": "assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.jpg",
       "carousel": true,
-      "path": "posts/推荐系统——推荐引擎的架构-15996742.md"
+      "path": "posts/推荐系统——推荐引擎的架构-15996742.md",
+      "urlKey": "20220312"
     },
     {
       "slug": "置顶-nebula-graph-图计算数据库-15993772",
@@ -103,7 +109,8 @@
       "tags": [],
       "cover": "assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.png",
       "carousel": true,
-      "path": "posts/置顶-nebula-graph-图计算数据库-15993772.md"
+      "path": "posts/置顶-nebula-graph-图计算数据库-15993772.md",
+      "urlKey": "20220311"
     },
     {
       "slug": "nebula代码走读——从Validator到Executor-15988828",
@@ -116,7 +123,8 @@
         "图数据库"
       ],
       "cover": "assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.png",
-      "path": "posts/nebula代码走读——从Validator到Executor-15988828.md"
+      "path": "posts/nebula代码走读——从Validator到Executor-15988828.md",
+      "urlKey": "20220310"
     },
     {
       "slug": "推荐召回-向量召回之U2I学习总结-15986952",
@@ -129,7 +137,8 @@
         "推荐",
         "推荐算法"
       ],
-      "path": "posts/推荐召回-向量召回之U2I学习总结-15986952.md"
+      "path": "posts/推荐召回-向量召回之U2I学习总结-15986952.md",
+      "urlKey": "20220309"
     },
     {
       "slug": "随笔杂谈-15995658",
@@ -141,7 +150,8 @@
       "tags": [
         "杂七杂八"
       ],
-      "path": "posts/随笔杂谈-15995658.md"
+      "path": "posts/随笔杂谈-15995658.md",
+      "urlKey": "20200101"
     },
     {
       "slug": "生如夏花般绚烂死如秋叶般静美-bcd926d2",
@@ -156,7 +166,8 @@
       ],
       "series": "谙风",
       "seriesOrder": 12,
-      "path": "posts/生如夏花般绚烂死如秋叶般静美-bcd926d2.md"
+      "path": "posts/生如夏花般绚烂死如秋叶般静美-bcd926d2.md",
+      "urlKey": "20190605"
     },
     {
       "slug": "记忆的种子·一-c315b081",
@@ -171,7 +182,8 @@
       ],
       "series": "谙风",
       "seriesOrder": 1,
-      "path": "posts/记忆的种子·一-c315b081.md"
+      "path": "posts/记忆的种子·一-c315b081.md",
+      "urlKey": "20190605-2"
     },
     {
       "slug": "记忆的种子·二-29fe4821",
@@ -186,7 +198,8 @@
       ],
       "series": "谙风",
       "seriesOrder": 2,
-      "path": "posts/记忆的种子·二-29fe4821.md"
+      "path": "posts/记忆的种子·二-29fe4821.md",
+      "urlKey": "20190605-3"
     },
     {
       "slug": "谙风-小城中学-7712d2d6",
@@ -201,7 +214,8 @@
       ],
       "series": "谙风",
       "seriesOrder": 8,
-      "path": "posts/谙风-小城中学-7712d2d6.md"
+      "path": "posts/谙风-小城中学-7712d2d6.md",
+      "urlKey": "20190605-4"
     },
     {
       "slug": "PCC一个用python写的ｃ语言编译器-15991910",
@@ -215,7 +229,8 @@
         "编译器",
         "python"
       ],
-      "path": "posts/PCC一个用python写的ｃ语言编译器-15991910.md"
+      "path": "posts/PCC一个用python写的ｃ语言编译器-15991910.md",
+      "urlKey": "20190101"
     },
     {
       "slug": "桃李春风一杯酒江湖夜雨十年灯-15995716",
@@ -227,7 +242,8 @@
       "tags": [
         "杂七杂八"
       ],
-      "path": "posts/桃李春风一杯酒江湖夜雨十年灯-15995716.md"
+      "path": "posts/桃李春风一杯酒江湖夜雨十年灯-15995716.md",
+      "urlKey": "20190101-2"
     },
     {
       "slug": "模仿知乎的链接卡片-a714f04b",
@@ -240,7 +256,8 @@
         "教程",
         "前端"
       ],
-      "path": "posts/模仿知乎的链接卡片-a714f04b.md"
+      "path": "posts/模仿知乎的链接卡片-a714f04b.md",
+      "urlKey": "20181216"
     },
     {
       "slug": "Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4",
@@ -254,6 +271,7 @@
       ],
       "cover": "assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-03.gif",
       "path": "posts/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4.md",
+      "urlKey": "20181214",
       "thumbnail": "assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-03.thumb.webp"
     },
     {
@@ -267,7 +285,8 @@
         "随想"
       ],
       "cover": "assets/uploads/2026/05/12月6日杂谈-5027c817-01.jpg",
-      "path": "posts/12月6日杂谈-5027c817.md"
+      "path": "posts/12月6日杂谈-5027c817.md",
+      "urlKey": "20181206"
     },
     {
       "slug": "小程序开发之接入Bmob后端云作为后端数据库-93621394",
@@ -280,7 +299,8 @@
         "教程",
         "微信小程序"
       ],
-      "path": "posts/小程序开发之接入Bmob后端云作为后端数据库-93621394.md"
+      "path": "posts/小程序开发之接入Bmob后端云作为后端数据库-93621394.md",
+      "urlKey": "20181203"
     },
     {
       "slug": "使用vue.js制作carousel跑马灯组件-456bc465",
@@ -292,7 +312,8 @@
       "tags": [
         "前端"
       ],
-      "path": "posts/使用vue.js制作carousel跑马灯组件-456bc465.md"
+      "path": "posts/使用vue.js制作carousel跑马灯组件-456bc465.md",
+      "urlKey": "20181202"
     },
     {
       "slug": "Dijkstra单源最短路径算法-15e41f53",
@@ -308,6 +329,7 @@
       ],
       "cover": "assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.png",
       "path": "posts/Dijkstra单源最短路径算法-15e41f53.md",
+      "urlKey": "20181123",
       "thumbnail": "assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.thumb.webp"
     },
     {
@@ -323,6 +345,7 @@
       ],
       "cover": "assets/uploads/2026/05/使用腾讯云cdn加速博客-1609338289-01.png",
       "path": "posts/使用腾讯云cdn加速博客-1609338289.md",
+      "urlKey": "20181122",
       "thumbnail": "assets/uploads/2026/05/使用腾讯云cdn加速博客-1609338289-01.thumb.webp"
     },
     {
@@ -339,6 +362,7 @@
       ],
       "cover": "assets/uploads/2026/05/hexo建站笔记之首页文章轮播图-6bf81741-01.png",
       "path": "posts/hexo建站笔记之首页文章轮播图-6bf81741.md",
+      "urlKey": "20181114",
       "thumbnail": "assets/uploads/2026/05/hexo建站笔记之首页文章轮播图-6bf81741-01.thumb.webp"
     },
     {
@@ -349,7 +373,8 @@
       "author": "兰州小红鸡",
       "summary": "由于以前公众号发了挺多分享资源的文章，索性写个python爬虫来爬取 特点： 1.保留公众号排版样式（就是把div样式全拷下来了） 2.写成md格式，并且加了hexo渲染需要的头部…",
       "tags": [],
-      "path": "posts/将公众号文章爬到hexo博客-fb598031.md"
+      "path": "posts/将公众号文章爬到hexo博客-fb598031.md",
+      "urlKey": "20181111"
     },
     {
       "slug": "hexo建站笔记之彩色标签云-d6caa003",
@@ -365,6 +390,7 @@
       ],
       "cover": "assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-01.png",
       "path": "posts/hexo建站笔记之彩色标签云-d6caa003.md",
+      "urlKey": "20181107",
       "thumbnail": "assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-01.thumb.webp"
     },
     {
@@ -379,7 +405,8 @@
         "博客建站"
       ],
       "cover": "assets/uploads/2026/05/用回valine评论系统valine评论框样式美化-2d5da13e-01.png",
-      "path": "posts/用回valine评论系统valine评论框样式美化-2d5da13e.md"
+      "path": "posts/用回valine评论系统valine评论框样式美化-2d5da13e.md",
+      "urlKey": "20181101"
     },
     {
       "slug": "sql学习笔记2-5f5ec841",
@@ -391,7 +418,8 @@
       "tags": [
         "sql"
       ],
-      "path": "posts/sql学习笔记2-5f5ec841.md"
+      "path": "posts/sql学习笔记2-5f5ec841.md",
+      "urlKey": "20181030"
     },
     {
       "slug": "手动修改博客css样式打造属于自己的博客样式-e17f6e4c",
@@ -406,6 +434,7 @@
       ],
       "cover": "assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-06.png",
       "path": "posts/手动修改博客css样式打造属于自己的博客样式-e17f6e4c.md",
+      "urlKey": "20181029",
       "thumbnail": "assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-06.thumb.webp"
     },
     {
@@ -421,6 +450,7 @@
       ],
       "cover": "assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.png",
       "path": "posts/服务端搭建ssr教程-651cfd47.md",
+      "urlKey": "20181025",
       "thumbnail": "assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.thumb.webp"
     },
     {
@@ -434,7 +464,8 @@
         "教程",
         "博客建站"
       ],
-      "path": "posts/解决来必力评论系统加载慢的问题-3453c710.md"
+      "path": "posts/解决来必力评论系统加载慢的问题-3453c710.md",
+      "urlKey": "20181013"
     },
     {
       "slug": "hexo博客搭建以及next美化教程-e8d13fc",
@@ -449,6 +480,7 @@
       ],
       "cover": "assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-04.png",
       "path": "posts/hexo博客搭建以及next美化教程-e8d13fc.md",
+      "urlKey": "20181010",
       "thumbnail": "assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-04.thumb.webp"
     },
     {
@@ -461,7 +493,8 @@
       "tags": [
         "sql"
       ],
-      "path": "posts/sql语言学习笔记-1406270f.md"
+      "path": "posts/sql语言学习笔记-1406270f.md",
+      "urlKey": "20181008"
     },
     {
       "slug": "假期最后一天-1bde1150",
@@ -473,7 +506,8 @@
       "tags": [
         "随想"
       ],
-      "path": "posts/假期最后一天-1bde1150.md"
+      "path": "posts/假期最后一天-1bde1150.md",
+      "urlKey": "20181007"
     },
     {
       "slug": "MarkDown的用法学习笔记-93e22221",
@@ -487,6 +521,7 @@
       ],
       "cover": "assets/uploads/2026/05/MarkDown的用法学习笔记-93e22221-02.png",
       "path": "posts/MarkDown的用法学习笔记-93e22221.md",
+      "urlKey": "20181006",
       "thumbnail": "assets/uploads/2026/05/MarkDown的用法学习笔记-93e22221-02.thumb.webp"
     },
     {
@@ -500,7 +535,8 @@
         "教程",
         "前端"
       ],
-      "path": "posts/windows上的vim配置打造超级舒心又有逼格的编辑器-1a3fd97.md"
+      "path": "posts/windows上的vim配置打造超级舒心又有逼格的编辑器-1a3fd97.md",
+      "urlKey": "20180621"
     },
     {
       "slug": "挣钱要比想象的难-79ade34d",
@@ -512,7 +548,8 @@
       "tags": [
         "随想"
       ],
-      "path": "posts/挣钱要比想象的难-79ade34d.md"
+      "path": "posts/挣钱要比想象的难-79ade34d.md",
+      "urlKey": "20180514"
     },
     {
       "slug": "微信小程序加载游戏排名好友全球-6d6da729",
@@ -526,7 +563,8 @@
         "前端",
         "算法"
       ],
-      "path": "posts/微信小程序加载游戏排名好友全球-6d6da729.md"
+      "path": "posts/微信小程序加载游戏排名好友全球-6d6da729.md",
+      "urlKey": "20180501-3"
     },
     {
       "slug": "微信小程序小鸡单词单词书选择-7da2453f",
@@ -538,7 +576,8 @@
       "tags": [
         "微信小程序"
       ],
-      "path": "posts/微信小程序小鸡单词单词书选择-7da2453f.md"
+      "path": "posts/微信小程序小鸡单词单词书选择-7da2453f.md",
+      "urlKey": "20180501-2"
     },
     {
       "slug": "微信小程序小鸡单词单词测试功能-c24a6dbf",
@@ -551,7 +590,8 @@
         "微信小程序",
         "前端"
       ],
-      "path": "posts/微信小程序小鸡单词单词测试功能-c24a6dbf.md"
+      "path": "posts/微信小程序小鸡单词单词测试功能-c24a6dbf.md",
+      "urlKey": "20180501"
     },
     {
       "slug": "微信背单词小程序小鸡单词-66cf95f7",
@@ -564,7 +604,8 @@
         "微信小程序",
         "前端"
       ],
-      "path": "posts/微信背单词小程序小鸡单词-66cf95f7.md"
+      "path": "posts/微信背单词小程序小鸡单词-66cf95f7.md",
+      "urlKey": "20180427"
     },
     {
       "slug": "2018刑侦推理题c暴力破解-83736cf7",
@@ -574,7 +615,8 @@
       "author": "兰州小红鸡",
       "summary": "最近看到很火的那个2018年刑侦推理题，很多程序员都用来编程暴力破解 感觉挺好玩，就自己也来用c++试一试 （正在学校机房上实验课的我，只能对着发白的codeblocks撸码） $…",
       "tags": [],
-      "path": "posts/2018刑侦推理题c暴力破解-83736cf7.md"
+      "path": "posts/2018刑侦推理题c暴力破解-83736cf7.md",
+      "urlKey": "20180426"
     },
     {
       "slug": "wordpress建站可能遇到一些小问题-646aecb5",
@@ -587,7 +629,8 @@
         "博客建站",
         "教程"
       ],
-      "path": "posts/wordpress建站可能遇到一些小问题-646aecb5.md"
+      "path": "posts/wordpress建站可能遇到一些小问题-646aecb5.md",
+      "urlKey": "20180423-2"
     },
     {
       "slug": "pat乙级试题C算法题训练-dedc9755",
@@ -600,7 +643,8 @@
         "算法",
         "C++"
       ],
-      "path": "posts/pat乙级试题C算法题训练-dedc9755.md"
+      "path": "posts/pat乙级试题C算法题训练-dedc9755.md",
+      "urlKey": "20180423"
     },
     {
       "slug": "在阿里云服务器一键搭建web服务器wordprss安装-d438625",
@@ -612,7 +656,8 @@
       "tags": [
         "博客建站"
       ],
-      "path": "posts/在阿里云服务器一键搭建web服务器wordprss安装-d438625.md"
+      "path": "posts/在阿里云服务器一键搭建web服务器wordprss安装-d438625.md",
+      "urlKey": "20180421"
     },
     {
       "slug": "Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676",
@@ -626,6 +671,7 @@
       ],
       "cover": "assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-01.png",
       "path": "posts/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676.md",
+      "urlKey": "20180101",
       "thumbnail": "assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-01.thumb.webp"
     },
     {
@@ -641,7 +687,8 @@
       ],
       "series": "谙风",
       "seriesOrder": 11,
-      "path": "posts/兰州时间还长故事还很多-bb0e3aeb.md"
+      "path": "posts/兰州时间还长故事还很多-bb0e3aeb.md",
+      "urlKey": "20170705"
     },
     {
       "slug": "青梅不在竹马老去从此我爱上的每一个人都很像你-2ed35e3b",
@@ -654,7 +701,8 @@
         "随想",
         "邻家酒肆"
       ],
-      "path": "posts/青梅不在竹马老去从此我爱上的每一个人都很像你-2ed35e3b.md"
+      "path": "posts/青梅不在竹马老去从此我爱上的每一个人都很像你-2ed35e3b.md",
+      "urlKey": "20170622"
     },
     {
       "slug": "喜欢一个人就是想和她说好多好多话-f560a010",
@@ -667,7 +715,8 @@
         "随想",
         "邻家酒肆"
       ],
-      "path": "posts/喜欢一个人就是想和她说好多好多话-f560a010.md"
+      "path": "posts/喜欢一个人就是想和她说好多好多话-f560a010.md",
+      "urlKey": "20170618"
     },
     {
       "slug": "爱而不得人那么多为什么非你不可-be4966e8",
@@ -680,7 +729,8 @@
         "随想",
         "邻家酒肆"
       ],
-      "path": "posts/爱而不得人那么多为什么非你不可-be4966e8.md"
+      "path": "posts/爱而不得人那么多为什么非你不可-be4966e8.md",
+      "urlKey": "20170617"
     },
     {
       "slug": "然而青春啊-却在最酣畅淋漓时戛然而止-f9280584",
@@ -695,7 +745,8 @@
       ],
       "series": "谙风",
       "seriesOrder": 10,
-      "path": "posts/然而青春啊-却在最酣畅淋漓时戛然而止-f9280584.md"
+      "path": "posts/然而青春啊-却在最酣畅淋漓时戛然而止-f9280584.md",
+      "urlKey": "20170614"
     },
     {
       "slug": "写给发小一个童年的长度-66e78132",
@@ -710,7 +761,8 @@
       ],
       "series": "谙风",
       "seriesOrder": 9,
-      "path": "posts/写给发小一个童年的长度-66e78132.md"
+      "path": "posts/写给发小一个童年的长度-66e78132.md",
+      "urlKey": "20170613"
     },
     {
       "slug": "谙风-小城青旅-c54dc801",
@@ -725,7 +777,8 @@
       ],
       "series": "谙风",
       "seriesOrder": 7,
-      "path": "posts/谙风-小城青旅-c54dc801.md"
+      "path": "posts/谙风-小城青旅-c54dc801.md",
+      "urlKey": "20170612"
     },
     {
       "slug": "十月不远青海湖不远-427178b3",
@@ -738,7 +791,8 @@
         "随想",
         "邻家酒肆"
       ],
-      "path": "posts/十月不远青海湖不远-427178b3.md"
+      "path": "posts/十月不远青海湖不远-427178b3.md",
+      "urlKey": "20170611"
     },
     {
       "slug": "大学生你凭什么创业-560c5cce",
@@ -751,7 +805,8 @@
         "随想",
         "邻家酒肆"
       ],
-      "path": "posts/大学生你凭什么创业-560c5cce.md"
+      "path": "posts/大学生你凭什么创业-560c5cce.md",
+      "urlKey": "20170610"
     },
     {
       "slug": "所有的日子都是在等待一份久别的重逢-5ad87aa",
@@ -766,7 +821,8 @@
       ],
       "series": "谙风",
       "seriesOrder": 6,
-      "path": "posts/所有的日子都是在等待一份久别的重逢-5ad87aa.md"
+      "path": "posts/所有的日子都是在等待一份久别的重逢-5ad87aa.md",
+      "urlKey": "20170609"
     },
     {
       "slug": "未来的年月希望可以让我来温暖你们-76ea918a",
@@ -781,7 +837,8 @@
       ],
       "series": "谙风",
       "seriesOrder": 5,
-      "path": "posts/未来的年月希望可以让我来温暖你们-76ea918a.md"
+      "path": "posts/未来的年月希望可以让我来温暖你们-76ea918a.md",
+      "urlKey": "20170608"
     },
     {
       "slug": "人生在世如春梦-d95c37aa",
@@ -796,7 +853,8 @@
       ],
       "series": "谙风",
       "seriesOrder": 4,
-      "path": "posts/人生在世如春梦-d95c37aa.md"
+      "path": "posts/人生在世如春梦-d95c37aa.md",
+      "urlKey": "20170607"
     },
     {
       "slug": "那些在苦难中艰难生活的人-0aaaaa22",
@@ -808,7 +866,8 @@
       "tags": [],
       "series": "谙风",
       "seriesOrder": 3,
-      "path": "posts/那些在苦难中艰难生活的人-0aaaaa22.md"
+      "path": "posts/那些在苦难中艰难生活的人-0aaaaa22.md",
+      "urlKey": "20170606"
     },
     {
       "slug": "用python做一个C类编译器——语法翻译器-15995704",
@@ -821,6 +880,7 @@
       "cover": "assets/uploads/2026/05/用python做一个C类编译器——语法翻译器-15995704-01.png",
       "carousel": true,
       "path": "posts/用python做一个C类编译器——语法翻译器-15995704.md",
+      "urlKey": "20170101",
       "thumbnail": "assets/uploads/2026/05/用python做一个C类编译器——语法翻译器-15995704-01.thumb.webp"
     }
   ]

@@ -5,7 +5,7 @@
 import { CONFIG } from './config.js';
 import { getToken } from './auth.js';
 import { mountAdminShell, escapeHtml, showToast } from './admin-shell.js';
-import { postPathFromAdmin } from './site.js';
+import { postPathFromAdminPost } from './site.js';
 import { analyzeBrokenLinks, findOrphanImages, bulkDelete } from './admin-tools.js';
 
 const $ = sel => document.querySelector(sel);
@@ -218,7 +218,7 @@ async function runBrokenLinks() {
         <tbody>
           ${r.broken.map(b => `
             <tr>
-              <td><a href="${postPathFromAdmin(b.slug)}" target="_blank">${escapeHtml(b.slug)}</a></td>
+              <td><a href="${postPathFromAdminPost(b)}" target="_blank">${escapeHtml(b.slug)}</a></td>
               <td><code>${escapeHtml(b.url)}</code></td>
               <td><code>${escapeHtml(b.normalized)}</code></td>
             </tr>

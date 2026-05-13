@@ -3,7 +3,7 @@
 // ============================================================================
 
 import { fetchIndexPublic } from './api.js';
-import { initSite, escapeHtml, postPath } from './site.js';
+import { initSite, escapeHtml, postPathFromPost } from './site.js';
 import { setMeta } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -60,7 +60,7 @@ function renderSeries(groups) {
           return `
             <li class="series-item">
               <span class="order">${escapeHtml(orderLabel)}</span>
-              <a class="title" href="${postPath(p.slug)}">${escapeHtml(p.title || '无标题')}</a>
+              <a class="title" href="${postPathFromPost(p)}">${escapeHtml(p.title || '无标题')}</a>
               <span class="meta">${escapeHtml(dateStr)}</span>
             </li>
           `;
