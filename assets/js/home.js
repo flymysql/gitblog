@@ -59,7 +59,7 @@ function renderHero(posts) {
   `;
 }
 
-/** 头像列占位：部分 WebView 下纯 CSS 宽度会塌成 0，导致正文叠在头像上；按右侧内容高度设正方形边长 */
+/** 防 WebView 占位塌缩：按 .hero-info 总高度设正方形；签名单行不换行后高度随文案与统计区自适应 */
 let heroAvatarResizeObserver = null;
 let heroAvatarResizeFallbackBound = false;
 
@@ -91,6 +91,8 @@ function bindHeroAvatarSizeSync() {
   if (heroAvatarResizeObserver) heroAvatarResizeObserver.disconnect();
   heroAvatarResizeObserver = new ResizeObserver(() => apply());
   heroAvatarResizeObserver.observe(info);
+  const sub = info.querySelector('.hero-subtitle');
+  if (sub) heroAvatarResizeObserver.observe(sub);
 }
 
 function renderCarousel(posts) {
