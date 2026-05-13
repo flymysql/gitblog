@@ -78,12 +78,10 @@
   color: #614e4e;
   line-height: 1.5;
   margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
+  min-width: 0;
+  white-space: nowrap;
   overflow: hidden;
-  word-break: break-word;
+  text-overflow: ellipsis;
 }
 .hero-stats {
   display: flex;
@@ -136,12 +134,10 @@
     line-height: 1.45;
     margin: 0;
     padding-right: 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
+    min-width: 0;
+    white-space: nowrap;
     overflow: hidden;
-    word-break: break-word;
+    text-overflow: ellipsis;
   }
   .hero-stats {
     row-gap: 5px;
