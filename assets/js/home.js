@@ -434,7 +434,7 @@ function buildHomeList({ allPosts, tab, q, tag }) {
       } else {
         ul.innerHTML = `
           <li class="home-giscus-only">
-            <p class="home-notes-lead">欢迎每一位偶然驻足的你在此留下随笔——或记一桩小事，或安放无从说起的心情，或与路过的读众分享此刻的天气与念想。这里不设门槛，真挚即好；愿这方寸之地，能替你接住片言只语的人间烟火。</p>
+            <p class="home-notes-lead">这里是一处开放广场，谁都可以随手写几句想法。</p>
             <div class="home-notes-giscus" id="homeNotesGiscusRoot"></div>
           </li>`;
         const root = $('#homeNotesGiscusRoot');

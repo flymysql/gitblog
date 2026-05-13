@@ -12,7 +12,7 @@ const $ = sel => document.querySelector(sel);
   initSite({ active: 'notes.html' });
   setMeta({
     title: '随笔',
-    description: '欢迎留下随笔与心情；或记小事，或诉心绪。',
+    description: '开放广场，随手写几句想法。',
   });
 
   const host = $('#notesGiscusHost');
