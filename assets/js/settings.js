@@ -82,7 +82,6 @@ function fillForm(config) {
   renderNavEditor(config.site.nav || []);
   fillThemeTokens(config.theme && config.theme.tokens);
   renderSaobbyExtraEditor((config.pageviews && config.pageviews.saobby && config.pageviews.saobby.extra) || []);
-  applySaobbyVisibility((config.pageviews && config.pageviews.provider) || 'busuanzi');
 }
 
 function fillThemeTokens(tokens) {
@@ -169,11 +168,15 @@ function normalizeConfig(config) {
   config.theme.tokens = config.theme.tokens && typeof config.theme.tokens === 'object' ? config.theme.tokens : {};
   config.theme.customCss = String(config.theme.customCss || '');
   config.analytics = config.analytics || { enabled: false, snippet: '' };
-  config.pageviews = config.pageviews || { enabled: true, provider: 'busuanzi', showHomeStats: true, showPostViews: true, showFooterStats: true };
-  config.pageviews.saobby = config.pageviews.saobby || { site: { img: '', dashboard: '' }, article: { img: '', dashboard: '' }, extra: [] };
-  config.pageviews.saobby.site = config.pageviews.saobby.site || { img: '', dashboard: '' };
-  config.pageviews.saobby.article = config.pageviews.saobby.article || { img: '', dashboard: '' };
+  config.pageviews = config.pageviews || { enabled: true, showHomeStats: true, showPostViews: true, showFooterStats: true };
+  config.pageviews.saobby = config.pageviews.saobby || { site: { img: '', dashboard: '', label: '' }, extra: [] };
+  config.pageviews.saobby.site = config.pageviews.saobby.site || { img: '', dashboard: '', label: '' };
   if (!Array.isArray(config.pageviews.saobby.extra)) config.pageviews.saobby.extra = [];
+  config.pageviews.vercount = config.pageviews.vercount || { scriptSrc: '', label: '' };
+  delete config.pageviews.provider;
+  delete config.pageviews.articleProvider;
+  delete config.pageviews.showListPostViews;
+  if (config.pageviews.saobby.article) delete config.pageviews.saobby.article;
   config.share = config.share || { enabled: true, showInPosts: true, showInPages: false, qrcodeOfPage: true };
   config.share.enabled = config.share.enabled !== false;
   config.share.showInPosts = config.share.showInPosts !== false;
@@ -200,18 +203,15 @@ function normalizeConfig(config) {
   config.analytics.enabled = !!config.analytics.enabled;
   config.analytics.snippet = String(config.analytics.snippet || '').trim();
   config.pageviews.enabled = config.pageviews.enabled !== false;
-  config.pageviews.provider = config.pageviews.provider || 'busuanzi';
-  config.pageviews.articleProvider = config.pageviews.articleProvider || 'page-views-api';
   config.pageviews.showHomeStats = config.pageviews.showHomeStats !== false;
   config.pageviews.showPostViews = config.pageviews.showPostViews !== false;
   config.pageviews.showFooterStats = config.pageviews.showFooterStats !== false;
-  config.pageviews.showListPostViews = config.pageviews.showListPostViews !== false;
-  ['site', 'article'].forEach(k => {
-    const slot = config.pageviews.saobby[k];
-    slot.img = String(slot.img || '').trim();
-    slot.dashboard = String(slot.dashboard || '').trim();
-    slot.label = String(slot.label || (k === 'site' ? '总访问' : '阅读')).trim() || (k === 'site' ? '总访问' : '阅读');
-  });
+  const site = config.pageviews.saobby.site;
+  site.img = String(site.img || '').trim();
+  site.dashboard = String(site.dashboard || '').trim();
+  site.label = String(site.label || '总访问').trim() || '总访问';
+  config.pageviews.vercount.scriptSrc = String(config.pageviews.vercount.scriptSrc || '').trim();
+  config.pageviews.vercount.label = String(config.pageviews.vercount.label || '阅读').trim() || '阅读';
   config.pageviews.saobby.extra = config.pageviews.saobby.extra
     .map(it => ({
       name: String((it && it.name) || '').trim(),
@@ -422,20 +422,6 @@ function bindSaobbyEditor() {
   });
 }
 
-function applySaobbyVisibility(provider) {
-  const root = document;
-  root.querySelectorAll('[data-pv-when]').forEach(el => {
-    const want = el.getAttribute('data-pv-when');
-    el.hidden = (provider !== want);
-  });
-}
-
-function bindPageviewsProvider() {
-  const sel = document.querySelector('select[name="pageviews.provider"]');
-  if (!sel) return;
-  sel.addEventListener('change', () => applySaobbyVisibility(sel.value));
-}
-
 function bindNavEditor() {
   const host = $('#navEditor');
   const addBtn = $('#addNavItem');
@@ -553,46 +539,22 @@ function settingsContentHtml() {
 
       <section class="settings-card">
         <h3>访问计数（前台展示）</h3>
-        <p class="settings-help">在首页、文章页、Footer 上展示阅读 / 访客数字。可在两个 provider 之间切换：<b>busuanzi</b>（零配置，按 Referer 自动区分页面）和 <b>saobby</b>（在 <a href="https://www.saobby.com/create_webcounter" target="_blank" rel="noopener">saobby.com</a> 创建计数器后填入图片 URL；后台「访问数据」可嵌入 saobby 自带的可视化控制面板）。</p>
+        <p class="settings-help">本站固定为双通道：<b>Saobby</b> 统计站点总访问（首页 Hero / Footer 计数图）；<b>Vercount</b> 按页面 URL 统计每篇文章 / 独立页阅读（见 <a href="https://vercount.one" target="_blank" rel="noopener">vercount.one</a>）。二者互不影响。</p>
         <div class="settings-grid">
           <label class="settings-check"><input type="checkbox" name="pageviews.enabled"> 启用访问计数</label>
-          <label>provider
-            <select name="pageviews.provider" id="pvProviderSelect">
-              <option value="busuanzi">busuanzi（不蒜子）</option>
-              <option value="saobby">saobby（saobby.com）</option>
-              <option value="none">none（仅占位禁用）</option>
-            </select>
-            <span class="settings-hint" data-pv-when="busuanzi">无需注册、按 Referer 自动隔离站点；服务挂掉时占位会自动隐藏。</span>
-            <span class="settings-hint" data-pv-when="saobby">每个 saobby 计数器 = 一张图。把图片 URL 填到下方，控制面板 URL 用于后台「访问数据」嵌入。</span>
-          </label>
-          <label data-pv-when="busuanzi">文章阅读数 provider
-            <select name="pageviews.articleProvider">
-              <option value="page-views-api">Page Views API（支持首页文章列表）</option>
-              <option value="busuanzi">busuanzi（仅文章页当前页）</option>
-            </select>
-            <span class="settings-hint">首页要展示每篇文章阅读量时，推荐 Page Views API；它按 slug 查询，不会因首页展示而增加阅读数。</span>
-          </label>
-          <label class="settings-check"><input type="checkbox" name="pageviews.showHomeStats"> 首页 Hero 显示总访问 / 访客</label>
-          <label class="settings-check"><input type="checkbox" name="pageviews.showPostViews"> 文章页显示阅读次数</label>
-          <label class="settings-check"><input type="checkbox" name="pageviews.showFooterStats"> Footer 显示站点 PV / UV</label>
-          <label class="settings-check" data-pv-when="busuanzi"><input type="checkbox" name="pageviews.showListPostViews"> 首页文章列表显示逐篇阅读量</label>
+          <label class="settings-check"><input type="checkbox" name="pageviews.showHomeStats"> 首页 Hero 显示站点访问（Saobby）</label>
+          <label class="settings-check"><input type="checkbox" name="pageviews.showPostViews"> 文章页显示阅读次数（Vercount）</label>
+          <label class="settings-check"><input type="checkbox" name="pageviews.showFooterStats"> Footer 显示站点访问（Saobby）</label>
         </div>
       </section>
 
-      <section class="settings-card" data-pv-when="saobby">
-        <h3>Saobby 计数器配置</h3>
-        <p class="settings-help">在 <a href="https://www.saobby.com/create_webcounter" target="_blank" rel="noopener">saobby.com / 创建网页计数器</a> 创建后会得到一张计数图片，把图片 URL 与控制面板 URL（含 key）粘到这里即可。后台「访问数据」会用 iframe 嵌入这些控制面板。</p>
-        <div class="settings-row-title"><span>站点级计数器（首页 Hero / Footer）</span></div>
+      <section class="settings-card">
+        <h3>Saobby（站点总访问）</h3>
+        <p class="settings-help">在 <a href="https://www.saobby.com/create_webcounter" target="_blank" rel="noopener">saobby.com</a> 创建计数器后，把图片 URL 与控制面板 URL 粘到下方。后台「访问数据」可 iframe 嵌入控制面板。</p>
         <div class="settings-grid">
           <label class="span-2">图片 URL <input name="pageviews.saobby.site.img" placeholder="https://www.saobby.com/webcounter/svg?id=..."></label>
           <label class="span-2">控制面板 URL <input name="pageviews.saobby.site.dashboard" placeholder="https://www.saobby.com/webcounter_dashboard?key=..."></label>
-          <label>前缀文字 <input name="pageviews.saobby.site.label" placeholder="总访问"><span class="settings-hint">显示在数字图前面，例如「总访问」「访客数」</span></label>
-        </div>
-        <div class="settings-row-title" style="margin-top:14px"><span>文章页计数器（每篇文章共用一张图）</span></div>
-        <div class="settings-grid">
-          <label class="span-2">图片 URL <input name="pageviews.saobby.article.img" placeholder="可选，留空则文章页不显示阅读次数"></label>
-          <label class="span-2">控制面板 URL <input name="pageviews.saobby.article.dashboard" placeholder="https://www.saobby.com/webcounter_dashboard?key=..."></label>
-          <label>前缀文字 <input name="pageviews.saobby.article.label" placeholder="阅读"><span class="settings-hint">显示在数字图前面，例如「阅读」「访问」</span></label>
+          <label>前缀文字 <input name="pageviews.saobby.site.label" placeholder="总访问"><span class="settings-hint">显示在计数图旁，例如「总访问」</span></label>
         </div>
         <div class="settings-row-title" style="margin-top:14px">
           <span>额外计数器（仅在后台「访问数据」展示）</span>
@@ -600,7 +562,16 @@ function settingsContentHtml() {
         </div>
         <div class="saobby-extra-editor" id="saobbyExtraEditor"></div>
         <textarea name="pageviews.saobby.extra" hidden></textarea>
-        <p class="settings-help">用于跟踪首页之外的特定页面（例如「关于」「随笔列表」），方便分别看数据。</p>
+        <p class="settings-help">用于跟踪其它落地页的 Saobby 图（例如单独推广的页面）。</p>
+      </section>
+
+      <section class="settings-card">
+        <h3>Vercount（文章 / 独立页阅读）</h3>
+        <p class="settings-help">文章页会加载官方脚本并显示 <code>#vercount_value_page_pv</code>。留空脚本地址则使用默认 <code>https://events.vercount.one/js</code>；自托管请改成你的脚本 URL。统计需在 <a href="https://vercount.one" target="_blank" rel="noopener">vercount.one</a> 验证域名后查看。</p>
+        <div class="settings-grid">
+          <label class="span-2">脚本 URL（可选） <input name="pageviews.vercount.scriptSrc" placeholder="https://events.vercount.one/js"></label>
+          <label>前缀文字 <input name="pageviews.vercount.label" placeholder="阅读"><span class="settings-hint">显示在数字前，例如「阅读」「浏览」</span></label>
+        </div>
       </section>
 
       <section class="settings-card">
@@ -738,7 +709,6 @@ function topActions() {
   fillForm(state.current);
   bindNavEditor();
   bindSaobbyEditor();
-  bindPageviewsProvider();
   bindThemePanel();
   await loadRemoteConfigSha();
 

@@ -5,8 +5,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
 import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER } from './site.js';
-// 注：列表逐篇阅读数在 saobby provider 下会自动返回空，不影响渲染
-import { initPageviews, bszSiteStatsHtml, articleListPvHtml, renderArticleListViews } from './pageviews.js';
+import { initPageviews, bszSiteStatsHtml } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 
 const $ = sel => document.querySelector(sel);
@@ -237,7 +236,6 @@ function postItemHtml(p, author, avatar) {
         <p class="post-summary">${escapeHtml(p.summary || '')}</p>
         <div class="post-meta">
           ${(p.tags || []).slice(0, 3).map(t => tagHtml(t)).join('')}
-          ${articleListPvHtml(p.slug)}
         </div>
       </a>
       ${p.cover ? `<a href="post.html?slug=${encodeURIComponent(p.slug)}" class="post-thumbnail"><img src="${LAZY_PLACEHOLDER}" data-src="${escapeHtml(publicImageUrl(p.thumbnail || p.cover))}" alt="${escapeHtml(p.title || '')}" loading="lazy" decoding="async" fetchpriority="low"></a>` : ''}
@@ -273,7 +271,6 @@ function renderList(posts) {
       : `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`);
   // 列表缩略图全部走视口懒加载（首屏前几张视口可见时会立刻加载）
   bindLazyImages(ul, { eagerCount: 0 });
-  renderArticleListViews(ul);
 
   const state = { loaded: firstChunk.length, observer: null, loadNext: null };
   const sentinel = document.getElementById('loadMoreSentinel');
@@ -286,7 +283,6 @@ function renderList(posts) {
     const inserted = [...frag.children];
     inserted.forEach(node => ul.insertBefore(node, sentinel));
     inserted.forEach(node => bindLazyImages(node, { eagerCount: 0 }));
-    inserted.forEach(node => renderArticleListViews(node));
     state.loaded += nextChunk.length;
     if (state.loaded >= posts.length) {
       // 全部加载完，把 sentinel 替换成"到底"提示
@@ -368,7 +364,7 @@ function applyFilter(posts, tab, q, tag) {
 }
 
 (async function init() {
-  // 避免 hero 与 footer 各有一份站点计数（saobby 会加载两张图 +2；不蒜子会重复容器）
+  // 避免 hero 与 footer 各有一份站点 Saobby 图（会各请求一次、+2）
   initSite({ active: './', skipDuplicateSitePv: true });
   setMeta({ title: '', description: CONFIG.site.description, type: 'website' });
   setJsonLd({

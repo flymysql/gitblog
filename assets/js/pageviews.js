@@ -1,138 +1,73 @@
 // ============================================================================
-// 访问计数：支持两种 provider
+// 访问计数（固定双通道）
 //
-//   1. busuanzi（不蒜子）— 默认零配置，按 Referer 自动区分站点 / 单页
-//   2. saobby（https://www.saobby.com）— 需要在站长控制面板各创建一个计数器，
-//      把图片 URL + 控制面板 URL 填进站点设置即可。每张图片放到页面上 = 自带计数 +1
+//   · 站点总访问量（首页 Hero / Footer）：Saobby 计数图片
+//   · 文章页 / 独立页（post.html?slug=…）阅读量：Vercount（events.vercount.one）
 //
-// 模型差异：
-//   - busuanzi：一段 CDN 脚本 + DOM 占位，回填数字
-//   - saobby ：每个计数器 = 一张图，图片 src 加载即 +1，本身就是数字图
-//     ⚠ 一个计数器代表「一类页面」，不能在首页用一张图统计每篇文章的阅读量；
-//        所以 saobby provider 下，首页文章列表的逐篇阅读量会自动隐藏。
-//
-// 加固：
-//   - 没有任何占位元素时，不注入 / 不生成 img（避免无意义请求）
-//   - 配置缺失（saobby.site.img 没填）→ 占位静默隐藏，不影响布局
-//   - busuanzi 5 秒兜底：到点还没拿到数字 → 隐藏所有 .bsz 占位
+// 不再支持不蒜子、Page Views API 或其它 provider。
 // ============================================================================
 
 import { CONFIG } from './config.js';
 
-const BUSUANZI_SRC = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
-const PAGE_VIEWS_API = 'https://page-views-api.ratneshc.com/api/v1';
+const VCOUNT_DEFAULT_SRC = 'https://events.vercount.one/js';
 
 const STATE = {
-  injected: false,
-  fallbackTimer: null,
+  vercountInjected: false,
 };
-const VIEW_CACHE_KEY = 'article_view_cache_v1';
-const VIEW_CACHE_TTL = 10 * 60 * 1000;
-const LIST_VIEW_CONCURRENCY = 4;
-
-// ---------- provider helpers ----------------------------------------------
 
 function pvCfg() {
   return CONFIG.pageviews || {};
 }
 
-function provider() {
-  const cfg = pvCfg();
-  if (!cfg.enabled) return 'none';
-  return cfg.provider || 'busuanzi';
-}
-
-export function isBusuanziOn() {
-  return provider() === 'busuanzi';
-}
-
-export function isSaobbyOn() {
-  return provider() === 'saobby';
-}
-
 function saobbyCfg() {
-  return (pvCfg().saobby) || {};
+  return pvCfg().saobby || {};
 }
 
 function saobbySiteImg() {
   return String((saobbyCfg().site || {}).img || '').trim();
 }
 
-function saobbyArticleImg() {
-  return String((saobbyCfg().article || {}).img || '').trim();
+function vercountCfg() {
+  return pvCfg().vercount || {};
 }
 
-function articleProvider() {
-  const cfg = pvCfg();
-  return cfg.articleProvider || 'page-views-api';
+function vercountScriptSrc() {
+  const s = String(vercountCfg().scriptSrc || '').trim();
+  return s || VCOUNT_DEFAULT_SRC;
 }
 
-function pageViewsApiOn() {
-  // 仅在 busuanzi 模式下，列表逐篇阅读数才走 Page Views API。
-  // saobby 模式下整个 list 阅读量隐藏，避免误导。
-  return isBusuanziOn() && !!pvCfg().enabled && articleProvider() === 'page-views-api';
+/** 站点级 Saobby 已配置且总开关打开（供后台「访问数据」等判断） */
+export function isSaobbyOn() {
+  const c = pvCfg();
+  return c.enabled !== false && !!saobbySiteImg();
 }
 
-// ---------- busuanzi --------------------------------------------------------
-
-function hideAllBsz(root = document) {
-  root.querySelectorAll('.bsz').forEach(el => { el.style.display = 'none'; });
-}
-
-function hideEmptyBsz(root = document) {
-  root.querySelectorAll('.bsz').forEach(el => {
-    const num = el.querySelector('.bsz-num');
-    if (!num) return;
-    if (!num.textContent || !num.textContent.trim()) el.style.display = 'none';
-  });
-}
-
-function injectBusuanzi() {
-  if (STATE.injected) return;
-  STATE.injected = true;
-  const s = document.createElement('script');
-  s.src = BUSUANZI_SRC;
-  s.async = true;
-  s.referrerPolicy = 'no-referrer-when-downgrade';
-  s.onerror = () => hideAllBsz();
-  document.head.appendChild(s);
-}
-
-function hasBszContainer() {
-  return !!document.querySelector(
-    '#busuanzi_container_site_pv, #busuanzi_container_site_uv, #busuanzi_container_page_pv'
-  );
-}
-
-// ---------- saobby ---------------------------------------------------------
-// 一个 saobby 计数器 = 一张图。我们把图片插入到对应占位里，
-// 浏览器加载这张图就 +1，图本身渲染就是数字。
+// ---------- Saobby（仅站点 slot） -------------------------------------------
 
 function hideAllSaobby(root = document) {
   root.querySelectorAll('[data-saobby-slot]').forEach(el => { el.hidden = true; });
 }
 
-function fillSaobbyImage(slotEl, src, label = '访问') {
+function siteSlotPrefix() {
+  return String(((saobbyCfg().site || {}).label || '总访问')).trim() || '总访问';
+}
+
+function fillSaobbySite(slotEl, src, label = '访问') {
   if (!slotEl) return;
   if (!src) { slotEl.hidden = true; return; }
-  // 在已渲染过的 slot 里插入一张图，避免重复插入
   if (slotEl.dataset.saobbyDone === '1') return;
   slotEl.dataset.saobbyDone = '1';
   slotEl.hidden = false;
-  // 用 data-saobby-prefix / data-saobby-suffix 给纯数字图加上"访问量"/"次"等文字
-  // 让纯数字图配合页面排版有可读性，并在主题切换时和正文一致
   const prefix = String(slotEl.dataset.saobbyPrefix || '').trim();
   const suffix = String(slotEl.dataset.saobbySuffix || '').trim();
   const isStat = slotEl.classList.contains('saobby-slot-stat');
   const numHtml = `<img src="${escapeAttr(src)}" alt="${escapeAttr(label)}" referrerpolicy="no-referrer-when-downgrade" loading="eager" decoding="async" class="saobby-counter">`;
   if (isStat) {
-    // 首页 hero 统一卡片：上面大数字图，下面 label
     slotEl.innerHTML = `
       <strong class="saobby-num">${numHtml}</strong>
       <span class="saobby-label">${escapeAttr(prefix || label)}${suffix ? ' / ' + escapeAttr(suffix) : ''}</span>
     `.trim();
   } else {
-    // 内联（footer / 文章 meta）：[前缀]+[图]+[后缀]
     slotEl.innerHTML = [
       prefix ? `<span class="saobby-prefix">${escapeAttr(prefix)}</span>` : '',
       numHtml,
@@ -145,273 +80,88 @@ function fillSaobbyImage(slotEl, src, label = '访问') {
   }
 }
 
-function siteSlotPrefix() {
-  return String(((saobbyCfg().site || {}).label || '总访问')).trim() || '总访问';
-}
-
-function articleSlotPrefix() {
-  return String(((saobbyCfg().article || {}).label || '阅读')).trim() || '阅读';
-}
-
-function injectSaobby(root = document) {
+function injectSaobbySiteSlots(root = document) {
   const siteImg = saobbySiteImg();
-  const articleImg = saobbyArticleImg();
   const sitePrefix = siteSlotPrefix();
-  const articlePrefix = articleSlotPrefix();
   root.querySelectorAll('[data-saobby-slot="site"]').forEach(el => {
     if (!el.dataset.saobbyPrefix && !el.dataset.saobbySuffix) el.dataset.saobbyPrefix = sitePrefix;
     const override = (el.dataset.saobbyImg || '').trim();
-    fillSaobbyImage(el, override || siteImg, sitePrefix);
-  });
-  root.querySelectorAll('[data-saobby-slot="article"]').forEach(el => {
-    if (!el.dataset.saobbyPrefix && !el.dataset.saobbySuffix) el.dataset.saobbyPrefix = articlePrefix;
-    // 文章页可以通过 data-saobby-img 提供本文专属计数器（来自 frontmatter.counter.img）
-    const override = (el.dataset.saobbyImg || '').trim();
-    fillSaobbyImage(el, override || articleImg, articlePrefix);
+    fillSaobbySite(el, override || siteImg, sitePrefix);
   });
 }
 
-// ---------- public API -----------------------------------------------------
+// ---------- Vercount（仅文章页 #vercount_value_page_pv） --------------------
 
-// 在每个页面入口 / 渲染完成后调用一次。重复调用安全。
+function injectVercountScript() {
+  if (STATE.vercountInjected) return;
+  const el = document.getElementById('vercount_value_page_pv');
+  if (!el) return;
+  const cfg = pvCfg();
+  if (cfg.enabled === false || cfg.showPostViews === false) return;
+  STATE.vercountInjected = true;
+  const s = document.createElement('script');
+  s.src = vercountScriptSrc();
+  s.defer = true;
+  s.referrerPolicy = 'no-referrer-when-downgrade';
+  s.onerror = () => { el.textContent = '—'; };
+  document.head.appendChild(s);
+}
+
+// ---------- public API -------------------------------------------------------
+
 export function initPageviews() {
   const cfg = pvCfg();
-  if (!cfg.enabled || provider() === 'none') {
-    hideAllBsz();
-    hideAllSaobby();
+  if (!cfg.enabled) {
+    hideAllSaobby(document);
     return;
   }
-  if (isBusuanziOn()) {
-    if (!hasBszContainer()) return;
-    injectBusuanzi();
-    if (STATE.fallbackTimer) clearTimeout(STATE.fallbackTimer);
-    STATE.fallbackTimer = setTimeout(() => hideEmptyBsz(), 5000);
-    return;
+  if (saobbySiteImg()) {
+    injectSaobbySiteSlots(document);
+  } else {
+    hideAllSaobby(document);
   }
-  if (isSaobbyOn()) {
-    injectSaobby();
-    return;
-  }
+  injectVercountScript();
 }
 
-// 站点级 PV / UV 占位 HTML（首页 hero / footer 都用它）
+/** 首页 Hero / Footer：站点 Saobby 占位 */
 export function bszSiteStatsHtml({ compact = false } = {}) {
-  if (isBusuanziOn()) {
-    if (compact) {
-      return `
-        <span class="bsz" id="busuanzi_container_site_pv">总访问 <span id="busuanzi_value_site_pv" class="bsz-num"></span></span>
-        <span class="bsz-sep">·</span>
-        <span class="bsz" id="busuanzi_container_site_uv">访客 <span id="busuanzi_value_site_uv" class="bsz-num"></span></span>
-      `;
-    }
-    return `
-      <div class="stat bsz" id="busuanzi_container_site_pv">
-        <strong class="bsz-num"><span id="busuanzi_value_site_pv"></span></strong>次访问
-      </div>
-      <div class="stat bsz" id="busuanzi_container_site_uv">
-        <strong class="bsz-num"><span id="busuanzi_value_site_uv"></span></strong>位访客
-      </div>
-    `;
-  }
-  if (isSaobbyOn() && saobbySiteImg()) {
-    const prefix = siteSlotPrefix();
-    if (compact) {
-      return `<span class="saobby-slot saobby-slot-compact" data-saobby-slot="site" data-saobby-suffix="${escapeAttr(prefix)}" hidden></span>`;
-    }
-    return `<div class="stat saobby-slot saobby-slot-stat" data-saobby-slot="site" data-saobby-prefix="${escapeAttr(prefix)}" hidden></div>`;
-  }
-  return '';
-}
-
-// 文章页阅读次数占位
-//   articleCounterImg 可选：传入本文专属 saobby 图片 URL（来自 frontmatter.counter.img），
-//   优先级高于全站默认 saobby.article.img
-export function bszPagePvHtml({ articleCounterImg = '' } = {}) {
-  if (isBusuanziOn()) {
-    if (pageViewsApiOn()) {
-      return `<span class="pvapi" data-pv-current="1">阅读 <span class="pvapi-num"></span></span>`;
-    }
-    return `<span class="bsz" id="busuanzi_container_page_pv">阅读 <span id="busuanzi_value_page_pv" class="bsz-num"></span></span>`;
-  }
-  if (isSaobbyOn()) {
-    const customImg = String(articleCounterImg || '').trim();
-    if (!customImg && !saobbyArticleImg()) return '';
-    const dataAttr = customImg ? ` data-saobby-img="${escapeAttr(customImg)}"` : '';
-    const prefix = articleSlotPrefix();
-    return `<span class="saobby-slot saobby-slot-inline" data-saobby-slot="article" data-saobby-prefix="${escapeAttr(prefix)}" data-saobby-suffix="次"${dataAttr} hidden></span>`;
-  }
-  return '';
-}
-
-// 首页文章列表逐篇阅读量
-// saobby 模型不支持按 slug 查，直接返回空 → 列表里这一栏不会出现
-export function articleListPvHtml(slug) {
-  if (!slug) return '';
   const cfg = pvCfg();
-  if (cfg.showListPostViews === false || cfg.showPostViews === false) return '';
-  if (isSaobbyOn()) return '';
-  if (!pageViewsApiOn()) return '';
-  return `<span class="post-views pvapi" data-pv-slug="${escapeAttr(slug)}" hidden>阅读 <span class="pvapi-num"></span></span>`;
-}
-
-// 文章页：计数器 +1 并把数字回填到当前页占位
-export async function trackAndRenderArticleView(slug) {
-  if (isSaobbyOn()) {
-    // saobby 走图片即 +1，初始化时已经处理
-    initPageviews();
-    return;
+  if (cfg.enabled === false || !saobbySiteImg()) return '';
+  const prefix = siteSlotPrefix();
+  if (compact) {
+    return `<span class="saobby-slot saobby-slot-compact" data-saobby-slot="site" data-saobby-suffix="${escapeAttr(prefix)}" hidden></span>`;
   }
-  if (!pageViewsApiOn() || !slug) {
-    initPageviews();
-    return;
-  }
-  document.querySelectorAll('[data-pv-current]').forEach(el => {
-    el.dataset.pvSlug = slug;
-  });
-  try {
-    await trackArticleView(slug);
-    const views = await fetchArticleViews(slug);
-    setArticleView(slug, views);
-  } catch (e) {
-    console.warn('[pageviews] render article view failed', e);
-    hideArticleView(slug);
-  }
+  return `<div class="stat saobby-slot saobby-slot-stat" data-saobby-slot="site" data-saobby-prefix="${escapeAttr(prefix)}" hidden></div>`;
 }
 
-// 首页列表批量补阅读量（仅 busuanzi + page-views-api 时才生效）
-export async function renderArticleListViews(root = document) {
-  if (!pageViewsApiOn()) return;
-  const nodes = [...root.querySelectorAll('[data-pv-slug]')].filter(el => !el.dataset.pvLoaded);
-  if (!nodes.length) return;
-  const slugs = [...new Set(nodes.map(el => el.dataset.pvSlug).filter(Boolean))];
-  nodes.forEach(el => { el.dataset.pvLoaded = '1'; });
-  const pending = [];
-  for (const slug of slugs) {
-    const cached = getCachedArticleViews(slug);
-    if (cached != null) {
-      setArticleView(slug, cached);
-    } else {
-      pending.push(slug);
-    }
-  }
-  if (!pending.length) return;
-  scheduleIdle(async () => {
-    for (let i = 0; i < pending.length; i += LIST_VIEW_CONCURRENCY) {
-      const batch = pending.slice(i, i + LIST_VIEW_CONCURRENCY);
-      await Promise.allSettled(batch.map(async slug => {
-        try {
-          const views = await fetchArticleViews(slug);
-          setCachedArticleViews(slug, views);
-          setArticleView(slug, views);
-        } catch (e) {
-          console.warn('[pageviews] list view failed', slug, e);
-          hideArticleView(slug);
-        }
-      }));
-    }
-  });
+/** 文章 meta：Vercount 页阅读量（按当前 URL 区分 slug） */
+export function bszPagePvHtml() {
+  const cfg = pvCfg();
+  if (cfg.enabled === false || cfg.showPostViews === false) return '';
+  const label = String(vercountCfg().label || '阅读').trim() || '阅读';
+  return `<span class="vercount-inline"><span class="vercount-prefix">${escapeHtml(label)} </span><span id="vercount_value_page_pv">…</span><span class="vercount-suffix"> 次</span></span>`;
 }
 
-// ---------- internal: page-views-api ---------------------------------------
-
-function siteKey() {
-  try {
-    const u = new URL(CONFIG.site.url || location.origin);
-    return u.host;
-  } catch {
-    return location.host;
-  }
+/** 已废弃：首页列表不再展示逐篇阅读数 */
+export function articleListPvHtml() {
+  return '';
 }
 
-function basePath() {
-  try {
-    const u = new URL(CONFIG.site.url || location.origin);
-    return u.pathname.replace(/\/+$/, '');
-  } catch {
-    return '';
-  }
+/** 占位：兼容旧 home.js 调用链 */
+export async function renderArticleListViews() {}
+
+export async function trackAndRenderArticleView() {
+  initPageviews();
 }
 
-function articlePath(slug) {
-  const prefix = basePath();
-  const path = `${prefix}/post.html?slug=${encodeURIComponent(slug || '')}`;
-  return path.startsWith('/') ? path : `/${path}`;
-}
-
-async function fetchArticleViews(slug) {
-  const url = `${PAGE_VIEWS_API}/views?site=${encodeURIComponent(siteKey())}&path=${encodeURIComponent(articlePath(slug))}`;
-  const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) throw new Error(`views api ${res.status}`);
-  const data = await res.json();
-  return Number(data.views || 0);
-}
-
-function readViewCache() {
-  try {
-    const raw = sessionStorage.getItem(VIEW_CACHE_KEY);
-    const data = raw ? JSON.parse(raw) : {};
-    return data && typeof data === 'object' ? data : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeViewCache(cache) {
-  try { sessionStorage.setItem(VIEW_CACHE_KEY, JSON.stringify(cache)); } catch {}
-}
-
-function getCachedArticleViews(slug) {
-  const item = readViewCache()[slug];
-  if (!item || Date.now() - Number(item.time || 0) > VIEW_CACHE_TTL) return null;
-  return Number(item.views || 0);
-}
-
-function setCachedArticleViews(slug, views) {
-  const cache = readViewCache();
-  cache[slug] = { views: Number(views || 0), time: Date.now() };
-  writeViewCache(cache);
-}
-
-async function trackArticleView(slug) {
-  const url = `${PAGE_VIEWS_API}/track?site=${encodeURIComponent(siteKey())}&path=${encodeURIComponent(articlePath(slug))}`;
-  try {
-    await fetch(url, { cache: 'no-store', keepalive: true });
-  } catch (e) {
-    console.warn('[pageviews] track failed', e);
-  }
-}
-
-function setArticleView(slug, views) {
-  document.querySelectorAll(`[data-pv-slug="${cssEscape(slug)}"]`).forEach(el => {
-    const num = el.querySelector('.pvapi-num');
-    if (num) num.textContent = String(views || 0);
-    el.hidden = false;
-  });
-}
-
-function hideArticleView(slug) {
-  document.querySelectorAll(`[data-pv-slug="${cssEscape(slug)}"]`).forEach(el => {
-    el.hidden = true;
-  });
-}
-
-// ---------- utilities ------------------------------------------------------
-
-function escapeAttr(s) {
+function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
   );
 }
 
-function cssEscape(s) {
-  if (window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(String(s));
-  return String(s).replace(/["\\]/g, '\\$&');
-}
-
-function scheduleIdle(fn) {
-  if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(fn, { timeout: 1800 });
-  } else {
-    setTimeout(fn, 900);
-  }
+function escapeAttr(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+  );
 }
