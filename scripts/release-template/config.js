@@ -54,7 +54,8 @@ export const CONFIG = {
     reactionsEnabled: "1",
     emitMetadata: "0",
     inputPosition: "top",
-    lang: "zh-CN"
+    lang: "zh-CN",
+    notesTerm: "gitblog-notes-feed"
   },
   analytics: {
     enabled: false,

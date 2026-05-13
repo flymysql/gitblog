@@ -138,7 +138,6 @@ if (existsSync(POSTS_DIR)) {
       carousel: !!data.carousel,
       series: data.series || undefined,
       seriesOrder: data.seriesOrder != null ? Number(data.seriesOrder) : undefined,
-      type: data.type || undefined,        // post | note（短动态）
       counter: (data.counter && typeof data.counter === 'object') ? {
         img: String(data.counter.img || ''),
         dashboard: String(data.counter.dashboard || ''),
@@ -151,6 +150,9 @@ if (existsSync(POSTS_DIR)) {
     if (data.page) {
       item.page = true;
       pages.push(item);
+    } else if (data.type === 'note') {
+      // 随笔改为仅走 giscus 讨论，不进入站点文章索引 / RSS / search
+      continue;
     } else {
       posts.push(item);
     }
@@ -194,7 +196,6 @@ const indexJson = {
     if (!rest.carousel) delete rest.carousel;
     if (!rest.series) delete rest.series;
     if (rest.seriesOrder == null) delete rest.seriesOrder;
-    if (!rest.type) delete rest.type;
     if (!rest.counter || (!rest.counter.img && !rest.counter.dashboard)) delete rest.counter;
     return rest;
   }),
@@ -237,26 +238,9 @@ writeFileSync('data/search.json', JSON.stringify({
 }, null, 2) + '\n');
 console.log(`search.json 已生成（${searchDocs.length} 篇）`);
 
-// ---------- 短动态 notes.json（type: note 的文章独立流） ----------
-const noteItems = posts
-  .filter(p => p.type === 'note' && !p.draft)
-  .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-  .map(p => ({
-    slug: p.slug,
-    title: p.title,
-    date: p.date,
-    updated: p.updated,
-    author: p.author,
-    tags: p.tags || [],
-    content: p.content,         // 短动态直接把正文打包进来，节省请求
-  }));
-writeFileSync('data/notes.json', JSON.stringify({
-  generated: new Date().toISOString(),
-  count: noteItems.length,
-  notes: noteItems,
-}, null, 2) + '\n');
-console.log(`notes.json 已生成（${noteItems.length} 条）`);
 function xmlEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+// ---------- robots.txt / manifest 之前的 URL 列表等 ----------
 
 const baseUrl = SITE_URL || '';
 const today = new Date().toISOString();

@@ -5,17 +5,8 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Wed, 13 May 2026 07:36:01 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 13 May 2026 07:56:34 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>随笔 · 2026-05-13 15:35</title>
-      <link>https://gitpull.cn/post.html?slug=%E9%9A%8F%E7%AC%94-2026-05-13-1535-mp3qw9tf</link>
-      <guid isPermaLink="false">随笔-2026-05-13-1535-mp3qw9tf</guid>
-      <pubDate>Wed, 13 May 2026 07:35:42 GMT</pubDate>
-      <author>兰州小红鸡</author>
-      <category>随笔</category>
-      <description><![CDATA[记得那年夏夜微风徐徐， 好像发生了很多陈杂趣事， 又似乎什么都没发生， 一场春雨过后，又有新的故事开始发芽。]]></description>
-    </item>
     <item>
       <title>GitBlog：一个带伪后台的博客站点</title>
       <link>https://gitpull.cn/post.html?slug=welcome</link>
@@ -276,6 +267,15 @@
       <author>兰州小红鸡</author>
       <category>教程</category><category>博客建站</category>
       <description><![CDATA[这两天花了点时间修改了下自己的next主题的博客 样式表放在了GitHub上喜欢的话可以直接使用 next博客主题样式修改 使用方法 直接下载样式表，然后复制到自己主题的theme…]]></description>
+    </item>
+    <item>
+      <title>服务端搭建ssr教程</title>
+      <link>https://gitpull.cn/post.html?slug=%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%90%AD%E5%BB%BAssr%E6%95%99%E7%A8%8B-651cfd47</link>
+      <guid isPermaLink="false">服务端搭建ssr教程-651cfd47</guid>
+      <pubDate>Thu, 25 Oct 2018 13:32:17 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>教程</category><category>前端</category>
+      <description><![CDATA[教程很简单，整个教程分三步： 第一步：购买VPS服务器 第二步：一键部署VPS服务器 第三步：一键加速VPS服务器 （谷歌BBR加速；对速度要求不高的话，此步骤可省略） ¶第一步：…]]></description>
     </item>
   </channel>
 </rss>
