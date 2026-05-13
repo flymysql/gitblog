@@ -2,31 +2,31 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://gitpull.cn/</loc>
-    <lastmod>2026-05-13T07:10:36.426Z</lastmod>
+    <lastmod>2026-05-13T07:12:24.867Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tags.html</loc>
-    <lastmod>2026-05-13T07:10:36.426Z</lastmod>
+    <lastmod>2026-05-13T07:12:24.867Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/archives.html</loc>
-    <lastmod>2026-05-13T07:10:36.426Z</lastmod>
+    <lastmod>2026-05-13T07:12:24.867Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools.html</loc>
-    <lastmod>2026-05-13T07:10:36.426Z</lastmod>
+    <lastmod>2026-05-13T07:12:24.867Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tool-air-conditioner.html</loc>
-    <lastmod>2026-05-13T07:10:36.426Z</lastmod>
+    <lastmod>2026-05-13T07:12:24.867Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -309,12 +309,6 @@
   <url>
     <loc>https://gitpull.cn/post.html?slug=%E5%85%B0%E5%B7%9E%E6%97%B6%E9%97%B4%E8%BF%98%E9%95%BF%E6%95%85%E4%BA%8B%E8%BF%98%E5%BE%88%E5%A4%9A-bb0e3aeb</loc>
     <lastmod>2017-07-05T00:52:05.000Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://gitpull.cn/post.html?slug=%E9%82%A3%E4%BA%9B%E8%B5%B0%E6%95%A3%E5%9C%A8%E5%B2%81%E6%9C%88%E9%87%8C%E7%9A%84%E6%9C%8B%E5%8F%8B-a26b6771</loc>
-    <lastmod>2017-07-04T00:52:05.000Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
