@@ -2,31 +2,31 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://gitpull.cn/</loc>
-    <lastmod>2026-05-13T06:46:33.564Z</lastmod>
+    <lastmod>2026-05-13T06:55:41.952Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tags.html</loc>
-    <lastmod>2026-05-13T06:46:33.564Z</lastmod>
+    <lastmod>2026-05-13T06:55:41.952Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/archives.html</loc>
-    <lastmod>2026-05-13T06:46:33.564Z</lastmod>
+    <lastmod>2026-05-13T06:55:41.952Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools.html</loc>
-    <lastmod>2026-05-13T06:46:33.564Z</lastmod>
+    <lastmod>2026-05-13T06:55:41.952Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tool-air-conditioner.html</loc>
-    <lastmod>2026-05-13T06:46:33.564Z</lastmod>
+    <lastmod>2026-05-13T06:55:41.952Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -87,6 +87,30 @@
   <url>
     <loc>https://gitpull.cn/post.html?slug=%E9%9A%8F%E7%AC%94%E6%9D%82%E8%B0%88-15995658</loc>
     <lastmod>2022-03-11T14:42:00.000Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://gitpull.cn/post.html?slug=%E7%94%9F%E5%A6%82%E5%A4%8F%E8%8A%B1%E8%88%AC%E7%BB%9A%E7%83%82%E6%AD%BB%E5%A6%82%E7%A7%8B%E5%8F%B6%E8%88%AC%E9%9D%99%E7%BE%8E-bcd926d2</loc>
+    <lastmod>2019-06-05T00:00:00.000Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://gitpull.cn/post.html?slug=%E8%AE%B0%E5%BF%86%E7%9A%84%E7%A7%8D%E5%AD%90%C2%B7%E4%B8%80-c315b081</loc>
+    <lastmod>2019-06-05T00:00:00.000Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://gitpull.cn/post.html?slug=%E8%AE%B0%E5%BF%86%E7%9A%84%E7%A7%8D%E5%AD%90%C2%B7%E4%BA%8C-29fe4821</loc>
+    <lastmod>2019-06-05T00:00:00.000Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://gitpull.cn/post.html?slug=%E8%B0%99%E9%A3%8E-%E5%B0%8F%E5%9F%8E%E4%B8%AD%E5%AD%A6-7712d2d6</loc>
+    <lastmod>2019-06-05T00:00:00.000Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
