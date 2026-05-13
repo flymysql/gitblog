@@ -161,6 +161,52 @@ function publicAssetAbsPath(relPath) {
   return `${bp}/${r}`.replace(/\/{2,}/g, '/');
 }
 
+/** 浏览器里用「当前 origin + 站点 path 前缀」拉静态 JSON/HTML，避免仅靠相对路径在 SW 下长时间挂起 */
+function publicAssetFetchUrl(relPath) {
+  const path = publicAssetAbsPath(relPath);
+  if (typeof window !== 'undefined' && window.location && window.location.origin && path.startsWith('/')) {
+    try {
+      return new URL(path, window.location.origin).href;
+    } catch {
+      /* 忽略 */
+    }
+  }
+  return `./${String(relPath || '').replace(/^\//, '')}`;
+}
+
+function cacheBust(url) {
+  return `${url}${String(url).includes('?') ? '&' : '?'}t=${Date.now()}`;
+}
+
+async function fetchWithTimeout(url, options = {}, ms = 15000) {
+  const ctrl = new AbortController();
+  const id = setTimeout(() => ctrl.abort(), ms);
+  try {
+    return await fetch(url, { ...options, signal: ctrl.signal });
+  } finally {
+    clearTimeout(id);
+  }
+}
+
+/** 拉取 build 生成的 JSON（绝对 URL + 超时；失败时静默重试一次） */
+export async function fetchStaticJson(relPath, ms = 15000) {
+  const rel = String(relPath || '').replace(/^\//, '');
+  const base = publicAssetFetchUrl(rel);
+  const tryOnce = async () => {
+    try {
+      const res = await fetchWithTimeout(cacheBust(base), { cache: 'no-cache' }, ms);
+      if (!res || !res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  };
+  let j = await tryOnce();
+  if (j) return j;
+  j = await tryOnce();
+  return j;
+}
+
 // ---------- 文章索引 ----------
 // posts.json 形如：
 // { posts: [ { slug, title, date, summary, tags, author, cover, path } ] }
@@ -179,22 +225,29 @@ export async function readIndex() {
 
 // 用 fetch 直接拿静态文件版本（首页未登录时使用，避免 API 限流）
 export async function fetchIndexPublic() {
-  const url = `${publicAssetAbsPath(CONFIG.paths.index)}?t=${Date.now()}`;
-  try {
-    const res = await fetch(url, { cache: 'no-cache' });
-    if (!res.ok) return { posts: [] };
-    return await res.json();
-  } catch {
-    return { posts: [] };
-  }
+  const j = await fetchStaticJson(CONFIG.paths.index, 15000);
+  if (j && Array.isArray(j.posts)) return j;
+  return { posts: [] };
 }
 
 export async function fetchPostMarkdownPublic(slug) {
   const rel = `${CONFIG.paths.posts}/${encodeURIComponent(slug)}.md`;
-  const url = `${publicAssetAbsPath(rel)}?t=${Date.now()}`;
-  const res = await fetch(url, { cache: 'no-cache' });
-  if (!res.ok) throw new Error(`无法加载文章 ${slug}`);
-  return await res.text();
+  const ms = 20000;
+  const base = publicAssetFetchUrl(rel);
+  const tryText = async () => {
+    try {
+      const res = await fetchWithTimeout(cacheBust(base), { cache: 'no-cache' }, ms);
+      if (!res || !res.ok) return null;
+      return await res.text();
+    } catch {
+      return null;
+    }
+  };
+  let t = await tryText();
+  if (t) return t;
+  t = await tryText();
+  if (t) return t;
+  throw new Error(`无法加载文章 ${slug}`);
 }
 
 // 保存索引

@@ -5,7 +5,7 @@
 
 import { CONFIG } from './config.js';
 import { initTheme, bindThemeToggle, themeToggleHtml } from './theme.js';
-import { fetchIndexPublic } from './api.js';
+import { fetchIndexPublic, fetchStaticJson } from './api.js';
 import { initPageviews, bszSiteStatsHtml } from './pageviews.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -333,13 +333,10 @@ let searchIndexCache = null;
 async function getSearchIndex() {
   if (searchIndexCache) return searchIndexCache;
   try {
-    const r = await fetch('data/search.json?_=' + Date.now(), { cache: 'no-cache' });
-    if (r.ok) {
-      const j = await r.json();
-      if (Array.isArray(j.docs)) {
-        searchIndexCache = j.docs;
-        return searchIndexCache;
-      }
+    const j = await fetchStaticJson('data/search.json', 15000);
+    if (j && Array.isArray(j.docs)) {
+      searchIndexCache = j.docs;
+      return searchIndexCache;
     }
   } catch {}
   searchIndexCache = null;
