@@ -192,11 +192,6 @@ function setEditorTags(tags) {
 }
 
 // ---------- 文章独立计数器（saobby 半自动） ----------
-function isSaobbyProviderOn() {
-  const cfg = CONFIG.pageviews || {};
-  return cfg.enabled !== false && cfg.provider === 'saobby';
-}
-
 function setEditorCounter(counter) {
   state.counter = {
     img: String((counter && counter.img) || '').trim(),
@@ -208,26 +203,8 @@ function setEditorCounter(counter) {
 function renderEditorCounter() {
   const field = $('#counterField');
   if (!field) return;
-  if (!isSaobbyProviderOn()) {
-    field.hidden = true;
-    return;
-  }
-  field.hidden = false;
-  const summary = $('#counterSummary');
-  const clearBtn = $('#counterClearBtn');
-  const c = state.counter || {};
-  const has = !!(c.img || c.dashboard);
-  if (clearBtn) clearBtn.hidden = !has;
-  if (!summary) return;
-  if (!has) {
-    summary.innerHTML = '<span class="editor-counter-empty">本文还没有配置独立计数器。读者将看到「站点设置 → 文章页计数器」里设的全站共用计数器。</span>';
-    return;
-  }
-  summary.innerHTML = `
-    ${c.img ? `<div class="editor-counter-line"><span>图片</span> <a href="${escapeHtml(c.img)}" target="_blank" rel="noopener">${escapeHtml(c.img)}</a></div>` : ''}
-    ${c.dashboard ? `<div class="editor-counter-line"><span>控制面板</span> <a href="${escapeHtml(c.dashboard)}" target="_blank" rel="noopener">${escapeHtml(c.dashboard)}</a></div>` : ''}
-    ${c.img ? `<div class="editor-counter-line"><span>预览</span> <img src="${escapeHtml(c.img)}" alt="counter" referrerpolicy="no-referrer-when-downgrade" class="editor-counter-img"></div>` : ''}
-  `;
+  // 文章阅读数由 Vercount 按页面 URL 统计，编辑器不再配置 per-post 计数器
+  field.hidden = true;
 }
 
 function buildSaobbyCreateUrl() {

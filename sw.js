@@ -46,7 +46,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-// 不要拦截 GitHub API、giscus、busuanzi、cdn 这些跨域 / 鉴权资源
+// 不要拦截 GitHub API、giscus、Vercount events、cdn 等跨域资源
 function shouldHandle(request) {
   if (request.method !== 'GET') return false;
   const url = new URL(request.url);
