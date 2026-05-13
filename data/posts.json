@@ -49,7 +49,8 @@
       "series": "DeepSeek 数据基础设施巡礼",
       "seriesOrder": 2,
       "path": "posts/smallpond-source-walkthrough.md",
-      "thumbnail": "assets/uploads/2026/05/smallpond-cover.thumb.webp"
+      "thumbnail": "assets/uploads/2026/05/smallpond-cover.thumb.webp",
+      "carousel": true
     },
     {
       "slug": "3fs-usrbio-zero-copy",
