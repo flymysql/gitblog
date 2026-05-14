@@ -335,7 +335,8 @@
 @media (max-width: 420px) {
   .article-title { font-size: 21px; }
   .article-author .meta .dot:nth-of-type(2) { display: none; }
-  .article-author .meta span:last-child { display: none; }
+  /* 窄屏隐藏「约 N 分钟」以省位；勿用 span:last-child，否则会误藏 Vercount 阅读量 */
+  .article-author .meta .meta-read-mins { display: none; }
 }
 
 /* ---------- 阅读增强：进度条 / 回到顶部 / 代码复制 / 灯箱 ---------- */

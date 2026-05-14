@@ -531,7 +531,7 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
             <span class="dot"></span>
             <span>${(content || '').length} 字</span>
             <span class="dot"></span>
-            <span>约 ${mins} 分钟</span>
+            <span class="meta-read-mins">约 ${mins} 分钟</span>
             ${(() => {
               if ((CONFIG.pageviews || {}).showPostViews === false) return '';
               const pv = bszPagePvHtml();
