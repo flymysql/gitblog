@@ -5,16 +5,16 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Fri, 15 May 2026 03:30:08 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 15 May 2026 03:45:45 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>CPTI：一个移动端优先的恋爱人格测试静态原型</title>
+      <title>CPTI：手机上就能玩的恋爱人格小测验</title>
       <link>https://gitpull.cn/post/20260514/</link>
       <guid isPermaLink="false">cpti-love-personality-test-intro</guid>
       <pubDate>Thu, 14 May 2026 00:00:00 GMT</pubDate>
       <author>Jimmy</author>
-      <category>产品</category><category>前端</category><category>静态站点</category>
-      <description><![CDATA[CPTI（GitHub：flymysql/cpti）是一套纯静态的恋爱人格测试小站：拆成首页、测试页、结果页三页结构，34 道题目与 20 种共享人格类型，支持 MBTI 轻量辅助与结果复制。本文做项目介绍，并穿插界面截图说明。]]></description>
+      <category>恋爱</category><category>测试</category><category>趣味</category>
+      <description><![CDATA[CPTI 是一个偏手机体验的恋爱向趣味测验：刷题像刷短内容，最后给你「你像谁」和「谁更适合接住你」两套结果，再配一整套恋爱角色卡。本文只聊怎么玩、能玩出什么，不聊实现细节。]]></description>
     </item>
     <item>
       <title>GitBlog：一个带伪后台的博客站点</title>
