@@ -5,8 +5,17 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Thu, 14 May 2026 08:51:39 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 15 May 2026 03:30:08 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CPTI：一个移动端优先的恋爱人格测试静态原型</title>
+      <link>https://gitpull.cn/post/20260514/</link>
+      <guid isPermaLink="false">cpti-love-personality-test-intro</guid>
+      <pubDate>Thu, 14 May 2026 00:00:00 GMT</pubDate>
+      <author>Jimmy</author>
+      <category>产品</category><category>前端</category><category>静态站点</category>
+      <description><![CDATA[CPTI（GitHub：flymysql/cpti）是一套纯静态的恋爱人格测试小站：拆成首页、测试页、结果页三页结构，34 道题目与 20 种共享人格类型，支持 MBTI 轻量辅助与结果复制。本文做项目介绍，并穿插界面截图说明。]]></description>
+    </item>
     <item>
       <title>GitBlog：一个带伪后台的博客站点</title>
       <link>https://gitpull.cn/post/welcome/</link>
@@ -267,15 +276,6 @@
       <author>兰州小红鸡</author>
       <category>教程</category><category>博客建站</category>
       <description><![CDATA[这两天花了点时间修改了下自己的next主题的博客 样式表放在了GitHub上喜欢的话可以直接使用 next博客主题样式修改 使用方法 直接下载样式表，然后复制到自己主题的theme…]]></description>
-    </item>
-    <item>
-      <title>服务端搭建ssr教程</title>
-      <link>https://gitpull.cn/post/20181025/</link>
-      <guid isPermaLink="false">服务端搭建ssr教程-651cfd47</guid>
-      <pubDate>Thu, 25 Oct 2018 13:32:17 GMT</pubDate>
-      <author>兰州小红鸡</author>
-      <category>教程</category><category>前端</category>
-      <description><![CDATA[教程很简单，整个教程分三步： 第一步：购买VPS服务器 第二步：一键部署VPS服务器 第三步：一键加速VPS服务器 （谷歌BBR加速；对速度要求不高的话，此步骤可省略） ¶第一步：…]]></description>
     </item>
   </channel>
 </rss>

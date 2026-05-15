@@ -2,37 +2,43 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://gitpull.cn/</loc>
-    <lastmod>2026-05-14T08:51:39.515Z</lastmod>
+    <lastmod>2026-05-15T03:30:08.165Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tags.html</loc>
-    <lastmod>2026-05-14T08:51:39.515Z</lastmod>
+    <lastmod>2026-05-15T03:30:08.165Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/archives.html</loc>
-    <lastmod>2026-05-14T08:51:39.515Z</lastmod>
+    <lastmod>2026-05-15T03:30:08.165Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/series.html</loc>
-    <lastmod>2026-05-14T08:51:39.515Z</lastmod>
+    <lastmod>2026-05-15T03:30:08.165Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools.html</loc>
-    <lastmod>2026-05-14T08:51:39.515Z</lastmod>
+    <lastmod>2026-05-15T03:30:08.165Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tool-air-conditioner.html</loc>
-    <lastmod>2026-05-14T08:51:39.515Z</lastmod>
+    <lastmod>2026-05-15T03:30:08.165Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://gitpull.cn/post/20260514/</loc>
+    <lastmod>2026-05-14T00:00:00.000Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
