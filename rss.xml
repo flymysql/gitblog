@@ -5,7 +5,7 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Fri, 15 May 2026 03:32:26 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 15 May 2026 03:37:46 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>CPTI：一个移动端优先的恋爱人格测试静态原型</title>
@@ -13,7 +13,7 @@
       <guid isPermaLink="false">cpti-love-personality-test-intro</guid>
       <pubDate>Thu, 14 May 2026 00:00:00 GMT</pubDate>
       <author>Jimmy</author>
-      <category>产品</category><category>前端</category><category>静态站点</category>
+      <category>杂七杂八</category><category>前端</category>
       <description><![CDATA[CPTI（GitHub：flymysql/cpti）是一套纯静态的恋爱人格测试小站：拆成首页、测试页、结果页三页结构，34 道题目与 20 种共享人格类型，支持 MBTI 轻量辅助与结果复制。本文做项目介绍，并穿插界面截图说明。]]></description>
     </item>
     <item>
