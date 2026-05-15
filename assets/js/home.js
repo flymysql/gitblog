@@ -4,7 +4,7 @@
 
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
-import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPathFromPost, postPath } from './site.js';
+import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPathFromPost, postPath, rootPath } from './site.js';
 import { initPageviews, bszSiteStatsHtml } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { isGiscusReady, mountGiscusScript, notesFeedTerm } from './giscus-embed.js';
@@ -27,6 +27,44 @@ function scheduleRestoreHomeScroll(y) {
   requestAnimationFrame(() => requestAnimationFrame(apply));
   setTimeout(apply, 80);
   setTimeout(apply, 320);
+}
+
+/** 首页首屏就绪后，空闲时预取主要站内页与 posts.json（HTTP 缓存，加速后续导航） */
+function schedulePrefetchOtherPages() {
+  if (typeof document === 'undefined' || !document.head) return;
+  if (navigator.connection && navigator.connection.saveData) return;
+
+  const add = (() => {
+    const seen = new Set();
+    return href => {
+      if (!href || seen.has(href)) return;
+      seen.add(href);
+      let abs;
+      try {
+        abs = new URL(href, window.location.origin);
+      } catch {
+        return;
+      }
+      if (abs.origin !== window.location.origin) return;
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = abs.href;
+      document.head.appendChild(link);
+    };
+  })();
+
+  const inject = () => {
+    ['tags.html', 'archives.html', 'series.html', 'notes.html', 'post.html', 'tools.html'].forEach(p => add(rootPath(p)));
+    const idx = CONFIG.paths && CONFIG.paths.index ? String(CONFIG.paths.index).replace(/^\//, '') : 'data/posts.json';
+    add(rootPath(idx));
+  };
+
+  const ric = window.requestIdleCallback;
+  if (typeof ric === 'function') {
+    ric(() => inject(), { timeout: 4000 });
+  } else {
+    setTimeout(inject, 2200);
+  }
 }
 
 function publicImageUrl(url) {
@@ -555,4 +593,5 @@ function buildHomeList({ allPosts, tab, q, tag }) {
   });
 
   refresh();
+  schedulePrefetchOtherPages();
 })();
