@@ -4,16 +4,15 @@
       "slug": "cpti-love-personality-test-intro",
       "title": "CPTI：手机上就能玩的恋爱人格小测验",
       "date": "2026-05-14",
-      "updated": "2026-05-15T03:37:31.632Z",
+      "updated": "2026-05-15T03:55:33.008Z",
       "author": "Jimmy",
       "summary": "CPTI 是一个偏手机体验的恋爱向趣味测验：刷题像刷短内容，最后给你「你像谁」和「谁更适合接住你」两套结果，再配一整套恋爱角色卡。本文只聊怎么玩、能玩出什么，不聊实现细节。",
       "tags": [
         "杂七杂八",
         "前端"
       ],
-      "cover": "assets/uploads/2026/05/cptijietu1.png",
       "path": "posts/cpti-love-personality-test-intro.md",
-      "urlKey": "20260514"
+      "cover": "assets/uploads/2026/05/cptijietu1.png"
     },
     {
       "slug": "welcome",
