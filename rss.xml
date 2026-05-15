@@ -5,7 +5,7 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Fri, 15 May 2026 03:45:45 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 15 May 2026 03:49:14 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>CPTI：手机上就能玩的恋爱人格小测验</title>
@@ -13,7 +13,7 @@
       <guid isPermaLink="false">cpti-love-personality-test-intro</guid>
       <pubDate>Thu, 14 May 2026 00:00:00 GMT</pubDate>
       <author>Jimmy</author>
-      <category>恋爱</category><category>测试</category><category>趣味</category>
+      <category>杂七杂八</category><category>前端</category>
       <description><![CDATA[CPTI 是一个偏手机体验的恋爱向趣味测验：刷题像刷短内容，最后给你「你像谁」和「谁更适合接住你」两套结果，再配一整套恋爱角色卡。本文只聊怎么玩、能玩出什么，不聊实现细节。]]></description>
     </item>
     <item>

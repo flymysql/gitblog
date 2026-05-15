@@ -1,17 +1,14 @@
 ---
 title: CPTI：手机上就能玩的恋爱人格小测验
 date: 2026-05-14
-updated: 2026-05-14
+updated: "2026-05-15T03:37:31.632Z"
 author: Jimmy
-tags:
-  - 恋爱
-  - 测试
-  - 趣味
-summary: "CPTI 是一个偏手机体验的恋爱向趣味测验：刷题像刷短内容，最后给你「你像谁」和「谁更适合接住你」两套结果，再配一整套恋爱角色卡。本文只聊怎么玩、能玩出什么，不聊实现细节。"
+tags: [杂七杂八, 前端]
 cover: assets/uploads/2026/05/cptijietu1.png
+summary: "CPTI 是一个偏手机体验的恋爱向趣味测验：刷题像刷短内容，最后给你「你像谁」和「谁更适合接住你」两套结果，再配一整套恋爱角色卡。本文只聊怎么玩、能玩出什么，不聊实现细节。"
 ---
 
-仓库与在线体验：[https://github.com/flymysql/cpti](https://github.com/flymysql/cpti)（README 里说明了 GitHub Pages 演示入口，用手机浏览器打开最对味。）
+在线体验：[https://cpti.cc](https://cpti.cc)。源码与说明见 GitHub：[https://github.com/flymysql/cpti](https://github.com/flymysql/cpti)（README 含 GitHub Pages 等入口，用手机浏览器打开最对味。）
 
 如果把 CPTI 想成一款「恋爱主题的轻游戏」，它大概在做三件事：**用很轻的交互把题刷完**、**用角色卡把结果讲明白**、**顺手给你一点「和谁更合拍」的谈资**。下面按「能做什么 → 怎么玩 → 有哪些人格」来写。
 
