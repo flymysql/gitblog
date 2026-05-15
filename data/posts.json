@@ -12,9 +12,9 @@
         "前端"
       ],
       "cover": "assets/uploads/2026/05/cptijietu1.png",
+      "carousel": true,
       "path": "posts/cpti-love-personality-test-intro.md",
-      "urlKey": "20260514",
-      "carousel": true
+      "urlKey": "20260514"
     },
     {
       "slug": "welcome",
