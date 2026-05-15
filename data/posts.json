@@ -13,7 +13,8 @@
       ],
       "cover": "assets/uploads/2026/05/cptijietu1.png",
       "path": "posts/cpti-love-personality-test-intro.md",
-      "urlKey": "20260514"
+      "urlKey": "20260514",
+      "carousel": true
     },
     {
       "slug": "welcome",
