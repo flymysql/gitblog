@@ -1,17 +1,14 @@
 ---
 title: CPTI：一个移动端优先的恋爱人格测试静态原型
 date: 2026-05-14
-updated: 2026-05-14
+updated: "2026-05-15T03:37:31.632Z"
 author: Jimmy
-tags:
-  - 产品
-  - 前端
-  - 静态站点
-summary: "CPTI（GitHub：flymysql/cpti）是一套纯静态的恋爱人格测试小站：拆成首页、测试页、结果页三页结构，34 道题目与 20 种共享人格类型，支持 MBTI 轻量辅助与结果复制。本文做项目介绍，并穿插界面截图说明。"
+tags: [杂七杂八, 前端]
 cover: assets/uploads/2026/05/cptijietu1.png
+summary: CPTI（GitHub：flymysql/cpti）是一套纯静态的恋爱人格测试小站：拆成首页、测试页、结果页三页结构，34 道题目与 20 种共享人格类型，支持 MBTI 轻量辅助与结果复制。本文做项目介绍，并穿插界面截图说明。
 ---
 
-仓库地址：[https://github.com/flymysql/cpti](https://github.com/flymysql/cpti)
+体验地址：[https://cpti.cc)
 
 CPTI 的定位很直白：**移动端优先**的恋爱向人格测试 **静态产品原型**——不依赖后端服务，打开 HTML 就能跑完整流程；适合快速验证文案、题型和结果呈现，也方便丢到 GitHub Pages 或任意静态托管上对外演示。
 
