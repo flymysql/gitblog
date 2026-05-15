@@ -6,6 +6,7 @@ author: Jimmy
 tags: [杂七杂八, 前端]
 cover: assets/uploads/2026/05/cptijietu1.png
 summary: CPTI 是一个偏手机体验的恋爱向趣味测验：刷题像刷短内容，最后给你「你像谁」和「谁更适合接住你」两套结果，再配一整套恋爱角色卡。本文只聊怎么玩、能玩出什么，不聊实现细节。
+carousel: true
 ---
 
 在线体验：[https://cpti.cc](https://cpti.cc)
