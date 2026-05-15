@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "cpti-love-personality-test-intro",
+      "title": "CPTI：一个移动端优先的恋爱人格测试静态原型",
+      "date": "2026-05-14",
+      "updated": "2026-05-14",
+      "author": "Jimmy",
+      "summary": "CPTI（GitHub：flymysql/cpti）是一套纯静态的恋爱人格测试小站：拆成首页、测试页、结果页三页结构，34 道题目与 20 种共享人格类型，支持 MBTI 轻量辅助与结果复制。本文做项目介绍，并穿插界面截图说明。",
+      "tags": [
+        "产品",
+        "前端",
+        "静态站点"
+      ],
+      "cover": "assets/uploads/2026/05/cptijietu1.png",
+      "path": "posts/cpti-love-personality-test-intro.md",
+      "urlKey": "20260514"
+    },
+    {
       "slug": "welcome",
       "title": "GitBlog：一个带伪后台的博客站点",
       "date": "2026-05-11T16:50:00+08:00",
