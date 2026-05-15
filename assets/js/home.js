@@ -29,41 +29,97 @@ function scheduleRestoreHomeScroll(y) {
   setTimeout(apply, 320);
 }
 
-/** 首页首屏就绪后，空闲时预取主要站内页与 posts.json（HTTP 缓存，加速后续导航） */
+/** 首页首屏就绪后：空闲时 prefetch 主要 HTML + posts.json，再解析各页 HTML 做 preload / modulepreload（与页面内 ?v= 自动对齐） */
 function schedulePrefetchOtherPages() {
   if (typeof document === 'undefined' || !document.head) return;
   if (navigator.connection && navigator.connection.saveData) return;
 
-  const add = (() => {
-    const seen = new Set();
-    return href => {
-      if (!href || seen.has(href)) return;
-      seen.add(href);
-      let abs;
-      try {
-        abs = new URL(href, window.location.origin);
-      } catch {
-        return;
-      }
-      if (abs.origin !== window.location.origin) return;
-      const link = document.createElement('link');
-      link.rel = 'prefetch';
-      link.href = abs.href;
-      document.head.appendChild(link);
-    };
-  })();
+  const basePage = window.location.href;
+  const prefetched = new Set();
+  const preloaded = new Set();
 
-  const inject = () => {
-    ['tags.html', 'archives.html', 'series.html', 'notes.html', 'post.html', 'tools.html'].forEach(p => add(rootPath(p)));
+  function toAbs(href, base = basePage) {
+    if (!href) return '';
+    try {
+      const u = new URL(href, base);
+      if (u.origin !== window.location.origin) return '';
+      return u.href;
+    } catch {
+      return '';
+    }
+  }
+
+  function addPrefetch(href) {
+    const abs = toAbs(href);
+    if (!abs || prefetched.has(abs)) return;
+    prefetched.add(abs);
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = abs;
+    document.head.appendChild(link);
+  }
+
+  function addPreloadStyle(href) {
+    const abs = toAbs(href);
+    if (!abs || preloaded.has(abs)) return;
+    if ([...document.querySelectorAll('link[rel~="stylesheet"]')].some(l => l.href === abs)) return;
+    preloaded.add(abs);
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.href = abs;
+    link.as = 'style';
+    document.head.appendChild(link);
+  }
+
+  function addModulePreload(href) {
+    const abs = toAbs(href);
+    if (!abs || preloaded.has(abs)) return;
+    if ([...document.querySelectorAll('script[type="module"]')].some(s => s.src === abs)) return;
+    preloaded.add(abs);
+    const link = document.createElement('link');
+    link.rel = 'modulepreload';
+    link.href = abs;
+    document.head.appendChild(link);
+  }
+
+  async function preloadSubresourcesFromPageHtml(pathRel) {
+    const pageUrl = toAbs(rootPath(pathRel));
+    if (!pageUrl) return;
+    try {
+      const res = await fetch(pageUrl, { credentials: 'same-origin' });
+      if (!res.ok) return;
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      doc.querySelectorAll('link[rel="stylesheet"][href], link[rel=stylesheet][href]').forEach(el => {
+        const h = el.getAttribute('href');
+        const abs = toAbs(h, pageUrl);
+        if (abs) addPreloadStyle(abs);
+      });
+      doc.querySelectorAll('script[type="module"][src]').forEach(el => {
+        const s = el.getAttribute('src');
+        const abs = toAbs(s, pageUrl);
+        if (abs) addModulePreload(abs);
+      });
+    } catch {
+      /* 忽略单页失败 */
+    }
+  }
+
+  const run = async () => {
+    const pages = ['tags.html', 'archives.html', 'series.html', 'notes.html', 'post.html', 'tools.html'];
+    pages.forEach(p => addPrefetch(rootPath(p)));
     const idx = CONFIG.paths && CONFIG.paths.index ? String(CONFIG.paths.index).replace(/^\//, '') : 'data/posts.json';
-    add(rootPath(idx));
+    addPrefetch(rootPath(idx));
+    for (const p of pages) {
+      await preloadSubresourcesFromPageHtml(p);
+    }
   };
 
   const ric = window.requestIdleCallback;
   if (typeof ric === 'function') {
-    ric(() => inject(), { timeout: 4000 });
+    ric(() => { run().catch(() => {}); }, { timeout: 6000 });
   } else {
-    setTimeout(inject, 2200);
+    setTimeout(() => { run().catch(() => {}); }, 2200);
   }
 }
 
