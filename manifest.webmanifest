@@ -1,7 +1,7 @@
 {
-  "name": "小红鸡",
-  "short_name": "小红鸡",
-  "description": "桃李春风一杯酒，江湖夜雨十年灯。",
+  "name": "我的博客",
+  "short_name": "我的博客",
+  "description": "一个用 GitHub Pages 搭的小博客。",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

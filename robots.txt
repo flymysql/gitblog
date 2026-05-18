@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gitpull.cn/sitemap.xml
+Sitemap: https://YOUR_USERNAME.github.io/YOUR_REPO/sitemap.xml
