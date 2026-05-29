@@ -5,8 +5,17 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Fri, 15 May 2026 03:56:11 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 29 May 2026 03:40:41 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>大模型推理的 PD 分离：原理、动机与 Mooncake 的实现</title>
+      <link>https://gitpull.cn/post/20260529/</link>
+      <guid isPermaLink="false">大模型推理的-pd-分离原理动机与-mooncake-的实现</guid>
+      <pubDate>Fri, 29 May 2026 03:40:23 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>算法</category><category>分布式存储</category>
+      <description><![CDATA[当我们谈论 LLM 推理优化时，绕不开一个关键词—— PD 分离 （Prefill Decode Disaggregation）。这篇文章从第一性原理出发，讲清…]]></description>
+    </item>
     <item>
       <title>CPTI：手机上就能玩的恋爱人格小测验</title>
       <link>https://gitpull.cn/post/20260514/</link>
@@ -267,15 +276,6 @@
       <author>兰州小红鸡</author>
       <category>sql</category>
       <description><![CDATA[今天继续做了会儿练习语句 都是比较基本的sql查询语句 需要熟练掌握的 1. 查询选修毛概的学生的姓名成绩，并且升序输出 2. 查询所有科目分数总和大于1100的学生姓名与分数总和…]]></description>
-    </item>
-    <item>
-      <title>手动修改博客css样式，打造属于自己的博客样式</title>
-      <link>https://gitpull.cn/post/20181029/</link>
-      <guid isPermaLink="false">手动修改博客css样式打造属于自己的博客样式-e17f6e4c</guid>
-      <pubDate>Sun, 28 Oct 2018 22:39:31 GMT</pubDate>
-      <author>兰州小红鸡</author>
-      <category>教程</category><category>博客建站</category>
-      <description><![CDATA[这两天花了点时间修改了下自己的next主题的博客 样式表放在了GitHub上喜欢的话可以直接使用 next博客主题样式修改 使用方法 直接下载样式表，然后复制到自己主题的theme…]]></description>
     </item>
   </channel>
 </rss>
