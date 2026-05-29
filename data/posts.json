@@ -1,6 +1,21 @@
 {
   "posts": [
     {
+      "slug": "大模型推理的-pd-分离原理动机与-mooncake-的实现",
+      "title": "大模型推理的 PD 分离：原理、动机与 Mooncake 的实现",
+      "date": "2026-05-29T03:40:23.322Z",
+      "updated": "2026-05-29T03:40:23.322Z",
+      "author": "兰州小红鸡",
+      "summary": "当我们谈论 LLM 推理优化时，绕不开一个关键词—— PD 分离 （Prefill Decode Disaggregation）。这篇文章从第一性原理出发，讲清…",
+      "tags": [
+        "算法",
+        "分布式存储"
+      ],
+      "path": "posts/大模型推理的-pd-分离原理动机与-mooncake-的实现.md",
+      "cover": "../assets/uploads/2026/05/1780025971901-bu285b-image.webp",
+      "carousel": true
+    },
+    {
       "slug": "cpti-love-personality-test-intro",
       "title": "CPTI：手机上就能玩的恋爱人格小测验",
       "date": "2026-05-14",
