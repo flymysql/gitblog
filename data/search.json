@@ -1,7 +1,20 @@
 {
-  "generated": "2026-05-15T03:56:11.303Z",
-  "count": 61,
+  "generated": "2026-05-29T03:40:41.890Z",
+  "count": 62,
   "docs": [
+    {
+      "slug": "大模型推理的-pd-分离原理动机与-mooncake-的实现",
+      "urlKey": "20260529",
+      "title": "大模型推理的 PD 分离：原理、动机与 Mooncake 的实现",
+      "summary": "当我们谈论 LLM 推理优化时，绕不开一个关键词—— PD 分离 （Prefill Decode Disaggregation）。这篇文章从第一性原理出发，讲清…",
+      "tags": [
+        "算法",
+        "分布式存储"
+      ],
+      "date": "2026-05-29T03:40:23.322Z",
+      "type": "post",
+      "text": "当我们谈论 LLM 推理优化时，绕不开一个关键词—— PD 分离 （Prefill Decode Disaggregation）。这篇文章从第一性原理出发，讲清楚 PD 分离为什么会出现、它解决了什么问题，以及业界最完整的开源实现 Mooncake 是怎么落地的。 一、从一次推理说起 我们先回到最基础的问题：一次 LLM 推理请求，内部到底发生了什么？ 当你向模型发送一句 prompt（比如\"帮我写一首关于春天的诗\"），模型的处理过程会分成两个 计算特征完全不同 的阶段： Prefill（预填充）阶段 模型需要先\"读懂\"你的整段输入。这个阶段会把 prompt 里所有 token 一次性 送进网络，并行计算它们之间的注意力，最终产出第一个输出 token。 因为是 N 个 token 一起算，矩阵运算是 矩阵 × 矩阵 （GEMM） 瓶颈在 算力 （FLOPs）——GPU 的 Tensor Core 火力全开 这个阶段的耗时，决定了用户看到第一个字的时间，也就是 TTFT （Time To First Token） Decode（解码）阶段 第一个 token 出来后，模型开始逐字往外蹦。每生成一个新 token，都要回顾前面所有的历史。 每步只算 1 个新 token，矩阵运算退化成 向量 × 矩阵 （GEMV） 瓶颈在 显存带宽 （HBM Bandwidth）——要把巨大的 KV cache 反复从显存读出来 这个阶段每一步的耗时，决定了出字速度，也就是 ITL （Inter Token Latency） 一张表看清差异 | 维度 | Prefill | Decode | | | | | | 计算形态 | 矩阵 × 矩阵（GEMM） | 向量 × 矩阵（GEMV） | | 瓶颈资源 | 算力 FLOPs | 显存带宽 HBM BW | | 适合的 batch | 小（1 4） | 大（32 256） | | 适合的并行 | TP 大（缩 TTFT） | TP 小 + 多副本（提吞吐） | | 适合的硬件 | 高算力卡（H100/H200） | 高带宽 / 高性价比卡 | | 性能指标 | TTFT | ITL | 这张表是理解 PD 分离的全部基础—— 两个阶段想要的东西，几乎处处相反 。 二、为什么不能混在一起跑 传统做法是 prefill 和 decode 跑在同一组 GPU 上，请求来了就排队处理。这种方式有几个躲不掉的硬伤。 1. 互相干扰：长 prefill 卡住所有 decode 想象一个场景：几十个用户正在流畅地逐字接收回复（decode 进行中），这时来了一个 4000 token 的长 prompt 请求。 为了处理这个长 prefill，GPU 被占用几百毫秒甚至上秒。在这段时间里， 所有正在 decode 的用户都卡住了 ——他们的出字速度（ITL）瞬间抖动，体验崩坏。 这就是经典的 Head of Line 阻塞 ：一个重请求拖垮一片轻请求。 2. 资源错配：一半的硬件在摸鱼 Prefill 阶段：算力拉满，但 显存带宽几乎闲置 Decode 阶段：带宽拉满，但 算力几乎闲置 两个阶段混跑，意味着无论什么时刻，你的 GPU 总有一半的能力在浪费。在动辄几百上千张卡的集群里，这种浪费直接换算成 30% 50% 的成本损失 。 3. 配置无法两全 Prefill 喜欢 小 batch （避免 padding 浪费），Decode 喜欢 大 batch （榨干带宽） Prefill 倾向 大 TP ，Decode 倾向 小 "
+    },
     {
       "slug": "cpti-love-personality-test-intro",
       "urlKey": "20260514",
