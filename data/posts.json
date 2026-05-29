@@ -11,9 +11,10 @@
         "算法",
         "分布式存储"
       ],
-      "path": "posts/大模型推理的-pd-分离原理动机与-mooncake-的实现.md",
       "cover": "../assets/uploads/2026/05/1780025971901-bu285b-image.webp",
-      "carousel": true
+      "carousel": true,
+      "path": "posts/大模型推理的-pd-分离原理动机与-mooncake-的实现.md",
+      "urlKey": "20260529"
     },
     {
       "slug": "cpti-love-personality-test-intro",
