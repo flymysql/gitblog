@@ -5,7 +5,7 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 01 Jun 2026 07:35:41 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 01 Jun 2026 09:40:16 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端</title>
@@ -14,7 +14,7 @@
       <pubDate>Mon, 01 Jun 2026 02:00:00 GMT</pubDate>
       <author>兰州小红鸡</author>
       <category>分布式存储</category><category>AI 基础设施</category><category>项目介绍</category>
-      <description><![CDATA[PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它提供和 Mooncake 类似的跨节点 RDMA 零拷贝能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 273 GB/s。这篇文章讲清楚它为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。]]></description>
+      <description><![CDATA[PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它提供和 Mooncake 类似的跨节点 RDMA 零拷贝能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。]]></description>
     </item>
     <item>
       <title>大模型推理的 PD 分离：原理、动机与 Mooncake 的实现</title>

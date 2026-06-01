@@ -4,9 +4,9 @@
       "slug": "peercache-decentralized-rdma-kv-cache",
       "title": "PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端",
       "date": "2026-06-01T10:00:00+08:00",
-      "updated": "2026-06-01T10:00:00+08:00",
+      "updated": "2026-06-01T18:00:00+08:00",
       "author": "兰州小红鸡",
-      "summary": "PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它提供和 Mooncake 类似的跨节点 RDMA 零拷贝能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 273 GB/s。这篇文章讲清楚它为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。",
+      "summary": "PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它提供和 Mooncake 类似的跨节点 RDMA 零拷贝能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。",
       "tags": [
         "分布式存储",
         "AI 基础设施",
