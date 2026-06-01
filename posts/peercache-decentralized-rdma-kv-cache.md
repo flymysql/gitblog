@@ -1,11 +1,11 @@
 ---
 title: PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端
 date: "2026-06-01T10:00:00+08:00"
-updated: "2026-06-01T18:00:00+08:00"
+updated: "2026-06-02T00:30:00+08:00"
 author: 兰州小红鸡
 tags: [分布式存储, AI 基础设施, 项目介绍]
 cover: ../assets/uploads/2026/06/peercache_scaling_ladder.png
-summary: PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它提供和 Mooncake 类似的跨节点 RDMA 零拷贝能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。
+summary: PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它的定位、为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。
 carousel: true
 ---
 
@@ -13,58 +13,84 @@ carousel: true
 
 > **项目地址**：[flymysql.github.io/PeerCache](https://flymysql.github.io/PeerCache/zh/)
 >
-> 一句话介绍：面向 SGLang HiCache 的**点对点 RDMA 零拷贝 L3 KV 缓存后端**——和 Mooncake 一样跨节点零拷贝，但**没有中心化的 master 和 metadata 服务**。单卡能吃到裸 `ib_read_bw` 的 **94%**，整机 8 卡聚合 **413 GB/s（3.3 Tbps）**。
+> 一句话介绍：一个**去中心化、点对点、RDMA 零拷贝的 SGLang L3（HiCache）存储后端**，专门做**跨请求、跨节点的 KV（前缀）缓存复用**。它提供和 Mooncake Store 类似的复用能力，但**没有中心化的 master 和 metadata 服务**。单卡能吃到裸 `ib_read_bw` 的 **94%**，整机 8 卡聚合 **413 GB/s（3.3 Tbps）**。
 
-在上一篇 [《大模型推理的 PD 分离》](/post.html?slug=大模型推理的-pd-分离原理动机与-mooncake-的实现) 里，我把 prefill/decode 分离的来龙去脉和 Mooncake 的实现讲了一遍。这篇接着讲一个我自己动手写的东西：**PeerCache**——一个想把"KV 缓存跨节点搬运"这件事做得更轻、更去中心化的 L3 后端。
+在上一篇 [《大模型推理的 PD 分离》](/post.html?slug=大模型推理的-pd-分离原理动机与-mooncake-的实现) 里，我把 prefill/decode 分离的来龙去脉和 Mooncake 的实现讲了一遍。这篇接着讲一个我自己动手写的东西：**PeerCache**——一个想把"KV 缓存跨节点复用"这件事做得更轻、更去中心化的 L3 后端。
+
+不过开头要先纠正一个容易误解的点：**PeerCache 不是 PD 的搬运引擎**，它和 PD 是两件正交的事。下面会专门讲清楚。
 
 ---
 
-## 一、它解决什么问题
+## 一、它解决什么问题：跨请求的 KV 前缀复用
 
-先把场景收窄。在 PD 分离的 SGLang 部署里，prefill worker 和 decode worker 跑在**不同的节点**上：
+先说场景。LLM 推理里有大量请求**共享前缀**——系统提示词、few-shot 示例、多轮对话历史、RAG 文档、Agent 上下文……这些前缀对应的 KV 缓存其实是一样的，每来一个请求都重算一遍纯属浪费。
 
-- prefill worker 把 prompt 算成 KV 缓存；
-- decode worker 必须拿到这份 KV，才能接着往下生成。
+SGLang 的 RadixAttention 已经能在单机复用前缀 KV，HiCache 又把这套思路扩展成三层缓存——GPU 显存（L1）、主机内存（L2）、外部分布式存储（L3）。**PeerCache 就是这个 L3**：它让前缀 KV 不仅能在一台机器里复用，还能**跨节点**复用。
 
-中间这段"把 KV 页面从一个节点搬到另一个节点"的工作，就是 HiCache 里 **L3 存储层**要干的活。SGLang 的 HiCache 把缓存分成三层——GPU 显存（L1）、主机内存（L2）、外部分布式存储（L3）——并支持 Mooncake、3FS、NIXL 等多种 L3 后端。
+工作方式很简单：
+
+- 生产节点把 KV 页发布进**自己的本地池**，并把一条很小的位置记录写进**分片在所有节点上的一致性哈希目录**；
+- 任意节点查到 key 后，用**单边 RDMA READ** 直接零拷贝拉进自己的 buffer。
 
 ```mermaid
 flowchart LR
-    subgraph P [Prefill 节点 - 生产者]
-      P0[Prefill worker<br/>set KV 页面]
+    subgraph N1 [生产节点 - 算出前缀 KV]
+      P0[set KV 页面<br/>发布进本地池]
     end
-    subgraph D [Decode 节点 - 消费者]
-      D0[Decode worker<br/>get KV 页面]
+    subgraph N2 [消费节点 - 命中相同前缀]
+      D0[get KV 页面<br/>读进自己的 buffer]
     end
     P0 -->|"1 PUT 位置（极小 RPC）"| DIR[(一致性哈希<br/>目录分片)]
     D0 -->|"2 GET 位置（极小 RPC）"| DIR
     P0 ==>|"3 单边 RDMA READ（零拷贝）"| D0
 ```
 
-PeerCache 就是这个 L3：它用 RDMA 零拷贝让 decode 直接从远端主机内存里把 prefill 算好的 KV 读出来，**数据恰好跨网络一次，且传输期间两端 CPU 都不参与**（由网卡完成 DMA）。
-
-它当然也能用在非分离场景——任何节点都可以既当生产者又当消费者——只是 PD 分离是我重点调优的场景。
+接入也很省事：用 `--hicache-storage-backend dynamic` 直接挂进 SGLang，**无需 patch SGLang**。
 
 ---
 
-## 二、为什么不直接用 Mooncake
+## 二、它不是什么：两个别混的正交维度
 
-Mooncake 已经很成熟了，能力也强。但它的形态决定了它需要一套**中心化的协调设施**：一个 `master` 负责分配 / 跟踪对象，一个 `metadata` 服务负责存放元数据，再加上专用的托管内存池。对小一点的集群、或者只想要"跨节点零拷贝读 KV"这一个能力的人来说，这套东西部署和运维都偏重。
+这是整篇里我最想强调的一点。一提到"跨节点搬 KV + RDMA + Mooncake"，很多人第一反应是 PD 分离里那条 **prefill → decode 的 KV 交接**。但那条路**不是** PeerCache 干的活。
 
-PeerCache 的取舍是另一条路：**把中心节点全部砍掉，用一致性哈希把目录分散到每个节点上**。
+- **PeerCache ≠ PD 搬运引擎。** 它不负责每个请求的 prefill→decode KV 交接——那条延迟敏感的 GPU→GPU 路径是 Mooncake / NIXL 通过 `--disaggregation-transfer-backend` 做的。
+- **PeerCache ≠ 中心化存储。** 没有需要部署 / 扩容的 master 或元数据服务。
 
-| 维度 | Mooncake | PeerCache |
+把两个维度摆在一起看就清楚了：
+
+| 维度 | KV / 前缀复用（PeerCache） | PD 的 P→D 交接（Mooncake/NIXL） |
 | --- | --- | --- |
-| 元数据 | 中心 master + metadata 服务 | 分片目录（一致性哈希） |
-| 数据放置 | 专用托管内存池 | 留在生产数据的节点本地 |
-| 协调 | master 分配 / 跟踪对象 | 仅服务发现，内嵌于某个节点 |
-| 传输 | RDMA 零拷贝 | RDMA 零拷贝（单边 READ） |
+| 范围 | 跨请求 / 跨节点 | 单个请求内 |
+| 目标 | 省掉重复计算共享前缀 | 把 prefill 的 KV 交给 decode |
+| 延迟 | 缓存型，可容忍主机暂存 | 延迟敏感，GPU→GPU 直传 |
+| SGLang 参数 | `--hicache-storage-backend` | `--disaggregation-transfer-backend` |
+
+所以这俩**不是二选一**：一个 PD 集群通常两者都用——**PeerCache 在 prefill 层做前缀复用，Mooncake / NIXL 做 P→D 交接**。这也是我上一篇讲 PD 分离时它们各自的位置。
+
+---
+
+## 三、为什么不直接用中心化的 KV 缓存
+
+放对了维度之后，PeerCache 真正要对比的是那些**做 KV 复用、但靠中心 master / 中心元数据**的存储——比如 Mooncake Store、分布式模式的 LMCache。
+
+它们都很成熟、能力也强，但形态决定了要养一套中心化协调设施：master 分配 / 跟踪对象，元数据服务存放 lookup，数据常常还要拷进专用托管池。PeerCache 的取舍是另一条路：**把中心节点全部砍掉，用一致性哈希把目录分散到每个节点上**。
+
+| 维度 | 中心化存储 | PeerCache |
+| --- | --- | --- |
+| 元数据 | 中心 master / lookup 服务 | 一致性哈希 DHT，分片到所有节点 |
+| 单点故障 | master 是 SPOF / 瓶颈 | 没有中心元数据节点 |
+| 元数据吞吐 | 受 master 限制 | 随集群规模扩（每节点 ~1/N） |
+| 数据放置 | 常需拷进托管池 | 留在生产节点本地 |
+| 写路径 | 入池 + 协调 | 本地 memcpy + 一条小位置记录 |
+| 读路径 | 经存储 / 引擎 | 单边 RDMA READ，零拷贝 |
+| 要运行的服务 | master + worker | 仅内嵌发现（无独立 master） |
+| 扩展 | 给协调者扩容 | 加节点 → 环自动 re-shard |
 
 差别集中在两点：**目录是分片而不是中心存的**，**数据是留在生产者本地而不是搬进专用池的**。下面分别讲。
 
 ---
 
-## 三、核心理念
+## 四、核心理念
 
 我把整套设计浓缩成几条原则：
 
@@ -77,7 +103,7 @@ PeerCache 的取舍是另一条路：**把中心节点全部砍掉，用一致�
 
 ---
 
-## 四、双 MR 模型——一个绕不开的正确性问题
+## 五、双 MR 模型——一个绕不开的正确性问题
 
 这是 PeerCache 里我觉得最值得讲的一个设计点。
 
@@ -96,7 +122,7 @@ PeerCache 的取舍是另一条路：**把中心节点全部砍掉，用一致�
 
 ---
 
-## 五、读写数据流
+## 六、读写数据流
 
 ### 写入路径
 
@@ -140,7 +166,7 @@ sequenceDiagram
 
 ---
 
-## 六、控制面 / 数据面的分工
+## 七、控制面 / 数据面的分工
 
 PeerCache 把实现干净地切成两半：**控制面用 Python（走 TCP）**，**数据面用 C++ / libibverbs（走 RDMA）**。
 
@@ -163,13 +189,13 @@ flowchart TB
 
 几个我比较在意的工程细节：
 
-- **一致性哈希目录**：每个节点承载目录的一个分片，所有分片的并集才是完整目录，不存在中心存储。默认每节点 160 个虚拟节点（vnode）来均衡分布。`directory_replicas > 1` 可以把每条条目写进接下来的 N 个归属者做高可用，读取时在副本间回退。
+- **一致性哈希目录**：每个节点承载目录的一个分片，所有分片的并集才是完整目录，不存在中心存储。默认每节点 160 个虚拟节点（vnode）来均衡分布。`directory_replicas > 1`（默认 2）可以把每条条目写进接下来的 N 个归属者做高可用，读取时在副本间回退。
 - **连接管理**：连接引导用极小的 TCP 握手交换 `QpInfo`（qp_num / psn / lid / gid），把设备选择和连接建立彻底解耦，随后 QP 走 INIT → RTR → RTS。每个对端维护一个**有界的通道池**（一个通道 = 一条 RC QP + 自己独立的 CQ），惰性创建、复用、用 `max_channels_per_peer` 封顶——既避免 O(N²) 全连接网格，又允许多个读取者并发读同一个对端。
 - **并发模型**：服务端本就完全多线程，单边 RDMA READ 完全不耗响应方 CPU；客户端 `batch_read` 在整个 RDMA 传输期间释放 GIL，每个读取线程租一条独立通道（QP + 私有 CQ），N 个线程在 N 个 CQ 上各自 post/poll，没有共享 CQ 竞争。
 
 ---
 
-## 七、磁盘分层（L4）：把淘汰的页面接住
+## 八、磁盘分层（L4）：把淘汰的页面接住
 
 内存池总是有限的，写满之后被 LRU 淘汰的页面通常就丢了。PeerCache 提供一个可选的磁盘分层把它们接住：
 
@@ -193,7 +219,7 @@ flowchart LR
 
 ---
 
-## 八、性能基线
+## 九、性能基线
 
 下面这组数字来自一套特定的 8 卡 RoCE 环境，用内置的 `peercache-bench serve` / `drive` 双机工具测得（GET 路径，单边 RDMA READ 读 KV 页，MLA 布局）。**它展示的是方法论与曲线形态，不是性能保证**——请用复现命令在你自己的硬件上重跑。
 
@@ -284,20 +310,40 @@ PeerCache 落在裸 `ib_read_bw` 的 **~6% 以内**。这点差距来自目录�
 
 ---
 
-## 九、故障处理与权衡
+## 十、什么时候用，又主动舍弃了什么
 
-去中心化不是免费的，得把代价说清楚：
+去中心化不是免费的，得把得失都说清楚。
 
-- **驱逐竞争**：池驱逐会删目录条目，任何解析到陈旧 / 缺失条目的读取都返回 miss，让 SGLang 重新计算——这是**安全降级**，不会读到坏数据。
-- **内嵌 meta 是单点**：没有专用 meta 机器，IP 等于 `discovery_addr` 的节点在进程内承担服务发现。它确实是服务发现的单点，但成员信息在本地缓存，短暂中断不影响已建立的读写；发现主机宕了，在**相同 IP** 上重启即可，期间其它对端凭缓存继续服务。
-- **目录持久性**：单副本时，节点故障会丢掉它那一片的位置记录（以及本就在它上面的数据）——这是可接受的缓存 miss。需要冗余就把 `directory_replicas` 调大。
+### 优势
 
-整体的哲学是：**缓存丢了大不了重算，所以宁可换取部署的简单和读路径的极致零拷贝，也不去背一套强一致的中心化协调。**
+- **元数据无单点故障 / 瓶颈**：中心化方案里每次 PUT/GET 都打到 master；PeerCache 把目录分片，元数据吞吐随集群增长，没有中心热点。
+- **写路径轻、数据有局部性**：`set()` = 本地 memcpy + 一条小目录记录，不拷进中心池。
+- **运维组件更少**：发现服务内嵌，没有 master 要部署、扩容、做 HA。
+- **无协调者横向扩展**：新节点同时增容量和元数据吞吐，成员变化自动 re-shard 目录。
+- **去中心的故障域**：挂一个节点只丢它那份分片，不会整个元数据服务瘫；`directory_replicas`（默认 2）还保留副本。
+
+### 主动舍弃了什么
+
+- **成熟度与生态**：Mooncake / LMCache 经过大规模打磨，淘汰 / 分层 / 可观测性更全、集成更广；PeerCache 更精简、更年轻。
+- **全局放置决策**：中心 master 能做更聪明的全局淘汰 / 放置 / 负载均衡；PeerCache 只做"本地 + 哈希"决策。
+- **生产者热点与数据冗余**：KV 字节留在生产节点，热 key 可能让该节点成读热点；而且 KV 数据本身默认**不复制**——生产节点宕了那份页就不可用（目录有副本、有 disk 层兜底，但 KV 字节没多副本）。中心池更容易摊平负载、做数据冗余。
+- **驱逐竞争是安全降级**：池驱逐会删目录条目，任何解析到陈旧 / 缺失条目的读取都返回 miss，让 SGLang 重新计算——不会读到坏数据，但确实是一次缓存 miss。
+
+### 一张决策表
+
+| 你的情况 | 建议 |
+| --- | --- |
+| 想跨节点复用 KV、最少复杂度、不要 master | **PeerCache（聚合模式）** |
+| 需要 P/D 物理解耦（扩缩 / SLO） | Mooncake/NIXL 做交接 + PeerCache 在 prefill 做复用 |
+| 需要全局放置、丰富特性、强数据 HA | 成熟的中心化存储 |
+| 提示词都唯一、无共享前缀 | 任何 KV 复用缓存都帮不上多少 |
+
+最契合 PeerCache 的，是**聚合式（非 PD）+ 高前缀复用**的负载：系统提示词、few-shot、多轮历史、RAG、Agent 上下文——这里挂上 PeerCache 就是一个完整的共享缓存层，不用再养传输引擎；以及**想要类似 Mooncake-Store 的复用能力、但不想再养一个中心 master** 的团队。
 
 ---
 
-## 十、小结
+## 十一、小结
 
-PeerCache 想表达的其实是一个很朴素的观点：如果你要的只是"跨节点把 KV 零拷贝读过来"，那么 master 和 metadata 服务并不是必须的——把目录用一致性哈希分散开、让数据留在生产者本地、用双 MR 模型保证发布地址的生命周期，就能在砍掉中心设施的同时拿到接近裸带宽的读性能（单卡 94%，整机 8 卡 413 GB/s）。
+PeerCache 想表达的其实是一个很朴素的观点：如果你要的只是"跨请求、跨节点复用 KV 前缀"，那么 master 和 metadata 服务并不是必须的——把目录用一致性哈希分散开、让数据留在生产者本地、用双 MR 模型保证发布地址的生命周期，就能在砍掉中心设施的同时拿到接近裸带宽的读性能（单卡 94%，整机 8 卡 413 GB/s）。它和 PD 的 P→D 交接是正交的两件事，在 PD 集群里两者可以同时用。
 
-如果你也在折腾 SGLang 的 L3 后端，欢迎去 [项目主页](https://flymysql.github.io/PeerCache/zh/) 看看架构文档、性能基线和 SDK 参考，也欢迎在 issue 里交流。
+如果你也在折腾 SGLang 的 L3 后端，欢迎去 [项目主页](https://flymysql.github.io/PeerCache/zh/) 看看[定位对比](https://flymysql.github.io/PeerCache/zh/positioning/)、架构文档、性能基线和 SDK 参考，也欢迎在 issue 里交流。
