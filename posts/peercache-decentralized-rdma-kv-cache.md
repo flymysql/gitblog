@@ -4,13 +4,16 @@ date: "2026-06-01T10:00:00+08:00"
 updated: "2026-06-01T10:00:00+08:00"
 author: 兰州小红鸡
 tags: [分布式存储, AI 基础设施, 项目介绍]
-summary: PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它提供和 Mooncake 类似的跨节点 RDMA 零拷贝能力，却砍掉了中心化的 master 与 metadata 服务。这篇文章讲清楚它为什么这样设计、双 MR 模型和一致性哈希目录是怎么工作的，以及实测能跑到多快。
+cover: ../assets/uploads/2026/06/peercache_scaling_ladder.png
+summary: PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它提供和 Mooncake 类似的跨节点 RDMA 零拷贝能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 273 GB/s。这篇文章讲清楚它为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。
 carousel: true
 ---
 
+![PeerCache GET 吞吐：单卡 → 整机](../assets/uploads/2026/06/peercache_scaling_ladder.png)
+
 > **项目地址**：[flymysql.github.io/PeerCache](https://flymysql.github.io/PeerCache/zh/)
 >
-> 一句话介绍：面向 SGLang HiCache 的**点对点 RDMA 零拷贝 L3 KV 缓存后端**——和 Mooncake 一样跨节点零拷贝，但**没有中心化的 master 和 metadata 服务**。
+> 一句话介绍：面向 SGLang HiCache 的**点对点 RDMA 零拷贝 L3 KV 缓存后端**——和 Mooncake 一样跨节点零拷贝，但**没有中心化的 master 和 metadata 服务**。单卡能吃到裸 `ib_read_bw` 的 **94%**，整机 8 卡聚合 **273 GB/s（2.18 Tbps）**。
 
 在上一篇 [《大模型推理的 PD 分离》](/post.html?slug=大模型推理的-pd-分离原理动机与-mooncake-的实现) 里，我把 prefill/decode 分离的来龙去脉和 Mooncake 的实现讲了一遍。这篇接着讲一个我自己动手写的东西：**PeerCache**——一个想把"KV 缓存跨节点搬运"这件事做得更轻、更去中心化的 L3 后端。
 
@@ -190,17 +193,84 @@ flowchart LR
 
 ---
 
-## 八、性能速览
+## 八、性能基线
 
-跨机 RDMA 实测（GET，MLA；2× AMD EPYC 9K84 + 8× ConnectX-7，RoCEv2，MTU 4096）：
+下面这组数字来自一套特定的 8 卡 RoCE 环境，用内置的 `peercache-bench serve` / `drive` 双机工具测得（GET 路径，单边 RDMA READ 读 KV 页，MLA 布局）。**它展示的是方法论与曲线形态，不是性能保证**——请用复现命令在你自己的硬件上重跑。
 
-| 场景 | GET 吞吐 |
+### 测试环境
+
+| 项 | 值 |
 | --- | --- |
-| 单卡，PeerCache | 46.0 GB/s —— 裸 `ib_read_bw`（49.0 GB/s）的 ~94% |
-| 单进程，8 rail（1 MiB 页） | 147.6 GB/s（1.18 Tbps） |
-| 整机，8 卡，多进程 | 273.0 GB/s（≈ 2.18 Tbps） |
+| 拓扑 | 2 台主机（生产者 / 消费者），跨机 RoCE |
+| 网卡 | 8 × Mellanox ConnectX-7 `mlx5` RoCE，bond |
+| RoCE | RoCEv2，GID index 3，MTU 4096 |
+| 单卡线速 | ≈ 400 Gb/s（裸 READ 实测 392 Gbps） |
+| CPU | 2 × AMD EPYC 9K84，96 核/路（192 核 / 384 线程） |
+| 主机内存 | 2.2 TB（每 NUMA 节点 ≈ 1.16 TB） |
+| 传输 | `--protocol rdma`，布局 `mla` |
 
-单卡能吃到裸 `ib_read_bw` 的 **94%**，对一个还要在上面做目录解析和连接管理的缓存后端来说，我对这个数字是比较满意的——说明零拷贝路径上几乎没有额外开销被引入。
+### 总览：从单卡到整机
+
+![PeerCache GET 吞吐：从单卡到整机的扩展阶梯](../assets/uploads/2026/06/peercache_scaling_ladder.png)
+
+| 场景 | GET 吞吐 | 占单卡裸 RDMA | 说明 |
+| --- | --- | --- | --- |
+| 裸 `ib_read_bw`，1 卡，16 QP | 49.0 GB/s（392 Gbps） | 100% | 单卡硬件上限 |
+| PeerCache，1 卡，8 进程 | 46.0 GB/s（368 Gbps） | 94% | 存储层开销 ≈ 6% |
+| PeerCache，单进程，8 rail，1 MiB 页 | 147.6 GB/s（1.18 Tbps） | — | 受 GIL 限制；约 3 张卡的量 |
+| PeerCache，8 卡，多进程，1 MiB 页 | 273.0 GB/s（2.18 Tbps） | — | 约为 8 卡裸上限的 70% |
+
+### 1 · 单卡——PeerCache 对比裸 RDMA
+
+为衡量存储层引入的开销，把单卡的 PeerCache 和裸 fabric 直接对比：
+
+| 测量 | GET 吞吐 |
+| --- | --- |
+| `ib_read_bw -q 16 -s 131072`（裸单边 READ） | 49.0 GB/s（392 Gbps） |
+| PeerCache GET，128 KiB 页，8 进程 × 4 线程 | 46.0 GB/s（368 Gbps） |
+
+PeerCache 落在裸 `ib_read_bw` 的 **~6% 以内**。这点差距来自目录查找 + 每批编排；开启 `--dir-cache-ttl` 后，热的、静态的工作集上目录 RPC 基本被摊掉。这说明零拷贝读路径上几乎没有引入额外开销。
+
+### 2 · 单进程多卡（multi-rail）
+
+设置 `--devices d1,…,d8`，一个进程就会每卡开一条 rail，并在一次释放 GIL 的 C++ 调用（`batch_read_multi`）里把每批 READ 横跨所有 rail 分发。
+
+![PeerCache 单进程 8 rail：吞吐 vs 线程数](../assets/uploads/2026/06/peercache_single_process_scaling.png)
+
+| 页大小 | batch | 峰值 | 最佳线程数 |
+| --- | --- | --- | --- |
+| 128 KiB | 32 | 40.4 GB/s | 4 |
+| 1 MiB | 128 | 147.6 GB/s | 2 |
+
+两点值得注意：
+
+- **单进程被 GIL 限制**：吞吐在低线程数（2–4）就到峰值，线程越多反而下降——每批的 Python 编排被 GIL 串行化，加线程只增加争用。
+- **大传输能摊薄这部分开销**：GIL 持有的开销是按调用算的、不是按字节，所以把页从 128 KiB 加到 1 MiB，单进程从 40 → 148 GB/s（约 3 张卡的量）——尽管两者都受 GIL 限制。
+
+所以 multi-rail 让一个进程能用上多张卡，但单个 Python 进程吃不满全部 8 卡——那需要多进程。
+
+### 3 · 整机——多进程跨 8 卡
+
+生产形态（也是吃满每张卡的方式）是每卡一个进程组——正是 SGLang TP=8 部署的运行方式（8 个 rank，各绑本地网卡）。这里：8 卡 × 每卡 4 个读进程，1 MiB 页。
+
+![PeerCache 整机 8 卡：每卡 GET 吞吐](../assets/uploads/2026/06/peercache_per_card.png)
+
+| 指标 | 值 |
+| --- | --- |
+| 聚合 GET | 273.0 GB/s（2.18 Tbps） |
+| 单卡区间 | 16.9 – 50.1 GB/s |
+| 占 8 卡裸上限（≈ 392 GB/s） | ≈ 70% |
+
+聚合远超单进程（147 → 273 GB/s），但这时已经不再受网卡限制——而是被主机内存带宽 / PCIe，以及不均衡（两张卡只有 ~17 GB/s，其余 35–50）拖住。本机上网卡 1–4 在 NUMA node 0、5–8 在 node 1，没绑核的读进程可能落到错误的节点、付出跨 NUMA 代价。用 `numactl` 把每个进程组绑到该网卡的 NUMA 节点，就能把慢的网卡拉回来、抬高聚合。
+
+### 关键结论
+
+- **单卡**：PeerCache ≈ 裸 `ib_read_bw` 的 94%——RDMA 路径接近最优。
+- **GIL 是单进程的天花板**：用低线程数 + 大 batch / 大页把单进程压到最高；单进程吃不满全部网卡。
+- **整机带宽需要多进程**（每卡一组），这与 SGLang 多 rank 部署形态一致。
+- **超过约一张卡后**，瓶颈转移到内存 / PCIe / NUMA，不再是 fabric——绑 NUMA、均衡 bond 即可。
+
+> 注：1 MiB 页是合成值，用来展示大传输时的余量；真实 MLA KV 页通常约 128 KiB。引用数字时务必标注页大小。
 
 ---
 
@@ -218,6 +288,6 @@ flowchart LR
 
 ## 十、小结
 
-PeerCache 想表达的其实是一个很朴素的观点：如果你要的只是"跨节点把 KV 零拷贝读过来"，那么 master 和 metadata 服务并不是必须的——把目录用一致性哈希分散开、让数据留在生产者本地、用双 MR 模型保证发布地址的生命周期，就能在砍掉中心设施的同时拿到接近裸带宽的读性能。
+PeerCache 想表达的其实是一个很朴素的观点：如果你要的只是"跨节点把 KV 零拷贝读过来"，那么 master 和 metadata 服务并不是必须的——把目录用一致性哈希分散开、让数据留在生产者本地、用双 MR 模型保证发布地址的生命周期，就能在砍掉中心设施的同时拿到接近裸带宽的读性能（单卡 94%，整机 8 卡 273 GB/s）。
 
-如果你也在折腾 SGLang 的 L3 后端，欢迎去 [项目主页](https://flymysql.github.io/PeerCache/zh/) 看看架构文档和 SDK 参考，也欢迎在 issue 里交流。
+如果你也在折腾 SGLang 的 L3 后端，欢迎去 [项目主页](https://flymysql.github.io/PeerCache/zh/) 看看架构文档、性能基线和 SDK 参考，也欢迎在 issue 里交流。
