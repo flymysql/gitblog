@@ -5,8 +5,17 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Fri, 29 May 2026 03:40:41 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 01 Jun 2026 04:24:55 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端</title>
+      <link>https://gitpull.cn/post/20260601/</link>
+      <guid isPermaLink="false">peercache-去中心化-rdma-kv-缓存</guid>
+      <pubDate>Mon, 01 Jun 2026 02:00:00 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>分布式存储</category><category>AI 基础设施</category><category>项目介绍</category>
+      <description><![CDATA[PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它提供和 Mooncake 类似的跨节点 RDMA 零拷贝能力，却砍掉了中心化的 master 与 metadata 服务。这篇文章讲清楚它为什么这样设计、双 MR 模型和一致性哈希目录是怎么工作的，以及实测能跑到多快。]]></description>
+    </item>
     <item>
       <title>大模型推理的 PD 分离：原理、动机与 Mooncake 的实现</title>
       <link>https://gitpull.cn/post/20260529/</link>
@@ -267,15 +276,6 @@
       <author>兰州小红鸡</author>
       <category>教程</category><category>博客建站</category>
       <description><![CDATA[我感觉我一个处女座的就不应该搞前端，太吹毛求疵追求完美了，哪里有一点点觉得不漂亮就想改 博客的评论系统用过好几家（虽然都没有人评论 比如gitalk，来必力 之前用的来必力，加载慢…]]></description>
-    </item>
-    <item>
-      <title>sql学习笔记2</title>
-      <link>https://gitpull.cn/post/20181030/</link>
-      <guid isPermaLink="false">sql学习笔记2-5f5ec841</guid>
-      <pubDate>Tue, 30 Oct 2018 09:21:21 GMT</pubDate>
-      <author>兰州小红鸡</author>
-      <category>sql</category>
-      <description><![CDATA[今天继续做了会儿练习语句 都是比较基本的sql查询语句 需要熟练掌握的 1. 查询选修毛概的学生的姓名成绩，并且升序输出 2. 查询所有科目分数总和大于1100的学生姓名与分数总和…]]></description>
     </item>
   </channel>
 </rss>
