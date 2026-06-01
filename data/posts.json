@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "peercache-去中心化-rdma-kv-缓存",
+      "title": "PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端",
+      "date": "2026-06-01T10:00:00+08:00",
+      "updated": "2026-06-01T10:00:00+08:00",
+      "author": "兰州小红鸡",
+      "summary": "PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它提供和 Mooncake 类似的跨节点 RDMA 零拷贝能力，却砍掉了中心化的 master 与 metadata 服务。这篇文章讲清楚它为什么这样设计、双 MR 模型和一致性哈希目录是怎么工作的，以及实测能跑到多快。",
+      "tags": [
+        "分布式存储",
+        "AI 基础设施",
+        "项目介绍"
+      ],
+      "carousel": true,
+      "path": "posts/peercache-去中心化-rdma-kv-缓存.md",
+      "urlKey": "20260601"
+    },
+    {
       "slug": "大模型推理的-pd-分离原理动机与-mooncake-的实现",
       "title": "大模型推理的 PD 分离：原理、动机与 Mooncake 的实现",
       "date": "2026-05-29T03:40:23.322Z",
