@@ -4,13 +4,15 @@
       "slug": "用-ai-做好软件项目上下文工程实践指南",
       "title": "用 AI 做好软件项目：上下文工程实践指南",
       "date": "2026-06-15T04:56:47.024Z",
-      "updated": "2026-06-15T04:57:23.458Z",
+      "updated": "2026-06-15T05:03:50.209Z",
       "author": "兰州小红鸡",
       "summary": "在复杂软件项目中引入 AI，常见困境不是模型不够强，而是 每次会话都在重复建立上下文 ——Agent 全量读取大文件、反复追问架构、上一轮的结论无法延续、任务边…",
       "tags": [
         "AI 基础设施"
       ],
-      "path": "posts/用-ai-做好软件项目上下文工程实践指南.md"
+      "path": "posts/用-ai-做好软件项目上下文工程实践指南.md",
+      "cover": "../assets/uploads/2026/06/1781499659393-4hzbpp-image.webp",
+      "carousel": true
     },
     {
       "slug": "peercache-decentralized-rdma-kv-cache",
