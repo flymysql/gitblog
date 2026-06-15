@@ -1,10 +1,12 @@
 ---
 title: 用 AI 做好软件项目：上下文工程实践指南
 date: "2026-06-15T04:56:47.024Z"
-updated: "2026-06-15T04:57:23.458Z"
+updated: "2026-06-15T05:03:50.209Z"
 author: 兰州小红鸡
 tags: [AI 基础设施]
+cover: ../assets/uploads/2026/06/1781499659393-4hzbpp-image.webp
 summary: 在复杂软件项目中引入 AI，常见困境不是模型不够强，而是 每次会话都在重复建立上下文 ——Agent 全量读取大文件、反复追问架构、上一轮的结论无法延续、任务边…
+carousel: true
 ---
 
 在复杂软件项目中引入 AI，常见困境不是模型不够强，而是**每次会话都在重复建立上下文**——Agent 全量读取大文件、反复追问架构、上一轮的结论无法延续、任务边界模糊导致改动扩散。这些问题叠加，表现为 token 消耗高、理解慢、产出不稳定。
@@ -34,32 +36,8 @@ summary: 在复杂软件项目中引入 AI，常见困境不是模型不够强�
 
 推荐将项目上下文分为四层，由粗到细、由静到动：
 
-``` mermaid
-flowchart TB
-    subgraph L1["L1 · 静态规则层（每次会话自动注入）"]
-        R1[".cursor/rules/*.mdc"]
-        R2[".cursorignore"]
-        R3["项目级 Agent 指令文件"]
-    end
+![image.png](../assets/uploads/2026/06/1781499659393-4hzbpp-image.webp)
 
-    subgraph L2["L2 · 架构记忆层（会话开头主动读取）"]
-        M1["架构维护手册"]
-        M2["AI 变更日志最近条目"]
-    end
-
-    subgraph L3["L3 · 检索索引层（按需查询，不全量读）"]
-        T1["语义检索 context_search"]
-        T2["符号导航 find_symbol"]
-        T3["扩展上下文 expand_chunk"]
-    end
-
-    subgraph L4["L4 · 跨会话持久层（决策与代码区域记忆）"]
-        P1["项目 memories"]
-        P2["session_recall / record_decision"]
-    end
-
-    L1 --> L2 --> L3 --> L4
-```
 
 ### L1：规则与黑名单——控制 Agent 的默认行为
 
@@ -119,23 +97,9 @@ L4 的价值在于：数周后遇到「当时为什么选这个方案」，不�
 
 将四层串联，单次任务的推荐路径如下：
 
-```mermaid
-sequenceDiagram
-    participant U as 开发者
-    participant A as AI Agent
-    participant L2 as 手册/变更日志
-    participant L3 as 检索/符号工具
-    participant C as 代码库
 
-    U->>A: 窄 scope 任务 + 日志/现象
-    A->>L2: 读架构手册 + 近期变更
-    A->>L3: context_search / find_symbol
-    L3-->>A: 相关 chunk / 符号位置
-    A->>C: 小范围 Read
-    A->>C: 修改 + 测试
-    A->>L2: 追加变更日志
-    A->>U: 产出 + 待确认
-```
+![image.png](../assets/uploads/2026/06/1781499690211-lsx8gv-image.webp)
+
 
 ---
 
@@ -214,19 +178,9 @@ CCE 擅长「用自然语言问代码在哪」；Serena 擅长「这个函数被
 
 ### 整体流程概览
 
-```mermaid
-flowchart TD
-    S0["0. 安装 Cursor + Python 3.11+"]
-    S1["1. 安装 uv（Serena 运行时）"]
-    S2["2. pip 安装 CCE"]
-    S3["3. 配置 Serena → 全局 mcp.json"]
-    S4["4. cce init 建立项目索引"]
-    S5["5. 重启 Cursor，确认 MCP Running"]
-    S6["6. Serena 激活项目 + onboarding"]
-    S7["7. 验收检索与符号导航"]
 
-    S0 --> S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
-```
+![image.png](../assets/uploads/2026/06/1781499747805-cvhrz5-image.webp)
+
 
 预计耗时：首次约 15～30 分钟（含索引构建，视仓库大小而定）。索引建立后，日常只需重启 IDE 即可使用。
 
@@ -559,31 +513,9 @@ my-project/                          # 仓库根目录
 
 各层与目录的对应关系：
 
-```mermaid
-flowchart LR
-    subgraph git["提交到 git（团队共享）"]
-        G1["AI_MAINTENANCE.md"]
-        G2["AI_CHANGELOG.md"]
-        G3[".cursorignore + rules/"]
-        G4["docs/AI_ONBOARDING.md"]
-        G5["scripts/setup_ai_env.*"]
-    end
 
-    subgraph local["各开发者本地生成"]
-        L1[".cursor/mcp.json"]
-        L2[".cce/"]
-        L3[".serena/memories/"]
-    end
+![image.png](../assets/uploads/2026/06/1781499783979-opbsyu-image.webp)
 
-    subgraph global["用户主目录（全局一次）"]
-        U1["~/.cursor/mcp.json"]
-        U2["~/.local/bin/cce"]
-    end
-
-    G5 -->|"cce init"| L1
-    G5 -->|"cce init"| L2
-    U1 -->|"Serena MCP"| L3
-```
 
 **新成员上手路径（结合上图）：**
 
@@ -717,22 +649,9 @@ AI 适合广度扫描与问题枚举；**优先级决策由开发者基于业务
 
 ## 核心原则
 
-```mermaid
-flowchart TB
-    subgraph ctx["上下文工程"]
-        C1["四层记忆：规则 / 手册 / 索引 / 持久"]
-        C2["检索优先，Read 按需"]
-        C3["变更日志记录动机"]
-    end
 
-    subgraph eff["效率"]
-        E1["窄 scope 任务"]
-        E2["人机分工：判断 vs 执行"]
-        E3["验收标准前置"]
-    end
+![image.png](../assets/uploads/2026/06/1781499811553-b0cmrf-image.webp)
 
-    ctx --> eff
-```
 
 1. **先建上下文，再写代码。** 四层记忆到位后，AI 才能稳定产出。
 2. **检索优先，全量 Read 是最后手段。** token 节省与定位精度的基础。
