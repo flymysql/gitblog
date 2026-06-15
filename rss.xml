@@ -5,8 +5,17 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Wed, 03 Jun 2026 06:16:58 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 15 Jun 2026 05:04:06 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>用 AI 做好软件项目：上下文工程实践指南</title>
+      <link>https://gitpull.cn/post/20260615/</link>
+      <guid isPermaLink="false">用-ai-做好软件项目上下文工程实践指南</guid>
+      <pubDate>Mon, 15 Jun 2026 04:56:47 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>AI 基础设施</category>
+      <description><![CDATA[在复杂软件项目中引入 AI，常见困境不是模型不够强，而是 每次会话都在重复建立上下文 ——Agent 全量读取大文件、反复追问架构、上一轮的结论无法延续、任务边…]]></description>
+    </item>
     <item>
       <title>PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端</title>
       <link>https://gitpull.cn/post/20260601/</link>
@@ -267,15 +276,6 @@
       <author>兰州小红鸡</author>
       <category>教程</category><category>前端</category><category>博客建站</category>
       <description><![CDATA[方法比较简单，加个js脚本就好了，至于加载哪里都无所谓了，就放在标签云的页面。 就加在标签的那个页面好了。 1. 打开themes\\\\next\\\\layout\\\\page.swig…]]></description>
-    </item>
-    <item>
-      <title>用回valine评论系统,valine评论框样式美化</title>
-      <link>https://gitpull.cn/post/20181101/</link>
-      <guid isPermaLink="false">用回valine评论系统valine评论框样式美化-2d5da13e</guid>
-      <pubDate>Thu, 01 Nov 2018 00:52:05 GMT</pubDate>
-      <author>兰州小红鸡</author>
-      <category>教程</category><category>博客建站</category>
-      <description><![CDATA[我感觉我一个处女座的就不应该搞前端，太吹毛求疵追求完美了，哪里有一点点觉得不漂亮就想改 博客的评论系统用过好几家（虽然都没有人评论 比如gitalk，来必力 之前用的来必力，加载慢…]]></description>
     </item>
   </channel>
 </rss>
