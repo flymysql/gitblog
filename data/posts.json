@@ -10,9 +10,10 @@
       "tags": [
         "AI 基础设施"
       ],
-      "path": "posts/用-ai-做好软件项目上下文工程实践指南.md",
       "cover": "../assets/uploads/2026/06/1781499659393-4hzbpp-image.webp",
-      "carousel": true
+      "carousel": true,
+      "path": "posts/用-ai-做好软件项目上下文工程实践指南.md",
+      "urlKey": "20260615"
     },
     {
       "slug": "peercache-decentralized-rdma-kv-cache",
