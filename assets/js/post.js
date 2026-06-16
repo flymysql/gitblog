@@ -489,10 +489,37 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
   }
 
   if (isPrerendered) {
+    const prerenderSlug = (article.dataset.slug || '').trim();
     const titleEl = article.querySelector('.article-title');
-    const title = (meta && meta.title) || (titleEl && titleEl.textContent.trim()) || '无标题';
+    const title = (titleEl && titleEl.textContent.trim()) || '无标题';
+
+    // 正文已在 HTML 中，先同步做增强，索引数据并行拉取
+    const items = buildToc(article);
+    if (items) renderToc(items);
+    sanitizeArticleLayout(article);
+    enhanceCodeBlocks(article);
+    enhanceCodeAdvanced(article);
+    enhanceHeadings(article);
+    enhanceImages(article);
+    enhanceLinks(article);
+    rewriteLegacyPostLinks(article);
+    enhanceMath(article);
+    enhanceMermaid(article);
+    bindShareCard(article, { slug: prerenderSlug, title });
+
+    try {
+      const idx = await fetchIndexPublic();
+      allPosts = idx.posts || [];
+      meta = allPosts.find(p => p.slug === prerenderSlug) || null;
+    } catch {}
+
+    const slug = (meta && meta.slug) || prerenderSlug;
     const tags = (meta && meta.tags) || [];
-    await enhancePostArticle(article, { slug, title, tags, allPosts, meta, data: {} });
+    renderSeriesIndex(allPosts, slug, (meta && meta.series) || '');
+    renderNeighborsAndRelated(allPosts, slug, tags);
+    renderGiscus(slug);
+    initPageviews();
+    trackAndRenderArticleView(slug);
     return;
   }
 
