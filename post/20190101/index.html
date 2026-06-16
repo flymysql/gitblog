@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
-  <title>加载中…</title>
+  <title>【PCC】一个用python写的ｃ语言编译器 · 小红鸡</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
   <link rel="stylesheet" href="/assets/css/common.css?v=20260514200000">
   <link rel="stylesheet" href="/assets/css/post.css?v=20260521180000">
@@ -13,13 +13,269 @@
   <meta name="theme-color" content="#ea6f5a">
   <link rel="apple-touch-icon" href="/assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="PCC——python实现编译器 大学的编译原理课设，实现源码到汇编代码的翻译，链接部分使用gcc的功能。目前支持数组，四则运算，赋值，判断，输出，循环语句等。 项目地址：http…">
+  <meta name="author" content="兰州小红鸡">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="【PCC】一个用python写的ｃ语言编译器">
+  <meta property="og:description" content="PCC——python实现编译器 大学的编译原理课设，实现源码到汇编代码的翻译，链接部分使用gcc的功能。目前支持数组，四则运算，赋值，判断，输出，循环语句等。 项目地址：http…">
+  <meta property="og:image" content="https://gitpull.cn/assets/og/PCC%E4%B8%80%E4%B8%AA%E7%94%A8python%E5%86%99%E7%9A%84%EF%BD%83%E8%AF%AD%E8%A8%80%E7%BC%96%E8%AF%91%E5%99%A8-15991910.svg">
+  <meta property="og:url" content="https://gitpull.cn/post/20190101/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="小红鸡">
+  <meta property="og:locale" content="zh-CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="【PCC】一个用python写的ｃ语言编译器">
+  <meta name="twitter:description" content="PCC——python实现编译器 大学的编译原理课设，实现源码到汇编代码的翻译，链接部分使用gcc的功能。目前支持数组，四则运算，赋值，判断，输出，循环语句等。 项目地址：http…">
+  <meta name="twitter:image" content="https://gitpull.cn/assets/og/PCC%E4%B8%80%E4%B8%AA%E7%94%A8python%E5%86%99%E7%9A%84%EF%BD%83%E8%AF%AD%E8%A8%80%E7%BC%96%E8%AF%91%E5%99%A8-15991910.svg">
+  <link rel="canonical" href="https://gitpull.cn/post/20190101/">
+  <meta property="article:published_time" content="2019-01-01T00:00:00+08:00">
+  <meta property="article:modified_time" content="2022-03-10T23:55:00+08:00">
+  <meta property="article:author" content="兰州小红鸡">
+  <meta property="article:tag" content="杂七杂八">
+  <meta property="article:tag" content="编译器">
+  <meta property="article:tag" content="python">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"【PCC】一个用python写的ｃ语言编译器","description":"PCC——python实现编译器 大学的编译原理课设，实现源码到汇编代码的翻译，链接部分使用gcc的功能。目前支持数组，四则运算，赋值，判断，输出，循环语句等。 项目地址：http…","image":"https://gitpull.cn/assets/og/PCC%E4%B8%80%E4%B8%AA%E7%94%A8python%E5%86%99%E7%9A%84%EF%BD%83%E8%AF%AD%E8%A8%80%E7%BC%96%E8%AF%91%E5%99%A8-15991910.svg","datePublished":"2019-01-01T00:00:00+08:00","dateModified":"2022-03-10T23:55:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20190101/","keywords":"杂七杂八,编译器,python"}</script>
 </head>
 <body>
   <div id="site-nav"></div>
 
   <main class="article-layout">
-    <article class="article" id="article">
-      <div class="loading">加载中…</div>
+    <article class="article is-prerendered" id="article" data-prerendered="1" data-slug="PCC一个用python写的ｃ语言编译器-15991910">
+      <header class="article-header">
+      <div class="article-tags-top"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB">杂七杂八</a><a class="tag tag-colored" style="--tag-bg:#E6FAFA;--tag-text:#167A7F;--tag-border:#B8E7E8;--tag-dark-bg:#123638;--tag-dark-text:#8EE2E5;--tag-dark-border:#2B6E72;" href="/tags.html#%E7%BC%96%E8%AF%91%E5%99%A8">编译器</a><a class="tag tag-colored" style="--tag-bg:#F0E9FF;--tag-text:#6843B5;--tag-border:#D7C6F6;--tag-dark-bg:#271E3F;--tag-dark-text:#C5B2FF;--tag-dark-border:#55427F;" href="/tags.html#python">python</a></div>
+      <h1 class="article-title">【PCC】一个用python写的ｃ语言编译器</h1>
+      <div class="article-author">
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+        <div class="info">
+          <div class="name">兰州小红鸡</div>
+          <div class="meta">
+            <span>2018-12-31</span>
+            <span class="dot"></span><span>更新于 2022-03-10</span>
+            <span class="dot"></span>
+            <span>3736 字</span>
+            <span class="dot"></span>
+            <span class="meta-read-mins">约 3 分钟</span>
+          </div>
+        </div>
+        <a class="article-edit" href="/admin/editor.html?slug=PCC%E4%B8%80%E4%B8%AA%E7%94%A8python%E5%86%99%E7%9A%84%EF%BD%83%E8%AF%AD%E8%A8%80%E7%BC%96%E8%AF%91%E5%99%A8-15991910" title="编辑此文">编辑</a>
+      </div>
+    </header>
+    <div class="article-body"><h2>PCC——python实现编译器</h2>
+<p>大学的编译原理课设，实现源码到汇编代码的翻译，链接部分使用gcc的功能。目前支持数组，四则运算，赋值，判断，输出，循环语句等。</p>
+<p>项目地址：<a href="https://github.com/flymysql/Py-Compiler">https://github.com/flymysql/Py-Compiler</a></p>
+<h2>源码说明</h2>
+<ol>
+<li>lexer.py 词法分析器</li>
+<li>get_predict_table.py 生成预测分析表</li>
+<li>LR.py 非递归的语法分析器</li>
+<li>generate.py 中间代码生成</li>
+<li>to_asm.py 汇编代码生成</li>
+<li>pcc.py 入口函数</li>
+</ol>
+<p>使用</p>
+<pre><code>$ python pcc.py
+</code></pre>
+<h2>命令说明</h2>
+<p>pcc -o (filename) 直接编译生成可执行程序<br>pcc -s (filename) 生成汇编源码<br>pcc -t (filename) 查看语法树生成过程<br>pcc -l (filename) 查看词法分析<br>pcc -h 查看帮助<br>pcc -p 查看本编译器的预测分析表<br>pcc -g 查看本编译器的语法推导<br>exit 退出</p>
+<h3>编译代码</h3>
+<pre><code>pcc -o ./test/test.c
+</code></pre>
+<h3>声明语句和赋值语句</h3>
+<pre><code>int a;
+a = 10;
+int b = a;
+int a = 1 + 2*(3 - 4);
+</code></pre>
+<h3>数组</h3>
+<pre><code>int arr[10];
+a[0] = 1;
+int b = a[0];
+</code></pre>
+<h3>数组下标，即[]中内容也可以用表达式嵌套</h3>
+<pre><code>int index = 5;
+arr[index] = 6;
+arr[arr[(index+1)*2-1]] = 7;
+</code></pre>
+<h3>输出语句</h3>
+<p>目前printf语句的参数最多可以带三个参数</p>
+<pre><code>printf("这是个不带参数的printf");
+printf("这是个参数%d",a);
+printf("三个参数：%d,%d,%d",a,b,c);
+char c="T";
+printf("字符型参数:%c",c);
+printf语句的参数也可以是表达式
+</code></pre>
+<p>例子</p>
+<pre><code>printf("%d", d + 2*(3+4));
+</code></pre>
+<h3>控制语句</h3>
+<p>目前仅支持if判断，可嵌套使用</p>
+<pre><code>if(a &lt; 2*10){
+    a = a + 1;
+    if(c &lt; a){
+        printf("%d", a*c);
+    }
+}
+</code></pre>
+<h3>while控制语句</h3>
+<p>这个不多说，也是可嵌套</p>
+<pre><code>int i = 1;
+printf("正在由pcc编译器为你打印99乘法表！");
+while(i &lt; 10){
+    int j = i;
+    while(j &lt; 10){
+        printf("%d*%d=%d	",i, j, i*j);
+        j = j + 1;
+    }
+    printf("\n");
+    i = i +1;
+}
+</code></pre>
+<p>举个栗子（打印99乘法表）</p>
+<p>源demo</p>
+<pre><code>int main(){
+    // 打印99乘法表
+    // int a[10];
+    int i = 1;
+    printf("正在由pcc编译器为你打印99乘法表！");
+    while(i &lt; 10){
+        int j = i;
+        while(j &lt; 10){
+            printf("%d*%d=%d	",i, j, i*j);
+            j = j + 1;
+        }
+        printf("\n");
+        i = i +1;
+    }
+}
+</code></pre>
+<p>举个栗子（打印斐波那契数列）</p>
+<p>ｃ语言源码</p>
+<pre><code>// 兰州小红鸡的注释测试
+int main(){
+    int arr[25];
+    int index = 0;
+    // 求０～２０的斐波那契数列
+    arr[0] = 1;
+    arr[1] = 2;
+    arr[2] = 3;
+    while(index &lt; 10*2 ){
+        int b = arr[index];
+        arr[index+2]=arr[index+1] + b;
+        printf("f(%d)=%d",index,b);
+        index = index +1;
+    }
+    printf("完成斐波那契数列打印！由小鸡编译器提供——pcc");
+}
+</code></pre>
+<p>生成的中间代码（四元式）</p>
+<pre><code>(=,0,0,index)
+(=,1,0,arr[]0)
+(=,2,0,arr[]1)
+(=,3,0,arr[]2)
+(code_block,0,0,W4)
+(j&lt;,index,20,code6)
+(j,0,0,block6)
+(code_block,0,0,code6)
+(=,arr[]index,0,b)
+(+,index,1,T0)
+(+,arr[]T0,b,T1)
+(+,index,2,T2)
+(=,T1,0,arr[]T2)
+(print,index,b,-1)
+(+,index,1,T3)
+(=,T3,0,index)
+(j,0,0,W4)
+(code_block,0,0,block6)
+(print,-1,-1,-1)
+</code></pre>
+<p>生成的汇编代码</p>
+<pre><code>    .text
+    .section	.rodata
+    .comm	T0,4,4
+    .comm	T1,4,4
+    .comm	T2,4,4
+    .comm	T3,4,4
+.LC0:
+    .string "f(%d)=%d"
+.LC1:
+    .string "完成斐波那契数列打印！由小鸡编译器提供——pcc"
+    .text
+    .globl	main
+    .type	main, @function
+main:
+
+    .cfi_startproc
+    pushq	%rbp
+    .cfi_def_cfa_offset 16
+    .cfi_offset 6, -16
+    movq	%rsp, %rbp
+    .cfi_def_cfa_register 6
+    subq	$120, %rsp
+    movl	$0, -8(%rbp)
+    movl	$0, -12(%rbp)
+    movl	$1, -112(%rbp)
+    movl	$2, -108(%rbp)
+    movl	$3, -104(%rbp)
+.W5:
+    movl	-12(%rbp), %eax
+    cmpl	$20, %eax
+    jle	.code7
+    jmp	.block7
+.code7:
+    movl	-12(%rbp), %eax
+    cltq
+    movl	-112(%rbp, %rax, 4), %ecx
+    movl	%ecx, -8(%rbp)
+    movl	-12(%rbp), %edx
+    movl	$1, %eax
+    addl	%edx, %eax
+    movl	%eax, T0(%rip)
+    movl	T0(%rip), %eax
+    cltq
+    movl	-112(%rbp, %rax, 4), %edx
+    movl	-8(%rbp), %eax
+    addl	%edx, %eax
+    movl	%eax, T1(%rip)
+    movl	-12(%rbp), %edx
+    movl	$2, %eax
+    addl	%edx, %eax
+    movl	%eax, T2(%rip)
+    movl	T2(%rip), %eax
+    cltq
+    movl	T1(%rip), %ecx
+    movl	%ecx, -112(%rbp, %rax, 4)
+    movl	-12(%rbp), %eax
+    movl	-8(%rbp), %edx
+    movl	%eax, %esi
+    leaq	.LC0(%rip), %rdi
+    movl	$0, %eax
+    call	printf@PLT
+    movl	-12(%rbp), %edx
+    movl	$1, %eax
+    addl	%edx, %eax
+    movl	%eax, T3(%rip)
+    movl	T3(%rip), %ecx
+    movl	%ecx, -12(%rbp)
+    jmp	.W5
+.block7:
+    movl	%eax, %esi
+    leaq	.LC1(%rip), %rdi
+    movl	$0, %eax
+    call	printf@PLT
+
+    movl	$0, %eax
+    leave
+    .cfi_def_cfa 7, 8
+    ret
+    .cfi_endproc
+.LFE6:
+    .size	main, .-main
+    .ident	"PCC: 1.0.0"
+</code></pre>
+<p>其他命令自行发觉hhh</p>
+</div>
+    <footer class="article-footer"><div class="article-tags"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E6%9D%82%E4%B8%83%E6%9D%82%E5%85%AB">杂七杂八</a><a class="tag tag-colored" style="--tag-bg:#E6FAFA;--tag-text:#167A7F;--tag-border:#B8E7E8;--tag-dark-bg:#123638;--tag-dark-text:#8EE2E5;--tag-dark-border:#2B6E72;" href="/tags.html#%E7%BC%96%E8%AF%91%E5%99%A8">编译器</a><a class="tag tag-colored" style="--tag-bg:#F0E9FF;--tag-text:#6843B5;--tag-border:#D7C6F6;--tag-dark-bg:#271E3F;--tag-dark-text:#C5B2FF;--tag-dark-border:#55427F;" href="/tags.html#python">python</a></div></footer>
     </article>
     <aside class="toc-sidebar" id="tocSidebar" hidden></aside>
   </main>

@@ -8,7 +8,13 @@ on:
       - 'post/**'
       - 'data/posts.json'
       - 'assets/js/config.js'
+      - 'assets/js/post.js'
+      - 'post.html'
       - 'scripts/build.mjs'
+      - 'scripts/markdown-render.mjs'
+      - 'scripts/prerender-post-html.mjs'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/build.yml'
   workflow_dispatch:
 
@@ -30,8 +36,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Generate sitemap / rss / validate
-        run: node scripts/build.mjs
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate sitemap / rss / prerender posts
+        run: npm run build
 
       - name: Commit if changed
         run: |

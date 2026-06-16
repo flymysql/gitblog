@@ -401,6 +401,29 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   else article.appendChild(sec);
 }
 
+async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, data }) {
+  const items = buildToc(article);
+  if (items) renderToc(items);
+
+  sanitizeArticleLayout(article);
+  enhanceCodeBlocks(article);
+  enhanceCodeAdvanced(article);
+  enhanceHeadings(article);
+  enhanceImages(article);
+  enhanceLinks(article);
+  rewriteLegacyPostLinks(article);
+  enhanceMath(article);
+  enhanceMermaid(article);
+  bindShareCard(article, { ...(data || {}), slug, title });
+
+  renderSeriesIndex(allPosts, slug, (meta && meta.series) || (data && data.series));
+  renderNeighborsAndRelated(allPosts, slug, tags);
+  renderGiscus(slug);
+
+  initPageviews();
+  trackAndRenderArticleView(slug);
+}
+
 (async function init() {
   initSite({ active: '' });
   bindReadingProgress();
@@ -419,7 +442,9 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   const qSlug = (params.get('slug') || '').trim();
 
   const article = $('#article');
-  if (!qSlug && !pathSeg) {
+  const isPrerendered = article && article.dataset.prerendered === '1';
+
+  if (!qSlug && !pathSeg && !isPrerendered) {
     article.innerHTML = '<div class="error">未找到文章地址（请使用 /post/YYYYMMDD/、/post/welcome/ 等或 post.html?slug=）</div>';
     return;
   }
@@ -429,7 +454,10 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
   try {
     const idx = await fetchIndexPublic();
     allPosts = idx.posts || [];
-    if (qSlug) {
+    if (isPrerendered) {
+      const prerenderSlug = (article.dataset.slug || '').trim();
+      meta = allPosts.find(p => p.slug === prerenderSlug) || null;
+    } else if (qSlug) {
       meta = allPosts.find(p => p.slug === qSlug) || null;
     } else if (pathSeg) {
       meta = allPosts.find(p => p.urlKey === pathSeg)
@@ -438,13 +466,13 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
     }
   } catch {}
 
-  const slug = (meta && meta.slug) || qSlug || pathSeg;
+  const slug = (meta && meta.slug) || (isPrerendered ? (article.dataset.slug || '').trim() : '') || qSlug || pathSeg;
   if (!slug) {
     article.innerHTML = '<div class="error">未找到对应文章</div>';
     return;
   }
 
-  if (!meta && pathSeg && isPostPublicPathKey(pathSeg)) {
+  if (!meta && pathSeg && isPostPublicPathKey(pathSeg) && !isPrerendered) {
     article.innerHTML = `<div class="error">未找到路径「${escapeHtml(pathSeg)}」对应的文章</div>`;
     return;
   }
@@ -458,6 +486,14 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
     } catch {
       /* 部分 WebView 对 replaceState 较严格 */
     }
+  }
+
+  if (isPrerendered) {
+    const titleEl = article.querySelector('.article-title');
+    const title = (meta && meta.title) || (titleEl && titleEl.textContent.trim()) || '无标题';
+    const tags = (meta && meta.tags) || [];
+    await enhancePostArticle(article, { slug, title, tags, allPosts, meta, data: {} });
+    return;
   }
 
   let raw = '';
@@ -549,32 +585,5 @@ function renderSeriesIndex(allPosts, currentSlug, seriesName) {
     ${shareCardHtml({ ...(meta || {}), ...data, slug, title, page: !!(meta && meta.page) || !!data.page })}
   `;
 
-  // TOC
-  const items = buildToc(article);
-  if (items) renderToc(items);
-
-  // 增强：清布局 / 代码复制 / 标题锚点 / 图片懒加载+灯箱 / 数学 / Mermaid / 代码行号折叠
-  sanitizeArticleLayout(article);
-  enhanceCodeBlocks(article);          // 复制按钮（已存在）
-  enhanceCodeAdvanced(article);        // 行号 + 长代码折叠 + 语言徽标
-  enhanceHeadings(article);
-  enhanceImages(article);
-  enhanceLinks(article);
-  rewriteLegacyPostLinks(article);
-  enhanceMath(article);                // KaTeX 渲染 .math 节点（懒加载 KaTeX）
-  enhanceMermaid(article);             // Mermaid 渲染 .mermaid 节点（懒加载 mermaid.js）
-  bindShareCard(article, { ...data, slug, title });  // 分享 / 二维码 / 打赏
-
-  // 系列文章目录（如果属于某个系列）
-  renderSeriesIndex(allPosts, slug, (meta && meta.series) || data.series);
-
-  // 上下篇 + 相关文章
-  renderNeighborsAndRelated(allPosts, slug, tags);
-
-  // 评论
-  renderGiscus(slug);
-
-  // 文章 author meta 里的「阅读 N」占位是这里渲染的；按 slug 计数，首页列表只读不增。
-  initPageviews();
-  trackAndRenderArticleView(slug);
+  await enhancePostArticle(article, { slug, title, tags, allPosts, meta, data });
 })();
