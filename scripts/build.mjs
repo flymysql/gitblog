@@ -505,6 +505,27 @@ function rewritePostShellHtml(html) {
     .replace(/\bhref="rss\.xml"/g, `href="${postShellRootHref('rss.xml')}"`)
     .replace(/\blink rel="apple-touch-icon" href="assets\//g, `link rel="apple-touch-icon" href="${a}/`);
 }
+
+function writeRootPostHtmlRedirect(entries) {
+  const map = {};
+  for (const p of entries) {
+    const key = safePostUrlKeyDir(p);
+    if (p.slug && key) map[p.slug] = key;
+  }
+  const bpJson = JSON.stringify(SITE_PATH_PREFIX.replace(/\/+$/, ''));
+  const body = `(function(){try{var m=${JSON.stringify(map)};var s=new URLSearchParams(location.search).get('slug');if(!s||!/post\\.html$/i.test(location.pathname))return;var k=m[s];if(!k)return;var bp=${bpJson};location.replace((bp?bp:'')+'/post/'+encodeURIComponent(k)+'/');}catch(e){}})();`;
+  let html = readFileSync('post.html', 'utf8');
+  html = html.replace(/\n?\s*<script data-post-slug-redirect>[\s\S]*?<\/script>/g, '');
+  html = html.replace(
+    /(<meta name="referrer" content="no-referrer-when-downgrade">)/,
+    `$1\n  <script data-post-slug-redirect>${body}</script>`
+  );
+  writeFileSync('post.html', html);
+  console.log(`post.html 已写入 slug→urlKey 跳转（${Object.keys(map).length} 篇）`);
+}
+
+const postEntries = [...visiblePosts, ...pages.filter(x => !x.draft)];
+writeRootPostHtmlRedirect(postEntries);
 const POST_SHELL = rewritePostShellHtml(readFileSync('post.html', 'utf8'));
 const POST_ROOT = 'post';
 const SITE_FOR_PRERENDER = {
@@ -536,7 +557,7 @@ function safePostUrlKeyDir(p) {
 if (existsSync(POST_ROOT)) rmSync(POST_ROOT, { recursive: true, force: true });
 mkdirSync(POST_ROOT, { recursive: true });
 let postShellCount = 0;
-for (const p of [...visiblePosts, ...pages.filter(x => !x.draft)]) {
+for (const p of postEntries) {
   const dirKey = safePostUrlKeyDir(p);
   if (!dirKey) {
     console.warn('[build] 跳过缺少或非法 urlKey，无法生成 post 目录：', p.slug);
