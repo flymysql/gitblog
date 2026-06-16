@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
-  <title>加载中…</title>
+  <title>Dijkstra单源最短路径算法 · 小红鸡</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
   <link rel="stylesheet" href="/assets/css/common.css?v=20260514200000">
   <link rel="stylesheet" href="/assets/css/post.css?v=20260521180000">
@@ -13,13 +13,230 @@
   <meta name="theme-color" content="#ea6f5a">
   <link rel="apple-touch-icon" href="/assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。…">
+  <meta name="author" content="兰州小红鸡">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="Dijkstra单源最短路径算法">
+  <meta property="og:description" content="算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。…">
+  <meta property="og:image" content="/assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.png">
+  <meta property="og:url" content="https://gitpull.cn/post/20181123/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="小红鸡">
+  <meta property="og:locale" content="zh-CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Dijkstra单源最短路径算法">
+  <meta name="twitter:description" content="算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。…">
+  <meta name="twitter:image" content="/assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.png">
+  <link rel="canonical" href="https://gitpull.cn/post/20181123/">
+  <meta property="article:published_time" content="2018-11-23T17:32:33+08:00">
+  <meta property="article:modified_time" content="2018-11-23T17:32:33+08:00">
+  <meta property="article:author" content="兰州小红鸡">
+  <meta property="article:tag" content="前端">
+  <meta property="article:tag" content="算法">
+  <meta property="article:tag" content="C++">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Dijkstra单源最短路径算法","description":"算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。…","image":"/assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.png","datePublished":"2018-11-23T17:32:33+08:00","dateModified":"2018-11-23T17:32:33+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20181123/","keywords":"前端,算法,C++"}</script>
 </head>
 <body>
   <div id="site-nav"></div>
 
   <main class="article-layout">
-    <article class="article" id="article">
-      <div class="loading">加载中…</div>
+    <article class="article is-prerendered" id="article" data-prerendered="1" data-slug="Dijkstra单源最短路径算法-15e41f53">
+      <header class="article-header">
+      <div class="article-tags-top"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E5%89%8D%E7%AB%AF">前端</a><a class="tag tag-colored" style="--tag-bg:#FCE8F3;--tag-text:#A33B72;--tag-border:#F2B9D8;--tag-dark-bg:#381B2C;--tag-dark-text:#F7A6CE;--tag-dark-border:#753858;" href="/tags.html#%E7%AE%97%E6%B3%95">算法</a><a class="tag tag-colored" style="--tag-bg:#FFF4D8;--tag-text:#936018;--tag-border:#F2D38A;--tag-dark-bg:#382A12;--tag-dark-text:#F4C76F;--tag-dark-border:#735421;" href="/tags.html#C%2B%2B">C++</a></div>
+      <h1 class="article-title">Dijkstra单源最短路径算法</h1>
+      <div class="article-author">
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+        <div class="info">
+          <div class="name">兰州小红鸡</div>
+          <div class="meta">
+            <span>2018-11-23</span>
+            
+            <span class="dot"></span>
+            <span>4712 字</span>
+            <span class="dot"></span>
+            <span class="meta-read-mins">约 5 分钟</span>
+          </div>
+        </div>
+        <a class="article-edit" href="/admin/editor.html?slug=Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95-15e41f53" title="编辑此文">编辑</a>
+      </div>
+    </header>
+    <div class="article-body"><p><a href="https://me.idealli.com/others/Dijkstra.html">算法动态演示地址</a> 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述</p>
+<h3><a href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0">¶</a>问题描述</h3>
+<p>给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。另外，还给定 V 中的一个顶点，称为源。现在我们要计算从源到所有其他各顶点的最短路径长度。这里的长度是指路上各边权之和。这个问题通常称为单源最短路径问题。<br>Dijkstra算法的解决方案</p>
+<p>Dijkstra提出按各顶点与源点v间的路径长度的递增次序，生成到各顶点的最短路径的算法。既先求出长度最短的一条最短路径，再参照它求出长度次短的一条最短路径，依次类推，直到从源点v 到其它各顶点的最短路径全部求出为止。</p>
+<h3><a href="#dijkstra%E7%AE%97%E6%B3%95%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E6%83%B3">¶</a>Dijkstra算法的解题思想</h3>
+<p>将图G中所有的顶点V分成两个顶点集合S和T。以v为源点已经确定了最短路径的终点并入S集合中，S初始时只含顶点v,T则是尚未确定到源点v最短路径的顶点集合。然后每次从T集合中选择S集合点中到T路径最短的那个点，并加入到集合S中，并把这个点从集合T删除。直到T集合为空为止。</p>
+<h3><a href="#%E5%85%B7%E4%BD%93%E6%AD%A5%E9%AA%A4">¶</a>具体步骤</h3>
+<ol>
+<li><p>选一顶点v为源点，并视从源点v出发的所有边为到各顶点的最短路径（确定数据结构：因为求的是最短路径，所以①就要用一个记录从源点v到其它各顶点的路径长度数组dist[],开始时，dist是源点v到顶点i的直接边长度，即dist中记录的是邻接阵的第v行。②设一个用来记录从源点到其它顶点的路径数组path[],path中存放路径上第i个顶点的前驱顶点）。</p>
+</li>
+<li><p>在上述的最短路径dist[]中选一条最短的，并将其终点（即v,k）k加入到集合s中。</p>
+</li>
+<li><p>调整T中各顶点到源点v的最短路径。 因为当顶点k加入到集合s中后，源点v到T中剩余的其它顶点j就又增加了经过顶点k到达j的路径,这条路径可能要比源点v到j原来的最短的还要短。调整方法是比较dist[k]+g[k,j]与dist[j]，取其中的较小者。</p>
+</li>
+<li><p>再选出一个到源点v路径长度最小的顶点k,从T中删去后加入S中，再回去到第三步，如此重复，直到集合S中的包含图G的所有顶点。</p>
+</li>
+</ol>
+<h3><a href="#c-%E4%BB%A3%E7%A0%81">¶</a>C++代码</h3>
+<pre><code class="language-cpp">
+#define MaxvertextType 100
+#define gigantic 99999
+typedef char vertextType;
+typedef int edgeType;
+
+//邻接矩阵
+typedef struct {
+    vertextType vex[MaxvertextType];
+    edgeType edge[MaxvertextType][MaxvertextType];
+    int vexnum=MaxvertextType,arcnum;
+}Mgraph;
+
+//节点在数组中的下标
+int getVex(Mgraph G,vertextType x){
+    int i=0;
+    for(;G.vex[i]!=x;i++);
+    return i;
+}
+
+//单源最短路径算法
+void Dijkstra(Mgraph g,vertextType x){
+    int vexnum=g.vexnum;
+    int vex=getVex(g,x);
+    edgeType dist[vexnum];
+    int path[vexnum];
+    path[0]=0;
+    for (int i = 0; i &lt; vexnum; ++i) {
+        dist[i]=g.edge[vex][i];
+        if(dist[i]!=gigantic)path[i]=0;
+    }
+    bool S[vexnum];
+    S[0] = true;
+    int dd,dvex=0;
+    for (int j = 0; j &lt; vexnum-1; ++j) {
+        dd=gigantic;
+        for (int i = 1; i &lt; vexnum; ++i) {
+            if(dist[i]&lt;dd &amp;&amp; !S[i]) {
+                dd=dist[i];
+                dvex=i;
+            }
+        }
+        S[dvex]= true;
+        for (int k = 1; k &lt; vexnum; ++k) {
+            if (!S[k]){
+                if (dist[dvex]+g.edge[dvex][k]&lt;dist[k]) {
+                    dist[k] = dist[dvex] + g.edge[dvex][k];
+                    path[k] = dvex;
+                }
+            }
+        }
+    }
+    for (int m = 1; m &lt; vexnum; ++m) {
+        int nowvex=m;
+        cout&lt;&lt;"\npath:"&lt;&lt;g.vex[nowvex];
+        while(path[nowvex]!=0){
+            nowvex=path[nowvex];
+            cout&lt;&lt;"&lt;-"&lt;&lt;g.vex[nowvex];
+        }
+        cout&lt;&lt;"&lt;-"&lt;&lt;g.vex[0];
+        cout&lt;&lt;"\tdistance:"&lt;&lt;dist[m];
+    }
+}
+
+//图的初始化
+void init(Mgraph &amp; g){
+    for(int i=0;i&lt;g.vexnum;i++){
+        for (int j = 0; j &lt; g.vexnum; ++j) {
+            if (i==j)g.edge[i][j]=0;
+            else g.edge[i][j]=gigantic;
+        }
+    }
+}
+</code></pre>
+<p>感觉代码还是有点臃肿了 晚点打算再写一个<code>JavaScript</code>实现的算法 结合html来制作图形界面</p>
+<h3><a href="#2018-11-24%E6%9B%B4%E6%96%B0">¶</a>2018-11-24更新</h3>
+<blockquote>
+<p>花了一早上写了<code>js</code>版本的，并能够动态演示过程</p>
+</blockquote>
+<p><a href="https://me.idealli.com/others/Dijkstra.html">演示地址</a></p>
+<p><img src="/assets/uploads/2026/05/Dijkstra%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95-15e41f53-01.png" alt="兰州小红鸡"></p>
+<h3><a href="#%E9%83%A8%E5%88%86javascript%E4%BB%A3%E7%A0%81">¶</a>部分javascript代码</h3>
+<pre><code class="language-cpp">
+var MaxvertextType = 100
+var gigantic = 99999
+
+//邻接矩阵
+function Mgraph() {
+    this.vex=new Array();
+    this.edge=new Array();
+    this.vexnum=MaxvertextType;
+    this.arcnum=MaxvertextType;
+};
+
+function getVex(G,x){
+    var i=0;
+    for(;G.vex[i]!=x;i++);
+    return i;
+}
+
+//单源最短路径算法
+function Dijkstra(g,x){
+    var vexnum=g.vexnum;
+    var vex=getVex(g,x);
+    var dist= new Array();
+    var path = new Array();
+    path[0]=0;
+    for (var i = 0; i &lt; vexnum; ++i) {
+        dist[i]=g.edge[vex][i];
+        if(dist[i]!=gigantic)path[i]=0;
+    }
+    var S = new Array();
+    S[0] = true;
+    var dd;
+    var dvex=0;
+    for (var j = 0; j &lt; vexnum-1; ++j) {
+        dd=gigantic;
+        for (var i = 1; i &lt; vexnum; ++i) {
+            if(dist[i]&lt;dd &amp;&amp; !S[i]) {
+                dd=dist[i];
+                dvex=i;
+            }
+        }
+        S[dvex]= true;
+        for (var k = 1; k &lt; vexnum; ++k) {
+            if (!S[k]){
+                if (dist[dvex]+g.edge[dvex][k]&lt;dist[k]) {
+                    dist[k] = dist[dvex] + g.edge[dvex][k];
+                    path[k] = dvex;
+                }
+            }
+        }
+    }
+    for (var m = 1; m &lt; vexnum; ++m) {
+        var nowvex=m;
+        var str="\npath:"+g.vex[nowvex];
+        while(path[nowvex]!=0){
+            nowvex=path[nowvex];
+            str=str+"&lt;-"+g.vex[nowvex];
+        }
+        str=str+"&lt;-"+g.vex[0]+"\tdistance:"+dist[m];
+        console.log(str);
+    }
+}
+
+//图的初始化
+function init(g){
+    for(var i=0;i&lt;g.vexnum;i++){
+        var temp=[];
+        for (var j = 0; j &lt; g.vexnum; ++j) {
+            if (i==j) temp[j]=0;
+            else temp[j]=gigantic;
+        }
+        g.edge[i]=temp;
+    }
+}
+</code></pre>
+</div>
+    <footer class="article-footer"><div class="article-tags"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E5%89%8D%E7%AB%AF">前端</a><a class="tag tag-colored" style="--tag-bg:#FCE8F3;--tag-text:#A33B72;--tag-border:#F2B9D8;--tag-dark-bg:#381B2C;--tag-dark-text:#F7A6CE;--tag-dark-border:#753858;" href="/tags.html#%E7%AE%97%E6%B3%95">算法</a><a class="tag tag-colored" style="--tag-bg:#FFF4D8;--tag-text:#936018;--tag-border:#F2D38A;--tag-dark-bg:#382A12;--tag-dark-text:#F4C76F;--tag-dark-border:#735421;" href="/tags.html#C%2B%2B">C++</a></div></footer>
     </article>
     <aside class="toc-sidebar" id="tocSidebar" hidden></aside>
   </main>
