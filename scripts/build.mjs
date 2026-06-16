@@ -1,6 +1,7 @@
 // 校验 + 重新生成 sitemap.xml 与 rss.xml
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { join, basename, extname } from 'node:path';
+import { buildPrerenderedPostHtml } from './prerender-post-html.mjs';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
 const cfgRaw = readFileSync('assets/js/config.js', 'utf8');
@@ -13,6 +14,22 @@ const SITE_TITLE = getStr('title') || 'Blog';
 const SITE_DESC = getStr('description') || '';
 const SITE_AUTHOR = getStr('author') || '';
 const SITE_LOCALE = getStr('locale') || 'zh-CN';
+const SITE_AVATAR = getStr('avatar') || '';
+const SITE_LOGO = getStr('logo') || '';
+const SITE_SUBTITLE = getStr('subtitle') || '';
+
+function getSectionBool(section, key, fallback = false) {
+  const re = new RegExp(`${section}\\s*:\\s*\\{[\\s\\S]*?${key}\\s*:\\s*(true|false)`);
+  const m = cfgRaw.match(re);
+  if (!m) return fallback;
+  return m[1] === 'true';
+}
+
+function getNestedStr(section, key) {
+  const re = new RegExp(`${section}\\s*:\\s*\\{[\\s\\S]*?${key}\\s*:\\s*"([^"]*)"`);
+  const m = cfgRaw.match(re);
+  return m ? m[1] : '';
+}
 const POSTS_DIR = 'posts';
 const INDEX_FILE = 'data/posts.json';
 const OG_DIR = 'assets/og';
@@ -490,6 +507,25 @@ function rewritePostShellHtml(html) {
 }
 const POST_SHELL = rewritePostShellHtml(readFileSync('post.html', 'utf8'));
 const POST_ROOT = 'post';
+const SITE_FOR_PRERENDER = {
+  title: SITE_TITLE,
+  subtitle: SITE_SUBTITLE,
+  author: SITE_AUTHOR,
+  avatar: SITE_AVATAR,
+  logo: SITE_LOGO,
+  locale: SITE_LOCALE,
+};
+const SHARE_CFG = {
+  enabled: getSectionBool('share', 'enabled', false),
+  qrcodeOfPage: getSectionBool('share', 'qrcodeOfPage', true),
+};
+const DONATE_CFG = {
+  enabled: getSectionBool('donate', 'enabled', false),
+  title: getNestedStr('donate', 'title') || '如果这篇文章对你有帮助，欢迎请我喝杯咖啡 ☕️',
+  wechat: '',
+  alipay: '',
+  paypal: '',
+};
 function safePostUrlKeyDir(p) {
   const slug = String(p.slug || '');
   const k = String(p.urlKey || '').trim();
@@ -508,7 +544,23 @@ for (const p of [...visiblePosts, ...pages.filter(x => !x.draft)]) {
   }
   const dir = join(POST_ROOT, dirKey);
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, 'index.html'), POST_SHELL);
+  const raw = readFileSync(p.path, 'utf8');
+  const { data: fmData, content } = parseFM(raw);
+  const prerendered = buildPrerenderedPostHtml({
+    post: {
+      ...p,
+      canonical: postPublicAbsUrl(p),
+    },
+    fmData,
+    content,
+    sitePathPrefix: SITE_PATH_PREFIX,
+    siteOrigin: SITE_ORIGIN,
+    site: SITE_FOR_PRERENDER,
+    shareCfg: SHARE_CFG,
+    donateCfg: DONATE_CFG,
+    postShellTemplate: POST_SHELL,
+  });
+  writeFileSync(join(dir, 'index.html'), prerendered);
   postShellCount++;
 }
-console.log(`post/{{urlKey}}/ 已生成（${postShellCount} 个 HTML shell）`);
+console.log(`post/{{urlKey}}/ 已生成（${postShellCount} 篇预渲染 HTML）`);

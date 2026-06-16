@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
-  <title>加载中…</title>
+  <title>微信小程序加载游戏排名/好友/全球 · 小红鸡</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
   <link rel="stylesheet" href="/assets/css/common.css?v=20260514200000">
   <link rel="stylesheet" href="/assets/css/post.css?v=20260521180000">
@@ -13,13 +13,115 @@
   <meta name="theme-color" content="#ea6f5a">
   <link rel="apple-touch-icon" href="/assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="后端用的wafer实现">
+  <meta name="author" content="兰州小红鸡">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="微信小程序加载游戏排名/好友/全球">
+  <meta property="og:description" content="后端用的wafer实现">
+  <meta property="og:image" content="https://gitpull.cn/assets/og/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8A%A0%E8%BD%BD%E6%B8%B8%E6%88%8F%E6%8E%92%E5%90%8D%E5%A5%BD%E5%8F%8B%E5%85%A8%E7%90%83-6d6da729.svg">
+  <meta property="og:url" content="https://gitpull.cn/post/20180501-3/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="小红鸡">
+  <meta property="og:locale" content="zh-CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="微信小程序加载游戏排名/好友/全球">
+  <meta name="twitter:description" content="后端用的wafer实现">
+  <meta name="twitter:image" content="https://gitpull.cn/assets/og/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8A%A0%E8%BD%BD%E6%B8%B8%E6%88%8F%E6%8E%92%E5%90%8D%E5%A5%BD%E5%8F%8B%E5%85%A8%E7%90%83-6d6da729.svg">
+  <link rel="canonical" href="https://gitpull.cn/post/20180501-3/">
+  <meta property="article:published_time" content="2018-05-01T16:28:03+08:00">
+  <meta property="article:modified_time" content="2018-05-01T16:28:03+08:00">
+  <meta property="article:author" content="兰州小红鸡">
+  <meta property="article:tag" content="微信小程序">
+  <meta property="article:tag" content="前端">
+  <meta property="article:tag" content="算法">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"微信小程序加载游戏排名/好友/全球","description":"后端用的wafer实现","image":"https://gitpull.cn/assets/og/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8A%A0%E8%BD%BD%E6%B8%B8%E6%88%8F%E6%8E%92%E5%90%8D%E5%A5%BD%E5%8F%8B%E5%85%A8%E7%90%83-6d6da729.svg","datePublished":"2018-05-01T16:28:03+08:00","dateModified":"2018-05-01T16:28:03+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20180501-3/","keywords":"微信小程序,前端,算法"}</script>
 </head>
 <body>
   <div id="site-nav"></div>
 
   <main class="article-layout">
-    <article class="article" id="article">
-      <div class="loading">加载中…</div>
+    <article class="article is-prerendered" id="article" data-prerendered="1" data-slug="微信小程序加载游戏排名好友全球-6d6da729">
+      <header class="article-header">
+      <div class="article-tags-top"><a class="tag tag-colored" style="--tag-bg:#FFE8E3;--tag-text:#C44732;--tag-border:#F7C5BA;--tag-dark-bg:#3A211D;--tag-dark-text:#FFB2A3;--tag-dark-border:#6F3B32;" href="/tags.html#%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F">微信小程序</a><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E5%89%8D%E7%AB%AF">前端</a><a class="tag tag-colored" style="--tag-bg:#FCE8F3;--tag-text:#A33B72;--tag-border:#F2B9D8;--tag-dark-bg:#381B2C;--tag-dark-text:#F7A6CE;--tag-dark-border:#753858;" href="/tags.html#%E7%AE%97%E6%B3%95">算法</a></div>
+      <h1 class="article-title">微信小程序加载游戏排名/好友/全球</h1>
+      <div class="article-author">
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+        <div class="info">
+          <div class="name">兰州小红鸡</div>
+          <div class="meta">
+            <span>2018-05-01</span>
+            
+            <span class="dot"></span>
+            <span>1456 字</span>
+            <span class="dot"></span>
+            <span class="meta-read-mins">约 1 分钟</span>
+          </div>
+        </div>
+        <a class="article-edit" href="/admin/editor.html?slug=%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%8A%A0%E8%BD%BD%E6%B8%B8%E6%88%8F%E6%8E%92%E5%90%8D%E5%A5%BD%E5%8F%8B%E5%85%A8%E7%90%83-6d6da729" title="编辑此文">编辑</a>
+      </div>
+    </header>
+    <div class="article-body"><p><strong>后端用的wafer实现</strong></p>
+<pre><code class="language-javascript">var qcloud = require('../../vendor/wafer2-client-sdk/index')
+var config = require('../../config') var util = require('../../utils/util.js') const app = getApp();
+    Page({
+        data: {
+        currentTab: 0,
+        friendsData: [],
+        globalData: [],
+        loadNumber: 0//全球排名数据加载次数
+    },
+ onLoad: function (opt) {
+ wx.showShareMenu({ withShareTicket: true })
+ app.pageGetUserInfo(this)
+ this.getRankGlobalData();
+},
+
+onShow() {
+this.getRankFriendsData();
+},
+
+onReachBottom: function () {//下拉加载
+
+    const that = this if (that.data.currentTab) {
+    that.getRankGlobalData() }
+ },
+</code></pre>
+<pre><code class="language-javascript"> getRankGlobalData() {//加载全球排名的数据
+ const that = this qcloud.request({
+    login: false,
+    url: app.appData.baseUrl + 'getRankGlobalData',
+    data: { loadNumber: that.data.loadNumber },
+    success: (res) =&gt; {
+    that.setData({ globalData: that.data.globalData.concat(res.data.data),//数据叠加 loadNumber: that.data.loadNumber+1 })
+},
+    fail(error) {
+    util.showModel('请求失败', error);
+    console.log('request fail', error);
+},
+})
+},
+getRankFriendsData: function () {
+     const that = this qcloud.request({ login: false, url: app.appData.baseUrl + 'getRankFriendsData',
+     data: { openId: this.data.openId }, success: (res) =&gt; { this.setData({ friendsData: res.data.data })
+},
+     fail(error) {
+     util.showModel('请求失败', error);
+     console.log('request fail', error);
+    },
+});
+},
+
+swichNav(e) {
+    var that = this;
+    that.setData({
+    currentTab: e.target.dataset.current,
+    })
+    },
+}
+)
+</code></pre>
+</div>
+    <footer class="article-footer"><div class="article-tags"><a class="tag tag-colored" style="--tag-bg:#FFE8E3;--tag-text:#C44732;--tag-border:#F7C5BA;--tag-dark-bg:#3A211D;--tag-dark-text:#FFB2A3;--tag-dark-border:#6F3B32;" href="/tags.html#%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F">微信小程序</a><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E5%89%8D%E7%AB%AF">前端</a><a class="tag tag-colored" style="--tag-bg:#FCE8F3;--tag-text:#A33B72;--tag-border:#F2B9D8;--tag-dark-bg:#381B2C;--tag-dark-text:#F7A6CE;--tag-dark-border:#753858;" href="/tags.html#%E7%AE%97%E6%B3%95">算法</a></div></footer>
     </article>
     <aside class="toc-sidebar" id="tocSidebar" hidden></aside>
   </main>

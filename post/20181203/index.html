@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
-  <title>加载中…</title>
+  <title>小程序开发之接入Bmob后端云作为后端数据库 · 小红鸡</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
   <link rel="stylesheet" href="/assets/css/common.css?v=20260514200000">
   <link rel="stylesheet" href="/assets/css/post.css?v=20260521180000">
@@ -13,13 +13,141 @@
   <meta name="theme-color" content="#ea6f5a">
   <link rel="apple-touch-icon" href="/assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="前几天在网络课的项目汇报中，我展示了一个背单词的微信小程序，后端使用的是bmob的数据库。 今天有同学来问我怎么用那个数据库，我当时可能没讲清楚，索性写篇博客来说一下。 接入 Bm…">
+  <meta name="author" content="兰州小红鸡">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="小程序开发之接入Bmob后端云作为后端数据库">
+  <meta property="og:description" content="前几天在网络课的项目汇报中，我展示了一个背单词的微信小程序，后端使用的是bmob的数据库。 今天有同学来问我怎么用那个数据库，我当时可能没讲清楚，索性写篇博客来说一下。 接入 Bm…">
+  <meta property="og:image" content="https://gitpull.cn/assets/og/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91%E4%B9%8B%E6%8E%A5%E5%85%A5Bmob%E5%90%8E%E7%AB%AF%E4%BA%91%E4%BD%9C%E4%B8%BA%E5%90%8E%E7%AB%AF%E6%95%B0%E6%8D%AE%E5%BA%93-93621394.svg">
+  <meta property="og:url" content="https://gitpull.cn/post/20181203/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="小红鸡">
+  <meta property="og:locale" content="zh-CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="小程序开发之接入Bmob后端云作为后端数据库">
+  <meta name="twitter:description" content="前几天在网络课的项目汇报中，我展示了一个背单词的微信小程序，后端使用的是bmob的数据库。 今天有同学来问我怎么用那个数据库，我当时可能没讲清楚，索性写篇博客来说一下。 接入 Bm…">
+  <meta name="twitter:image" content="https://gitpull.cn/assets/og/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91%E4%B9%8B%E6%8E%A5%E5%85%A5Bmob%E5%90%8E%E7%AB%AF%E4%BA%91%E4%BD%9C%E4%B8%BA%E5%90%8E%E7%AB%AF%E6%95%B0%E6%8D%AE%E5%BA%93-93621394.svg">
+  <link rel="canonical" href="https://gitpull.cn/post/20181203/">
+  <meta property="article:published_time" content="2018-12-03T07:37:40+08:00">
+  <meta property="article:modified_time" content="2018-12-03T07:37:40+08:00">
+  <meta property="article:author" content="兰州小红鸡">
+  <meta property="article:tag" content="教程">
+  <meta property="article:tag" content="微信小程序">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"小程序开发之接入Bmob后端云作为后端数据库","description":"前几天在网络课的项目汇报中，我展示了一个背单词的微信小程序，后端使用的是bmob的数据库。 今天有同学来问我怎么用那个数据库，我当时可能没讲清楚，索性写篇博客来说一下。 接入 Bm…","image":"https://gitpull.cn/assets/og/%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91%E4%B9%8B%E6%8E%A5%E5%85%A5Bmob%E5%90%8E%E7%AB%AF%E4%BA%91%E4%BD%9C%E4%B8%BA%E5%90%8E%E7%AB%AF%E6%95%B0%E6%8D%AE%E5%BA%93-93621394.svg","datePublished":"2018-12-03T07:37:40+08:00","dateModified":"2018-12-03T07:37:40+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20181203/","keywords":"教程,微信小程序"}</script>
 </head>
 <body>
   <div id="site-nav"></div>
 
   <main class="article-layout">
-    <article class="article" id="article">
-      <div class="loading">加载中…</div>
+    <article class="article is-prerendered" id="article" data-prerendered="1" data-slug="小程序开发之接入Bmob后端云作为后端数据库-93621394">
+      <header class="article-header">
+      <div class="article-tags-top"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E6%95%99%E7%A8%8B">教程</a><a class="tag tag-colored" style="--tag-bg:#FFE8E3;--tag-text:#C44732;--tag-border:#F7C5BA;--tag-dark-bg:#3A211D;--tag-dark-text:#FFB2A3;--tag-dark-border:#6F3B32;" href="/tags.html#%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F">微信小程序</a></div>
+      <h1 class="article-title">小程序开发之接入Bmob后端云作为后端数据库</h1>
+      <div class="article-author">
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+        <div class="info">
+          <div class="name">兰州小红鸡</div>
+          <div class="meta">
+            <span>2018-12-02</span>
+            
+            <span class="dot"></span>
+            <span>2715 字</span>
+            <span class="dot"></span>
+            <span class="meta-read-mins">约 4 分钟</span>
+          </div>
+        </div>
+        <a class="article-edit" href="/admin/editor.html?slug=%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91%E4%B9%8B%E6%8E%A5%E5%85%A5Bmob%E5%90%8E%E7%AB%AF%E4%BA%91%E4%BD%9C%E4%B8%BA%E5%90%8E%E7%AB%AF%E6%95%B0%E6%8D%AE%E5%BA%93-93621394" title="编辑此文">编辑</a>
+      </div>
+    </header>
+    <div class="article-body"><p>前几天在网络课的项目汇报中，我展示了一个背单词的微信小程序，后端使用的是bmob的数据库。<br>今天有同学来问我怎么用那个数据库，我当时可能没讲清楚，索性写篇博客来说一下。</p>
+<p>接入<strong>Bmob后端云</strong>做一个简单的总结。所谓后端云，一句话概括就是跑在云端的数据库后台+服务器后台，引入到微信小程序开发中能带来的好处就是：让我们可以专注于小程序本身的业务逻辑开发，而不用去管复杂的后台服务器</p>
+<p>当然，这种免费的第三方数据库只适合平常做着玩的小项目，和那些比较水的校创项目 长期发展的话，建议自己买一台服务器手动搭建数据库，后续有空的话我会再写一篇自己搭建后端服务器的教程</p>
+<h3><a href="#%E6%8E%A5%E5%85%A5bmob%E5%90%8E%E7%AB%AF%E4%BA%91">¶</a>接入Bmob后端云</h3>
+<ul>
+<li><p>准备一个小程序公众号和Bmob账号<br>首先需要到微信公众平台官网上去注册一个小程序类型的公众号，假设将要开发的小程序命名为：MyApp.</p>
+</li>
+<li><p>打开Bmob官网注册一个账号。</p>
+</li>
+<li><p>获取并记录好MyApp小程序的<code>AppID</code>和<code>AppSecret</code><br>这两项信息在小程序后台的"设置－开发设置"页面可以获取到，获取到后需要在一个文本文件中记好，<strong>后面要用到</strong>。</p>
+</li>
+</ul>
+<h3><a href="#%E7%99%BB%E5%BD%95bmob%E6%8E%A7%E5%88%B6%E5%8F%B0">¶</a>登录Bmob控制台</h3>
+<p>创建一个应用，假设名字叫<code>MyBmobApp</code>，然后进入应用。到"设置"页面输入刚刚获取到的小程序的<code>AppID</code>和<code>AppSecret</code>并保存。</p>
+<p>获取并记好<code>MyBmobApp</code>对应的<code>Application ID</code>和<code>REST API key</code>.</p>
+<h3><a href="#%E7%99%BB%E5%BD%95%E5%B0%8F%E7%A8%8B%E5%BA%8Fmyapp%E5%90%8E%E5%8F%B0">¶</a>登录小程序MyApp后台</h3>
+<p>到<strong>设置－开发设置－服务器域名</strong>页面添加Bmob安全域名并保存（可一次性添加多个）。</p>
+<p>注：四种安全域名(两种类型：https和wss)</p>
+<p>全部填<code>api.bmob.cn</code>和<code>xxx.bmobcloud.com</code>，其中"xxx"为<code>MyBmobApp</code>的<code>Application ID</code>.</p>
+<h3><a href="#%E4%B8%8B%E8%BD%BDsdk">¶</a>下载SDK</h3>
+<p>到Bmob官网下载微信小程序对应的<code>SDK</code>并解压，将其中的所有<code>js</code>文件都放到小程序工程的<strong>utils</strong>目录下。</p>
+<h3><a href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E5%92%8C%E5%BC%95%E5%85%A5bmob">¶</a>初始化和引入Bmob</h3>
+<p>在小程序工程的<code>app.js</code>中加入如下代码进行全局初始化：</p>
+<pre><code class="language-sql">var Bmob = require('utils/bmob.js');
+Bmob.initialize('XXX','XXXXXX');
+// 注：其中'XXX'为MyBmobApp的Application ID,'XXXXXX'为其REST API key
+</code></pre>
+<p>在需要用到Bmob的page页的js中引入Bmob：</p>
+<pre><code class="language-sql">var Bmob = require('../../utils/bmob.js');
+</code></pre>
+<p>现在就可以在小程序中对Bmob后端云数据库进行各种操作了，像操作本地数据库那么简单。</p>
+<h3><a href="#%E5%B0%8F%E7%A8%8B%E5%BA%8F%E7%9B%B8%E5%85%B3api%E7%9A%84%E8%B0%83%E7%94%A8">¶</a>小程序相关api的调用</h3>
+<p>注意：调用数据库api之前你需要在bmob云后台创建相应的数据库<br>有数据库才能进行相应操作</p>
+<p>比如一个简单的用户登陆如何操作呢？</p>
+<h4><a href="#%E7%94%A8%E6%88%B7%E6%93%8D%E4%BD%9C">¶</a>用户操作</h4>
+<p>2018年5月1号起，微信官方彻底废除wx.getUserInfo 函数，如需获取用户信息，需要使用按钮获取。</p>
+<ul>
+<li>wxml：</li>
+</ul>
+<pre><code class="language-sql">&lt;button open-type="getUserInfo" bindgetuserinfo="getUserInfo"&gt; 获取头像昵称 &lt;/button&gt;
+</code></pre>
+<ul>
+<li>js：</li>
+</ul>
+<pre><code class="language-sql">getUserInfo: function(e) {
+    app.globalData.userInfo = e.detail.userInfo
+    Bmob.User.upInfo(e.detail.userInfo)
+    this.setData({
+      userInfo: e.detail.userInfo,
+      hasUserInfo: true
+    })
+}
+</code></pre>
+<ul>
+<li>wxml显示</li>
+</ul>
+<pre><code class="language-sql">&lt;image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"&gt;&lt;/image&gt;
+&lt;text class="userinfo-nickname"&gt;{{userInfo.nickName}}&lt;/text&gt;
+</code></pre>
+<ul>
+<li>请求示例：</li>
+</ul>
+<pre><code class="language-sql">Bmob.User.upInfo(e.detail.userInfo).then(result =&gt; {
+      console.log(result)
+    }).catch(err =&gt; {
+      console.log(err)
+    })
+</code></pre>
+<ul>
+<li>返回示例:</li>
+</ul>
+<pre><code class="language-sql">{"updatedAt":"2018-05-02 14:43:26"}
+</code></pre>
+<p>如上的简单操作，我们就可以使用bmob云数据库作为我们小程序的后端数据库啦<br>详细api文档还请阅读bmob官方api文档</p>
+<p><a href="http://doc.bmob.cn/data/wechat_app_new/index.html#_60">bmob云后端api文档</a></p>
+<h3><a href="#%E5%85%B3%E4%BA%8E%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%AE%A1%E5%8F%91%E5%B8%83%E6%88%96%E6%9B%B4%E6%96%B0">¶</a>关于小程序审发布或更新</h3>
+<blockquote>
+<p>小程序上线需要经过审核、发布两个过程。<br>审核通过后有全量更新、或者分阶段发布，小程序才会更新，首次发布没有选项。</p>
+</blockquote>
+<ol>
+<li>全量发布：即时向全量微信用户发布新版小程序。</li>
+<li>分阶段发布：新版小程序将在15天内以开发者自定义比例，向微信用户发布更新</li>
+<li>详情见知乎：发布小程序时选择全量发布和分阶段发布是什么意思？</li>
+</ol>
+<p>不得不说小程序审核速度是非常快的，通常小程序没有涉及政策不允许的内容或者超过小程序允许的应用服务类型，都是可以顺利通过，初次体验，即便在国庆期间，也是有工作团队进行审核，审核时间通常在几小时内。</p>
+<h3><a href="#%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD">¶</a>未完待续</h3>
+<p>小程序一直处于不愠不火的状态，但微信团队一直坚持在更新，都在不断的更新或者修复异常bug，有时间希望做些更有趣的小程序和大家分享。</p>
+</div>
+    <footer class="article-footer"><div class="article-tags"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E6%95%99%E7%A8%8B">教程</a><a class="tag tag-colored" style="--tag-bg:#FFE8E3;--tag-text:#C44732;--tag-border:#F7C5BA;--tag-dark-bg:#3A211D;--tag-dark-text:#FFB2A3;--tag-dark-border:#6F3B32;" href="/tags.html#%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F">微信小程序</a></div></footer>
     </article>
     <aside class="toc-sidebar" id="tocSidebar" hidden></aside>
   </main>
