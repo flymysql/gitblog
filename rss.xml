@@ -5,8 +5,17 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 16 Jun 2026 09:14:37 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 16 Jun 2026 09:39:29 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>海门回声 | 一个寂静的生日夜晚</title>
+      <link>https://gitpull.cn/post/20260616/</link>
+      <guid isPermaLink="false">海门回声-一个寂静的生日夜晚</guid>
+      <pubDate>Tue, 16 Jun 2026 12:00:00 GMT</pubDate>
+      <author>邻家酒肆</author>
+      <category>海门回声</category><category>随想</category>
+      <description><![CDATA[二〇〇三年的夏天，父母在外地打工，十二岁的姐姐和六岁的我留在南日岛上。那是姐姐的生日，她从村口小卖部买回一红塑料袋的饼干——不是什么高级货，是寺庙祭祀时常用的那种，硬邦邦的，表面印着模糊的花纹。对我们而言，那股油脂香味已经难得。姐姐喊来伟华哥，昏暗的客厅里，一张大凳子当桌子，三个人各拿一张小凳子围着坐……]]></description>
+    </item>
     <item>
       <title>用 AI 做好软件项目：上下文工程实践指南</title>
       <link>https://gitpull.cn/post/20260615/</link>
@@ -267,15 +276,6 @@
       <author>兰州小红鸡</author>
       
       <description><![CDATA[由于以前公众号发了挺多分享资源的文章，索性写个python爬虫来爬取 特点： 1.保留公众号排版样式（就是把div样式全拷下来了） 2.写成md格式，并且加了hexo渲染需要的头部…]]></description>
-    </item>
-    <item>
-      <title>hexo建站笔记之彩色标签云</title>
-      <link>https://gitpull.cn/post/20181107/</link>
-      <guid isPermaLink="false">hexo建站笔记之彩色标签云-d6caa003</guid>
-      <pubDate>Wed, 07 Nov 2018 12:08:34 GMT</pubDate>
-      <author>兰州小红鸡</author>
-      <category>教程</category><category>前端</category><category>博客建站</category>
-      <description><![CDATA[方法比较简单，加个js脚本就好了，至于加载哪里都无所谓了，就放在标签云的页面。 就加在标签的那个页面好了。 1. 打开themes\\\\next\\\\layout\\\\page.swig…]]></description>
     </item>
   </channel>
 </rss>
