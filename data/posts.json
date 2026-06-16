@@ -94,8 +94,9 @@
       "tags": [
         "杂七杂八"
       ],
+      "cover": "../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.jpg",
       "path": "posts/about.md",
-      "cover": "../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.jpg"
+      "urlKey": "about"
     },
     {
       "slug": "smallpond-source-walkthrough",
