@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
-  <title>加载中…</title>
+  <title>sql语言学习笔记 · 小红鸡</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
   <link rel="stylesheet" href="/assets/css/common.css?v=20260514200000">
   <link rel="stylesheet" href="/assets/css/post.css?v=20260521180000">
@@ -13,13 +13,178 @@
   <meta name="theme-color" content="#ea6f5a">
   <link rel="apple-touch-icon" href="/assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="¶创建数据库 主要是今天第一次上了数据库实验课 就随便记记 新手上路，见笑了 以下是创建数据库userdb1的SQL语句， ¶运行上诉语句建立数据库userdb1 ¶建立学生选课和…">
+  <meta name="author" content="兰州小红鸡">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="sql语言学习笔记">
+  <meta property="og:description" content="¶创建数据库 主要是今天第一次上了数据库实验课 就随便记记 新手上路，见笑了 以下是创建数据库userdb1的SQL语句， ¶运行上诉语句建立数据库userdb1 ¶建立学生选课和…">
+  <meta property="og:image" content="https://gitpull.cn/assets/og/sql%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1406270f.svg">
+  <meta property="og:url" content="https://gitpull.cn/post/20181008/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="小红鸡">
+  <meta property="og:locale" content="zh-CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="sql语言学习笔记">
+  <meta name="twitter:description" content="¶创建数据库 主要是今天第一次上了数据库实验课 就随便记记 新手上路，见笑了 以下是创建数据库userdb1的SQL语句， ¶运行上诉语句建立数据库userdb1 ¶建立学生选课和…">
+  <meta name="twitter:image" content="https://gitpull.cn/assets/og/sql%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1406270f.svg">
+  <link rel="canonical" href="https://gitpull.cn/post/20181008/">
+  <meta property="article:published_time" content="2018-10-08T21:16:09+08:00">
+  <meta property="article:modified_time" content="2018-10-08T21:16:09+08:00">
+  <meta property="article:author" content="兰州小红鸡">
+  <meta property="article:tag" content="sql">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"sql语言学习笔记","description":"¶创建数据库 主要是今天第一次上了数据库实验课 就随便记记 新手上路，见笑了 以下是创建数据库userdb1的SQL语句， ¶运行上诉语句建立数据库userdb1 ¶建立学生选课和…","image":"https://gitpull.cn/assets/og/sql%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1406270f.svg","datePublished":"2018-10-08T21:16:09+08:00","dateModified":"2018-10-08T21:16:09+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20181008/","keywords":"sql"}</script>
 </head>
 <body>
   <div id="site-nav"></div>
 
   <main class="article-layout">
-    <article class="article" id="article">
-      <div class="loading">加载中…</div>
+    <article class="article is-prerendered" id="article" data-prerendered="1" data-slug="sql语言学习笔记-1406270f">
+      <header class="article-header">
+      <div class="article-tags-top"><a class="tag tag-colored" style="--tag-bg:#FCE8F3;--tag-text:#A33B72;--tag-border:#F2B9D8;--tag-dark-bg:#381B2C;--tag-dark-text:#F7A6CE;--tag-dark-border:#753858;" href="/tags.html#sql">sql</a></div>
+      <h1 class="article-title">sql语言学习笔记</h1>
+      <div class="article-author">
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+        <div class="info">
+          <div class="name">兰州小红鸡</div>
+          <div class="meta">
+            <span>2018-10-08</span>
+            
+            <span class="dot"></span>
+            <span>2597 字</span>
+            <span class="dot"></span>
+            <span class="meta-read-mins">约 2 分钟</span>
+          </div>
+        </div>
+        <a class="article-edit" href="/admin/editor.html?slug=sql%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1406270f" title="编辑此文">编辑</a>
+      </div>
+    </header>
+    <div class="article-body"><h2><a href="#%E5%88%9B%E5%BB%BA%E6%95%B0%E6%8D%AE%E5%BA%93">¶</a>创建数据库</h2>
+<blockquote>
+<p>主要是今天第一次上了数据库实验课<br>就随便记记<br>新手上路，见笑了</p>
+</blockquote>
+<p>以下是创建数据库userdb1的SQL语句，</p>
+<pre><code class="language-sql">create database userdb1
+on
+(name=userdb4_data,--数据文件的逻辑名称,注意不能与日志逻辑同名
+filename='g:\xygl\userdb4.mdf' ,--物理名称，注意路径必须存在
+size=5,--数据初始长度为5M
+maxsize=10,--最大长度为10M
+filegrowth=1)--数据文件每次增长1M
+log on
+( name=userdb4_log,
+filename='g:\xygl\userdb4.ldf ' ,
+size=2 ,
+maxsize=5 ,
+filegrowth=1)
+</code></pre>
+<h2><a href="#%E8%BF%90%E8%A1%8C%E4%B8%8A%E8%AF%89%E8%AF%AD%E5%8F%A5%E5%BB%BA%E7%AB%8B%E6%95%B0%E6%8D%AE%E5%BA%93userdb1">¶</a>运行上诉语句建立数据库userdb1</h2>
+<h2><a href="#%E5%BB%BA%E7%AB%8B%E5%AD%A6%E7%94%9F%E9%80%89%E8%AF%BE%E5%92%8C%E8%80%81%E5%B8%88%E4%B8%8E%E8%AF%BE%E7%A8%8B%E4%B9%8B%E9%97%B4%E7%9A%84%E6%95%B0%E6%8D%AE%E5%BA%93">¶</a>建立学生选课和老师与课程之间的数据库</h2>
+<p>代码注释有点乱码，不影响哈</p>
+<pre><code class="language-sql">use EDUC1
+
+课程的表
+
+CREATE TABLE course
+(
+  cno	char(10)  PRIMARY KEY, 	--主键
+  spno	char (8),  	--
+  cname	 char(20)	NOT NULL, --¿ÎÃû
+  ctno	tinyint,	--ÀàÐÍ±àºÅ
+  experiment	tinyint,	--¿Î³ÌÊ±Êý
+  lecture	tinyint,	--ÊÚ¿ÎÑ§Ê±
+  semester	tinyint,	--¿ª¿ÎÑ§ÆÚ
+  credit	tinyint,	--¿Î³ÌÑ§·Ö
+)
+
+老师与课程的表
+CREATE TABLE teacher_course
+(
+ tcid	smallint	PRIMARY KEY,--ÉÏ¿Î±àºÅ
+ tno	char(8),	--½ÌÊ¦±àºÅ£¨Íâ¼ü£©
+ spno	char (8),	--×¨Òµ´úÂë£¨Íâ¼ü£©
+ classno	char(4),	--°à¼¶ºÅ
+ cno	char (10),	--¿Î³Ì±àºÅ£¨Íâ¼ü£©
+ semester	char(6),	--Ñ§ÆÚ
+ schoolyear	char(10),	--Ñ§Äê
+ classtime	varchar	(40),	--ÉÏ¿ÎÊ±¼ä
+ classroom	varchar	(40),	--ÉÏ¿ÎµØµã
+ weektime	tinyint	,	--Ã¿ÖÜ¿ÎÊ±Êý
+)
+
+学生与课程的表
+CREATE TABLE student_course
+(
+ sno	char(8) NOT NULL	,     --	Ñ§ÉúÑ§ºÅ
+ tcid	smallint NOT NULL,   	--ÉÏ¿Î±àºÅ
+ score	tinyint	,		--Ñ§Éú³É¼¨
+ CONSTRAINT   PK_Name   PRIMARY KEY (sno,tcid),
+)
+
+老师的表
+
+CREATE TABLE teacher
+(
+tno	char(8)	PRIMARY KEY,	--½ÌÊ¦±àºÅ
+tname	char(8)	NOT NULL,  --½ÌÊ¦ÐÕÃû
+sex	char(2),		--½ÌÊ¦ÐÔ±ð
+birthday	smalldatetime,	--½ÌÊ¦³öÉúÈÕÆÚ
+dno	char(6),	--½ÌÊ¦ËùÔÚÔºÏµ
+pno	tinyint,		--½ÌÊ¦Ö°Îñ»òÖ°³Æ±àºÅ
+home	varchar(40)	,  --½ÌÊ¦¼ÒÍ¥×¡Ö·
+zipcode	char(6)	,		--ÓÊÕþ±àÂë
+tel	varchar(40)	,		--ÁªÏµµç»°
+email	varchar(40),	--µç×ÓÓÊ¼þ
+
+)
+</code></pre>
+<ol start="2">
+<li>根据如上表结构用向导创建各表。</li>
+<li>用企业管理器删除所建立的表Student_course,Student和Course</li>
+<li>在查询分析器中用sql语句删除表Tearch_course和表Teacher</li>
+<li>根据如上表结构用SQL语句创建各表。</li>
+<li>将以上创建表的SQL命令以 .SQL文件的形式保存在磁盘上</li>
+</ol>
+<h2><a href="#%E5%88%A0%E9%99%A4%E8%A1%A8">¶</a>删除表</h2>
+<pre><code class="language-sql">use EDUC1
+drop table teacher
+drop table teacher_course
+</code></pre>
+<h2><a href="#%E4%BF%AE%E6%94%B9%E8%A1%A8%E4%B8%AD%E7%9A%84%E5%88%97">¶</a>修改表中的列</h2>
+<pre><code class="language-sql">use EDUC1
+alter table student
+drop constraint PK_student
+--因为sno是主键，所有不能直接修改
+
+alter table student
+alter column sno varchar(20) not null
+alter table student
+add constraint PK_student primary key (sno)
+</code></pre>
+<h2><a href="#%E6%B7%BB%E5%8A%A0%E5%88%97%E7%9A%84%E9%99%90%E5%88%B6">¶</a>添加列的限制</h2>
+<pre><code class="language-sql">use EDUC1
+alter table course
+ADD
+CONSTRAINT year CHECK(year BETWEEN 2004 AND 2008)
+</code></pre>
+<h2><a href="#%E5%88%A0%E9%99%A4%E5%88%97">¶</a>删除列</h2>
+<pre><code class="language-sql">use EDUC1
+alter table course
+drop constraint year
+alter table course
+drop column year
+</code></pre>
+<h3><a href="#%E4%BB%8A%E5%A4%A9%E5%B0%B1%E5%AD%A6%E4%BA%86%E8%BF%99%E4%B9%88%E5%A4%9A-%E5%91%8A%E8%BE%9E">¶</a>今天就学了这么多，告辞！！！</h3>
+<p><strong>这周又要开始完成每周考研周计划</strong></p>
+<h2><a href="#%E8%80%83%E7%A0%94%E5%91%A8%E8%AE%A1%E5%88%92">¶</a>考研周计划</h2>
+<ol>
+<li>张宇高数第三讲</li>
+<li>王道数据结构把第四章树看完</li>
+<li>王道第三章看完</li>
+<li>英语听力*3 + 阅读*3 + 作文 * 1</li>
+</ol>
+<p>任务还是很重的(￣▽￣)""</p>
+</div>
+    <footer class="article-footer"><div class="article-tags"><a class="tag tag-colored" style="--tag-bg:#FCE8F3;--tag-text:#A33B72;--tag-border:#F2B9D8;--tag-dark-bg:#381B2C;--tag-dark-text:#F7A6CE;--tag-dark-border:#753858;" href="/tags.html#sql">sql</a></div></footer>
     </article>
     <aside class="toc-sidebar" id="tocSidebar" hidden></aside>
   </main>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
-  <title>加载中…</title>
+  <title>PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端 · 小红鸡</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
   <link rel="stylesheet" href="/assets/css/common.css?v=20260514200000">
   <link rel="stylesheet" href="/assets/css/post.css?v=20260521180000">
@@ -13,13 +13,535 @@
   <meta name="theme-color" content="#ea6f5a">
   <link rel="apple-touch-icon" href="/assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它的定位、为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。">
+  <meta name="author" content="兰州小红鸡">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端">
+  <meta property="og:description" content="PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它的定位、为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。">
+  <meta property="og:image" content="/assets/uploads/2026/06/peercache_scaling_ladder.png">
+  <meta property="og:url" content="https://gitpull.cn/post/20260601/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="小红鸡">
+  <meta property="og:locale" content="zh-CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端">
+  <meta name="twitter:description" content="PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它的定位、为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。">
+  <meta name="twitter:image" content="/assets/uploads/2026/06/peercache_scaling_ladder.png">
+  <link rel="canonical" href="https://gitpull.cn/post/20260601/">
+  <meta property="article:published_time" content="2026-06-01T10:00:00+08:00">
+  <meta property="article:modified_time" content="2026-06-02T00:30:00+08:00">
+  <meta property="article:author" content="兰州小红鸡">
+  <meta property="article:tag" content="分布式存储">
+  <meta property="article:tag" content="AI 基础设施">
+  <meta property="article:tag" content="项目介绍">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端","description":"PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它的定位、为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。","image":"/assets/uploads/2026/06/peercache_scaling_ladder.png","datePublished":"2026-06-01T10:00:00+08:00","dateModified":"2026-06-02T00:30:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260601/","keywords":"分布式存储,AI 基础设施,项目介绍"}</script>
 </head>
 <body>
   <div id="site-nav"></div>
 
   <main class="article-layout">
-    <article class="article" id="article">
-      <div class="loading">加载中…</div>
+    <article class="article is-prerendered" id="article" data-prerendered="1" data-slug="peercache-decentralized-rdma-kv-cache">
+      <header class="article-header">
+      <div class="article-tags-top"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8">分布式存储</a><a class="tag tag-colored" style="--tag-bg:#E6FAFA;--tag-text:#167A7F;--tag-border:#B8E7E8;--tag-dark-bg:#123638;--tag-dark-text:#8EE2E5;--tag-dark-border:#2B6E72;" href="/tags.html#AI%20%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD">AI 基础设施</a><a class="tag tag-colored" style="--tag-bg:#EEF0F3;--tag-text:#4B5563;--tag-border:#D5DAE1;--tag-dark-bg:#252A33;--tag-dark-text:#CBD5E1;--tag-dark-border:#47515F;" href="/tags.html#%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D">项目介绍</a></div>
+      <h1 class="article-title">PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端</h1>
+      <div class="article-author">
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+        <div class="info">
+          <div class="name">兰州小红鸡</div>
+          <div class="meta">
+            <span>2026-06-01</span>
+            <span class="dot"></span><span>更新于 2026-06-01</span>
+            <span class="dot"></span>
+            <span>11797 字</span>
+            <span class="dot"></span>
+            <span class="meta-read-mins">约 16 分钟</span>
+          </div>
+        </div>
+        <a class="article-edit" href="/admin/editor.html?slug=peercache-decentralized-rdma-kv-cache" title="编辑此文">编辑</a>
+      </div>
+    </header>
+    <div class="article-body"><p><img src="/assets/uploads/2026/06/peercache_scaling_ladder.png" alt="PeerCache GET 吞吐：单卡 → 整机"></p>
+<blockquote>
+<p><strong>项目地址</strong>：<a href="https://flymysql.github.io/PeerCache/zh/">flymysql.github.io/PeerCache</a></p>
+<p>一句话介绍：一个<strong>去中心化、点对点、RDMA 零拷贝的 SGLang L3（HiCache）存储后端</strong>，专门做<strong>跨请求、跨节点的 KV（前缀）缓存复用</strong>。它提供和 Mooncake Store 类似的复用能力，但<strong>没有中心化的 master 和 metadata 服务</strong>。单卡能吃到裸 <code>ib_read_bw</code> 的 <strong>94%</strong>，整机 8 卡聚合 <strong>413 GB/s（3.3 Tbps）</strong>。</p>
+</blockquote>
+<p>在上一篇 <a href="/post.html?slug=%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86%E7%9A%84-pd-%E5%88%86%E7%A6%BB%E5%8E%9F%E7%90%86%E5%8A%A8%E6%9C%BA%E4%B8%8E-mooncake-%E7%9A%84%E5%AE%9E%E7%8E%B0">《大模型推理的 PD 分离》</a> 里，我把 prefill/decode 分离的来龙去脉和 Mooncake 的实现讲了一遍。这篇接着讲一个我自己动手写的东西：<strong>PeerCache</strong>——一个想把"KV 缓存跨节点复用"这件事做得更轻、更去中心化的 L3 后端。</p>
+<p>不过开头要先纠正一个容易误解的点：<strong>PeerCache 不是 PD 的搬运引擎</strong>，它和 PD 是两件正交的事。下面会专门讲清楚。</p>
+<hr>
+<h2>一、它解决什么问题：跨请求的 KV 前缀复用</h2>
+<p>先说场景。LLM 推理里有大量请求<strong>共享前缀</strong>——系统提示词、few-shot 示例、多轮对话历史、RAG 文档、Agent 上下文……这些前缀对应的 KV 缓存其实是一样的，每来一个请求都重算一遍纯属浪费。</p>
+<p>SGLang 的 RadixAttention 已经能在单机复用前缀 KV，HiCache 又把这套思路扩展成三层缓存——GPU 显存（L1）、主机内存（L2）、外部分布式存储（L3）。<strong>PeerCache 就是这个 L3</strong>：它让前缀 KV 不仅能在一台机器里复用，还能<strong>跨节点</strong>复用。</p>
+<p>工作方式很简单：</p>
+<ul>
+<li>生产节点把 KV 页发布进<strong>自己的本地池</strong>，并把一条很小的位置记录写进<strong>分片在所有节点上的一致性哈希目录</strong>；</li>
+<li>任意节点查到 key 后，用<strong>单边 RDMA READ</strong> 直接零拷贝拉进自己的 buffer。</li>
+</ul>
+<div class="mermaid" data-mermaid="flowchart LR
+    subgraph N1 [生产节点 - 算出前缀 KV]
+      P0[set KV 页面<br/>发布进本地池]
+    end
+    subgraph N2 [消费节点 - 命中相同前缀]
+      D0[get KV 页面<br/>读进自己的 buffer]
+    end
+    P0 -->|&quot;1 PUT 位置（极小 RPC）&quot;| DIR[(一致性哈希<br/>目录分片)]
+    D0 -->|&quot;2 GET 位置（极小 RPC）&quot;| DIR
+    P0 ==>|&quot;3 单边 RDMA READ（零拷贝）&quot;| D0">flowchart LR
+    subgraph N1 [生产节点 - 算出前缀 KV]
+      P0[set KV 页面&lt;br/&gt;发布进本地池]
+    end
+    subgraph N2 [消费节点 - 命中相同前缀]
+      D0[get KV 页面&lt;br/&gt;读进自己的 buffer]
+    end
+    P0 --&gt;|"1 PUT 位置（极小 RPC）"| DIR[(一致性哈希&lt;br/&gt;目录分片)]
+    D0 --&gt;|"2 GET 位置（极小 RPC）"| DIR
+    P0 ==&gt;|"3 单边 RDMA READ（零拷贝）"| D0</div><p>接入也很省事：用 <code>--hicache-storage-backend dynamic</code> 直接挂进 SGLang，<strong>无需 patch SGLang</strong>。</p>
+<hr>
+<h2>二、它不是什么：两个别混的正交维度</h2>
+<p>这是整篇里我最想强调的一点。一提到"跨节点搬 KV + RDMA + Mooncake"，很多人第一反应是 PD 分离里那条 <strong>prefill → decode 的 KV 交接</strong>。但那条路<strong>不是</strong> PeerCache 干的活。</p>
+<ul>
+<li><strong>PeerCache ≠ PD 搬运引擎。</strong> 它不负责每个请求的 prefill→decode KV 交接——那条延迟敏感的 GPU→GPU 路径是 Mooncake / NIXL 通过 <code>--disaggregation-transfer-backend</code> 做的。</li>
+<li><strong>PeerCache ≠ 中心化存储。</strong> 没有需要部署 / 扩容的 master 或元数据服务。</li>
+</ul>
+<p>把两个维度摆在一起看就清楚了：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>KV / 前缀复用（PeerCache）</th>
+<th>PD 的 P→D 交接（Mooncake/NIXL）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>范围</td>
+<td>跨请求 / 跨节点</td>
+<td>单个请求内</td>
+</tr>
+<tr>
+<td>目标</td>
+<td>省掉重复计算共享前缀</td>
+<td>把 prefill 的 KV 交给 decode</td>
+</tr>
+<tr>
+<td>延迟</td>
+<td>缓存型，可容忍主机暂存</td>
+<td>延迟敏感，GPU→GPU 直传</td>
+</tr>
+<tr>
+<td>SGLang 参数</td>
+<td><code>--hicache-storage-backend</code></td>
+<td><code>--disaggregation-transfer-backend</code></td>
+</tr>
+</tbody></table>
+<p>所以这俩<strong>不是二选一</strong>：一个 PD 集群通常两者都用——<strong>PeerCache 在 prefill 层做前缀复用，Mooncake / NIXL 做 P→D 交接</strong>。这也是我上一篇讲 PD 分离时它们各自的位置。</p>
+<hr>
+<h2>三、为什么不直接用中心化的 KV 缓存</h2>
+<p>放对了维度之后，PeerCache 真正要对比的是那些<strong>做 KV 复用、但靠中心 master / 中心元数据</strong>的存储——比如 Mooncake Store、分布式模式的 LMCache。</p>
+<p>它们都很成熟、能力也强，但形态决定了要养一套中心化协调设施：master 分配 / 跟踪对象，元数据服务存放 lookup，数据常常还要拷进专用托管池。PeerCache 的取舍是另一条路：<strong>把中心节点全部砍掉，用一致性哈希把目录分散到每个节点上</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>中心化存储</th>
+<th>PeerCache</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>元数据</td>
+<td>中心 master / lookup 服务</td>
+<td>一致性哈希 DHT，分片到所有节点</td>
+</tr>
+<tr>
+<td>单点故障</td>
+<td>master 是 SPOF / 瓶颈</td>
+<td>没有中心元数据节点</td>
+</tr>
+<tr>
+<td>元数据吞吐</td>
+<td>受 master 限制</td>
+<td>随集群规模扩（每节点 ~1/N）</td>
+</tr>
+<tr>
+<td>数据放置</td>
+<td>常需拷进托管池</td>
+<td>留在生产节点本地</td>
+</tr>
+<tr>
+<td>写路径</td>
+<td>入池 + 协调</td>
+<td>本地 memcpy + 一条小位置记录</td>
+</tr>
+<tr>
+<td>读路径</td>
+<td>经存储 / 引擎</td>
+<td>单边 RDMA READ，零拷贝</td>
+</tr>
+<tr>
+<td>要运行的服务</td>
+<td>master + worker</td>
+<td>仅内嵌发现（无独立 master）</td>
+</tr>
+<tr>
+<td>扩展</td>
+<td>给协调者扩容</td>
+<td>加节点 → 环自动 re-shard</td>
+</tr>
+</tbody></table>
+<p>差别集中在两点：<strong>目录是分片而不是中心存的</strong>，<strong>数据是留在生产者本地而不是搬进专用池的</strong>。下面分别讲。</p>
+<hr>
+<h2>四、核心理念</h2>
+<p>我把整套设计浓缩成几条原则：</p>
+<ul>
+<li><strong>内嵌服务发现，没有独立 meta 节点。</strong> 在所有节点上把 <code>discovery_addr</code> 配成同一个节点的 IP，那个节点会在<strong>进程内</strong>自动承担服务发现：别的节点向它注册、心跳、拉取实时成员列表。它这里<strong>既不存数据，也不存元数据</strong>——只是一个成员名册。</li>
+<li><strong>一致性哈希目录（DHT）。</strong> 映射 <code>key -&gt; {数据节点, 远端地址, rkey, 长度}</code> 通过对 key 取哈希分片到所有节点。写入方和读取方各自对 key 取哈希，就能独立地算出"这条记录归谁管"，不需要问任何人。</li>
+<li><strong>写入时数据留本地。</strong> <code>set()</code> 把页面拷进节点本地的发布池（一次主机 memcpy，不走网络、不依赖 master），只把一条极小的位置记录推到目录归属者那里。</li>
+<li><strong>读取时单边 RDMA READ。</strong> <code>get()</code> 先查目录拿到 <code>{addr, rkey, len}</code>，再发起一次零拷贝 <code>IBV_WR_RDMA_READ</code>，数据直接落进 SGLang 已经注册好的主机缓冲区。</li>
+<li><strong>磁盘持久化分层（L4）。</strong> 被内存淘汰的页面可以落盘，之后再被读取时提升回内存。</li>
+<li><strong>内置监控。</strong> Prometheus <code>/metrics</code> 端点 + 一个零依赖的 HTML 可视化页面。</li>
+</ul>
+<hr>
+<h2>五、双 MR 模型——一个绕不开的正确性问题</h2>
+<p>这是 PeerCache 里我觉得最值得讲的一个设计点。</p>
+<p>直觉上，既然要做零拷贝 RDMA READ，那直接把 SGLang 的主机 KV 缓冲区注册成 MR、把它的地址发布到目录里，让远端来读不就行了？</p>
+<p><strong>不行。</strong> SGLang 的主机 KV 缓冲区是 <strong>L2 层</strong>，会被 HiCache 随时驱逐 / 覆盖。如果我把它的地址发布出去，远端 READ 可能会落到一个<strong>已经被复用的页面</strong>上——读到的是别的请求的 KV，这就是典型的悬空引用 / 数据损坏。</p>
+<p>所以每个节点注册<strong>两块</strong>内存区域（MR）：</p>
+<ol>
+<li><strong>接收 MR</strong> = <code>mem_pool_host.kv_buffer</code>——<code>get</code> 时单边 READ 的<strong>目标</strong>（数据落进这里）。</li>
+<li><strong>发布池 MR</strong> = 后端自己持有、带 LRU 的主机内存池——远端节点 READ 的<strong>来源</strong>。</li>
+</ol>
+<p><code>set()</code> 时把页面 memcpy 进发布池（节点本地、不走网络），并把 <code>addr + rkey + len</code> 发布到目录。<strong>从池里驱逐一个页面，会同时删掉对应的目录条目</strong>——因此一条已发布的地址在它被驱逐之前始终有效，远端永远不会读到悬空地址。</p>
+<p>这就是为什么写端那一次 memcpy 是<strong>必要</strong>的：它把"会被随时复用的 L2"和"我能保证生命周期的发布池"解耦开。这是为正确性付出的标准代价，而网络传输本身仍然是零拷贝。</p>
+<hr>
+<h2>六、读写数据流</h2>
+<h3>写入路径</h3>
+<div class="mermaid" data-mermaid="sequenceDiagram
+    participant W as 节点 W（生产者）
+    participant Dw as 目录归属者 = hash(key)
+    W->>W: set(): 本地 memcpy 页面 -> 发布池 MR
+    W->>Dw: PUT key -> {node, addr, rkey, len}
+    Note over W,Dw: 数据从不离开 W；只发送一条极小的记录">sequenceDiagram
+    participant W as 节点 W（生产者）
+    participant Dw as 目录归属者 = hash(key)
+    W-&gt;&gt;W: set(): 本地 memcpy 页面 -&gt; 发布池 MR
+    W-&gt;&gt;Dw: PUT key -&gt; {node, addr, rkey, len}
+    Note over W,Dw: 数据从不离开 W；只发送一条极小的记录</div><p>写入开销 = <strong>一次本地 memcpy + 一次小目录 RPC</strong>。没有 master，也没有 KV 数据的网络拷贝。</p>
+<h3>读取路径</h3>
+<div class="mermaid" data-mermaid="sequenceDiagram
+    participant R as 节点 R（读取方）
+    participant Dr as 目录归属者 = hash(key)
+    participant W as 节点 W（数据节点）
+    R->>Dr: GET key
+    Dr-->>R: {node=W, addr, rkey, len}
+    R->>W: 单边 RDMA READ (addr, rkey)
+    W-->>R: 字节直接 DMA 进 R 的主机缓冲区（零拷贝）">sequenceDiagram
+    participant R as 节点 R（读取方）
+    participant Dr as 目录归属者 = hash(key)
+    participant W as 节点 W（数据节点）
+    R-&gt;&gt;Dr: GET key
+    Dr--&gt;&gt;R: {node=W, addr, rkey, len}
+    R-&gt;&gt;W: 单边 RDMA READ (addr, rkey)
+    W--&gt;&gt;R: 字节直接 DMA 进 R 的主机缓冲区（零拷贝）</div><p>如果目录显示数据就在读取方自己身上，读取会退化成一次本地 <code>memcpy</code>，完全不走网络。</p>
+<h3>一次"生产者 → 消费者"到底拷几次</h3>
+<p>只统计（庞大的）KV 数据的搬运，目录 RPC 只有几十字节，忽略不计：</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>KV 数据拷贝次数</th>
+<th>发生了什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>set</code>（写，生产者）</td>
+<td>1 次主机 memcpy</td>
+<td>页面从 SGLang 主机缓冲区 → 后端发布池 MR（节点本地，不走网络）</td>
+</tr>
+<tr>
+<td><code>get</code>（远端读）</td>
+<td>0 次 CPU 拷贝</td>
+<td>单边 <code>IBV_WR_RDMA_READ</code>；网卡把字节从远端发布池直接 DMA 进读取方主机缓冲区</td>
+</tr>
+<tr>
+<td><code>get</code>（数据已在本地）</td>
+<td>1 次主机 memcpy</td>
+<td>发布池 → 主机缓冲区，不走网络</td>
+</tr>
+</tbody></table>
+<p>所以一次跨节点 KV 传输的代价是：<strong>写端一次主机 memcpy + 读端一次零拷贝 RDMA READ</strong>。</p>
+<hr>
+<h2>七、控制面 / 数据面的分工</h2>
+<p>PeerCache 把实现干净地切成两半：<strong>控制面用 Python（走 TCP）</strong>，<strong>数据面用 C++ / libibverbs（走 RDMA）</strong>。</p>
+<div class="mermaid" data-mermaid="flowchart TB
+    subgraph cp [控制面 - Python, TCP]
+      DISC[服务发现: 内嵌 meta]
+      RING[一致性哈希环]
+      DIR[目录分片 + 客户端]
+      POOL[发布池 - LRU]
+    end
+    subgraph dp [数据面 - C++, libibverbs]
+      TE[TransferEngine]
+      CM[ConnectionManager - RC QP 池]
+      MR[MR 注册表]
+    end
+    STORE[PeerCacheStore - HiCacheStorage] --> cp
+    STORE --> dp">flowchart TB
+    subgraph cp [控制面 - Python, TCP]
+      DISC[服务发现: 内嵌 meta]
+      RING[一致性哈希环]
+      DIR[目录分片 + 客户端]
+      POOL[发布池 - LRU]
+    end
+    subgraph dp [数据面 - C++, libibverbs]
+      TE[TransferEngine]
+      CM[ConnectionManager - RC QP 池]
+      MR[MR 注册表]
+    end
+    STORE[PeerCacheStore - HiCacheStorage] --&gt; cp
+    STORE --&gt; dp</div><p>几个我比较在意的工程细节：</p>
+<ul>
+<li><strong>一致性哈希目录</strong>：每个节点承载目录的一个分片，所有分片的并集才是完整目录，不存在中心存储。默认每节点 160 个虚拟节点（vnode）来均衡分布。<code>directory_replicas &gt; 1</code>（默认 2）可以把每条条目写进接下来的 N 个归属者做高可用，读取时在副本间回退。</li>
+<li><strong>连接管理</strong>：连接引导用极小的 TCP 握手交换 <code>QpInfo</code>（qp_num / psn / lid / gid），把设备选择和连接建立彻底解耦，随后 QP 走 INIT → RTR → RTS。每个对端维护一个<strong>有界的通道池</strong>（一个通道 = 一条 RC QP + 自己独立的 CQ），惰性创建、复用、用 <code>max_channels_per_peer</code> 封顶——既避免 O(N²) 全连接网格，又允许多个读取者并发读同一个对端。</li>
+<li><strong>并发模型</strong>：服务端本就完全多线程，单边 RDMA READ 完全不耗响应方 CPU；客户端 <code>batch_read</code> 在整个 RDMA 传输期间释放 GIL，每个读取线程租一条独立通道（QP + 私有 CQ），N 个线程在 N 个 CQ 上各自 post/poll，没有共享 CQ 竞争。</li>
+</ul>
+<hr>
+<h2>八、磁盘分层（L4）：把淘汰的页面接住</h2>
+<p>内存池总是有限的，写满之后被 LRU 淘汰的页面通常就丢了。PeerCache 提供一个可选的磁盘分层把它们接住：</p>
+<div class="mermaid" data-mermaid="flowchart LR
+    SET[set 页面] --> POOL[(内存池 MR)]
+    SET -. 异步写透 .-> DISK[(磁盘分层)]
+    POOL -- LRU 淘汰 --> DISK
+    POOL -- 淘汰 --> DIR{{目录: resident=false}}
+    GET[get 页面] --> DIR2{{目录}}
+    DIR2 -- resident=false --> PROMOTE[提升: 磁盘 -> 内存池]
+    PROMOTE --> POOL
+    PROMOTE --> RDMA[零拷贝 RDMA READ]">flowchart LR
+    SET[set 页面] --&gt; POOL[(内存池 MR)]
+    SET -. 异步写透 .-&gt; DISK[(磁盘分层)]
+    POOL -- LRU 淘汰 --&gt; DISK
+    POOL -- 淘汰 --&gt; DIR{{目录: resident=false}}
+    GET[get 页面] --&gt; DIR2{{目录}}
+    DIR2 -- resident=false --&gt; PROMOTE[提升: 磁盘 -&gt; 内存池]
+    PROMOTE --&gt; POOL
+    PROMOTE --&gt; RDMA[零拷贝 RDMA READ]</div><ul>
+<li><strong>写透（异步）</strong>：<code>set</code> 时页面落内存池后，会被排队异步写盘（默认 <code>/data/peercache/</code>，上限 <code>100GB</code>，磁盘自身也按 LRU 约束）。</li>
+<li><strong>淘汰 ≠ 删除</strong>：内存池淘汰某页时，目录条目保留，只标记 <code>resident=false</code>（数据在盘上）。只有等磁盘也淘汰它，目录条目才真正删除。</li>
+<li><strong>读时提升</strong>：<code>get</code> 解析到非驻留条目会触发提升——数据所属节点把页面从盘读回内存池，重新标记驻留，再正常提供零拷贝 READ。远端读则发一个 <code>data_promote</code> RPC 让所属节点先提升再返回新的 <code>{addr, rkey}</code>。</li>
+</ul>
+<p>磁盘分层是可选的（<code>disk_enabled</code>），而且能优雅降级：如果 <code>disk_path</code> 建不出来就自动禁用，内存池退回"淘汰即删除"。</p>
+<hr>
+<h2>九、性能基线</h2>
+<p>下面这组数字来自一套特定的 8 卡 RoCE 环境，用内置的 <code>peercache-bench serve</code> / <code>drive</code> 双机工具测得（GET 路径，单边 RDMA READ 读 KV 页，MLA 布局）。<strong>它展示的是方法论与曲线形态，不是性能保证</strong>——请用复现命令在你自己的硬件上重跑。</p>
+<h3>测试环境</h3>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>拓扑</td>
+<td>2 台主机（生产者 / 消费者），跨机 RoCE</td>
+</tr>
+<tr>
+<td>网卡</td>
+<td>8 × Mellanox ConnectX-7 <code>mlx5</code> RoCE，bond</td>
+</tr>
+<tr>
+<td>RoCE</td>
+<td>RoCEv2，GID index 3，MTU 4096</td>
+</tr>
+<tr>
+<td>单卡线速</td>
+<td>≈ 400 Gb/s（裸 READ 实测 392 Gbps）</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>2 × AMD EPYC 9K84，96 核/路（192 核 / 384 线程）</td>
+</tr>
+<tr>
+<td>主机内存</td>
+<td>2.2 TB（每 NUMA 节点 ≈ 1.16 TB）</td>
+</tr>
+<tr>
+<td>传输</td>
+<td><code>--protocol rdma</code>，布局 <code>mla</code></td>
+</tr>
+</tbody></table>
+<h3>总览：从单卡到整机</h3>
+<p><img src="/assets/uploads/2026/06/peercache_scaling_ladder.png" alt="PeerCache GET 吞吐：从单卡到整机的扩展阶梯"></p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>GET 吞吐</th>
+<th>占单卡裸 RDMA</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>裸 <code>ib_read_bw</code>，1 卡，16 QP</td>
+<td>49.0 GB/s（392 Gbps）</td>
+<td>100%</td>
+<td>单卡硬件参考值（保守）</td>
+</tr>
+<tr>
+<td>PeerCache，1 卡，8 进程</td>
+<td>46.0 GB/s（368 Gbps）</td>
+<td>94%</td>
+<td>存储层开销 ≈ 6%</td>
+</tr>
+<tr>
+<td>PeerCache，单进程，8 rail，1 MiB 页</td>
+<td>147.6 GB/s（1.18 Tbps）</td>
+<td>—</td>
+<td>受 GIL 限制；约 3 张卡的量</td>
+</tr>
+<tr>
+<td>PeerCache，8 卡，多进程，128 KiB 页</td>
+<td>413.1 GB/s（3.3 Tbps）</td>
+<td>—</td>
+<td>每卡 25–89 GB/s；受内存/PCIe/NUMA 限制</td>
+</tr>
+</tbody></table>
+<p>值得一提的是，满负载多进程下<strong>单卡实际跑到了 89 GB/s</strong>——上面 16-QP 的 <code>ib_read_bw</code> 只是一个保守的单卡参考值，并不是硬上限。</p>
+<h3>1 · 单卡——PeerCache 对比裸 RDMA</h3>
+<p>为衡量存储层引入的开销，把单卡的 PeerCache 和裸 fabric 直接对比：</p>
+<table>
+<thead>
+<tr>
+<th>测量</th>
+<th>GET 吞吐</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ib_read_bw -q 16 -s 131072</code>（裸单边 READ）</td>
+<td>49.0 GB/s（392 Gbps）</td>
+</tr>
+<tr>
+<td>PeerCache GET，128 KiB 页，8 进程 × 4 线程</td>
+<td>46.0 GB/s（368 Gbps）</td>
+</tr>
+</tbody></table>
+<p>PeerCache 落在裸 <code>ib_read_bw</code> 的 <strong>~6% 以内</strong>。这点差距来自目录查找 + 每批编排；开启 <code>--dir-cache-ttl</code> 后，热的、静态的工作集上目录 RPC 基本被摊掉。这说明零拷贝读路径上几乎没有引入额外开销。</p>
+<h3>2 · 单进程多卡（multi-rail）</h3>
+<p>设置 <code>--devices d1,…,d8</code>，一个进程就会每卡开一条 rail，并在一次释放 GIL 的 C++ 调用（<code>batch_read_multi</code>）里把每批 READ 横跨所有 rail 分发。</p>
+<p><img src="/assets/uploads/2026/06/peercache_single_process_scaling.png" alt="PeerCache 单进程 8 rail：吞吐 vs 线程数"></p>
+<table>
+<thead>
+<tr>
+<th>页大小</th>
+<th>batch</th>
+<th>峰值</th>
+<th>最佳线程数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>128 KiB</td>
+<td>32</td>
+<td>40.4 GB/s</td>
+<td>4</td>
+</tr>
+<tr>
+<td>1 MiB</td>
+<td>128</td>
+<td>147.6 GB/s</td>
+<td>2</td>
+</tr>
+</tbody></table>
+<p>两点值得注意：</p>
+<ul>
+<li><strong>单进程被 GIL 限制</strong>：吞吐在低线程数（2–4）就到峰值，线程越多反而下降——每批的 Python 编排被 GIL 串行化，加线程只增加争用。</li>
+<li><strong>大传输能摊薄这部分开销</strong>：GIL 持有的开销是按调用算的、不是按字节，所以把页从 128 KiB 加到 1 MiB，单进程从 40 → 148 GB/s（约 3 张卡的量）——尽管两者都受 GIL 限制。</li>
+</ul>
+<p>所以 multi-rail 让一个进程能用上多张卡，但单个 Python 进程吃不满全部 8 卡——那需要多进程。</p>
+<h3>3 · 整机——多进程跨 8 卡</h3>
+<p>生产形态（也是吃满每张卡的方式）是每卡一个进程组——正是 SGLang TP=8 部署的运行方式（8 个 rank，各绑本地网卡）。这里：<strong>8 卡 × 每卡 8 个读进程，128 KiB 页</strong>。</p>
+<p><img src="/assets/uploads/2026/06/peercache_per_card.png" alt="PeerCache 整机 8 卡：每卡 GET 吞吐"></p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>聚合 GET</td>
+<td>413.1 GB/s（3.3 Tbps）</td>
+</tr>
+<tr>
+<td>单卡区间</td>
+<td>25.1 – 89.4 GB/s（均值 ≈ 51.6）</td>
+</tr>
+<tr>
+<td>配置</td>
+<td>8 卡 × 每卡 8 进程，128 KiB 页</td>
+</tr>
+</tbody></table>
+<p>聚合远超单进程（147 → 413 GB/s），而且单卡在这里跑到了 <strong>89 GB/s</strong>，所以已经不再受网卡限制——瓶颈是主机内存带宽 / PCIe，以及不均衡（两张卡只有 ~25 GB/s，其余 49–89）。本机上网卡 1–4 在 NUMA node 0、5–8 在 node 1，没绑核的读进程可能落到错误的节点、付出跨 NUMA 代价。用 <code>numactl</code> 把每个进程组绑到该网卡的 NUMA 节点，就能把慢的网卡拉回来、抬高聚合。</p>
+<h3>4 · GPUDirect RDMA：直接读进 GPU 显存</h3>
+<p>真实 SGLang 部署里 KV 缓冲区其实在 <strong>GPU 显存</strong>里。PeerCache 可以注册这块显存，让单边 READ 直接落进显存，<strong>不经过主机内存中转</strong>：缓冲区暴露 dmabuf fd 时用 <code>ibv_reg_dmabuf_mr</code> 注册，否则在加载了 <code>nvidia-peermem</code> 时直接注册设备虚拟地址。</p>
+<p>实测（单进程，8 rail，1 MiB 页，读进显存）：<strong>49.5 GB/s</strong>，100% 命中（同条件下读进主机内存是 140 GB/s）。这个差距是<strong>单 GPU 的 PCIe 瓶颈</strong>——8 条 rail 全写进同一块 GPU，共享它那条 PCIe 链路（Gen5 x16 约 50 GB/s）。</p>
+<p>关键在于：真实 SGLang TP=N 部署里每个 rank 读进<strong>自己的</strong> GPU，所以 GPUDirect 会随 GPU 数量<strong>线性放大</strong>（≈ N × 单 GPU PCIe 带宽），不会被单条链路卡住。</p>
+<h3>关键结论</h3>
+<ul>
+<li><strong>单卡</strong>：PeerCache ≈ 裸 <code>ib_read_bw</code> 的 94%——RDMA 路径接近最优。</li>
+<li><strong>GIL 是单进程的天花板</strong>：用低线程数 + 大 batch / 大页把单进程压到最高；单进程吃不满全部网卡。</li>
+<li><strong>整机带宽需要多进程</strong>（每卡一组），这与 SGLang 多 rank 部署形态一致，满负载下整机能到 413 GB/s。</li>
+<li><strong>超过约一张卡后</strong>，瓶颈转移到内存 / PCIe / NUMA，不再是 fabric——绑 NUMA、均衡 bond 即可。</li>
+</ul>
+<blockquote>
+<p>注：1 MiB 页是合成值，用来展示大传输时的余量；真实 MLA KV 页通常约 128 KiB。引用数字时务必标注页大小。</p>
+</blockquote>
+<hr>
+<h2>十、什么时候用，又主动舍弃了什么</h2>
+<p>去中心化不是免费的，得把得失都说清楚。</p>
+<h3>优势</h3>
+<ul>
+<li><strong>元数据无单点故障 / 瓶颈</strong>：中心化方案里每次 PUT/GET 都打到 master；PeerCache 把目录分片，元数据吞吐随集群增长，没有中心热点。</li>
+<li><strong>写路径轻、数据有局部性</strong>：<code>set()</code> = 本地 memcpy + 一条小目录记录，不拷进中心池。</li>
+<li><strong>运维组件更少</strong>：发现服务内嵌，没有 master 要部署、扩容、做 HA。</li>
+<li><strong>无协调者横向扩展</strong>：新节点同时增容量和元数据吞吐，成员变化自动 re-shard 目录。</li>
+<li><strong>去中心的故障域</strong>：挂一个节点只丢它那份分片，不会整个元数据服务瘫；<code>directory_replicas</code>（默认 2）还保留副本。</li>
+</ul>
+<h3>主动舍弃了什么</h3>
+<ul>
+<li><strong>成熟度与生态</strong>：Mooncake / LMCache 经过大规模打磨，淘汰 / 分层 / 可观测性更全、集成更广；PeerCache 更精简、更年轻。</li>
+<li><strong>全局放置决策</strong>：中心 master 能做更聪明的全局淘汰 / 放置 / 负载均衡；PeerCache 只做"本地 + 哈希"决策。</li>
+<li><strong>生产者热点与数据冗余</strong>：KV 字节留在生产节点，热 key 可能让该节点成读热点；而且 KV 数据本身默认<strong>不复制</strong>——生产节点宕了那份页就不可用（目录有副本、有 disk 层兜底，但 KV 字节没多副本）。中心池更容易摊平负载、做数据冗余。</li>
+<li><strong>驱逐竞争是安全降级</strong>：池驱逐会删目录条目，任何解析到陈旧 / 缺失条目的读取都返回 miss，让 SGLang 重新计算——不会读到坏数据，但确实是一次缓存 miss。</li>
+</ul>
+<h3>一张决策表</h3>
+<table>
+<thead>
+<tr>
+<th>你的情况</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>想跨节点复用 KV、最少复杂度、不要 master</td>
+<td><strong>PeerCache（聚合模式）</strong></td>
+</tr>
+<tr>
+<td>需要 P/D 物理解耦（扩缩 / SLO）</td>
+<td>Mooncake/NIXL 做交接 + PeerCache 在 prefill 做复用</td>
+</tr>
+<tr>
+<td>需要全局放置、丰富特性、强数据 HA</td>
+<td>成熟的中心化存储</td>
+</tr>
+<tr>
+<td>提示词都唯一、无共享前缀</td>
+<td>任何 KV 复用缓存都帮不上多少</td>
+</tr>
+</tbody></table>
+<p>最契合 PeerCache 的，是<strong>聚合式（非 PD）+ 高前缀复用</strong>的负载：系统提示词、few-shot、多轮历史、RAG、Agent 上下文——这里挂上 PeerCache 就是一个完整的共享缓存层，不用再养传输引擎；以及<strong>想要类似 Mooncake-Store 的复用能力、但不想再养一个中心 master</strong> 的团队。</p>
+<hr>
+<h2>十一、小结</h2>
+<p>PeerCache 想表达的其实是一个很朴素的观点：如果你要的只是"跨请求、跨节点复用 KV 前缀"，那么 master 和 metadata 服务并不是必须的——把目录用一致性哈希分散开、让数据留在生产者本地、用双 MR 模型保证发布地址的生命周期，就能在砍掉中心设施的同时拿到接近裸带宽的读性能（单卡 94%，整机 8 卡 413 GB/s）。它和 PD 的 P→D 交接是正交的两件事，在 PD 集群里两者可以同时用。</p>
+<p>如果你也在折腾 SGLang 的 L3 后端，欢迎去 <a href="https://flymysql.github.io/PeerCache/zh/">项目主页</a> 看看<a href="https://flymysql.github.io/PeerCache/zh/positioning/">定位对比</a>、架构文档、性能基线和 SDK 参考，也欢迎在 issue 里交流。</p>
+</div>
+    <footer class="article-footer"><div class="article-tags"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8">分布式存储</a><a class="tag tag-colored" style="--tag-bg:#E6FAFA;--tag-text:#167A7F;--tag-border:#B8E7E8;--tag-dark-bg:#123638;--tag-dark-text:#8EE2E5;--tag-dark-border:#2B6E72;" href="/tags.html#AI%20%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD">AI 基础设施</a><a class="tag tag-colored" style="--tag-bg:#EEF0F3;--tag-text:#4B5563;--tag-border:#D5DAE1;--tag-dark-bg:#252A33;--tag-dark-text:#CBD5E1;--tag-dark-border:#47515F;" href="/tags.html#%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D">项目介绍</a></div></footer>
     </article>
     <aside class="toc-sidebar" id="tocSidebar" hidden></aside>
   </main>

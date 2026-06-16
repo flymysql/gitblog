@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
-  <title>加载中…</title>
+  <title>推荐召回-向量召回之U2I学习总结 · 小红鸡</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
   <link rel="stylesheet" href="/assets/css/common.css?v=20260514200000">
   <link rel="stylesheet" href="/assets/css/post.css?v=20260521180000">
@@ -13,13 +13,85 @@
   <meta name="theme-color" content="#ea6f5a">
   <link rel="apple-touch-icon" href="/assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="常见召回模型 I2I：计算item item相似度，用于相似推荐、相关推荐； U2I：基于矩阵分解，通过用户特征直接推荐item； U2U2I：基于用户的协同过滤，先找相似用户，再…">
+  <meta name="author" content="兰州小红鸡">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="推荐召回-向量召回之U2I学习总结">
+  <meta property="og:description" content="常见召回模型 I2I：计算item item相似度，用于相似推荐、相关推荐； U2I：基于矩阵分解，通过用户特征直接推荐item； U2U2I：基于用户的协同过滤，先找相似用户，再…">
+  <meta property="og:image" content="https://gitpull.cn/assets/og/%E6%8E%A8%E8%8D%90%E5%8F%AC%E5%9B%9E-%E5%90%91%E9%87%8F%E5%8F%AC%E5%9B%9E%E4%B9%8BU2I%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93-15986952.svg">
+  <meta property="og:url" content="https://gitpull.cn/post/20220309/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="小红鸡">
+  <meta property="og:locale" content="zh-CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="推荐召回-向量召回之U2I学习总结">
+  <meta name="twitter:description" content="常见召回模型 I2I：计算item item相似度，用于相似推荐、相关推荐； U2I：基于矩阵分解，通过用户特征直接推荐item； U2U2I：基于用户的协同过滤，先找相似用户，再…">
+  <meta name="twitter:image" content="https://gitpull.cn/assets/og/%E6%8E%A8%E8%8D%90%E5%8F%AC%E5%9B%9E-%E5%90%91%E9%87%8F%E5%8F%AC%E5%9B%9E%E4%B9%8BU2I%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93-15986952.svg">
+  <link rel="canonical" href="https://gitpull.cn/post/20220309/">
+  <meta property="article:published_time" content="2022-03-09T20:42:00+08:00">
+  <meta property="article:modified_time" content="2022-03-09T20:42:00+08:00">
+  <meta property="article:author" content="兰州小红鸡">
+  <meta property="article:tag" content="推荐">
+  <meta property="article:tag" content="推荐算法">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"推荐召回-向量召回之U2I学习总结","description":"常见召回模型 I2I：计算item item相似度，用于相似推荐、相关推荐； U2I：基于矩阵分解，通过用户特征直接推荐item； U2U2I：基于用户的协同过滤，先找相似用户，再…","image":"https://gitpull.cn/assets/og/%E6%8E%A8%E8%8D%90%E5%8F%AC%E5%9B%9E-%E5%90%91%E9%87%8F%E5%8F%AC%E5%9B%9E%E4%B9%8BU2I%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93-15986952.svg","datePublished":"2022-03-09T20:42:00+08:00","dateModified":"2022-03-09T20:42:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20220309/","keywords":"推荐,推荐算法"}</script>
 </head>
 <body>
   <div id="site-nav"></div>
 
   <main class="article-layout">
-    <article class="article" id="article">
-      <div class="loading">加载中…</div>
+    <article class="article is-prerendered" id="article" data-prerendered="1" data-slug="推荐召回-向量召回之U2I学习总结-15986952">
+      <header class="article-header">
+      <div class="article-tags-top"><a class="tag tag-colored" style="--tag-bg:#FFE8E3;--tag-text:#C44732;--tag-border:#F7C5BA;--tag-dark-bg:#3A211D;--tag-dark-text:#FFB2A3;--tag-dark-border:#6F3B32;" href="/tags.html#%E6%8E%A8%E8%8D%90">推荐</a><a class="tag tag-colored" style="--tag-bg:#FCE8F3;--tag-text:#A33B72;--tag-border:#F2B9D8;--tag-dark-bg:#381B2C;--tag-dark-text:#F7A6CE;--tag-dark-border:#753858;" href="/tags.html#%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95">推荐算法</a></div>
+      <h1 class="article-title">推荐召回-向量召回之U2I学习总结</h1>
+      <div class="article-author">
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+        <div class="info">
+          <div class="name">兰州小红鸡</div>
+          <div class="meta">
+            <span>2022-03-09</span>
+            
+            <span class="dot"></span>
+            <span>1131 字</span>
+            <span class="dot"></span>
+            <span class="meta-read-mins">约 2 分钟</span>
+          </div>
+        </div>
+        <a class="article-edit" href="/admin/editor.html?slug=%E6%8E%A8%E8%8D%90%E5%8F%AC%E5%9B%9E-%E5%90%91%E9%87%8F%E5%8F%AC%E5%9B%9E%E4%B9%8BU2I%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93-15986952" title="编辑此文">编辑</a>
+      </div>
+    </header>
+    <div class="article-body"><h2>常见召回模型</h2>
+<ul>
+<li>I2I：计算item-item相似度，用于相似推荐、相关推荐；</li>
+<li>U2I：基于矩阵分解，通过用户特征直接推荐item；</li>
+<li>U2U2I：基于用户的协同过滤，先找相似用户，再推荐相似用户喜欢的item；</li>
+<li>U2I2I：基于物品的协同过滤，先统计用户喜爱的物品，再推荐他喜欢的item；</li>
+<li>U2TAG2I：基于标签偏好推荐，先统计用户偏好的tag，然后匹配所有的item；其中tag一般是item的标签、分类、关键词等。</li>
+</ul>
+<blockquote>
+<p>其中U表示user，2表示走向(to)，I表示Item，TAG表示标签(tag)。在深度神经网络出现之前，传统的多路召回方法主要有：内容偏好召回、协同过滤、热门召回和策略召回等，下面进行详细的介绍。</p>
+</blockquote>
+<h2>u2i召回框架</h2>
+<p>常见的u2i召回模型</p>
+<ol>
+<li><p>离线模型：通过用户行为日志和对应的item，离线训练模型，并得到用于表示用户特征的user embedding模型，和用于表示item特征的item embedding模型。</p>
+</li>
+<li><p>在线模型：通过用户线上的实时行为，构造实时特征，再通过User embedding模型提取用户当前embedding特征最后进行检索，找到用户最感兴趣的topN 的item。</p>
+</li>
+</ol>
+<p>比较经典的u2i召回模型主要有两种：Youtube召回；由DSSM发展而来的双塔召回。</p>
+<h2>双塔模型</h2>
+<p>双塔模型DSSM全称是Deep Structured Semantic Model，最早是微软提出解决搜索问题。双塔模型上线很方便，user塔在线计算user embedding，item塔离线计算item embeding，通过向量检索就可以快速进行召回。<br>DSSM模型的原理相对简单：通过Q（Query）和D（Document）的曝光、点击日志，采用DNN把Q和D表示为低维向量（如上图中128维的和），并通过余弦相识度来计算向量距离，最终训练出语义相似度模型。</p>
+<p>将DSSM中的Q（Query）和D（Document）分别替换成推荐系统中的User和Item，就构成了经典的双塔模型。</p>
+<h2>双塔模型的线上工程流程</h2>
+<ol>
+<li>从用户历史行为获得的item list。</li>
+<li>从item embedding中获取各个item 对应的向量。通过指定的计算（比如相加，求平均，时间衰减）得到相同embeding size的user embedding。</li>
+<li>用user embedding计算item embedding中各个item向量与用户向量的余弦值。</li>
+<li>返回相似度top k 的item</li>
+</ol>
+<h2>余弦值求相似度</h2>
+</div>
+    <footer class="article-footer"><div class="article-tags"><a class="tag tag-colored" style="--tag-bg:#FFE8E3;--tag-text:#C44732;--tag-border:#F7C5BA;--tag-dark-bg:#3A211D;--tag-dark-text:#FFB2A3;--tag-dark-border:#6F3B32;" href="/tags.html#%E6%8E%A8%E8%8D%90">推荐</a><a class="tag tag-colored" style="--tag-bg:#FCE8F3;--tag-text:#A33B72;--tag-border:#F2B9D8;--tag-dark-bg:#381B2C;--tag-dark-text:#F7A6CE;--tag-dark-border:#753858;" href="/tags.html#%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95">推荐算法</a></div></footer>
     </article>
     <aside class="toc-sidebar" id="tocSidebar" hidden></aside>
   </main>
