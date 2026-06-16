@@ -3,7 +3,7 @@
 // 与 ?v=VERSION 的 cache-busting 协同：CACHE_NAME 用 release VERSION 区分批次
 // ============================================================================
 
-const SW_VERSION = '20260515220000';
+const SW_VERSION = '20260617120000';
 const STATIC_CACHE = `static-${SW_VERSION}`;
 const PAGE_CACHE = `pages-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
@@ -97,7 +97,9 @@ self.addEventListener('fetch', event => {
 });
 
 async function handleHtml(request, event) {
-  const cached = await matchHtmlShell(request);
+  const url = new URL(request.url);
+  const postArticle = isPostArticlePath(url.pathname);
+
   const network = (event.preloadResponse || Promise.resolve(null))
     .then(preload => preload || fetch(request))
     .then(res => {
@@ -107,6 +109,18 @@ async function handleHtml(request, event) {
       }
       return res;
     });
+
+  // 文章页已预渲染完整 HTML：network-first，避免旧版「加载中…」空壳被 stale 缓存命中
+  if (postArticle) {
+    try {
+      const res = await network;
+      if (res && res.status === 200) return res;
+    } catch { /* 离线回退 */ }
+    const cached = await matchHtmlShell(request);
+    return cached || caches.match(OFFLINE_URL);
+  }
+
+  const cached = await matchHtmlShell(request);
 
   // 导航页最影响 DCL。已有缓存时立刻返回页面壳，后台静默更新，避免慢 304 卡住首屏。
   if (cached) {
@@ -119,6 +133,11 @@ async function handleHtml(request, event) {
     network.catch(() => null),
     delay(6000).then(() => null),
   ]).then(res => res || caches.match(OFFLINE_URL));
+}
+
+function isPostArticlePath(pathname) {
+  const p = String(pathname || '').replace(/\/+$/, '') || '/';
+  return /\/post\/[^/]+(?:\/index\.html)?$/i.test(p);
 }
 
 async function matchHtmlShell(request) {
