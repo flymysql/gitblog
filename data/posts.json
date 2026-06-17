@@ -1,6 +1,20 @@
 {
   "posts": [
     {
+      "slug": "qq-farm-assistant-经典农场辅助",
+      "title": "QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具",
+      "date": "2026-06-17T12:00:00+08:00",
+      "updated": "2026-06-17T12:00:00+08:00",
+      "author": "Jimmy",
+      "summary": "一个跑在 Windows 上的 QQ 经典农场（微信小游戏）桌面辅助：用图像识别锁定微信窗口，自动收菜、补种、逛好友农场偷菜，支持虚拟机前台挂机。双击 init.bat 初始化，双击 start.bat 开跑，日志写在 logs/daemon.log。",
+      "tags": [
+        "杂七杂八"
+      ],
+      "carousel": true,
+      "path": "posts/qq-farm-assistant-经典农场辅助.md",
+      "urlKey": "20260617"
+    },
+    {
       "slug": "海门回声-一个寂静的生日夜晚",
       "title": "海门回声 | 静谧的生日夜晚",
       "date": "2026-06-16T20:00:00+08:00",
