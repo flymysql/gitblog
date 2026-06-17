@@ -5,8 +5,17 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 16 Jun 2026 15:52:09 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 17 Jun 2026 07:23:12 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具</title>
+      <link>https://gitpull.cn/post/20260617/</link>
+      <guid isPermaLink="false">qq-farm-assistant-经典农场辅助</guid>
+      <pubDate>Wed, 17 Jun 2026 04:00:00 GMT</pubDate>
+      <author>Jimmy</author>
+      <category>杂七杂八</category>
+      <description><![CDATA[一个跑在 Windows 上的 QQ 经典农场（微信小游戏）桌面辅助：用图像识别锁定微信窗口，自动收菜、补种、逛好友农场偷菜，支持虚拟机前台挂机。双击 init.bat 初始化，双击 start.bat 开跑，日志写在 logs/daemon.log。]]></description>
+    </item>
     <item>
       <title>海门回声 | 静谧的生日夜晚</title>
       <link>https://gitpull.cn/post/20260616/</link>
@@ -267,15 +276,6 @@
       <author>兰州小红鸡</author>
       <category>教程</category><category>前端</category><category>博客建站</category>
       <description><![CDATA[¶设计特点 轮播图UI：模仿简书 可以直接在每篇文章的md文件里设置是否要设为轮播图的文章 就是我们每次新写一篇文章，用hexo生成一个md文件，我们只要在头部注明是否要作为轮播图…]]></description>
-    </item>
-    <item>
-      <title>将公众号文章爬到hexo博客</title>
-      <link>https://gitpull.cn/post/20181111/</link>
-      <guid isPermaLink="false">将公众号文章爬到hexo博客-fb598031</guid>
-      <pubDate>Sun, 11 Nov 2018 14:00:15 GMT</pubDate>
-      <author>兰州小红鸡</author>
-      
-      <description><![CDATA[由于以前公众号发了挺多分享资源的文章，索性写个python爬虫来爬取 特点： 1.保留公众号排版样式（就是把div样式全拷下来了） 2.写成md格式，并且加了hexo渲染需要的头部…]]></description>
     </item>
   </channel>
 </rss>
