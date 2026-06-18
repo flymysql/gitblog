@@ -1,6 +1,7 @@
 // 构建期生成可爬取的文章 HTML（正文 + head 内 SEO 元数据）
 import { load as loadHtml } from 'cheerio';
 import { renderMarkdown, escapeHtml } from './markdown-render.mjs';
+import sharp from 'sharp';
 
 const TAG_PALETTE = [
   { bg: '#FFE8E3', text: '#C44732', border: '#F7C5BA', darkBg: '#3A211D', darkText: '#FFB2A3', darkBorder: '#6F3B32' },
@@ -65,14 +66,43 @@ function tagHtml(tag, href, sitePathPrefix) {
   return `<span ${attrs}>${body}</span>`;
 }
 
-function fixContentAssetUrls(html, sitePathPrefix, siteOrigin) {
+const _imgMetaCache = new Map();
+async function localImageMeta(src) {
+  // src: markdown 原始图片地址。仅本地图片（assets/ 或 posts/）能读到尺寸，远程图跳过。
+  let rel = String(src || '').trim().split('?')[0].split('#')[0];
+  if (!rel || /^https?:\/\//i.test(rel) || rel.startsWith('//') || rel.startsWith('data:') || rel.startsWith('blob:')) return null;
+  rel = rel.replace(/^\.\//, '').replace(/^\/+/, '');
+  while (rel.startsWith('../')) rel = rel.slice(3);
+  if (!rel.startsWith('assets/') && !rel.startsWith('posts/')) return null;
+  if (_imgMetaCache.has(rel)) return _imgMetaCache.get(rel);
+  let result = null;
+  try {
+    const meta = await sharp(rel).metadata();
+    if (meta.width && meta.height) result = { width: meta.width, height: meta.height };
+  } catch {}
+  _imgMetaCache.set(rel, result);
+  return result;
+}
+
+async function fixContentAssetUrls(html, sitePathPrefix, siteOrigin) {
   const $ = loadHtml(`<div id="wrap">${html}</div>`, null, false);
   const root = $('#wrap');
+  const imgEls = [];
   root.find('img[src]').each((_, el) => {
     const src = $(el).attr('src');
     const fixed = publicImageUrl(src, sitePathPrefix, siteOrigin);
     if (fixed) $(el).attr('src', fixed);
+    imgEls.push({ el, src });
   });
+  for (const { el, src } of imgEls) {
+    const meta = await localImageMeta(src);
+    if (meta) {
+      $(el).attr('width', String(meta.width));
+      $(el).attr('height', String(meta.height));
+    }
+    if (!$(el).attr('loading')) $(el).attr('loading', 'lazy');
+    if (!$(el).attr('decoding')) $(el).attr('decoding', 'async');
+  }
   root.find('a[href]').each((_, el) => {
     const href = $(el).attr('href') || '';
     if (!href || href.startsWith('#') || href.startsWith('mailto:') || /^https?:\/\//i.test(href)) return;
@@ -108,6 +138,9 @@ function buildMetaHead({
   updated,
   tags,
   site,
+  ogImageWidth,
+  ogImageHeight,
+  homeUrl,
 }) {
   const lines = [
     `<meta name="description" content="${escapeHtml(description)}">`,
@@ -126,6 +159,8 @@ function buildMetaHead({
     `<meta name="twitter:image" content="${escapeHtml(image)}">`,
     `<link rel="canonical" href="${escapeHtml(canonical)}">`,
   ];
+  if (ogImageWidth) lines.push(`<meta property="og:image:width" content="${ogImageWidth}">`);
+  if (ogImageHeight) lines.push(`<meta property="og:image:height" content="${ogImageHeight}">`);
   if (date) lines.push(`<meta property="article:published_time" content="${escapeHtml(date)}">`);
   if (updated) lines.push(`<meta property="article:modified_time" content="${escapeHtml(updated)}">`);
   if (author) lines.push(`<meta property="article:author" content="${escapeHtml(author)}">`);
@@ -150,6 +185,14 @@ function buildMetaHead({
     keywords: (tags || []).join(','),
   });
   lines.push(`<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`);
+  if (homeUrl) {
+    const crumbs = [{ '@type': 'ListItem', position: 1, name: '首页', item: homeUrl }];
+    const firstTag = (tags || [])[0];
+    if (firstTag) crumbs.push({ '@type': 'ListItem', position: 2, name: firstTag, item: `${homeUrl}tags.html#${encodeURIComponent(firstTag)}` });
+    crumbs.push({ '@type': 'ListItem', position: crumbs.length + 1, name: title, item: canonical });
+    const breadcrumb = stripUndefined({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: crumbs });
+    lines.push(`<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`);
+  }
   return lines.join('\n  ');
 }
 
@@ -204,7 +247,7 @@ function buildShareCardHtml({ canonical, title, shareCfg, donateCfg, sitePathPre
   `;
 }
 
-export function buildArticleInnerHtml({
+export async function buildArticleInnerHtml({
   post,
   fmData,
   content,
@@ -225,7 +268,7 @@ export function buildArticleInnerHtml({
   const canonical = post.canonical || '';
   const tagsBase = rootHref(sitePathPrefix, 'tags.html');
 
-  let bodyHtml = fixContentAssetUrls(renderMarkdown(content), sitePathPrefix, siteOrigin);
+  let bodyHtml = await fixContentAssetUrls(renderMarkdown(content), sitePathPrefix, siteOrigin);
   const mins = readingMinutes(content);
   const tagTop = tags.length
     ? `<div class="article-tags-top">${tags.map(t => tagHtml(t, `${tagsBase}#${encodeURIComponent(t)}`, sitePathPrefix)).join('')}</div>`
@@ -262,7 +305,7 @@ export function buildArticleInnerHtml({
   `.trim();
 }
 
-export function buildPrerenderedPostHtml({
+export async function buildPrerenderedPostHtml({
   post,
   fmData,
   content,
@@ -279,11 +322,23 @@ export function buildPrerenderedPostHtml({
   const updated = post.updated || fmData.updated || date;
   const author = post.author || fmData.author || site.author;
   const cover = publicImageUrl(post.cover || fmData.cover || '', sitePathPrefix, siteOrigin);
+  const coverRaw = post.cover || fmData.cover || '';
   const tags = post.tags || fmData.tags || [];
   const summary = post.summary || fmData.summary || '';
   const canonical = post.canonical || '';
-  const ogAuto = `${siteOrigin}${rootHref(sitePathPrefix, `assets/og/${encodeURIComponent(slug)}.svg`)}`;
+  const ogAuto = `${siteOrigin}${rootHref(sitePathPrefix, `assets/og/${encodeURIComponent(slug)}.png`)}`;
   const image = cover || ogAuto || site.avatar || '';
+
+  let ogImageWidth = 0;
+  let ogImageHeight = 0;
+  if (image === ogAuto) {
+    ogImageWidth = 1200;
+    ogImageHeight = 630;
+  } else if (coverRaw) {
+    const m = await localImageMeta(coverRaw);
+    if (m) { ogImageWidth = m.width; ogImageHeight = m.height; }
+  }
+  const homeUrl = (siteOrigin + rootHref(sitePathPrefix, '')).replace(/\/$/, '') + '/';
 
   const metaHead = buildMetaHead({
     title,
@@ -295,9 +350,12 @@ export function buildPrerenderedPostHtml({
     updated,
     tags,
     site,
+    ogImageWidth,
+    ogImageHeight,
+    homeUrl,
   });
 
-  const articleInner = buildArticleInnerHtml({
+  const articleInner = await buildArticleInnerHtml({
     post,
     fmData,
     content,
@@ -315,6 +373,9 @@ export function buildPrerenderedPostHtml({
       /<article class="article" id="article">[\s\S]*?<\/article>/,
       `<article class="article is-prerendered" id="article" data-prerendered="1" data-slug="${escapeHtml(slug)}">\n      ${articleInner}\n    </article>`
     );
+
+  // 移除壳里的 noindex（post.html fallback 专用），预渲染产物用 buildMetaHead 的 index,follow
+  html = html.replace(/<meta\s+name="robots"\s+content="noindex">\s*\n?\s*/g, '');
 
   // 在 theme bootstrap 之后插入 SEO 元数据
   html = html.replace(

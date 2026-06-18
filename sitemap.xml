@@ -2,37 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://gitpull.cn/</loc>
-    <lastmod>2026-06-17T07:28:52.621Z</lastmod>
+    <lastmod>2026-06-17T04:00:00.000Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tags.html</loc>
-    <lastmod>2026-06-17T07:28:52.621Z</lastmod>
+    <lastmod>2026-06-18T04:09:08.378Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/archives.html</loc>
-    <lastmod>2026-06-17T07:28:52.621Z</lastmod>
+    <lastmod>2026-06-18T04:09:08.378Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/series.html</loc>
-    <lastmod>2026-06-17T07:28:52.621Z</lastmod>
+    <lastmod>2026-06-18T04:09:08.378Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools.html</loc>
-    <lastmod>2026-06-17T07:28:52.621Z</lastmod>
+    <lastmod>2026-06-18T04:09:08.378Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tool-air-conditioner.html</loc>
-    <lastmod>2026-06-17T07:28:52.621Z</lastmod>
+    <lastmod>2026-06-18T04:09:08.378Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -133,13 +133,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://gitpull.cn/post/20190605/</loc>
-    <lastmod>2019-06-05T00:00:00.000Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://gitpull.cn/post/20190605-2/</loc>
+    <loc>https://gitpull.cn/post/20190605-4/</loc>
     <lastmod>2019-06-05T00:00:00.000Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -151,19 +145,25 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://gitpull.cn/post/20190605-4/</loc>
+    <loc>https://gitpull.cn/post/20190605-2/</loc>
     <lastmod>2019-06-05T00:00:00.000Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://gitpull.cn/post/20190101/</loc>
-    <lastmod>2022-03-10T15:55:00.000Z</lastmod>
+    <loc>https://gitpull.cn/post/20190605/</loc>
+    <lastmod>2019-06-05T00:00:00.000Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/post/20190101-2/</loc>
+    <lastmod>2022-03-10T15:55:00.000Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://gitpull.cn/post/20190101/</loc>
     <lastmod>2022-03-11T15:05:00.000Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

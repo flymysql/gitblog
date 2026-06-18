@@ -1,6 +1,7 @@
 // 校验 + 重新生成 sitemap.xml 与 rss.xml
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { join, basename, extname } from 'node:path';
+import sharp from 'sharp';
 import { buildPrerenderedPostHtml } from './prerender-post-html.mjs';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
@@ -346,9 +347,13 @@ function xmlEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => 
 
 const baseUrl = SITE_URL || '';
 const today = new Date().toISOString();
+// 首页 lastmod 取最新文章的更新时间（比构建时间戳更能反映内容变化）
+const latestPostDate = visiblePosts.length
+  ? new Date(visiblePosts[0].date || today).toISOString()
+  : today;
 
 const urls = [
-  { loc: baseUrl + '/', lastmod: today, changefreq: 'daily', priority: '1.0' },
+  { loc: baseUrl + '/', lastmod: latestPostDate, changefreq: 'daily', priority: '1.0' },
   { loc: baseUrl + '/tags.html', lastmod: today, changefreq: 'weekly', priority: '0.8' },
   { loc: baseUrl + '/archives.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
   { loc: baseUrl + '/series.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
@@ -483,10 +488,20 @@ function ogSvg(post) {
   <text x="1080" y="500" text-anchor="end" fill="#999" font-size="24" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${svgEsc(SITE_AUTHOR)}</text>
 </svg>`;
 }
-for (const post of [...visiblePosts, ...pages.filter(p => !p.draft)]) {
-  writeFileSync(join(OG_DIR, `${post.slug}.svg`), ogSvg(post));
+const ogEntries = [...visiblePosts, ...pages.filter(p => !p.draft)];
+let ogPngCount = 0;
+for (const post of ogEntries) {
+  const svg = ogSvg(post);
+  writeFileSync(join(OG_DIR, `${post.slug}.svg`), svg);
+  // 社交平台（微信/QQ/Twitter/FB 等）大多不支持 SVG OG 图，需转 PNG（1200×630）
+  try {
+    await sharp(Buffer.from(svg)).resize(1200, 630, { fit: 'cover' }).png().toFile(join(OG_DIR, `${post.slug}.png`));
+    ogPngCount++;
+  } catch (e) {
+    console.warn(`[og] PNG 转换失败 ${post.slug}:`, e.message);
+  }
 }
-console.log(`OG 分享图已生成：${visiblePosts.length + pages.filter(p => !p.draft).length} 张`);
+console.log(`OG 分享图已生成：${ogEntries.length} 张 SVG，${ogPngCount} 张 PNG`);
 
 // ---------- post/{urlKey}/index.html（/post/YYYYMMDD/ 与 post.js 一致） ----------
 /** 壳内 href/src 用站点根绝对路径，避免在 /post/xxx/ 下相对路径变成 /post/xxx/assets/… 或 SW 缓存旧壳错位 */
@@ -567,7 +582,7 @@ for (const p of postEntries) {
   mkdirSync(dir, { recursive: true });
   const raw = readFileSync(p.path, 'utf8');
   const { data: fmData, content } = parseFM(raw);
-  const prerendered = buildPrerenderedPostHtml({
+  const prerendered = await buildPrerenderedPostHtml({
     post: {
       ...p,
       canonical: postPublicAbsUrl(p),
@@ -585,3 +600,93 @@ for (const p of postEntries) {
   postShellCount++;
 }
 console.log(`post/{{urlKey}}/ 已生成（${postShellCount} 篇预渲染 HTML）`);
+
+function stripUndefinedBuild(value) {
+  if (Array.isArray(value)) return value.map(stripUndefinedBuild).filter(v => v !== undefined);
+  if (value && typeof value === 'object') {
+    const out = {};
+    for (const [k, v] of Object.entries(value)) {
+      if (v === undefined || v === '') continue;
+      out[k] = stripUndefinedBuild(v);
+    }
+    return out;
+  }
+  return value;
+}
+
+// ---------- index.html：注入静态 SEO 元数据 + 预渲染首页文章列表（给爬虫可抓取内容） ----------
+function injectHomeSeo() {
+  if (!existsSync('index.html')) return;
+  let html = readFileSync('index.html', 'utf8');
+  const homeUrl = baseUrl + '/';
+  const homeTitle = SITE_SUBTITLE ? `${SITE_TITLE} · ${SITE_SUBTITLE}` : SITE_TITLE;
+  const ogImage = SITE_AVATAR || SITE_LOGO || '';
+  const homeMeta = [
+    `<meta name="description" content="${xmlEsc(SITE_DESC || SITE_SUBTITLE || SITE_TITLE)}">`,
+    `<meta name="author" content="${xmlEsc(SITE_AUTHOR)}">`,
+    `<meta name="robots" content="index, follow">`,
+    `<meta property="og:title" content="${xmlEsc(SITE_TITLE)}">`,
+    `<meta property="og:description" content="${xmlEsc(SITE_DESC || SITE_SUBTITLE || '')}">`,
+    ogImage ? `<meta property="og:image" content="${xmlEsc(ogImage)}">` : '',
+    `<meta property="og:url" content="${xmlEsc(homeUrl)}">`,
+    `<meta property="og:type" content="website">`,
+    `<meta property="og:site_name" content="${xmlEsc(SITE_TITLE)}">`,
+    `<meta property="og:locale" content="${xmlEsc(SITE_LOCALE)}">`,
+    `<meta name="twitter:card" content="${ogImage ? 'summary_large_image' : 'summary'}">`,
+    `<meta name="twitter:title" content="${xmlEsc(SITE_TITLE)}">`,
+    `<meta name="twitter:description" content="${xmlEsc(SITE_DESC || SITE_SUBTITLE || '')}">`,
+    ogImage ? `<meta name="twitter:image" content="${xmlEsc(ogImage)}">` : '',
+    `<link rel="canonical" href="${xmlEsc(homeUrl)}">`,
+  ].filter(Boolean).join('\n  ');
+  const websiteLd = stripUndefinedBuild({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_TITLE,
+    description: SITE_DESC,
+    url: homeUrl,
+    inLanguage: SITE_LOCALE,
+    publisher: { '@type': 'Organization', name: SITE_TITLE, logo: SITE_LOGO || undefined },
+  });
+  const orgLd = stripUndefinedBuild({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: SITE_TITLE,
+    url: homeUrl,
+    logo: SITE_LOGO || SITE_AVATAR || undefined,
+  });
+  const jsonLd = `<script type="application/ld+json">${JSON.stringify(websiteLd)}</script>\n  <script type="application/ld+json">${JSON.stringify(orgLd)}</script>`;
+
+  // title / description
+  html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${xmlEsc(homeTitle)}</title>`);
+  html = html.replace(/<meta name="description" content="">/, homeMeta.split('\n')[0]);
+
+  // 预渲染首页最新文章列表（home.js 加载后会重写 #postList，爬虫在此前已可抓取内容与链接）
+  const latestForHome = visiblePosts.slice(0, 10);
+  let listHtml = '';
+  if (latestForHome.length) {
+    listHtml = latestForHome.map(p => {
+      const href = postPublicAbsUrl(p);
+      const dateTxt = String(p.date || '').slice(0, 10);
+      const summary = xmlEsc(String(p.summary || '').slice(0, 120));
+      const tagsHtml = (p.tags || []).slice(0, 2).map(t => `<span class="tag">#${xmlEsc(t)}</span>`).join(' ');
+      return `      <li class="post-item"><a href="${xmlEsc(href)}"><strong>${xmlEsc(p.title)}</strong></a> <time>${dateTxt}</time>${tagsHtml ? ' ' + tagsHtml : ''}<br>${summary}</li>`;
+    }).join('\n');
+  } else {
+    listHtml = '      <li class="loading">加载中…</li>';
+  }
+  html = html.replace(
+    /<ul id="postList" class="post-list">[\s\S]*?<\/ul>/,
+    `<ul id="postList" class="post-list">\n${listHtml}\n    </ul>`
+  );
+
+  // 插入 SEO meta + JSON-LD（在 theme bootstrap 之后）
+  const seoBlock = `${homeMeta.split('\n').slice(1).join('\n  ')}\n  ${jsonLd}`;
+  html = html.replace(
+    /(<meta name="apple-mobile-web-app-capable" content="yes">)/,
+    `$1\n  ${seoBlock}`
+  );
+
+  writeFileSync('index.html', html);
+  console.log(`index.html 已注入静态 SEO + 首页列表（${latestForHome.length} 篇）`);
+}
+injectHomeSeo();
