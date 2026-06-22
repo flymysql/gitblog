@@ -316,11 +316,11 @@
   .article-author .meta { font-size: 11.5px; gap: 6px; }
   .article-edit { font-size: 11px; padding: 3px 10px; }
 
-  .article-body { font-size: 15.5px; line-height: 1.85; }
+  .article-body { font-size: 16px; line-height: 1.85; }
   .article-body h1 { font-size: 22px; }
   .article-body h2 { font-size: 19px; }
   .article-body h3 { font-size: 17px; }
-  .article-body h4 { font-size: 15.5px; }
+  .article-body h4 { font-size: 16px; }
   .article-body pre { padding: 12px 14px; font-size: 12.5px; }
   .article-body blockquote { padding: 8px 14px; font-size: 14px; }
   .article-body table { font-size: 13px; }
