@@ -358,6 +358,7 @@ const urls = [
   { loc: baseUrl + '/archives.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
   { loc: baseUrl + '/series.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
   { loc: baseUrl + '/tools.html', lastmod: today, changefreq: 'monthly', priority: '0.7' },
+  { loc: baseUrl + '/tool-kit.html', lastmod: today, changefreq: 'monthly', priority: '0.65' },
   { loc: baseUrl + '/tool-air-conditioner.html', lastmod: today, changefreq: 'monthly', priority: '0.6' },
   ...pages.filter(p => !p.draft).map(p => ({
     loc: postPublicAbsUrl(p),
