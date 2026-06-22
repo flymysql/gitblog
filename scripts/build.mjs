@@ -4,6 +4,16 @@ import { join, basename, extname } from 'node:path';
 import sharp from 'sharp';
 import { buildPrerenderedPostHtml } from './prerender-post-html.mjs';
 import { TOOL_HTML_FILES } from './generate-tool-pages.mjs';
+import {
+  parseNavItems,
+  buildNavShell,
+  buildHeroShell,
+  buildPostItemShell,
+  pickCarouselItems,
+  buildCarouselShell,
+  buildCriticalHomeCss,
+  postHrefFromEntry,
+} from './home-shell-html.mjs';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
 const cfgRaw = readFileSync('assets/js/config.js', 'utf8');
@@ -19,6 +29,7 @@ const SITE_LOCALE = getStr('locale') || 'zh-CN';
 const SITE_AVATAR = getStr('avatar') || '';
 const SITE_LOGO = getStr('logo') || '';
 const SITE_SUBTITLE = getStr('subtitle') || '';
+const BUILD_VERSION = (cfgRaw.match(/VERSION\s*=\s*['"]([^'"]+)['"]/) || [])[1] || '20260514040000';
 
 function getSectionBool(section, key, fallback = false) {
   const re = new RegExp(`${section}\\s*:\\s*\\{[\\s\\S]*?${key}\\s*:\\s*(true|false)`);
@@ -687,17 +698,80 @@ function injectHomeSeo() {
   html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${xmlEsc(homeTitle)}</title>`);
   html = html.replace(/<meta name="description" content="">/, homeMeta.split('\n')[0]);
 
-  // 预渲染首页最新文章列表（home.js 加载后会重写 #postList，爬虫在此前已可抓取内容与链接）
-  const latestForHome = visiblePosts.slice(0, 10);
+  // 同步 CSS 版本号 + 首屏关键样式 / preload
+  const cssCommon = `assets/css/common.css?v=${BUILD_VERSION}`;
+  const cssHome = `assets/css/home.css?v=${BUILD_VERSION}`;
+  html = html.replace(/assets\/css\/common\.css\?v=[^"]+/g, cssCommon);
+  html = html.replace(/assets\/css\/home\.css\?v=[^"]+/g, cssHome);
+  html = html.replace(/assets\/js\/home\.js\?v=[^"]+/g, `assets/js/home.js?v=${BUILD_VERSION}`);
+
+  const headPerf = `${buildCriticalHomeCss()}
+  <link rel="preload" href="${cssCommon}" as="style">
+  <link rel="preload" href="${cssHome}" as="style">`;
+  html = html.replace(/<style id="critical-home">[\s\S]*?<\/style>\s*/i, '');
+  html = html.replace(/\s*<link rel="preload" href="assets\/css\/[^"]+" as="style">\s*/gi, '\n');
+  html = html.replace(
+    /(<script>\(function\(\)\{var s=localStorage;[\s\S]*?\}\)\(\);<\/script>)/,
+    `$1\n  ${headPerf}`
+  );
+
+  const navItems = parseNavItems(cfgRaw);
+  const navShell = buildNavShell({
+    siteTitle: SITE_TITLE,
+    siteLogo: SITE_LOGO,
+    navItems,
+    pathPrefix: SITE_PATH_PREFIX,
+    active: './',
+  });
+  html = html.replace(/<div id="site-nav">\s*<\/div>/, `<div id="site-nav">\n    ${navShell}\n  </div>`);
+
+  const tagSet = new Set();
+  visiblePosts.forEach(p => (p.tags || []).forEach(t => tagSet.add(t)));
+  const heroShell = buildHeroShell({
+    description: SITE_DESC || SITE_SUBTITLE,
+    avatar: SITE_AVATAR,
+    postCount: visiblePosts.length,
+    tagCount: tagSet.size,
+    pathPrefix: SITE_PATH_PREFIX,
+  });
+  html = html.replace(
+    /<section class="hero" id="hero"[^>]*>[\s\S]*?<\/section>/,
+    `<section class="hero" id="hero" data-shell="prerender">\n    ${heroShell}\n  </section>`
+  );
+
+  const carouselItems = pickCarouselItems(visiblePosts);
+  const carouselShell = buildCarouselShell(carouselItems, {
+    postHrefFromEntry: p => postHrefFromEntry(p, postPublicAbsUrl),
+  });
+  if (carouselShell) {
+    html = html.replace(
+      /<section class="home-carousel" id="homeCarousel"[^>]*>[\s\S]*?<\/section>/,
+      `<section class="home-carousel" id="homeCarousel" data-shell="prerender">\n    ${carouselShell}\n  </section>`
+    );
+  } else {
+    html = html.replace(
+      /<section class="home-carousel" id="homeCarousel"[^>]*>[\s\S]*?<\/section>/,
+      `<section class="home-carousel" id="homeCarousel" hidden></section>`
+    );
+  }
+
+  const hrefFn = p => postHrefFromEntry(p, postPublicAbsUrl);
+  const latestForHome = visiblePosts.slice(0, 15);
   let listHtml = '';
   if (latestForHome.length) {
-    listHtml = latestForHome.map(p => {
-      const href = postPublicAbsUrl(p);
-      const dateTxt = String(p.date || '').slice(0, 10);
-      const summary = xmlEsc(String(p.summary || '').slice(0, 120));
-      const tagsHtml = (p.tags || []).slice(0, 2).map(t => `<span class="tag">#${xmlEsc(t)}</span>`).join(' ');
-      return `      <li class="post-item"><a href="${xmlEsc(href)}"><strong>${xmlEsc(p.title)}</strong></a> <time>${dateTxt}</time>${tagsHtml ? ' ' + tagsHtml : ''}<br>${summary}</li>`;
-    }).join('\n');
+    listHtml = latestForHome.map(p => buildPostItemShell(p, {
+      author: SITE_AUTHOR,
+      avatar: SITE_AVATAR,
+      postHrefFromEntry: hrefFn,
+    })).join('\n');
+    if (visiblePosts.length > latestForHome.length) {
+      listHtml += `\n      <li class="load-more-sentinel" id="loadMoreSentinel" aria-hidden="true">
+           <span class="load-more-spinner"></span>
+           <span class="load-more-text">加载更多</span>
+         </li>`;
+    } else {
+      listHtml += `\n      <li class="load-more-end">已经到底啦 · 共 ${visiblePosts.length} 篇</li>`;
+    }
   } else {
     listHtml = '      <li class="loading">加载中…</li>';
   }
@@ -706,15 +780,22 @@ function injectHomeSeo() {
     `<ul id="postList" class="post-list">\n${listHtml}\n    </ul>`
   );
 
-  // 插入 SEO meta + JSON-LD（在 theme bootstrap 之后）
+  // 插入 SEO meta + JSON-LD（在 theme bootstrap 之后；重复构建时先替换旧块）
   const seoBlock = `${homeMeta.split('\n').slice(1).join('\n  ')}\n  ${jsonLd}`;
-  html = html.replace(
-    /(<meta name="apple-mobile-web-app-capable" content="yes">)/,
-    `$1\n  ${seoBlock}`
-  );
+  if (/<meta name="apple-mobile-web-app-capable" content="yes">[\s\S]*?<\/head>/.test(html)) {
+    html = html.replace(
+      /<meta name="apple-mobile-web-app-capable" content="yes">[\s\S]*?(?=<\/head>)/,
+      `<meta name="apple-mobile-web-app-capable" content="yes">\n  ${seoBlock}\n`
+    );
+  } else {
+    html = html.replace(
+      /(<meta name="apple-mobile-web-app-capable" content="yes">)/,
+      `$1\n  ${seoBlock}`
+    );
+  }
 
   writeFileSync('index.html', html);
-  console.log(`index.html 已注入静态 SEO + 首页列表（${latestForHome.length} 篇）`);
+  console.log(`index.html 已注入首屏壳层 + SEO + 首页列表（${latestForHome.length} 篇）`);
 }
 injectHomeSeo();
 console.log(`tool/*.html 已就绪（${TOOL_HTML_FILES.length} 个工具页，含评论区）`);
