@@ -120,6 +120,6 @@ export const CONFIG = {
   },
   decor: {
     enabled: false,
-    pcCornerImage: ""     // PC 端右下角装饰图，如 assets/uploads/2026/06/pc-corner-mascot.png
+    pcCornerImage: ""     // PC 端右下角装饰图，如 assets/uploads/2026/06/pc-corner-mascot.webp
   }
 };
