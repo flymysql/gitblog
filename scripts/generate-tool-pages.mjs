@@ -3,7 +3,7 @@
 import { writeFileSync } from 'node:fs';
 import { toolPageHtml } from './tool-page-shell.mjs';
 
-const V = '20260622140000';
+const V = '20260622180000';
 
 const PAGES = [
   {
