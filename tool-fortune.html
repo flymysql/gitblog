@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <title>今日运势 · 加载中…</title>
+  <meta name="description" content="娱乐向今日签文，同一日期与昵称结果固定，图一乐，请勿当真。">
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
+  <link rel="stylesheet" href="assets/css/common.css?v=20260622140000">
+  <link rel="stylesheet" href="assets/css/tools.css?v=20260622140000">
+  <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#ea6f5a">
+  <link rel="apple-touch-icon" href="assets/icon.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="tool-kit-page tool-single-page">
+    <section class="tool-kit-hero">
+      <p class="eyebrow">Daily Fortune</p>
+      <h1>今日运势</h1>
+      <p>娱乐向，图一乐。同一日期 + 昵称会得到相同结果。</p>
+    </section>
+    <div class="tool-kit-panels">
+      
+      <section class="tool-kit-panel is-active">
+        <div class="tool-kit-form tool-kit-form-inline">
+          <label>昵称（可选） <input type="text" id="fortuneName" placeholder="留空也行" maxlength="20"></label>
+          <button type="button" class="tool-kit-btn" id="fortuneBtn">再抽一次</button>
+        </div>
+        <article class="fortune-card" id="fortuneResult" hidden>
+          <div class="fortune-grade" id="fortuneGrade"></div>
+          <p class="fortune-text" id="fortuneText"></p>
+          <dl class="fortune-meta">
+            <div><dt>宜</dt><dd id="fortuneGood"></dd></div>
+            <div><dt>忌</dt><dd id="fortuneBad"></dd></div>
+            <div><dt>幸运色</dt><dd id="fortuneColor"></dd></div>
+            <div><dt>幸运数字</dt><dd id="fortuneNum"></dd></div>
+          </dl>
+          <p class="tool-kit-hint">仅供娱乐，请勿当真。</p>
+        </article>
+      </section>
+    </div>
+    <section class="tool-actions">
+      <a class="btn-home" href="./">返回首页</a>
+      <a class="btn-ghost" href="tools.html">查看工具箱</a>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <div id="site-overlays"></div>
+  <script type="module" src="assets/js/tool-fortune.js?v=20260622140000"></script>
+</body>
+</html>
