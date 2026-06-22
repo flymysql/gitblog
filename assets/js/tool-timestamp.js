@@ -3,7 +3,7 @@ import { initToolPage, $ } from './tool-kit-common.js';
 initToolPage({
   title: '时间戳转换',
   description: 'Unix 时间戳（秒/毫秒）与本地日期时间互转，支持一键取当前时间。',
-  path: 'tool-timestamp.html',
+  path: 'tools/tool-timestamp.html',
 });
 
 function toLocalInput(d) {

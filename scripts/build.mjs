@@ -354,16 +354,16 @@ const latestPostDate = visiblePosts.length
   : today;
 
 const TOOL_SITEMAP_PAGES = [
-  'tool-age.html',
-  'tool-fortune.html',
-  'tool-json.html',
-  'tool-codec.html',
-  'tool-timestamp.html',
-  'tool-regex.html',
-  'tool-qrcode.html',
-  'tool-image.html',
-  'tool-network.html',
-  'tool-air-conditioner.html',
+  'tools/tool-age.html',
+  'tools/tool-fortune.html',
+  'tools/tool-json.html',
+  'tools/tool-codec.html',
+  'tools/tool-timestamp.html',
+  'tools/tool-regex.html',
+  'tools/tool-qrcode.html',
+  'tools/tool-image.html',
+  'tools/tool-network.html',
+  'tools/tool-air-conditioner.html',
 ];
 
 const urls = [
@@ -371,7 +371,7 @@ const urls = [
   { loc: baseUrl + '/tags.html', lastmod: today, changefreq: 'weekly', priority: '0.8' },
   { loc: baseUrl + '/archives.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
   { loc: baseUrl + '/series.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
-  { loc: baseUrl + '/tools.html', lastmod: today, changefreq: 'monthly', priority: '0.7' },
+  { loc: baseUrl + '/tools/', lastmod: today, changefreq: 'monthly', priority: '0.7' },
   ...TOOL_SITEMAP_PAGES.map(p => ({
     loc: baseUrl + '/' + p,
     lastmod: today,

@@ -3,7 +3,7 @@ import { initToolPage, $, formatBytes, setStatus } from './tool-kit-common.js';
 initToolPage({
   title: '图片压缩 / WebP 转换',
   description: '浏览器本地压缩图片，输出 WebP、JPEG 或 PNG，可调质量与最大宽度。',
-  path: 'tool-image.html',
+  path: 'tools/tool-image.html',
 });
 
 const statusEl = $('imgStatus');

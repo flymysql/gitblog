@@ -5,7 +5,7 @@ import { drawFortuneShareImage, downloadCanvas, toolPageUrl } from './tool-share
 initToolPage({
   title: '今日运势',
   description: '娱乐向今日签文，同一日期与昵称结果固定，图一乐，请勿当真。',
-  path: 'tool-fortune.html',
+  path: 'tools/tool-fortune.html',
   commentsHint: '今日签文如何？来聊两句～',
 });
 
@@ -46,7 +46,7 @@ $('fortuneShare').addEventListener('click', async () => {
   try {
     const name = lastFortune.name;
     const query = name ? `name=${encodeURIComponent(name)}` : '';
-    const pageUrl = toolPageUrl('tool-fortune.html', query);
+    const pageUrl = toolPageUrl('tools/tool-fortune.html', query);
     const canvas = await drawFortuneShareImage({ ...lastFortune, pageUrl });
     const d = new Date();
     downloadCanvas(canvas, `fortune-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}.png`);

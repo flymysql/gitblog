@@ -3,8 +3,10 @@ import { setMeta, setJsonLd } from './seo.js';
 import { CONFIG } from './config.js';
 import { isGiscusReady, mountGiscusScript } from './giscus-embed.js';
 
+export const TOOLS_INDEX = 'tools/';
+
 export function initToolPage({ title, description, path, giscusTerm, commentsHint }) {
-  initSite({ active: 'tools.html' });
+  initSite({ active: TOOLS_INDEX });
   setMeta({ title, description, type: 'website' });
   const base = CONFIG.site.url || location.origin;
   setJsonLd({

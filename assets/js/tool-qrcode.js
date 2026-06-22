@@ -3,7 +3,7 @@ import { initToolPage, $, setStatus } from './tool-kit-common.js';
 initToolPage({
   title: '二维码生成',
   description: '文本或链接一键生成二维码 PNG，支持下载。',
-  path: 'tool-qrcode.html',
+  path: 'tools/tool-qrcode.html',
 });
 
 let QRCodeLib = null;

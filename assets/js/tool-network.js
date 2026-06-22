@@ -3,7 +3,7 @@ import { initToolPage, $, escapeHtml, copyText, renderKv } from './tool-kit-comm
 initToolPage({
   title: '网络与浏览器信息',
   description: '查看公网 IP、运营商、城市与浏览器、屏幕、UA 等信息。',
-  path: 'tool-network.html',
+  path: 'tools/tool-network.html',
 });
 
 function parseUA() {
