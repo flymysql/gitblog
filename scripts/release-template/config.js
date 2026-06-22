@@ -118,5 +118,9 @@ export const CONFIG = {
     wechat: "",           // 微信收款码图片 URL
     alipay: "",           // 支付宝收款码图片 URL
     paypal: ""            // PayPal 链接（如 https://paypal.me/xxx）
+  },
+  decor: {
+    enabled: false,
+    pcCornerImage: ""     // PC 端右下角装饰图，如 assets/uploads/2026/06/pc-corner-mascot.png
   }
 };

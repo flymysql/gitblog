@@ -130,5 +130,9 @@ export const CONFIG = {
     wechat: "",
     alipay: "",
     paypal: ""
+  },
+  decor: {
+    enabled: true,
+    pcCornerImage: "assets/uploads/2026/06/pc-corner-mascot.png"
   }
 };
