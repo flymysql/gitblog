@@ -531,6 +531,24 @@ function injectAnalytics() {
   });
 }
 
+function mountPcCornerDecor() {
+  const decor = CONFIG.decor || {};
+  if (!decor.enabled || !decor.pcCornerImage) return;
+  if (location.pathname.includes('/admin/')) return;
+  if (document.getElementById('site-pc-corner-decor')) return;
+  const wrap = document.createElement('div');
+  wrap.id = 'site-pc-corner-decor';
+  wrap.className = 'site-pc-corner-decor';
+  wrap.setAttribute('aria-hidden', 'true');
+  const img = document.createElement('img');
+  img.src = rootPath(String(decor.pcCornerImage).replace(/^\/+/, ''));
+  img.alt = '';
+  img.decoding = 'async';
+  img.loading = 'lazy';
+  wrap.appendChild(img);
+  document.body.appendChild(wrap);
+}
+
 export function initSite({ active = '', skipDuplicateSitePv = false } = {}) {
   initTheme();
   applyFavicon();
@@ -549,6 +567,7 @@ export function initSite({ active = '', skipDuplicateSitePv = false } = {}) {
   if ($('#year')) $('#year').textContent = new Date().getFullYear();
   injectAnalytics();
   initPageviews();
+  mountPcCornerDecor();
   registerServiceWorker();
 }
 
