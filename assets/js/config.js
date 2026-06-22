@@ -133,6 +133,6 @@ export const CONFIG = {
   },
   decor: {
     enabled: true,
-    pcCornerImage: "assets/uploads/2026/06/pc-corner-mascot.png"
+    pcCornerImage: "assets/uploads/2026/06/pc-corner-mascot.webp"
   }
 };
