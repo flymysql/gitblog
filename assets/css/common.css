@@ -962,3 +962,40 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
 @media (max-width: 420px) {
   .preset-picker-grid { grid-template-columns: 1fr; }
 }
+
+/* PC 端右下角装饰图（仅宽屏显示，不挡点击） */
+.site-pc-corner-decor {
+  display: none;
+}
+
+@media (min-width: 821px) {
+  .site-pc-corner-decor {
+    display: block;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    pointer-events: none;
+    user-select: none;
+    max-width: min(300px, 26vw);
+    line-height: 0;
+  }
+
+  .site-pc-corner-decor img {
+    width: 100%;
+    height: auto;
+    max-height: min(520px, 72vh);
+    object-fit: contain;
+    object-position: bottom right;
+    opacity: 0.95;
+  }
+
+  :root[data-mode="dark"] .site-pc-corner-decor img,
+  :root[data-theme="dark"] .site-pc-corner-decor img {
+    opacity: 0.88;
+  }
+}
+
+@media print {
+  .site-pc-corner-decor { display: none !important; }
+}
