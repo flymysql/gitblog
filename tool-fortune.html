@@ -29,6 +29,7 @@
         <div class="tool-kit-form tool-kit-form-inline">
           <label>昵称（可选） <input type="text" id="fortuneName" placeholder="留空也行" maxlength="20"></label>
           <button type="button" class="tool-kit-btn" id="fortuneBtn">再抽一次</button>
+          <button type="button" class="tool-kit-btn is-ghost" id="fortuneShare">生成分享图</button>
         </div>
         <article class="fortune-card" id="fortuneResult" hidden>
           <div class="fortune-grade" id="fortuneGrade"></div>
@@ -43,11 +44,17 @@
         </article>
       </section>
     </div>
+    <section class="tool-comments" id="toolComments">
+      <h2>评论</h2>
+      <p>今日签文如何？来聊两句～</p>
+      <div id="toolGiscus"></div>
+    </section>
     <section class="tool-actions">
       <a class="btn-home" href="./">返回首页</a>
       <a class="btn-ghost" href="tools.html">查看工具箱</a>
     </section>
   </main>
+  <script type="application/json" id="toolPageMeta">{"giscusTerm":"tool-fortune"}</script>
   <div id="site-footer"></div>
   <div id="site-overlays"></div>
   <script type="module" src="assets/js/tool-fortune.js?v=20260622140000"></script>
