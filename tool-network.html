@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <title>网络与浏览器信息 · 加载中…</title>
+  <meta name="description" content="查看公网 IP、运营商、城市与浏览器、屏幕、UA 等信息。">
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
+  <link rel="stylesheet" href="assets/css/common.css?v=20260622140000">
+  <link rel="stylesheet" href="assets/css/tools.css?v=20260622140000">
+  <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#ea6f5a">
+  <link rel="apple-touch-icon" href="assets/icon.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+  <div id="site-nav"></div>
+  <main class="tool-kit-page tool-single-page">
+    <section class="tool-kit-hero">
+      <p class="eyebrow">Network Info</p>
+      <h1>网络与浏览器信息</h1>
+      <p>IP 与运营商需联网查询；浏览器信息来自本机，不会上传。</p>
+    </section>
+    <div class="tool-kit-panels">
+      
+      <section class="tool-kit-panel is-active">
+        <div class="tool-kit-toolbar">
+          <button type="button" class="tool-kit-btn" id="netRefresh">刷新</button>
+          <button type="button" class="tool-kit-btn is-ghost" id="netCopy">复制全部</button>
+        </div>
+        <dl class="tool-kit-kv" id="netClient"></dl>
+        <h3 class="tool-kit-subtitle">公网 IP</h3>
+        <dl class="tool-kit-kv" id="netIp">
+          <p class="tool-kit-placeholder">加载中…</p>
+        </dl>
+      </section>
+    </div>
+    <section class="tool-actions">
+      <a class="btn-home" href="./">返回首页</a>
+      <a class="btn-ghost" href="tools.html">查看工具箱</a>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <div id="site-overlays"></div>
+  <script type="module" src="assets/js/tool-network.js?v=20260622140000"></script>
+</body>
+</html>
