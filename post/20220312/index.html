@@ -19,7 +19,7 @@
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="推荐系统——推荐引擎的架构">
   <meta property="og:description" content="什么是推荐系统 谈推荐系统之前我们先聊一下搜索系统，推荐系统和搜索系统都是为了解决互联网信息过载的问题，互联网信息的数量远超过人类可以逐一浏览的程度，而搜索引擎便是解决这一问题的代…">
-  <meta property="og:image" content="https://gitpull.cn/assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.jpg">
+  <meta property="og:image" content="https://gitpull.cn/assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.webp">
   <meta property="og:url" content="https://gitpull.cn/post/20220312/">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="小红鸡">
@@ -27,14 +27,14 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="推荐系统——推荐引擎的架构">
   <meta name="twitter:description" content="什么是推荐系统 谈推荐系统之前我们先聊一下搜索系统，推荐系统和搜索系统都是为了解决互联网信息过载的问题，互联网信息的数量远超过人类可以逐一浏览的程度，而搜索引擎便是解决这一问题的代…">
-  <meta name="twitter:image" content="https://gitpull.cn/assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.jpg">
+  <meta name="twitter:image" content="https://gitpull.cn/assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.webp">
   <link rel="canonical" href="https://gitpull.cn/post/20220312/">
   <meta property="og:image:width" content="1013">
   <meta property="og:image:height" content="953">
   <meta property="article:published_time" content="2022-03-12T11:31:00+08:00">
   <meta property="article:modified_time" content="2022-03-12T11:31:00+08:00">
   <meta property="article:author" content="兰州小红鸡">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"推荐系统——推荐引擎的架构","description":"什么是推荐系统 谈推荐系统之前我们先聊一下搜索系统，推荐系统和搜索系统都是为了解决互联网信息过载的问题，互联网信息的数量远超过人类可以逐一浏览的程度，而搜索引擎便是解决这一问题的代…","image":"https://gitpull.cn/assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.jpg","datePublished":"2022-03-12T11:31:00+08:00","dateModified":"2022-03-12T11:31:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20220312/"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"推荐系统——推荐引擎的架构","description":"什么是推荐系统 谈推荐系统之前我们先聊一下搜索系统，推荐系统和搜索系统都是为了解决互联网信息过载的问题，互联网信息的数量远超过人类可以逐一浏览的程度，而搜索引擎便是解决这一问题的代…","image":"https://gitpull.cn/assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.webp","datePublished":"2022-03-12T11:31:00+08:00","dateModified":"2022-03-12T11:31:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20220312/"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://gitpull.cn/"},{"@type":"ListItem","position":2,"name":"推荐系统——推荐引擎的架构","item":"https://gitpull.cn/post/20220312/"}]}</script>
 </head>
 <body>
@@ -46,14 +46,14 @@
       
       <h1 class="article-title">推荐系统——推荐引擎的架构</h1>
       <div class="article-author">
-        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.webp)"></div>
         <div class="info">
           <div class="name">兰州小红鸡</div>
           <div class="meta">
             <span>2022-03-12</span>
             
             <span class="dot"></span>
-            <span>1704 字</span>
+            <span>1706 字</span>
             <span class="dot"></span>
             <span class="meta-read-mins">约 4 分钟</span>
             <span class="dot"></span><span class="vercount-inline"><span class="vercount-prefix">阅读 </span><span id="vercount_value_page_pv">…</span><span class="vercount-suffix"> 次</span></span>
@@ -68,13 +68,13 @@
 <p>举个例子：俄乌战争爆发的几天后，车臣部队发了一段出征誓师的视频，当夜微博b站平台车臣的搜索量上涨，同时在相关视频的推荐下面，相关的俄罗斯与车臣战争的科普视频播放量也暴增，普京个人科普视频播放量也随之上涨。</p>
 <p>大部分用户在搜索相关视频的时候，只想关注与“车臣”有关的视频，但是他们并不清楚与车臣有关的视频有哪些，他们不会去搜第一次车臣战争或者第二次车臣战争，因为在这之前他们并不清楚这些东西。所以这就是推荐系统要做的事，感知哪些信息是用户想获取的。</p>
 <h2>系统架构</h2>
-<p>在服务层，下面的推荐引擎由于推荐模型的不同，可能会存在多个推荐引擎。服务层对多个推荐引擎进行召回得到初始的推荐结果，并经过过滤排名等操作将最后结果推荐给用户。<br><img src="/assets/uploads/2026/05/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E2%80%94%E2%80%94%E6%8E%A8%E8%8D%90%E5%BC%95%E6%93%8E%E7%9A%84%E6%9E%B6%E6%9E%84-15996742-01.jpg" alt="image" loading="lazy" decoding="async"></p>
+<p>在服务层，下面的推荐引擎由于推荐模型的不同，可能会存在多个推荐引擎。服务层对多个推荐引擎进行召回得到初始的推荐结果，并经过过滤排名等操作将最后结果推荐给用户。<br><img src="/assets/uploads/2026/05/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E2%80%94%E2%80%94%E6%8E%A8%E8%8D%90%E5%BC%95%E6%93%8E%E7%9A%84%E6%9E%B6%E6%9E%84-15996742-01.webp" alt="image" loading="lazy" decoding="async"></p>
 <h2>推荐引擎的架构</h2>
 <p>推荐引擎架构主要包括3部分：</p>
 <ol>
 <li>生成用户特征向量<br>该部分负责从数据库或者缓存中拿到用户行为数据，通过分析不同行为，生成当前用户的特征向量。</li>
 <li>特征—物品相关推荐<br>该部分负责将用户的特征向量通过特征-物品相关矩阵转化为初始推荐物品列表。</li>
-<li>过滤-排名模块<br>该部分负责对初始的推荐列表进行过滤、排名等处理，从而生成最终的推荐结果<br><img src="/assets/uploads/2026/05/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E2%80%94%E2%80%94%E6%8E%A8%E8%8D%90%E5%BC%95%E6%93%8E%E7%9A%84%E6%9E%B6%E6%9E%84-15996742-02.jpg" alt="image" loading="lazy" decoding="async"></li>
+<li>过滤-排名模块<br>该部分负责对初始的推荐列表进行过滤、排名等处理，从而生成最终的推荐结果<br><img src="/assets/uploads/2026/05/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E2%80%94%E2%80%94%E6%8E%A8%E8%8D%90%E5%BC%95%E6%93%8E%E7%9A%84%E6%9E%B6%E6%9E%84-15996742-02.webp" alt="image" loading="lazy" decoding="async"></li>
 </ol>
 <h3>在线召回</h3>
 <p>通过对接上游feed服务的流量请求,返回用户会最感兴趣的N条以内的推荐列表(ID列表)。</p>

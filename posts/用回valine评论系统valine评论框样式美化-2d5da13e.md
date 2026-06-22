@@ -7,7 +7,7 @@ tags:
   - 教程
   - 博客建站
 summary: "我感觉我一个处女座的就不应该搞前端，太吹毛求疵追求完美了，哪里有一点点觉得不漂亮就想改 博客的评论系统用过好几家（虽然都没有人评论 比如gitalk，来必力 之前用的来必力，加载慢…"
-cover: assets/uploads/2026/05/用回valine评论系统valine评论框样式美化-2d5da13e-01.png
+cover: assets/uploads/2026/05/用回valine评论系统valine评论框样式美化-2d5da13e-01.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/2d5da13e.html
@@ -27,7 +27,7 @@ origin:
 不过之前没用valine的原因时它评论框样式感觉不好看  
 所以这次我用回valine，首先改了样式
 
-![兰州小红鸡](assets/uploads/2026/05/用回valine评论系统valine评论框样式美化-2d5da13e-01.png)
+![兰州小红鸡](assets/uploads/2026/05/用回valine评论系统valine评论框样式美化-2d5da13e-01.webp)
 
 **好像也没太大变化，不过就是看着顺眼了**
 

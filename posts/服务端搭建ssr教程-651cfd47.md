@@ -7,7 +7,7 @@ tags:
   - 教程
   - 前端
 summary: "教程很简单，整个教程分三步： 第一步：购买VPS服务器 第二步：一键部署VPS服务器 第三步：一键加速VPS服务器 （谷歌BBR加速；对速度要求不高的话，此步骤可省略） ¶第一步：…"
-cover: assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.png
+cover: assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/651cfd47.html
@@ -45,7 +45,7 @@ VPS服务器需要选择国外的，首选国际知名的vultr，速度不错、
 
 购买vps服务器时，服务器地址优先选择：美国西海岸等靠近大陆的服务器，不推荐日本服务器，因为近段时间日本服务器开不出好IP。系统推荐选择CentOS 6.X64位的系统（系统版本不要选的太高，不要选centos7！centos7默认的防火墙可能会干扰ssr的正常连接！）。完成购买后，找到系统的密码记下来，部署服务器时需要用到。如图：
 
-![兰州小红鸡](assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-05.png)
+![兰州小红鸡](assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-05.webp)
 
 默认是centos7系统，点击图中的CentOS几个字，会弹出centos6，然后选中它！vps操作系统不要选centos7，因为选它很可能会影响ssr的正常连接。
 
