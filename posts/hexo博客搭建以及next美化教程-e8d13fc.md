@@ -7,7 +7,7 @@ tags:
   - 教程
   - 博客建站
 summary: "¶前言 本文虽然是非常详细的小白教程 但是也需要一点点的姿势，额，知识储量 ¶知识储量 了解css和html，会写一点html基础语句 用过GitHub，知道建仓库过程以及在命令行…"
-cover: assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-04.png
+cover: assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-04.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/e8d13fc.html
@@ -772,7 +772,7 @@ gitalk：一个基于 Github Issue 和 Preact 开发的评论插件
 
 在GitHub上注册新应用，链接：[https://github.com/settings/applications/new](https://github.com/settings/applications/new)
 
-![兰州小红鸡](assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-02.png)
+![兰州小红鸡](assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-02.webp)
 
 参数说明：
 
@@ -785,7 +785,7 @@ Authorization callback URL：# 网站URL，https://asdfv1929.github.io
 
 点击注册后，页面跳转如下，其中Client ID和Client Secret在后面的配置中需要用到，到时复制粘贴即可：
 
-![兰州小红鸡](assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-03.png)
+![兰州小红鸡](assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-03.webp)
 
 #### [¶](#gitalk-swig)gitalk.swig
 
@@ -864,7 +864,7 @@ body {
 将你的背景图片放在theme/next/source/images目录  
 上面的css代码我只设置图片放在网页右下角，可以根据个人爱好设置
 
-![](assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-04.png)
+![](assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-04.webp)
 
 ### [¶](#在主页添加标签云)在主页添加标签云
 
@@ -1238,7 +1238,7 @@ hexo g
 
 使用**hexo d**命令将博客部署到github后,这里填写**github上的baidusitemap.xml**地址即可。
 
-![](assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-05.png)
+![](assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-05.webp)
 
 ## [¶](#参考文章)参考文章
 

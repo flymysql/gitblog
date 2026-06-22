@@ -6,7 +6,7 @@ author: "兰州小红鸡"
 tags:
   - "杂七杂八"
 summary: "前言：玩了快一年博客了，一直用的第三方框架，比如WordPress，typecho，hexo等。其中hexo用的最久，期间把nex主题改得乱七八糟。上周看完node的文档后，决定自…"
-cover: assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-01.png
+cover: assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-01.webp
 origin:
   from: cnblogs
   url: https://www.cnblogs.com/gitpull/p/15995676.html
@@ -69,13 +69,13 @@ origin:
 
 手机上的页面效果
 
-![image](assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-01.png)
+![image](assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-01.webp)
 
-![image](assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-02.png)
+![image](assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-02.webp)
 
 电脑上的页面效果
 
-![image](assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-03.png)
+![image](assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-03.webp)
 
 ### 技术栈
 
@@ -116,7 +116,7 @@ mysql
 路由：把需要支持的请求（以及请求 URL 中包含的任何信息）转发到适当的控制器函数。  
 控制器：从模型中获取请求的数据，创建一个 HTML 页面显示出数据，并将页面返回给用户，以便在浏览器中查看。  
 视图（模板）：供控制器用来渲染数据。  
-![image](assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-04.png)
+![image](assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-04.webp)
 
 ### 博客安装
 
