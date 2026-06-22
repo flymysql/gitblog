@@ -8,7 +8,7 @@ tags:
   - 算法
   - C++
 summary: "算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。…"
-cover: assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.png
+cover: assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/15e41f53.html
@@ -125,7 +125,7 @@ void init(Mgraph & g){
 
 [演示地址](https://me.idealli.com/others/Dijkstra.html)
 
-![兰州小红鸡](assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.png)
+![兰州小红鸡](assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.webp)
 
 ### [¶](#部分javascript代码)部分javascript代码
 

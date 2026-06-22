@@ -11,9 +11,11 @@
         "海门回声",
         "随想"
       ],
+      "cover": "../assets/uploads/2026/06/heigui-cover.webp",
+      "carousel": true,
       "path": "posts/海门回声-黑鬼.md",
-      "cover": "../assets/uploads/2026/06/heigui-cover.png",
-      "carousel": true
+      "urlKey": "20260618",
+      "thumbnail": "../assets/uploads/2026/06/heigui-cover.thumb.webp"
     },
     {
       "slug": "qq-farm-assistant-经典农场辅助",
@@ -70,7 +72,7 @@
         "AI 基础设施",
         "项目介绍"
       ],
-      "cover": "../assets/uploads/2026/06/peercache_scaling_ladder.png",
+      "cover": "../assets/uploads/2026/06/peercache_scaling_ladder.webp",
       "carousel": true,
       "path": "posts/peercache-decentralized-rdma-kv-cache.md",
       "urlKey": "20260601"
@@ -102,7 +104,7 @@
         "杂七杂八",
         "前端"
       ],
-      "cover": "assets/uploads/2026/05/cptijietu1.png",
+      "cover": "assets/uploads/2026/05/cptijietu1.webp",
       "carousel": true,
       "path": "posts/cpti-love-personality-test-intro.md",
       "urlKey": "20260514"
@@ -119,7 +121,7 @@
         "教程",
         "项目介绍"
       ],
-      "cover": "../assets/uploads/2026/05/1778490605877-blwjij-image.png",
+      "cover": "../assets/uploads/2026/05/1778490605877-blwjij-image.webp",
       "pinned": true,
       "pinnedOrder": 1,
       "carousel": true,
@@ -137,7 +139,7 @@
       "tags": [
         "杂七杂八"
       ],
-      "cover": "../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.jpg",
+      "cover": "../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.webp",
       "path": "posts/about.md",
       "urlKey": "about"
     },
@@ -188,7 +190,7 @@
       "author": "兰州小红鸡",
       "summary": "多维数组的内存结构 类似ndarray之类的多维数组，实际上是一个连续的内存地址+一种索引方案。我们可以将一个多维数组对象分为两部分，一部分是实际存储数组数据的连续内存段，另一部分…",
       "tags": [],
-      "cover": "assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.png",
+      "cover": "assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.webp",
       "path": "posts/多维数组的索引方案与内存设计-16000038.md",
       "urlKey": "20220313"
     },
@@ -200,7 +202,7 @@
       "author": "兰州小红鸡",
       "summary": "什么是推荐系统 谈推荐系统之前我们先聊一下搜索系统，推荐系统和搜索系统都是为了解决互联网信息过载的问题，互联网信息的数量远超过人类可以逐一浏览的程度，而搜索引擎便是解决这一问题的代…",
       "tags": [],
-      "cover": "assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.jpg",
+      "cover": "assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.webp",
       "path": "posts/推荐系统——推荐引擎的架构-15996742.md",
       "urlKey": "20220312"
     },
@@ -212,7 +214,7 @@
       "author": "兰州小红鸡",
       "summary": "更新历史 在学习过程中，本文持续更新 2021 12 13：更新nebula官方介绍 2021 12 14：更新编译与部署方式，总结importer导入方式 2021 12 15：…",
       "tags": [],
-      "cover": "assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.png",
+      "cover": "assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.webp",
       "carousel": true,
       "path": "posts/置顶-nebula-graph-图计算数据库-15993772.md",
       "urlKey": "20220311"
@@ -227,7 +229,7 @@
       "tags": [
         "图数据库"
       ],
-      "cover": "assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.png",
+      "cover": "assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.webp",
       "path": "posts/nebula代码走读——从Validator到Executor-15988828.md",
       "urlKey": "20220310"
     },
@@ -374,7 +376,7 @@
       "tags": [
         "教程"
       ],
-      "cover": "assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-03.gif",
+      "cover": "assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-03.webp",
       "path": "posts/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4.md",
       "urlKey": "20181214",
       "thumbnail": "assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-03.thumb.webp"
@@ -389,7 +391,7 @@
       "tags": [
         "随想"
       ],
-      "cover": "assets/uploads/2026/05/12月6日杂谈-5027c817-01.jpg",
+      "cover": "assets/uploads/2026/05/12月6日杂谈-5027c817-01.webp",
       "path": "posts/12月6日杂谈-5027c817.md",
       "urlKey": "20181206"
     },
@@ -432,7 +434,7 @@
         "算法",
         "C++"
       ],
-      "cover": "assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.png",
+      "cover": "assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.webp",
       "path": "posts/Dijkstra单源最短路径算法-15e41f53.md",
       "urlKey": "20181123",
       "thumbnail": "assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.thumb.webp"
@@ -448,7 +450,7 @@
         "教程",
         "博客建站"
       ],
-      "cover": "assets/uploads/2026/05/使用腾讯云cdn加速博客-1609338289-01.png",
+      "cover": "assets/uploads/2026/05/使用腾讯云cdn加速博客-1609338289-01.webp",
       "path": "posts/使用腾讯云cdn加速博客-1609338289.md",
       "urlKey": "20181122",
       "thumbnail": "assets/uploads/2026/05/使用腾讯云cdn加速博客-1609338289-01.thumb.webp"
@@ -465,7 +467,7 @@
         "前端",
         "博客建站"
       ],
-      "cover": "assets/uploads/2026/05/hexo建站笔记之首页文章轮播图-6bf81741-01.png",
+      "cover": "assets/uploads/2026/05/hexo建站笔记之首页文章轮播图-6bf81741-01.webp",
       "path": "posts/hexo建站笔记之首页文章轮播图-6bf81741.md",
       "urlKey": "20181114",
       "thumbnail": "assets/uploads/2026/05/hexo建站笔记之首页文章轮播图-6bf81741-01.thumb.webp"
@@ -493,7 +495,7 @@
         "前端",
         "博客建站"
       ],
-      "cover": "assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-01.png",
+      "cover": "assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-01.webp",
       "path": "posts/hexo建站笔记之彩色标签云-d6caa003.md",
       "urlKey": "20181107",
       "thumbnail": "assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-01.thumb.webp"
@@ -509,7 +511,7 @@
         "教程",
         "博客建站"
       ],
-      "cover": "assets/uploads/2026/05/用回valine评论系统valine评论框样式美化-2d5da13e-01.png",
+      "cover": "assets/uploads/2026/05/用回valine评论系统valine评论框样式美化-2d5da13e-01.webp",
       "path": "posts/用回valine评论系统valine评论框样式美化-2d5da13e.md",
       "urlKey": "20181101"
     },
@@ -537,7 +539,7 @@
         "教程",
         "博客建站"
       ],
-      "cover": "assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-06.png",
+      "cover": "assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-06.webp",
       "path": "posts/手动修改博客css样式打造属于自己的博客样式-e17f6e4c.md",
       "urlKey": "20181029",
       "thumbnail": "assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-06.thumb.webp"
@@ -553,10 +555,9 @@
         "教程",
         "前端"
       ],
-      "cover": "assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.png",
+      "cover": "assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.webp",
       "path": "posts/服务端搭建ssr教程-651cfd47.md",
-      "urlKey": "20181025",
-      "thumbnail": "assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.thumb.webp"
+      "urlKey": "20181025"
     },
     {
       "slug": "解决来必力评论系统加载慢的问题-3453c710",
@@ -583,7 +584,7 @@
         "教程",
         "博客建站"
       ],
-      "cover": "assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-04.png",
+      "cover": "assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-04.webp",
       "path": "posts/hexo博客搭建以及next美化教程-e8d13fc.md",
       "urlKey": "20181010",
       "thumbnail": "assets/uploads/2026/05/hexo博客搭建以及next美化教程-e8d13fc-04.thumb.webp"
@@ -624,10 +625,9 @@
       "tags": [
         "前端"
       ],
-      "cover": "assets/uploads/2026/05/MarkDown的用法学习笔记-93e22221-02.png",
+      "cover": "assets/uploads/2026/05/MarkDown的用法学习笔记-93e22221-02.webp",
       "path": "posts/MarkDown的用法学习笔记-93e22221.md",
-      "urlKey": "20181006",
-      "thumbnail": "assets/uploads/2026/05/MarkDown的用法学习笔记-93e22221-02.thumb.webp"
+      "urlKey": "20181006"
     },
     {
       "slug": "windows上的vim配置打造超级舒心又有逼格的编辑器-1a3fd97",
@@ -774,7 +774,7 @@
       "tags": [
         "杂七杂八"
       ],
-      "cover": "assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-01.png",
+      "cover": "assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-01.webp",
       "path": "posts/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676.md",
       "urlKey": "20180101",
       "thumbnail": "assets/uploads/2026/05/Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676-01.thumb.webp"
@@ -982,10 +982,9 @@
       "author": "兰州小红鸡",
       "summary": "编程语言:Python 3.7 项目地址：python做编译器——语法翻译器 编程平台:manjaro 编程环境:vscode 完成的内容:承接上次的词法分析器，将其输出的字符表转…",
       "tags": [],
-      "cover": "assets/uploads/2026/05/用python做一个C类编译器——语法翻译器-15995704-01.png",
+      "cover": "assets/uploads/2026/05/用python做一个C类编译器——语法翻译器-15995704-01.webp",
       "path": "posts/用python做一个C类编译器——语法翻译器-15995704.md",
-      "urlKey": "20170101",
-      "thumbnail": "assets/uploads/2026/05/用python做一个C类编译器——语法翻译器-15995704-01.thumb.webp"
+      "urlKey": "20170101"
     }
   ]
 }

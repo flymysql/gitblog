@@ -7,7 +7,7 @@ tags:
   - 教程
   - 博客建站
 summary: "这两天花了点时间修改了下自己的next主题的博客 样式表放在了GitHub上喜欢的话可以直接使用 next博客主题样式修改 使用方法 直接下载样式表，然后复制到自己主题的theme…"
-cover: assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-06.png
+cover: assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-06.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/e17f6e4c.html
@@ -29,7 +29,7 @@ next博客主题样式修改
 <link rel="stylesheet" type="text/css" href="https://picture-1256429518.cos.ap-chengdu.myqcloud.com/blog/custom.css">
 ```
 
-![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-01.png)
+![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-01.webp)
 
 ### [¶](#自己动手修改的方法)自己动手修改的方法
 
@@ -47,21 +47,21 @@ next博客主题样式修改
 
 先用浏览器打开自己博客页面，找到自己要修改的样式的地方，比如我要修改这个文章标题样式
 
-![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-02.png)
+![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-02.webp)
 
 然后鼠标右键，点击检查
 
-![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-03.png)
+![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-03.webp)
 
 深色的那一行就是标题所在的html语句
 
 鼠标移动到那一行，点击，这时右侧出现css样式表
 
-![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-04.png)
+![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-04.webp)
 
 **选择样式名称，复制**
 
-![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-05.png)
+![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-05.webp)
 
 然后回到themes\\next\\source\\css\_custom目录下的custom.styl文件中，开始自己写样式
 
@@ -77,12 +77,12 @@ next博客主题样式修改
 
 **showtime**
 
-![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-06.png)
+![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-06.webp)
 
-![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-07.png)
+![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-07.webp)
 
-![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-08.png)
+![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-08.webp)
 
-![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-09.png)
+![兰州小红鸡](assets/uploads/2026/05/手动修改博客css样式打造属于自己的博客样式-e17f6e4c-09.webp)
 
 > 当然前提是你使用的是nexo主题，并且我使用的是next里的mist子主题，其他主题可能不兼容

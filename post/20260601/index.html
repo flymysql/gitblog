@@ -19,7 +19,7 @@
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端">
   <meta property="og:description" content="PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它的定位、为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。">
-  <meta property="og:image" content="https://gitpull.cn/assets/uploads/2026/06/peercache_scaling_ladder.png">
+  <meta property="og:image" content="https://gitpull.cn/assets/uploads/2026/06/peercache_scaling_ladder.webp">
   <meta property="og:url" content="https://gitpull.cn/post/20260601/">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="小红鸡">
@@ -27,7 +27,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端">
   <meta name="twitter:description" content="PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它的定位、为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。">
-  <meta name="twitter:image" content="https://gitpull.cn/assets/uploads/2026/06/peercache_scaling_ladder.png">
+  <meta name="twitter:image" content="https://gitpull.cn/assets/uploads/2026/06/peercache_scaling_ladder.webp">
   <link rel="canonical" href="https://gitpull.cn/post/20260601/">
   <meta property="og:image:width" content="1120">
   <meta property="og:image:height" content="560">
@@ -37,7 +37,7 @@
   <meta property="article:tag" content="分布式存储">
   <meta property="article:tag" content="AI 基础设施">
   <meta property="article:tag" content="项目介绍">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端","description":"PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它的定位、为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。","image":"https://gitpull.cn/assets/uploads/2026/06/peercache_scaling_ladder.png","datePublished":"2026-06-01T10:00:00+08:00","dateModified":"2026-06-02T00:30:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260601/","keywords":"分布式存储,AI 基础设施,项目介绍"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端","description":"PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它的定位、为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。","image":"https://gitpull.cn/assets/uploads/2026/06/peercache_scaling_ladder.webp","datePublished":"2026-06-01T10:00:00+08:00","dateModified":"2026-06-02T00:30:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260601/","keywords":"分布式存储,AI 基础设施,项目介绍"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://gitpull.cn/"},{"@type":"ListItem","position":2,"name":"分布式存储","item":"https://gitpull.cn/tags.html#%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8"},{"@type":"ListItem","position":3,"name":"PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端","item":"https://gitpull.cn/post/20260601/"}]}</script>
 </head>
 <body>
@@ -49,14 +49,14 @@
       <div class="article-tags-top"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8">分布式存储</a><a class="tag tag-colored" style="--tag-bg:#E6FAFA;--tag-text:#167A7F;--tag-border:#B8E7E8;--tag-dark-bg:#123638;--tag-dark-text:#8EE2E5;--tag-dark-border:#2B6E72;" href="/tags.html#AI%20%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD">AI 基础设施</a><a class="tag tag-colored" style="--tag-bg:#EEF0F3;--tag-text:#4B5563;--tag-border:#D5DAE1;--tag-dark-bg:#252A33;--tag-dark-text:#CBD5E1;--tag-dark-border:#47515F;" href="/tags.html#%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D">项目介绍</a></div>
       <h1 class="article-title">PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端</h1>
       <div class="article-author">
-        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.webp)"></div>
         <div class="info">
           <div class="name">兰州小红鸡</div>
           <div class="meta">
             <span>2026-06-01</span>
             <span class="dot"></span><span>更新于 2026-06-01</span>
             <span class="dot"></span>
-            <span>11797 字</span>
+            <span>11801 字</span>
             <span class="dot"></span>
             <span class="meta-read-mins">约 16 分钟</span>
             <span class="dot"></span><span class="vercount-inline"><span class="vercount-prefix">阅读 </span><span id="vercount_value_page_pv">…</span><span class="vercount-suffix"> 次</span></span>
@@ -65,7 +65,7 @@
         <a class="article-edit" href="/admin/editor.html?slug=peercache-decentralized-rdma-kv-cache" title="编辑此文">编辑</a>
       </div>
     </header>
-    <div class="article-body"><p><img src="/assets/uploads/2026/06/peercache_scaling_ladder.png" alt="PeerCache GET 吞吐：单卡 → 整机" width="1120" height="560" loading="lazy" decoding="async"></p>
+    <div class="article-body"><p><img src="/assets/uploads/2026/06/peercache_scaling_ladder.webp" alt="PeerCache GET 吞吐：单卡 → 整机" width="1120" height="560" loading="lazy" decoding="async"></p>
 <blockquote>
 <p><strong>项目地址</strong>：<a href="https://flymysql.github.io/PeerCache/zh/">flymysql.github.io/PeerCache</a></p>
 <p>一句话介绍：一个<strong>去中心化、点对点、RDMA 零拷贝的 SGLang L3（HiCache）存储后端</strong>，专门做<strong>跨请求、跨节点的 KV（前缀）缓存复用</strong>。它提供和 Mooncake Store 类似的复用能力，但<strong>没有中心化的 master 和 metadata 服务</strong>。单卡能吃到裸 <code>ib_read_bw</code> 的 <strong>94%</strong>，整机 8 卡聚合 <strong>413 GB/s（3.3 Tbps）</strong>。</p>
@@ -373,7 +373,7 @@
 </tr>
 </tbody></table>
 <h3>总览：从单卡到整机</h3>
-<p><img src="/assets/uploads/2026/06/peercache_scaling_ladder.png" alt="PeerCache GET 吞吐：从单卡到整机的扩展阶梯" width="1120" height="560" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/06/peercache_scaling_ladder.webp" alt="PeerCache GET 吞吐：从单卡到整机的扩展阶梯" width="1120" height="560" loading="lazy" decoding="async"></p>
 <table>
 <thead>
 <tr>
@@ -430,7 +430,7 @@
 <p>PeerCache 落在裸 <code>ib_read_bw</code> 的 <strong>~6% 以内</strong>。这点差距来自目录查找 + 每批编排；开启 <code>--dir-cache-ttl</code> 后，热的、静态的工作集上目录 RPC 基本被摊掉。这说明零拷贝读路径上几乎没有引入额外开销。</p>
 <h3>2 · 单进程多卡（multi-rail）</h3>
 <p>设置 <code>--devices d1,…,d8</code>，一个进程就会每卡开一条 rail，并在一次释放 GIL 的 C++ 调用（<code>batch_read_multi</code>）里把每批 READ 横跨所有 rail 分发。</p>
-<p><img src="/assets/uploads/2026/06/peercache_single_process_scaling.png" alt="PeerCache 单进程 8 rail：吞吐 vs 线程数" width="1050" height="588" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/06/peercache_single_process_scaling.webp" alt="PeerCache 单进程 8 rail：吞吐 vs 线程数" width="1050" height="588" loading="lazy" decoding="async"></p>
 <table>
 <thead>
 <tr>
@@ -461,7 +461,7 @@
 <p>所以 multi-rail 让一个进程能用上多张卡，但单个 Python 进程吃不满全部 8 卡——那需要多进程。</p>
 <h3>3 · 整机——多进程跨 8 卡</h3>
 <p>生产形态（也是吃满每张卡的方式）是每卡一个进程组——正是 SGLang TP=8 部署的运行方式（8 个 rank，各绑本地网卡）。这里：<strong>8 卡 × 每卡 8 个读进程，128 KiB 页</strong>。</p>
-<p><img src="/assets/uploads/2026/06/peercache_per_card.png" alt="PeerCache 整机 8 卡：每卡 GET 吞吐" width="1120" height="588" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/06/peercache_per_card.webp" alt="PeerCache 整机 8 卡：每卡 GET 吞吐" width="1120" height="588" loading="lazy" decoding="async"></p>
 <table>
 <thead>
 <tr>
