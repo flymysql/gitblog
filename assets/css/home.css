@@ -97,7 +97,7 @@
 
 @media (max-width: 720px) {
   .hero {
-    margin: 4px 10px 0;
+    margin: 8px 12px 0;
     border-radius: 14px;
     background:
       radial-gradient(circle at 12% 8%, rgba(234, 111, 90, 0.12), transparent 34%),
@@ -107,18 +107,12 @@
   }
   .hero-link {
     align-items: center;
-    padding: 5px 10px 5px 8px;
-    gap: 8px;
-  }
-  .hero-avatar-wrap {
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    min-height: 44px;
+    padding: 9px 12px 9px;
+    gap: 10px;
   }
   .hero-info {
-    gap: 4px;
-    padding-right: 20px;
+    gap: 5px;
+    padding-right: 22px;
   }
   .hero-arrow {
     position: absolute;
@@ -144,8 +138,8 @@
     overflow: visible;
   }
   .hero-stats {
-    row-gap: 4px;
-    column-gap: 4px;
+    row-gap: 5px;
+    column-gap: 5px;
     font-size: 11px;
     line-height: 1;
     padding-right: 0;
@@ -153,8 +147,8 @@
   .hero-stats .stat {
     display: inline-flex;
     align-items: center;
-    min-height: 20px;
-    padding: 2px 6px;
+    min-height: 22px;
+    padding: 3px 7px;
     border-radius: 999px;
     background: color-mix(in srgb, var(--bg-elev), var(--primary) 5%);
     border: 1px solid color-mix(in srgb, var(--border), var(--primary) 18%);
