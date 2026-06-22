@@ -59,6 +59,16 @@ function publicImageUrl(url, sitePathPrefix, siteOrigin) {
   return s;
 }
 
+/** 微信 / OG 爬虫需要绝对 HTTPS 地址，相对路径会退化为默认链接图标 */
+function absolutePublicUrl(url, sitePathPrefix, siteOrigin) {
+  const path = publicImageUrl(url, sitePathPrefix, siteOrigin);
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path) || path.startsWith('//')) return path;
+  const origin = String(siteOrigin || '').replace(/\/+$/, '');
+  if (!origin) return path;
+  return `${origin}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
 function tagHtml(tag, href, sitePathPrefix) {
   const body = escapeHtml(tag);
   const attrs = `class="tag tag-colored" style="${tagStyle(tag)}"`;
@@ -331,13 +341,13 @@ export async function buildPrerenderedPostHtml({
   const date = post.date || fmData.date || '';
   const updated = post.updated || fmData.updated || date;
   const author = post.author || fmData.author || site.author;
-  const cover = publicImageUrl(post.cover || fmData.cover || '', sitePathPrefix, siteOrigin);
   const coverRaw = post.cover || fmData.cover || '';
+  const coverAbs = absolutePublicUrl(coverRaw, sitePathPrefix, siteOrigin);
   const tags = post.tags || fmData.tags || [];
   const summary = post.summary || fmData.summary || '';
   const canonical = post.canonical || '';
   const ogAuto = `${siteOrigin}${rootHref(sitePathPrefix, `assets/og/${encodeURIComponent(slug)}.png`)}`;
-  const image = cover || ogAuto || site.avatar || '';
+  const image = coverAbs || ogAuto || absolutePublicUrl(site.avatar || '', sitePathPrefix, siteOrigin) || '';
 
   let ogImageWidth = 0;
   let ogImageHeight = 0;
