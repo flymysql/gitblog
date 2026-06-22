@@ -31,6 +31,14 @@ function publicImageUrl(url) {
   return s;
 }
 
+function absolutePublicImageUrl(url) {
+  const path = publicImageUrl(url);
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path) || path.startsWith('//')) return path;
+  const origin = String(CONFIG.site.url || '').replace(/\/+$/, '');
+  return origin ? `${origin}${path.startsWith('/') ? path : `/${path}`}` : path;
+}
+
 function buildToc(article) {
   const headings = [...article.querySelectorAll('h2, h3')];
   if (headings.length < 2) return null;
@@ -537,7 +545,7 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
   const updated = (meta && meta.updated) || data.updated || date;
   const author = (meta && meta.author) || data.author || CONFIG.site.author;
   const avatar = (meta && meta.avatar) || CONFIG.site.avatar;
-  const cover = publicImageUrl((meta && meta.cover) || data.cover || '');
+  const coverAbs = absolutePublicImageUrl((meta && meta.cover) || data.cover || '');
   const tags = (meta && meta.tags) || data.tags || [];
   const summary = (meta && meta.summary) || data.summary || '';
   // SEO + 优先用 OG 自动图（assets/og/{slug}.svg）兜底
@@ -547,10 +555,11 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
     ? postPath(meta.urlKey)
     : `${rootPath('post.html')}?slug=${encodeURIComponent(slug)}`;
   const canonical = baseSite ? `${baseSite}${canonPathRel}` : `${window.location.origin}${canonPathRel}`;
+  const ogImage = coverAbs || (CONFIG.site.url ? ogAuto : avatar);
   setMeta({
     title,
     description: summary,
-    image: cover || (CONFIG.site.url ? ogAuto : avatar),
+    image: ogImage,
     type: 'article',
     publishedTime: date,
     modifiedTime: updated,
@@ -564,7 +573,7 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
     '@type': 'BlogPosting',
     headline: title,
     description: summary,
-    image: cover || (CONFIG.site.url ? ogAuto : avatar),
+    image: ogImage,
     datePublished: date,
     dateModified: updated,
     author: { '@type': 'Person', name: author || CONFIG.site.author },
