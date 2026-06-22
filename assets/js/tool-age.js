@@ -1,10 +1,10 @@
 import { initToolPage, $ } from './tool-kit-common.js';
-import { drawAgeShareImage, downloadCanvas, toolPageUrl } from './tool-share-image.js';
+import { drawAgeShareImage, showShareImagePreview, toolPageUrl } from './tool-share-image.js';
 
 initToolPage({
   title: '年龄计算器',
   description: '输入生日，计算年龄、总天数、总小时与距下次生日的天数。',
-  path: 'tool-age.html',
+  path: 'tools/tool-age.html',
   commentsHint: '算出来的数字准不准？来晒晒你的年龄～',
 });
 
@@ -89,9 +89,12 @@ $('ageShare').addEventListener('click', async () => {
   try {
     const canvas = await drawAgeShareImage({
       ...lastAge,
-      pageUrl: toolPageUrl('tool-age.html'),
+      pageUrl: toolPageUrl('tools/tool-age.html'),
     });
-    downloadCanvas(canvas, `age-${Date.now()}.png`);
+    showShareImagePreview(canvas, {
+      title: '年龄分享图',
+      filename: `age-${Date.now()}.png`,
+    });
   } catch (e) {
     alert(`分享图生成失败：${e.message}`);
   } finally {
