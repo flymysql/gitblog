@@ -813,9 +813,10 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
 }
 
 @media (max-width: 720px) {
-  .nav { padding: 0 12px; height: 56px; }
+  .nav { padding: 0 10px 0 2px; height: 56px; }
   :root { --nav-height: 56px; }
-  .nav-inner { gap: 6px; }
+  .nav-inner { gap: 4px; }
+  .nav-menu-btn { margin-left: -2px; margin-right: 2px; }
   .nav-logo { font-size: 15px; }
   .nav-logo svg, .nav-logo-img { width: 24px; height: 24px; }
   .btn-write { padding: 0 10px; height: 32px; font-size: 12px; gap: 4px; }
