@@ -442,6 +442,16 @@
   margin-bottom: 18px;
 }
 
+#toolGiscus {
+  min-height: 120px;
+}
+
+.tool-comments-loading {
+  color: var(--text-tertiary);
+  font-size: 14px;
+  margin: 0 0 12px;
+}
+
 @keyframes ventSwing {
   0%, 100% { transform: rotateX(0deg); }
   50% { transform: rotateX(18deg); }

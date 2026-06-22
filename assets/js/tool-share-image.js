@@ -134,7 +134,7 @@ export async function drawFortuneShareImage({ grade, level, text, good, bad, col
 
   ctx.fillStyle = '#222';
   ctx.font = `32px ${FONT}`;
-  wrapText(ctx, text, 48, 240, W - 96, 48, 5);
+  const textEndY = wrapText(ctx, text, 48, 240, W - 96, 48, 5);
 
   const meta = [
     ['宜', good],
@@ -142,13 +142,17 @@ export async function drawFortuneShareImage({ grade, level, text, good, bad, col
     ['幸运色', color],
     ['幸运数字', String(num)],
   ];
-  let y = 480;
+  const labelX = 48;
+  const valueGap = 20;
   ctx.font = `26px ${FONT}`;
+  const labelWidth = Math.max(...meta.map(([label]) => ctx.measureText(label).width));
+  const valueX = labelX + labelWidth + valueGap;
+  let y = Math.max(textEndY + 36, 460);
   for (const [label, val] of meta) {
     ctx.fillStyle = '#aaa';
-    ctx.fillText(label, 48, y);
+    ctx.fillText(label, labelX, y);
     ctx.fillStyle = '#333';
-    ctx.fillText(val, 110, y);
+    ctx.fillText(val, valueX, y);
     y += 48;
   }
 

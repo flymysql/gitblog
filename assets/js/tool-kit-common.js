@@ -31,7 +31,8 @@ export function mountToolComments(term, hint) {
     host.innerHTML = '<div class="tool-comments-hint">留言板未启用。可在后台设置里打开 giscus。</div>';
     return;
   }
-  mountGiscusScript(host, term);
+  host.innerHTML = '<p class="tool-comments-loading" aria-live="polite">评论加载中…</p>';
+  mountGiscusScript(host, term, { loading: 'eager' });
 }
 
 export function $(id) { return document.getElementById(id); }
