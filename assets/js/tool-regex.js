@@ -3,7 +3,7 @@ import { initToolPage, $, escapeHtml } from './tool-kit-common.js';
 initToolPage({
   title: '正则测试',
   description: '在线正则表达式测试，实时高亮匹配并列出所有 match。',
-  path: 'tool-regex.html',
+  path: 'tools/tool-regex.html',
 });
 
 function runRegex() {

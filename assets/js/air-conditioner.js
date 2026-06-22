@@ -176,7 +176,7 @@ function renderGiscus() {
   mountToolComments('tool-air-conditioner');
 }
 
-initSite({ active: 'tools.html' });
+initSite({ active: 'tools/' });
 setMeta({
   title: '在线小空调',
   description: '一个可以开关、调温、切模式和留言的在线小空调。',
@@ -188,7 +188,7 @@ setJsonLd({
   name: '在线小空调',
   applicationCategory: 'EntertainmentApplication',
   operatingSystem: 'Any',
-  url: `${CONFIG.site.url || location.origin}/tool-air-conditioner.html`,
+  url: `${CONFIG.site.url || location.origin}/tools/tool-air-conditioner.html`,
   description: '一个可以开关、调温、切模式和留言的在线小空调。',
 });
 bindControls();

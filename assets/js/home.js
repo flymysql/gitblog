@@ -106,7 +106,7 @@ function schedulePrefetchOtherPages() {
   }
 
   const run = async () => {
-    const pages = ['tags.html', 'archives.html', 'series.html', 'notes.html', 'post.html', 'tools.html'];
+    const pages = ['tags.html', 'archives.html', 'series.html', 'notes.html', 'post.html', 'tools/'];
     pages.forEach(p => addPrefetch(rootPath(p)));
     const idx = CONFIG.paths && CONFIG.paths.index ? String(CONFIG.paths.index).replace(/^\//, '') : 'data/posts.json';
     addPrefetch(rootPath(idx));
