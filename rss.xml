@@ -5,8 +5,17 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Thu, 18 Jun 2026 04:09:08 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 22 Jun 2026 04:31:29 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>海门回声 | 黑鬼</title>
+      <link>https://gitpull.cn/post/20260618/</link>
+      <guid isPermaLink="false">海门回声-黑鬼</guid>
+      <pubDate>Thu, 18 Jun 2026 12:00:00 GMT</pubDate>
+      <author>邻家酒肆</author>
+      <category>海门回声</category><category>随想</category>
+      <description><![CDATA[黑鬼已经死了好多年了，大概在我上初中还是高中的时候。听大人们说，是在某一年的春节里，二月的天气还很冷，他像往常一样被铁链子拴在家院子前面的小屋子里，有好几天家人忘了给他送饭，便饿死了。也有人说是冻死的。我后来真的见过他——脸发青，像苔藓，不像电视剧里画着黑眼圈的饿汉。]]></description>
+    </item>
     <item>
       <title>QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具</title>
       <link>https://gitpull.cn/post/20260617/</link>
@@ -153,7 +162,7 @@
     </item>
     <item>
       <title>生如夏花般绚烂 死如秋叶般静美</title>
-      <link>https://gitpull.cn/post/20190605-4/</link>
+      <link>https://gitpull.cn/post/20190605/</link>
       <guid isPermaLink="false">生如夏花般绚烂死如秋叶般静美-bcd926d2</guid>
       <pubDate>Wed, 05 Jun 2019 00:00:00 GMT</pubDate>
       <author>邻家酒肆</author>
@@ -162,7 +171,7 @@
     </item>
     <item>
       <title>记忆的种子·一</title>
-      <link>https://gitpull.cn/post/20190605-3/</link>
+      <link>https://gitpull.cn/post/20190605-2/</link>
       <guid isPermaLink="false">记忆的种子·一-c315b081</guid>
       <pubDate>Wed, 05 Jun 2019 00:00:00 GMT</pubDate>
       <author>邻家酒肆</author>
@@ -171,7 +180,7 @@
     </item>
     <item>
       <title>记忆的种子·二</title>
-      <link>https://gitpull.cn/post/20190605-2/</link>
+      <link>https://gitpull.cn/post/20190605-3/</link>
       <guid isPermaLink="false">记忆的种子·二-29fe4821</guid>
       <pubDate>Wed, 05 Jun 2019 00:00:00 GMT</pubDate>
       <author>邻家酒肆</author>
@@ -180,7 +189,7 @@
     </item>
     <item>
       <title>谙风 | 小城中学</title>
-      <link>https://gitpull.cn/post/20190605/</link>
+      <link>https://gitpull.cn/post/20190605-4/</link>
       <guid isPermaLink="false">谙风-小城中学-7712d2d6</guid>
       <pubDate>Wed, 05 Jun 2019 00:00:00 GMT</pubDate>
       <author>邻家酒肆</author>
@@ -189,7 +198,7 @@
     </item>
     <item>
       <title>【PCC】一个用python写的ｃ语言编译器</title>
-      <link>https://gitpull.cn/post/20190101-2/</link>
+      <link>https://gitpull.cn/post/20190101/</link>
       <guid isPermaLink="false">PCC一个用python写的ｃ语言编译器-15991910</guid>
       <pubDate>Mon, 31 Dec 2018 16:00:00 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -198,7 +207,7 @@
     </item>
     <item>
       <title>桃李春风一杯酒，江湖夜雨十年灯</title>
-      <link>https://gitpull.cn/post/20190101/</link>
+      <link>https://gitpull.cn/post/20190101-2/</link>
       <guid isPermaLink="false">桃李春风一杯酒江湖夜雨十年灯-15995716</guid>
       <pubDate>Mon, 31 Dec 2018 16:00:00 GMT</pubDate>
       <author>兰州小红鸡</author>
@@ -267,15 +276,6 @@
       <author>兰州小红鸡</author>
       <category>教程</category><category>博客建站</category>
       <description><![CDATA[最近把博客搬到腾讯云后，使用腾讯云的COS存储 免费50G的存储空间，放个小博客还是够用的 而且，还可以使用免费的CDN加速 国内访问博客速度比放在GitHub上要快多了 申请腾讯…]]></description>
-    </item>
-    <item>
-      <title>hexo建站笔记之首页文章轮播图</title>
-      <link>https://gitpull.cn/post/20181114/</link>
-      <guid isPermaLink="false">hexo建站笔记之首页文章轮播图-6bf81741</guid>
-      <pubDate>Wed, 14 Nov 2018 07:25:40 GMT</pubDate>
-      <author>兰州小红鸡</author>
-      <category>教程</category><category>前端</category><category>博客建站</category>
-      <description><![CDATA[¶设计特点 轮播图UI：模仿简书 可以直接在每篇文章的md文件里设置是否要设为轮播图的文章 就是我们每次新写一篇文章，用hexo生成一个md文件，我们只要在头部注明是否要作为轮播图…]]></description>
     </item>
   </channel>
 </rss>
