@@ -568,6 +568,13 @@
 .tool-kit-panel { display: none; }
 .tool-kit-panel.is-active { display: block; }
 
+.tool-single-page .tool-kit-panel,
+.tool-single-page .tool-kit-panel.is-active {
+  display: block;
+}
+
+.tool-single-page .tool-kit-tabs { display: none; }
+
 .tool-kit-panel h2 {
   font-size: 22px;
   margin-bottom: 6px;

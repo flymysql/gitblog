@@ -352,14 +352,31 @@ const latestPostDate = visiblePosts.length
   ? new Date(visiblePosts[0].date || today).toISOString()
   : today;
 
+const TOOL_SITEMAP_PAGES = [
+  'tool-age.html',
+  'tool-fortune.html',
+  'tool-json.html',
+  'tool-codec.html',
+  'tool-timestamp.html',
+  'tool-regex.html',
+  'tool-qrcode.html',
+  'tool-image.html',
+  'tool-network.html',
+  'tool-air-conditioner.html',
+];
+
 const urls = [
   { loc: baseUrl + '/', lastmod: latestPostDate, changefreq: 'daily', priority: '1.0' },
   { loc: baseUrl + '/tags.html', lastmod: today, changefreq: 'weekly', priority: '0.8' },
   { loc: baseUrl + '/archives.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
   { loc: baseUrl + '/series.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
   { loc: baseUrl + '/tools.html', lastmod: today, changefreq: 'monthly', priority: '0.7' },
-  { loc: baseUrl + '/tool-kit.html', lastmod: today, changefreq: 'monthly', priority: '0.65' },
-  { loc: baseUrl + '/tool-air-conditioner.html', lastmod: today, changefreq: 'monthly', priority: '0.6' },
+  ...TOOL_SITEMAP_PAGES.map(p => ({
+    loc: baseUrl + '/' + p,
+    lastmod: today,
+    changefreq: 'monthly',
+    priority: '0.6',
+  })),
   ...pages.filter(p => !p.draft).map(p => ({
     loc: postPublicAbsUrl(p),
     lastmod: new Date(p.updated || p.date || today).toISOString(),
