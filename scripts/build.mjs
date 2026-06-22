@@ -562,6 +562,13 @@ const DONATE_CFG = {
   alipay: '',
   paypal: '',
 };
+const PAGEVIEWS_CFG = {
+  enabled: getSectionBool('pageviews', 'enabled', true),
+  showPostViews: getSectionBool('pageviews', 'showPostViews', true),
+  vercount: {
+    label: getNestedStr('vercount', 'label') || '阅读',
+  },
+};
 function safePostUrlKeyDir(p) {
   const slug = String(p.slug || '');
   const k = String(p.urlKey || '').trim();
@@ -594,6 +601,7 @@ for (const p of postEntries) {
     site: SITE_FOR_PRERENDER,
     shareCfg: SHARE_CFG,
     donateCfg: DONATE_CFG,
+    pageviewsCfg: PAGEVIEWS_CFG,
     postShellTemplate: POST_SHELL,
   });
   writeFileSync(join(dir, 'index.html'), prerendered);

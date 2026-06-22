@@ -247,6 +247,13 @@ function buildShareCardHtml({ canonical, title, shareCfg, donateCfg, sitePathPre
   `;
 }
 
+function buildPagePvHtml(pageviewsCfg) {
+  const cfg = pageviewsCfg || {};
+  if (cfg.enabled === false || cfg.showPostViews === false) return '';
+  const label = String((cfg.vercount || {}).label || '阅读').trim() || '阅读';
+  return `<span class="dot"></span><span class="vercount-inline"><span class="vercount-prefix">${escapeHtml(label)} </span><span id="vercount_value_page_pv">…</span><span class="vercount-suffix"> 次</span></span>`;
+}
+
 export async function buildArticleInnerHtml({
   post,
   fmData,
@@ -256,6 +263,7 @@ export async function buildArticleInnerHtml({
   site,
   shareCfg,
   donateCfg,
+  pageviewsCfg,
 }) {
   const slug = post.slug;
   const title = post.title || fmData.title || '无标题';
@@ -294,6 +302,7 @@ export async function buildArticleInnerHtml({
             <span>${(content || '').length} 字</span>
             <span class="dot"></span>
             <span class="meta-read-mins">约 ${mins} 分钟</span>
+            ${buildPagePvHtml(pageviewsCfg)}
           </div>
         </div>
         <a class="article-edit" href="${escapeHtml(editHref)}" title="编辑此文">编辑</a>
@@ -314,6 +323,7 @@ export async function buildPrerenderedPostHtml({
   site,
   shareCfg,
   donateCfg,
+  pageviewsCfg,
   postShellTemplate,
 }) {
   const slug = post.slug;
@@ -364,6 +374,7 @@ export async function buildPrerenderedPostHtml({
     site,
     shareCfg,
     donateCfg,
+    pageviewsCfg,
   });
 
   const assets = rootHref(sitePathPrefix, 'assets');
