@@ -1,6 +1,7 @@
 import { CONFIG } from './config.js';
 import { initSite } from './site.js';
 import { setMeta, setJsonLd } from './seo.js';
+import { mountToolComments } from './tool-kit-common.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -172,42 +173,7 @@ function bindControls() {
 }
 
 function renderGiscus() {
-  const g = CONFIG.giscus || {};
-  const host = $('#toolGiscus');
-  if (!host || !g.enabled) {
-    if (host) host.innerHTML = '<div class="tool-comments-hint">留言板未启用。可在后台设置里打开 giscus。</div>';
-    return;
-  }
-  if (!g.repoId || !g.categoryId) {
-    host.innerHTML = '<div class="tool-comments-hint">giscus 缺少 repoId 或 categoryId，请先在后台设置中补全。</div>';
-    return;
-  }
-  const html = document.documentElement;
-  const choice = html.dataset.themeChoice || 'auto';
-  const resolved = choice === 'auto'
-    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-    : choice;
-  const script = document.createElement('script');
-  script.src = 'https://giscus.app/client.js';
-  script.crossOrigin = 'anonymous';
-  script.async = true;
-  const attrs = {
-    'data-repo': g.repo,
-    'data-repo-id': g.repoId,
-    'data-category': g.category,
-    'data-category-id': g.categoryId,
-    'data-mapping': 'specific',
-    'data-term': 'tool-air-conditioner',
-    'data-strict': g.strict || '0',
-    'data-reactions-enabled': g.reactionsEnabled || '1',
-    'data-emit-metadata': g.emitMetadata || '0',
-    'data-input-position': g.inputPosition || 'top',
-    'data-theme': resolved,
-    'data-lang': g.lang || 'zh-CN',
-    'data-loading': 'lazy',
-  };
-  Object.entries(attrs).forEach(([key, value]) => script.setAttribute(key, value));
-  host.appendChild(script);
+  mountToolComments('tool-air-conditioner');
 }
 
 initSite({ active: 'tools.html' });
