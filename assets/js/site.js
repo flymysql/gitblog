@@ -531,6 +531,13 @@ function injectAnalytics() {
   });
 }
 
+function decorImageUrl(path) {
+  const rel = String(path || '').replace(/^\/+/, '');
+  const base = String(CONFIG.site?.url || '').replace(/\/+$/, '');
+  if (base && /^https?:\/\//i.test(base)) return `${base}/${rel}`;
+  return rootPath(rel);
+}
+
 function mountPcCornerDecor() {
   const decor = CONFIG.decor || {};
   if (!decor.enabled || !decor.pcCornerImage) return;
@@ -541,10 +548,11 @@ function mountPcCornerDecor() {
   wrap.className = 'site-pc-corner-decor';
   wrap.setAttribute('aria-hidden', 'true');
   const img = document.createElement('img');
-  img.src = rootPath(String(decor.pcCornerImage).replace(/^\/+/, ''));
+  img.src = decorImageUrl(decor.pcCornerImage);
   img.alt = '';
   img.decoding = 'async';
   img.loading = 'lazy';
+  img.addEventListener('error', () => wrap.remove(), { once: true });
   wrap.appendChild(img);
   document.body.appendChild(wrap);
 }
