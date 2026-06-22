@@ -107,6 +107,18 @@ function injectVercountScript() {
   document.head.appendChild(s);
 }
 
+/** 预渲染 HTML 可能缺少 Vercount 占位，运行时补注入 */
+function ensureArticlePagePvPlaceholder(root = document) {
+  const cfg = pvCfg();
+  if (cfg.enabled === false || cfg.showPostViews === false) return;
+  if (root.getElementById('vercount_value_page_pv')) return;
+  const meta = root.querySelector('#article .article-author .meta');
+  if (!meta) return;
+  const html = bszPagePvHtml();
+  if (!html) return;
+  meta.insertAdjacentHTML('beforeend', `<span class="dot"></span>${html}`);
+}
+
 // ---------- public API -------------------------------------------------------
 
 export function initPageviews() {
@@ -120,6 +132,7 @@ export function initPageviews() {
   } else {
     hideAllSaobby(document);
   }
+  ensureArticlePagePvPlaceholder(document);
   injectVercountScript();
 }
 
