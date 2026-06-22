@@ -3,7 +3,7 @@
 // 与 ?v=VERSION 的 cache-busting 协同：CACHE_NAME 用 release VERSION 区分批次
 // ============================================================================
 
-const SW_VERSION = '20260622103000';
+const SW_VERSION = '20260622113000';
 const STATIC_CACHE = `static-${SW_VERSION}`;
 const PAGE_CACHE = `pages-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
@@ -47,7 +47,10 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     Promise.all([
-      self.registration.navigationPreload ? self.registration.navigationPreload.enable().catch(() => {}) : null,
+      // HTML 走 cache-first，navigation preload 会在命中缓存时被取消并刷控制台警告
+      self.registration.navigationPreload
+        ? self.registration.navigationPreload.disable().catch(() => {})
+        : null,
       caches.keys().then(keys =>
         Promise.all(keys
         .filter(k => ![STATIC_CACHE, PAGE_CACHE, RUNTIME_CACHE].includes(k))
@@ -106,24 +109,23 @@ self.addEventListener('fetch', event => {
   }
 });
 
+async function fetchAndCachePage(request) {
+  const res = await fetch(request);
+  if (res && res.status === 200) {
+    const copy = res.clone();
+    caches.open(PAGE_CACHE).then(c => c.put(request, copy)).catch(() => {});
+  }
+  return res;
+}
+
 async function handleHtml(request, event) {
   const url = new URL(request.url);
   const postArticle = isPostArticlePath(url.pathname);
 
-  const network = (event.preloadResponse || Promise.resolve(null))
-    .then(preload => preload || fetch(request))
-    .then(res => {
-      if (res && res.status === 200) {
-        const copy = res.clone();
-        caches.open(PAGE_CACHE).then(c => c.put(request, copy)).catch(() => {});
-      }
-      return res;
-    });
-
   // 文章页已预渲染完整 HTML：network-first，避免旧版「加载中…」空壳被 stale 缓存命中
   if (postArticle) {
     try {
-      const res = await network;
+      const res = await fetchAndCachePage(request);
       if (res && res.status === 200) return res;
     } catch { /* 离线回退 */ }
     const cached = await matchHtmlShell(request);
@@ -134,13 +136,13 @@ async function handleHtml(request, event) {
 
   // 导航页最影响 DCL。已有缓存时立刻返回页面壳，后台静默更新，避免慢 304 卡住首屏。
   if (cached) {
-    event.waitUntil(network.catch(() => {}));
+    event.waitUntil(fetchAndCachePage(request).catch(() => {}));
     return cached;
   }
 
   // 首次访问且没有缓存时才等网络；多等几秒避免慢网/冷启动时误落到离线页
   return Promise.race([
-    network.catch(() => null),
+    fetchAndCachePage(request).catch(() => null),
     delay(6000).then(() => null),
   ]).then(res => res || caches.match(OFFLINE_URL));
 }
