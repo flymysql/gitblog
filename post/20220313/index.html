@@ -19,7 +19,7 @@
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="多维数组的索引方案与内存设计">
   <meta property="og:description" content="多维数组的内存结构 类似ndarray之类的多维数组，实际上是一个连续的内存地址+一种索引方案。我们可以将一个多维数组对象分为两部分，一部分是实际存储数组数据的连续内存段，另一部分…">
-  <meta property="og:image" content="/assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.png">
+  <meta property="og:image" content="https://gitpull.cn/assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.png">
   <meta property="og:url" content="https://gitpull.cn/post/20220313/">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="小红鸡">
@@ -27,14 +27,14 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="多维数组的索引方案与内存设计">
   <meta name="twitter:description" content="多维数组的内存结构 类似ndarray之类的多维数组，实际上是一个连续的内存地址+一种索引方案。我们可以将一个多维数组对象分为两部分，一部分是实际存储数组数据的连续内存段，另一部分…">
-  <meta name="twitter:image" content="/assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.png">
+  <meta name="twitter:image" content="https://gitpull.cn/assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.png">
   <link rel="canonical" href="https://gitpull.cn/post/20220313/">
   <meta property="og:image:width" content="1076">
   <meta property="og:image:height" content="210">
   <meta property="article:published_time" content="2022-03-13T12:08:00+08:00">
   <meta property="article:modified_time" content="2022-03-13T12:08:00+08:00">
   <meta property="article:author" content="兰州小红鸡">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"多维数组的索引方案与内存设计","description":"多维数组的内存结构 类似ndarray之类的多维数组，实际上是一个连续的内存地址+一种索引方案。我们可以将一个多维数组对象分为两部分，一部分是实际存储数组数据的连续内存段，另一部分…","image":"/assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.png","datePublished":"2022-03-13T12:08:00+08:00","dateModified":"2022-03-13T12:08:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20220313/"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"多维数组的索引方案与内存设计","description":"多维数组的内存结构 类似ndarray之类的多维数组，实际上是一个连续的内存地址+一种索引方案。我们可以将一个多维数组对象分为两部分，一部分是实际存储数组数据的连续内存段，另一部分…","image":"https://gitpull.cn/assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.png","datePublished":"2022-03-13T12:08:00+08:00","dateModified":"2022-03-13T12:08:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20220313/"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://gitpull.cn/"},{"@type":"ListItem","position":2,"name":"多维数组的索引方案与内存设计","item":"https://gitpull.cn/post/20220313/"}]}</script>
 </head>
 <body>
