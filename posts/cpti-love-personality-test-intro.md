@@ -4,7 +4,7 @@ date: 2026-05-14
 updated: "2026-05-15T03:55:33.008Z"
 author: Jimmy
 tags: [杂七杂八, 前端]
-cover: assets/uploads/2026/05/cptijietu1.png
+cover: assets/uploads/2026/05/cptijietu1.webp
 summary: CPTI 是一个偏手机体验的恋爱向趣味测验：刷题像刷短内容，最后给你「你像谁」和「谁更适合接住你」两套结果，再配一整套恋爱角色卡。本文只聊怎么玩、能玩出什么，不聊实现细节。
 carousel: true
 ---
@@ -22,7 +22,7 @@ carousel: true
 - **题型不单调**：除了常规选项，还有 **聊天场景题** 和少量 **调剂用的搞怪题**，整体氛围偏轻松，不像在做严肃量表。
 - **结果页支持一键复制**：测完把整段文案复制走，丢给闺蜜分析、发朋友圈吐槽、写进备忘录都行。
 
-![首页与入口氛围](assets/uploads/2026/05/cptijietu1.png)
+![首页与入口氛围](assets/uploads/2026/05/cptijietu1.webp)
 
 ---
 
@@ -34,7 +34,7 @@ carousel: true
 4. 做完进 **结果页**：先看主结果角色卡，再读「谁更适合接住你」那一栏，对照你真实相处过的人，会特别有画面。
 5. 可选：填 MBTI → 再读一遍结果里和你相关的句子，看看有没有多中几条。
 
-![测试页：瀑布流短题卡](assets/uploads/2026/05/cptijietu2.png)
+![测试页：瀑布流短题卡](assets/uploads/2026/05/cptijietu2.webp)
 
 ---
 
@@ -47,7 +47,7 @@ carousel: true
 
 两套都来自同一套题，所以不会出现「完全不相干的两个故事」，更像是 **同一场恋爱里，镜子和内景镜头各拍了一张**。
 
-![题型与场景题氛围](assets/uploads/2026/05/cptijietu3.png)
+![题型与场景题氛围](assets/uploads/2026/05/cptijietu3.webp)
 
 ---
 
@@ -97,7 +97,7 @@ carousel: true
 
 测完以后，**小狗、恋爱脑、上头怪** 这一挂很适合转发给好友互怼（褒义）；**小猫咪、刺猬、哑巴** 这一挂则更容易在评论区里「世另我」。
 
-![结果页：双结果与复制](assets/uploads/2026/05/cptijietu4.png)
+![结果页：双结果与复制](assets/uploads/2026/05/cptijietu4.webp)
 
 ---
 

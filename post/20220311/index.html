@@ -19,7 +19,7 @@
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="nebula graph 图计算数据库">
   <meta property="og:description" content="更新历史 在学习过程中，本文持续更新 2021 12 13：更新nebula官方介绍 2021 12 14：更新编译与部署方式，总结importer导入方式 2021 12 15：…">
-  <meta property="og:image" content="https://gitpull.cn/assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.png">
+  <meta property="og:image" content="https://gitpull.cn/assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.webp">
   <meta property="og:url" content="https://gitpull.cn/post/20220311/">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="小红鸡">
@@ -27,14 +27,14 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="nebula graph 图计算数据库">
   <meta name="twitter:description" content="更新历史 在学习过程中，本文持续更新 2021 12 13：更新nebula官方介绍 2021 12 14：更新编译与部署方式，总结importer导入方式 2021 12 15：…">
-  <meta name="twitter:image" content="https://gitpull.cn/assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.png">
+  <meta name="twitter:image" content="https://gitpull.cn/assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.webp">
   <link rel="canonical" href="https://gitpull.cn/post/20220311/">
   <meta property="og:image:width" content="900">
   <meta property="og:image:height" content="521">
   <meta property="article:published_time" content="2022-03-11T15:03:00+08:00">
   <meta property="article:modified_time" content="2022-03-11T15:03:00+08:00">
   <meta property="article:author" content="兰州小红鸡">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"nebula graph 图计算数据库","description":"更新历史 在学习过程中，本文持续更新 2021 12 13：更新nebula官方介绍 2021 12 14：更新编译与部署方式，总结importer导入方式 2021 12 15：…","image":"https://gitpull.cn/assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.png","datePublished":"2022-03-11T15:03:00+08:00","dateModified":"2022-03-11T15:03:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20220311/"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"nebula graph 图计算数据库","description":"更新历史 在学习过程中，本文持续更新 2021 12 13：更新nebula官方介绍 2021 12 14：更新编译与部署方式，总结importer导入方式 2021 12 15：…","image":"https://gitpull.cn/assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.webp","datePublished":"2022-03-11T15:03:00+08:00","dateModified":"2022-03-11T15:03:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20220311/"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://gitpull.cn/"},{"@type":"ListItem","position":2,"name":"nebula graph 图计算数据库","item":"https://gitpull.cn/post/20220311/"}]}</script>
 </head>
 <body>
@@ -46,14 +46,14 @@
       
       <h1 class="article-title">nebula graph 图计算数据库</h1>
       <div class="article-author">
-        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.webp)"></div>
         <div class="info">
           <div class="name">兰州小红鸡</div>
           <div class="meta">
             <span>2022-03-11</span>
             
             <span class="dot"></span>
-            <span>25891 字</span>
+            <span>25898 字</span>
             <span class="dot"></span>
             <span class="meta-read-mins">约 22 分钟</span>
             <span class="dot"></span><span class="vercount-inline"><span class="vercount-prefix">阅读 </span><span id="vercount_value_page_pv">…</span><span class="vercount-suffix"> 次</span></span>
@@ -146,8 +146,8 @@
 <pre><code># 匹配从uuid为1的user点出发经过click连接doc点再经过swing边连接的doc点的所有路径
 match p=(v:user{uuid:"123"})-[e:click]-&gt;(v2)-[e2:swing]-&gt;(v3) return p
 </code></pre>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-01.png" alt="" loading="lazy" decoding="async"></p>
-<p>甚至更直观的我们还可以看到返回的simItem里面高度重合的部分<br><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-02.png" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-01.webp" alt="" loading="lazy" decoding="async"></p>
+<p>甚至更直观的我们还可以看到返回的simItem里面高度重合的部分<br><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-02.webp" alt="" loading="lazy" decoding="async"></p>
 <h2>服务架构</h2>
 <p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-03.png" alt="" loading="lazy" decoding="async"></p>
 <p>Nebula Graph 由三种服务构成：Graph 服务、Meta 服务和 Storage 服务，是一种存储与计算分离的架构。</p>
@@ -179,7 +179,7 @@ match p=(v:user{uuid:"123"})-[e:click]-&gt;(v2)-[e2:swing]-&gt;(v3) return p
 </li>
 </ol>
 <h3>Storage 服务</h3>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-05.png" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-05.webp" alt="" loading="lazy" decoding="async"></p>
 <p>和Meta一样，Storage也是用Raft协议作集群。<br><strong>storage的三个服务层次</strong></p>
 <ol>
 <li>Storage interface 层<br>Storage 服务的最上层，定义了一系列和图相关的 API。API 请求会在这一层被翻译成一组针对分片的 KV 操作。正是这一层的存在，使得 Storage 服务变成了真正的图存储，否则 Storage 服务只是一个 KV 存储服务。</li>
@@ -429,7 +429,7 @@ $ make install
 <p>使用一键部署的，在部署的时候已经装好nebula studio，直接访问对应的ip端口即可。</p>
 </blockquote>
 <p>启动成功后，在浏览器地址栏输入 <a href="http://ip">http://ip</a> address:7001。</p>
-<p>如果在浏览器窗口中能看到以下登录界面，表示已经成功部署并启动 Studio。<br><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-07.png" alt="" loading="lazy" decoding="async"></p>
+<p>如果在浏览器窗口中能看到以下登录界面，表示已经成功部署并启动 Studio。<br><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-07.webp" alt="" loading="lazy" decoding="async"></p>
 <h4>客户端sdk</h4>
 <ol>
 <li>Nebula CPP ： <a href="https://github.com/vesoft-inc/nebula-cpp">https://github.com/vesoft-inc/nebula-cpp</a></li>
@@ -797,7 +797,7 @@ files:
                 index: 3
 </code></pre>
 <h4>点配置</h4>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-08.png" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-08.webp" alt="" loading="lazy" decoding="async"></p>
 <h4>边配置</h4>
 <pre><code>schema:
   type: edge
@@ -817,7 +817,7 @@ files:
         type: double
         index: 3
 </code></pre>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-09.png" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-09.webp" alt="" loading="lazy" decoding="async"></p>
 <h3>使用Exchange导入</h3>
 <p>Exchange可以将不同数据源的数据导入到nebula数据库，便于迁移数据。<br>支持的数据列表：<br><img src="http://image.huawei.com/tiny-lts/v1/images/3a5d9573a940364935c1abd68db6685b_242x439.png@900-0-90-f.png" alt="image.png" loading="lazy" decoding="async"></p>
 <p>详情：<a href="https://docs.nebula-graph.com.cn/2.6.1/nebula-exchange/use-exchange/ex-ug-import-from-csv/">https://docs.nebula-graph.com.cn/2.6.1/nebula-exchange/use-exchange/ex-ug-import-from-csv/</a></p>
@@ -901,7 +901,7 @@ nebula-metad.conf
 <li>先启动两台机器的meta服务。</li>
 <li>保证meta服务正常起来后，在分别启动两台机器的graph和storage服务</li>
 </ol>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-12.png" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-12.webp" alt="" loading="lazy" decoding="async"></p>
 <h2>nebula 进阶学习</h2>
 <ol>
 <li>nebula graphd服务代码走读：<br><a href="https://www.cnblogs.com/gitpull/p/15988828.html">https://www.cnblogs.com/gitpull/p/15988828.html</a></li>

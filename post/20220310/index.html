@@ -19,7 +19,7 @@
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="nebula代码走读——从Validator到Executor">
   <meta property="og:description" content="整体架构 Nebula Graph Query Engine 主要分为四个模块，分别是 Parser、Validator、Optimizer 和 Executor。 Parser …">
-  <meta property="og:image" content="https://gitpull.cn/assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.png">
+  <meta property="og:image" content="https://gitpull.cn/assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.webp">
   <meta property="og:url" content="https://gitpull.cn/post/20220310/">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="小红鸡">
@@ -27,7 +27,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="nebula代码走读——从Validator到Executor">
   <meta name="twitter:description" content="整体架构 Nebula Graph Query Engine 主要分为四个模块，分别是 Parser、Validator、Optimizer 和 Executor。 Parser …">
-  <meta name="twitter:image" content="https://gitpull.cn/assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.png">
+  <meta name="twitter:image" content="https://gitpull.cn/assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.webp">
   <link rel="canonical" href="https://gitpull.cn/post/20220310/">
   <meta property="og:image:width" content="897">
   <meta property="og:image:height" content="150">
@@ -35,7 +35,7 @@
   <meta property="article:modified_time" content="2022-03-10T11:41:00+08:00">
   <meta property="article:author" content="兰州小红鸡">
   <meta property="article:tag" content="图数据库">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"nebula代码走读——从Validator到Executor","description":"整体架构 Nebula Graph Query Engine 主要分为四个模块，分别是 Parser、Validator、Optimizer 和 Executor。 Parser …","image":"https://gitpull.cn/assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.png","datePublished":"2022-03-10T11:41:00+08:00","dateModified":"2022-03-10T11:41:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20220310/","keywords":"图数据库"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"nebula代码走读——从Validator到Executor","description":"整体架构 Nebula Graph Query Engine 主要分为四个模块，分别是 Parser、Validator、Optimizer 和 Executor。 Parser …","image":"https://gitpull.cn/assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.webp","datePublished":"2022-03-10T11:41:00+08:00","dateModified":"2022-03-10T11:41:00+08:00","author":{"@type":"Person","name":"兰州小红鸡"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20220310/","keywords":"图数据库"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://gitpull.cn/"},{"@type":"ListItem","position":2,"name":"图数据库","item":"https://gitpull.cn/tags.html#%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93"},{"@type":"ListItem","position":3,"name":"nebula代码走读——从Validator到Executor","item":"https://gitpull.cn/post/20220310/"}]}</script>
 </head>
 <body>
@@ -47,14 +47,14 @@
       <div class="article-tags-top"><a class="tag tag-colored" style="--tag-bg:#EEF0F3;--tag-text:#4B5563;--tag-border:#D5DAE1;--tag-dark-bg:#252A33;--tag-dark-text:#CBD5E1;--tag-dark-border:#47515F;" href="/tags.html#%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93">图数据库</a></div>
       <h1 class="article-title">nebula代码走读——从Validator到Executor</h1>
       <div class="article-author">
-        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.webp)"></div>
         <div class="info">
           <div class="name">兰州小红鸡</div>
           <div class="meta">
             <span>2022-03-10</span>
             
             <span class="dot"></span>
-            <span>1588 字</span>
+            <span>1589 字</span>
             <span class="dot"></span>
             <span class="meta-read-mins">约 1 分钟</span>
             <span class="dot"></span><span class="vercount-inline"><span class="vercount-prefix">阅读 </span><span id="vercount_value_page_pv">…</span><span class="vercount-suffix"> 次</span></span>
@@ -65,7 +65,7 @@
     </header>
     <div class="article-body"><h2>整体架构</h2>
 <p>Nebula Graph Query Engine 主要分为四个模块，分别是 Parser、Validator、Optimizer 和 Executor。</p>
-<p><img src="/assets/uploads/2026/05/nebula%E4%BB%A3%E7%A0%81%E8%B5%B0%E8%AF%BB%E2%80%94%E2%80%94%E4%BB%8EValidator%E5%88%B0Executor-15988828-01.png" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/nebula%E4%BB%A3%E7%A0%81%E8%B5%B0%E8%AF%BB%E2%80%94%E2%80%94%E4%BB%8EValidator%E5%88%B0Executor-15988828-01.webp" alt="" loading="lazy" decoding="async"></p>
 <p>Parser 完成对语句的词法语法解析并生成抽象语法树（AST），Validator 会将 AST 转化为执行计划，Optimizer 对执行计划进行优化，而 Executor 负责实际数据的计算。</p>
 <h2>Graphd服务命令执行计划</h2>
 <pre><code>命令行执行

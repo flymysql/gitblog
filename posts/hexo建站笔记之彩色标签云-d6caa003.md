@@ -8,7 +8,7 @@ tags:
   - 前端
   - 博客建站
 summary: "方法比较简单，加个js脚本就好了，至于加载哪里都无所谓了，就放在标签云的页面。 就加在标签的那个页面好了。 1. 打开themes\\\\next\\\\layout\\\\page.swig…"
-cover: assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-01.png
+cover: assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-01.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/d6caa003.html
@@ -107,6 +107,6 @@ origin:
 
 标签云放在主页
 
-![兰州小红鸡](assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-01.png)
+![兰州小红鸡](assets/uploads/2026/05/hexo建站笔记之彩色标签云-d6caa003-01.webp)
 
 标签云页面
