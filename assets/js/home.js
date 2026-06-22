@@ -197,6 +197,14 @@ function bindHeroAvatarSizeSync() {
 
   const apply = () => {
     fitHeroSubtitleFont();
+    const mobile = window.matchMedia('(max-width: 720px)').matches;
+    if (mobile) {
+      wrap.style.width = '';
+      wrap.style.minWidth = '';
+      wrap.style.height = '';
+      wrap.style.boxSizing = '';
+      return;
+    }
     const h = Math.ceil(info.getBoundingClientRect().height);
     const side = Math.min(160, Math.max(48, h || 72));
     wrap.style.width = `${side}px`;
