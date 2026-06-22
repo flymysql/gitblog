@@ -3,7 +3,7 @@ import { initToolPage, $, copyText, setStatus } from './tool-kit-common.js';
 initToolPage({
   title: 'JSON 格式化',
   description: '在线 JSON 格式化、压缩、校验与复制，浏览器本地处理。',
-  path: 'tool-json.html',
+  path: 'tools/tool-json.html',
 });
 
 const statusEl = $('jsonStatus');

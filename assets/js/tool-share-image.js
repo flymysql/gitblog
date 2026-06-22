@@ -89,6 +89,62 @@ export function downloadCanvas(canvas, filename) {
   a.click();
 }
 
+let shareModalEl = null;
+
+/** 悬浮弹窗预览分享图，由用户长按或手动下载保存 */
+export function showShareImagePreview(canvas, { filename = 'share.png', title = '分享图' } = {}) {
+  if (!canvas) return;
+  closeShareImagePreview();
+
+  const dataUrl = canvas.toDataURL('image/png');
+  const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const hint = isTouch
+    ? '长按图片保存到相册，再分享到朋友圈'
+    : '右键图片另存为，或点击下方「下载图片」';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'tool-share-modal';
+  wrap.setAttribute('role', 'dialog');
+  wrap.setAttribute('aria-modal', 'true');
+  wrap.setAttribute('aria-label', title);
+  wrap.innerHTML = `
+    <div class="tool-share-modal-backdrop" data-close></div>
+    <div class="tool-share-modal-panel">
+      <button type="button" class="tool-share-modal-close" data-close aria-label="关闭">×</button>
+      <p class="tool-share-modal-title">${title}</p>
+      <p class="tool-share-modal-hint">${hint}</p>
+      <div class="tool-share-modal-img-wrap">
+        <img class="tool-share-modal-img" src="${dataUrl}" alt="${title}">
+      </div>
+      <div class="tool-share-modal-actions">
+        <button type="button" class="tool-kit-btn is-ghost" data-download>下载图片</button>
+        <button type="button" class="tool-kit-btn" data-close>关闭</button>
+      </div>
+    </div>
+  `;
+
+  const close = () => closeShareImagePreview();
+  wrap.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', close));
+  wrap.querySelector('[data-download]').addEventListener('click', () => downloadCanvas(canvas, filename));
+
+  const onKey = e => { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', onKey); } };
+  document.addEventListener('keydown', onKey);
+  wrap._onKey = onKey;
+
+  document.body.appendChild(wrap);
+  shareModalEl = wrap;
+  document.body.style.overflow = 'hidden';
+  wrap.querySelector('.tool-share-modal-close').focus();
+}
+
+export function closeShareImagePreview() {
+  if (!shareModalEl) return;
+  if (shareModalEl._onKey) document.removeEventListener('keydown', shareModalEl._onKey);
+  shareModalEl.remove();
+  shareModalEl = null;
+  document.body.style.overflow = '';
+}
+
 const FONT = 'system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
 
 /** 今日运势分享图 */

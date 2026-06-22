@@ -3,7 +3,7 @@
 // 与 ?v=VERSION 的 cache-busting 协同：CACHE_NAME 用 release VERSION 区分批次
 // ============================================================================
 
-const SW_VERSION = '20260622180000';
+const SW_VERSION = '20260622190000';
 const STATIC_CACHE = `static-${SW_VERSION}`;
 const PAGE_CACHE = `pages-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
@@ -18,17 +18,18 @@ const PRECACHE_URLS = [
   'tags.html',
   'archives.html',
   'series.html',
-  'tools.html',
-  'tool-age.html',
-  'tool-fortune.html',
-  'tool-json.html',
-  'tool-codec.html',
-  'tool-timestamp.html',
-  'tool-regex.html',
-  'tool-qrcode.html',
-  'tool-image.html',
-  'tool-network.html',
-  'tool-air-conditioner.html',
+  'tools/',
+  'tools/index.html',
+  'tools/tool-age.html',
+  'tools/tool-fortune.html',
+  'tools/tool-json.html',
+  'tools/tool-codec.html',
+  'tools/tool-timestamp.html',
+  'tools/tool-regex.html',
+  'tools/tool-qrcode.html',
+  'tools/tool-image.html',
+  'tools/tool-network.html',
+  'tools/tool-air-conditioner.html',
   'notes.html',
   'post.html',
   'offline.html',

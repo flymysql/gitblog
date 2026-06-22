@@ -17,6 +17,12 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'sw.js'
+      - 'tools/**'
+      - 'tool-*.html'
+      - 'tools.html'
+      - 'tool-kit.html'
+      - 'scripts/generate-tool-pages.mjs'
+      - 'scripts/tool-page-shell.mjs'
       - '.github/workflows/build.yml'
   workflow_dispatch:
 

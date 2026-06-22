@@ -3,7 +3,7 @@ import { initToolPage, $, copyText, setStatus } from './tool-kit-common.js';
 initToolPage({
   title: 'Base64 / URL 编解码',
   description: 'Base64 与 URL 编码、解码，支持交换输入输出，浏览器本地处理。',
-  path: 'tool-codec.html',
+  path: 'tools/tool-codec.html',
 });
 
 let codecMode = 'base64';
