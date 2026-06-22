@@ -133,6 +133,19 @@ function renderHero(posts) {
   hero.hidden = false;
   const tagCount = new Set();
   posts.forEach(p => (p.tags || []).forEach(t => tagCount.add(t)));
+  const statsInner = `
+          <div class="stat"><strong>${posts.length}</strong>篇文章</div>
+          <div class="stat"><strong>${tagCount.size}</strong>个标签</div>
+          ${posts.length ? `<div class="stat">最近更新 ${timeAgo(posts[0].date)}</div>` : ''}
+          ${(CONFIG.pageviews || {}).showHomeStats !== false ? bszSiteStatsHtml() : ''}`;
+
+  if (hero.dataset.shell === 'prerender' && hero.querySelector('.hero-link')) {
+    const statsEl = hero.querySelector('.hero-stats');
+    if (statsEl) statsEl.innerHTML = statsInner;
+    hero.removeAttribute('data-shell');
+    return;
+  }
+
   // 整块 hero 包一层 <a> 跳转到「关于」页面：支持点击 / 右键新标签 / 中键新窗口
   hero.innerHTML = `
     <a class="hero-link" href="${postPath('about')}" aria-label="关于${escapeHtml(CONFIG.site.title || '本站')}">
@@ -141,11 +154,7 @@ function renderHero(posts) {
       </div>
       <div class="hero-info">
         <div class="hero-subtitle">${escapeHtml(CONFIG.site.description || CONFIG.site.subtitle || '')}</div>
-        <div class="hero-stats">
-          <div class="stat"><strong>${posts.length}</strong>篇文章</div>
-          <div class="stat"><strong>${tagCount.size}</strong>个标签</div>
-          ${posts.length ? `<div class="stat">最近更新 ${timeAgo(posts[0].date)}</div>` : ''}
-          ${(CONFIG.pageviews || {}).showHomeStats !== false ? bszSiteStatsHtml() : ''}
+        <div class="hero-stats">${statsInner}
         </div>
       </div>
       <span class="hero-arrow" aria-hidden="true">›</span>
@@ -241,7 +250,9 @@ function renderCarousel(posts) {
 
   let current = 0;
   root.hidden = false;
-  root.innerHTML = `
+  const hasShell = root.dataset.shell === 'prerender' && root.querySelector('.carousel-viewport');
+  if (!hasShell) {
+    root.innerHTML = `
     <div class="carousel-viewport">
       ${items.map((p, i) => `
         <a class="carousel-slide${i === 0 ? ' active' : ''}" href="${postPathFromPost(p)}" aria-label="${escapeHtml(p.title || '文章')}">
@@ -266,6 +277,8 @@ function renderCarousel(posts) {
       </div>
     </div>
   `;
+  }
+  root.removeAttribute('data-shell');
 
   const slides = [...root.querySelectorAll('.carousel-slide')];
   const dots = [...root.querySelectorAll('.carousel-dots button')];
