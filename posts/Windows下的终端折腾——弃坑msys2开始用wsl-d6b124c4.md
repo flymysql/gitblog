@@ -6,7 +6,7 @@ author: "兰州小红鸡"
 tags:
   - "教程"
 summary: "之前用了半年Linux，后来因为平常一些软件需要，只能在Windows下玩，就换回Windows了。 但还是万分想念Linux，然而Windows下的终端一直用的不爽，就一直在尝试…"
-cover: assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-03.gif
+cover: assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-03.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/d6b124c4.html
@@ -53,7 +53,7 @@ origin:
 
 下面先秀一下我的wsl界面
 
-![兰州小红鸡](assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-03.gif)
+![兰州小红鸡](assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-03.webp)
 
 ## [¶](#更换数据源)更换数据源
 
@@ -105,7 +105,7 @@ deb https://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe
 
 将vscode的终端换成wsl，真是赏心悦目呢
 
-![兰州小红鸡](assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-04.png)
+![兰州小红鸡](assets/uploads/2026/05/Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4-04.webp)
 
 在设置里面将
 

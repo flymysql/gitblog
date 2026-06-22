@@ -593,7 +593,7 @@ function settingsContentHtml() {
 
       <section class="settings-card">
         <h3>图片上传策略</h3>
-        <p class="settings-help">编辑器拖拽 / 粘贴图片时会按这里的规则自动优化（GIF / SVG 不会被改）。WebP 通常比 PNG / JPEG 小 30%~70%。</p>
+        <p class="settings-help">编辑器拖拽 / 粘贴 / 工具栏上传图片时，会<strong>自动</strong>按这里的规则优化后再写入仓库（无需手动压缩）。GIF / SVG 不会被改。历史大图可用命令 <code>npm run compress:uploads</code> 批量转 WebP。</p>
         <div class="settings-grid">
           <label class="settings-check"><input type="checkbox" name="upload.preferWebp"> 自动转换为 WebP</label>
           <label>WebP 质量 <input type="number" name="upload.webpQuality" step="0.05" min="0.1" max="1.0">

@@ -4,11 +4,11 @@ date: "2026-05-11T16:40:00+08:00"
 updated: "2026-06-16T09:14:11.752Z"
 author: Jimmy
 tags: [杂七杂八]
-cover: ../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.jpg
+cover: ../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.webp
 summary: 关于这个博客和写它的人 —— 一名做系统软件的程序员，这些年从图数据库、推荐系统一路走到大模型推理基础设施（KV 缓存 / RDMA 零拷贝 / 分布式存储），业余写点代码、读点书、记点流水账。
 ---
 
-![1029bg.jpg](../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.jpg)
+![1029bg.jpg](../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.webp)
 
 ## 你好，这里是小红鸡
 

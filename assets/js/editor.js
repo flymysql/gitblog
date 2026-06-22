@@ -533,6 +533,20 @@ async function deletePost() {
   }
 }
 
+function formatBytes(n) {
+  if (n >= 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`;
+  if (n >= 1024) return `${Math.round(n / 1024)} KB`;
+  return `${n} B`;
+}
+
+function uploadResultMessage(result, fileName) {
+  if (!result.optimized || result.finalSize >= result.originalSize) {
+    return `已上传 ${fileName}`;
+  }
+  const saved = Math.max(0, 100 - Math.round((result.finalSize / result.originalSize) * 100));
+  return `已上传 ${fileName}（${formatBytes(result.originalSize)} → ${formatBytes(result.finalSize)}，省 ${saved}%）`;
+}
+
 // ---------- 图片上传：拖拽 + 粘贴 ----------
 async function handleImageFiles(files) {
   if (!gateAuth()) return;
@@ -540,12 +554,13 @@ async function handleImageFiles(files) {
     if (!file.type.startsWith('image/')) continue;
     setStatus(`上传 ${file.name}…`, 'saving');
     try {
-      const path = await uploadImage(file, file.name);
-      // 计算相对地址（编辑器在 admin/，文章访问在站点根 → 用站点根相对路径）
-      const url = '../' + path;
+      const result = await uploadImage(file, file.name);
+      const url = '../' + result.path;
       const md = `\n![${file.name}](${url})\n`;
       insertAtCursor(md);
-      setStatus(`已上传 ${file.name}`, 'saved');
+      const msg = uploadResultMessage(result, file.name);
+      setStatus(msg, 'saved');
+      showToast(msg);
     } catch (e) {
       console.error(e);
       setStatus('上传失败：' + e.message, 'error');
@@ -686,10 +701,12 @@ async function setupVditor(initialMd) {
           for (const file of files) {
             try {
               setStatus(`上传 ${file.name}…`, 'saving');
-              const path = await uploadImage(file, file.name);
-              const url = '../' + path;
+              const result = await uploadImage(file, file.name);
+              const url = '../' + result.path;
               state.vditor.insertValue(`![${file.name}](${url})\n`);
-              setStatus(`已上传 ${file.name}`, 'saved');
+              const msg = uploadResultMessage(result, file.name);
+              setStatus(msg, 'saved');
+              showToast(msg);
             } catch (e) {
               console.error(e);
               setStatus('上传失败：' + e.message, 'error');

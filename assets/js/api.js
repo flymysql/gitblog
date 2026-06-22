@@ -289,7 +289,12 @@ export async function uploadImage(blob, suggestedName) {
     branch: CONFIG.repo.branch,
   };
   await ghFetch(repoPath(path), { method: 'PUT', body });
-  return path;
+  return {
+    path,
+    optimized: working !== original,
+    originalSize: original.size,
+    finalSize: working.size,
+  };
 }
 
 // 静态图片（PNG / JPEG）：转 WebP + 缩放

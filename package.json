@@ -5,6 +5,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "build:thumbs": "node scripts/build-thumbnails.mjs",
+    "compress:uploads": "node scripts/compress-uploads.mjs",
     "migrate:cnblogs": "node scripts/migrate-cnblogs.mjs",
     "migrate:hexo": "node scripts/migrate-hexo.mjs",
     "fix:hexo-codeblocks": "node scripts/fix-hexo-codeblocks.mjs",

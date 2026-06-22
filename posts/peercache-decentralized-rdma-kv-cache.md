@@ -4,12 +4,12 @@ date: "2026-06-01T10:00:00+08:00"
 updated: "2026-06-02T00:30:00+08:00"
 author: 兰州小红鸡
 tags: [分布式存储, AI 基础设施, 项目介绍]
-cover: ../assets/uploads/2026/06/peercache_scaling_ladder.png
+cover: ../assets/uploads/2026/06/peercache_scaling_ladder.webp
 summary: PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它的定位、为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。
 carousel: true
 ---
 
-![PeerCache GET 吞吐：单卡 → 整机](../assets/uploads/2026/06/peercache_scaling_ladder.png)
+![PeerCache GET 吞吐：单卡 → 整机](../assets/uploads/2026/06/peercache_scaling_ladder.webp)
 
 > **项目地址**：[flymysql.github.io/PeerCache](https://flymysql.github.io/PeerCache/zh/)
 >
@@ -237,7 +237,7 @@ flowchart LR
 
 ### 总览：从单卡到整机
 
-![PeerCache GET 吞吐：从单卡到整机的扩展阶梯](../assets/uploads/2026/06/peercache_scaling_ladder.png)
+![PeerCache GET 吞吐：从单卡到整机的扩展阶梯](../assets/uploads/2026/06/peercache_scaling_ladder.webp)
 
 | 场景 | GET 吞吐 | 占单卡裸 RDMA | 说明 |
 | --- | --- | --- | --- |
@@ -263,7 +263,7 @@ PeerCache 落在裸 `ib_read_bw` 的 **~6% 以内**。这点差距来自目录�
 
 设置 `--devices d1,…,d8`，一个进程就会每卡开一条 rail，并在一次释放 GIL 的 C++ 调用（`batch_read_multi`）里把每批 READ 横跨所有 rail 分发。
 
-![PeerCache 单进程 8 rail：吞吐 vs 线程数](../assets/uploads/2026/06/peercache_single_process_scaling.png)
+![PeerCache 单进程 8 rail：吞吐 vs 线程数](../assets/uploads/2026/06/peercache_single_process_scaling.webp)
 
 | 页大小 | batch | 峰值 | 最佳线程数 |
 | --- | --- | --- | --- |
@@ -281,7 +281,7 @@ PeerCache 落在裸 `ib_read_bw` 的 **~6% 以内**。这点差距来自目录�
 
 生产形态（也是吃满每张卡的方式）是每卡一个进程组——正是 SGLang TP=8 部署的运行方式（8 个 rank，各绑本地网卡）。这里：**8 卡 × 每卡 8 个读进程，128 KiB 页**。
 
-![PeerCache 整机 8 卡：每卡 GET 吞吐](../assets/uploads/2026/06/peercache_per_card.png)
+![PeerCache 整机 8 卡：每卡 GET 吞吐](../assets/uploads/2026/06/peercache_per_card.webp)
 
 | 指标 | 值 |
 | --- | --- |
