@@ -27,7 +27,6 @@ export const CONFIG = {
     locale: "zh-CN",
     nav: [
       { name: "首页", href: "./" },
-      { name: "标签", href: "tags.html" },
       { name: "归档", href: "archives.html" },
       { name: "系列", href: "series.html" },
       { name: "工具", href: "tools/" },

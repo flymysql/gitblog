@@ -224,17 +224,26 @@ function navResolveHref(href) {
   return rootPath(h);
 }
 
+function isExternalNavHref(href) {
+  const h = String(href || '').trim();
+  return /^https?:\/\//i.test(h) || h.startsWith('//');
+}
+
+function navLinkAttrs(href) {
+  return isExternalNavHref(href) ? ' target="_blank" rel="noopener noreferrer"' : '';
+}
+
 function navHtml(active) {
   const navItems = CONFIG.site.nav || [];
   const links = navItems.map(n => {
     const res = navResolveHref(n.href);
     const isActive = active && (n.href === active || res === active || (active === 'home' && (n.href === './' || n.href === 'index.html')));
-    return `<a class="nav-link${isActive ? ' active' : ''}" href="${escapeHtml(res)}">${escapeHtml(n.name)}</a>`;
+    return `<a class="nav-link${isActive ? ' active' : ''}" href="${escapeHtml(res)}"${navLinkAttrs(n.href)}>${escapeHtml(n.name)}</a>`;
   }).join('');
   const drawerLinks = navItems.map(n => {
     const res = navResolveHref(n.href);
     const isActive = active && (n.href === active || res === active || (active === 'home' && (n.href === './' || n.href === 'index.html')));
-    return `<a class="nav-drawer-link${isActive ? ' active' : ''}" href="${escapeHtml(res)}">${escapeHtml(n.name)}</a>`;
+    return `<a class="nav-drawer-link${isActive ? ' active' : ''}" href="${escapeHtml(res)}"${navLinkAttrs(n.href)}>${escapeHtml(n.name)}</a>`;
   }).join('');
   return `
     <nav class="nav">

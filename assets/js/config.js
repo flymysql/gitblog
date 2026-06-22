@@ -28,10 +28,6 @@ export const CONFIG = {
         href: "./"
       },
       {
-        name: "标签",
-        href: "tags.html"
-      },
-      {
         name: "归档",
         href: "archives.html"
       },
@@ -50,6 +46,10 @@ export const CONFIG = {
       {
         name: "关于",
         href: "post/about/"
+      },
+      {
+        name: "小助手",
+        href: "https://yuanqi.tencent.com/webim/#/chat/RhQLBj?appid=2068988279428657408"
       }
     ],
     social: {
