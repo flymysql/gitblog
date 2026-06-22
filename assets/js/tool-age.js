@@ -1,5 +1,5 @@
 import { initToolPage, $ } from './tool-kit-common.js';
-import { drawAgeShareImage, downloadCanvas, toolPageUrl } from './tool-share-image.js';
+import { drawAgeShareImage, showShareImagePreview, toolPageUrl } from './tool-share-image.js';
 
 initToolPage({
   title: '年龄计算器',
@@ -91,7 +91,10 @@ $('ageShare').addEventListener('click', async () => {
       ...lastAge,
       pageUrl: toolPageUrl('tools/tool-age.html'),
     });
-    downloadCanvas(canvas, `age-${Date.now()}.png`);
+    showShareImagePreview(canvas, {
+      title: '年龄分享图',
+      filename: `age-${Date.now()}.png`,
+    });
   } catch (e) {
     alert(`分享图生成失败：${e.message}`);
   } finally {

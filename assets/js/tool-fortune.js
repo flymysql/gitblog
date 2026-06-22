@@ -1,6 +1,6 @@
 import { initToolPage, $, dateSeed, pick } from './tool-kit-common.js';
 import { FORTUNE_GRADES, FORTUNE_TEXTS, FORTUNE_GOOD, FORTUNE_BAD, FORTUNE_COLORS } from './tool-fortune-data.js';
-import { drawFortuneShareImage, downloadCanvas, toolPageUrl } from './tool-share-image.js';
+import { drawFortuneShareImage, showShareImagePreview, toolPageUrl } from './tool-share-image.js';
 
 initToolPage({
   title: '今日运势',
@@ -49,7 +49,10 @@ $('fortuneShare').addEventListener('click', async () => {
     const pageUrl = toolPageUrl('tools/tool-fortune.html', query);
     const canvas = await drawFortuneShareImage({ ...lastFortune, pageUrl });
     const d = new Date();
-    downloadCanvas(canvas, `fortune-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}.png`);
+    showShareImagePreview(canvas, {
+      title: '今日运势分享图',
+      filename: `fortune-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}.png`,
+    });
   } catch (e) {
     alert(`分享图生成失败：${e.message}`);
   } finally {
