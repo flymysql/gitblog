@@ -41,7 +41,7 @@ export const CONFIG = {
       },
       {
         name: "工具",
-        href: "tools.html"
+        href: "tools/"
       },
       {
         name: "随笔",
