@@ -273,6 +273,6 @@ html,body{margin:0;background:var(--bg);color:var(--text-main);font-family:-appl
 .post-title{font-size:18px;font-weight:700;margin:0 0 8px;line-height:1.5}
 @media(max-width:880px){.layout{grid-template-columns:1fr}.sidebar{display:none}}
 @media(max-width:820px){.nav-links{display:none}}
-@media(max-width:720px){.hero{margin:8px 12px 0}.layout{padding:0 14px}.home-carousel{padding:0 14px}.carousel-viewport{height:180px}}
+@media(max-width:720px){.hero{margin:8px 12px 0}.layout{padding:0 14px}.home-carousel{padding:0 14px}.carousel-viewport{height:180px}.hero-link{padding:4px 12px}}
 </style>`;
 }
