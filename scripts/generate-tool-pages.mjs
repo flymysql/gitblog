@@ -14,11 +14,15 @@ const PAGES = [
     h1: '年龄计算器',
     lead: '输入生日，看看你已经在这个星球上待了多久。',
     script: 'tool-age.js',
+    commentsHint: '算出来的数字准不准？来晒晒你的年龄～',
     body: `
       <section class="tool-kit-panel is-active">
         <div class="tool-kit-form">
           <label>出生日期 <input type="date" id="ageBirth" max="9999-12-31"></label>
           <label>出生时间（可选） <input type="time" id="ageTime" step="1"></label>
+        </div>
+        <div class="tool-kit-toolbar">
+          <button type="button" class="tool-kit-btn is-ghost" id="ageShare" hidden>生成分享图</button>
         </div>
         <div class="tool-kit-stats" id="ageResult">
           <p class="tool-kit-placeholder">请选择出生日期</p>
@@ -33,11 +37,13 @@ const PAGES = [
     h1: '今日运势',
     lead: '娱乐向，图一乐。同一日期 + 昵称会得到相同结果。',
     script: 'tool-fortune.js',
+    commentsHint: '今日签文如何？来聊两句～',
     body: `
       <section class="tool-kit-panel is-active">
         <div class="tool-kit-form tool-kit-form-inline">
           <label>昵称（可选） <input type="text" id="fortuneName" placeholder="留空也行" maxlength="20"></label>
           <button type="button" class="tool-kit-btn" id="fortuneBtn">再抽一次</button>
+          <button type="button" class="tool-kit-btn is-ghost" id="fortuneShare">生成分享图</button>
         </div>
         <article class="fortune-card" id="fortuneResult" hidden>
           <div class="fortune-grade" id="fortuneGrade"></div>

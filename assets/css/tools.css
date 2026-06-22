@@ -575,6 +575,14 @@
 
 .tool-single-page .tool-kit-tabs { display: none; }
 
+.tool-single-page .tool-comments {
+  margin-top: 28px;
+}
+
+.tool-single-page .tool-actions {
+  margin-top: 20px;
+}
+
 .tool-kit-panel h2 {
   font-size: 22px;
   margin-bottom: 6px;

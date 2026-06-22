@@ -1,8 +1,9 @@
 import { initSite } from './site.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { CONFIG } from './config.js';
+import { isGiscusReady, mountGiscusScript } from './giscus-embed.js';
 
-export function initToolPage({ title, description, path }) {
+export function initToolPage({ title, description, path, giscusTerm, commentsHint }) {
   initSite({ active: 'tools.html' });
   setMeta({ title, description, type: 'website' });
   const base = CONFIG.site.url || location.origin;
@@ -14,6 +15,23 @@ export function initToolPage({ title, description, path }) {
     operatingSystem: 'Any',
     url: `${base}/${path}`,
   });
+  mountToolComments(giscusTerm || path.replace(/\.html$/i, ''), commentsHint);
+}
+
+/** 工具页底部 giscus 评论区（每页独立 Discussion term） */
+export function mountToolComments(term, hint) {
+  const host = document.getElementById('toolGiscus');
+  if (!host) return;
+  const section = host.closest('.tool-comments');
+  if (section && hint) {
+    const p = section.querySelector('p');
+    if (p) p.textContent = hint;
+  }
+  if (!isGiscusReady()) {
+    host.innerHTML = '<div class="tool-comments-hint">留言板未启用。可在后台设置里打开 giscus。</div>';
+    return;
+  }
+  mountGiscusScript(host, term);
 }
 
 export function $(id) { return document.getElementById(id); }

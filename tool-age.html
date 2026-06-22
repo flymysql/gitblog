@@ -30,16 +30,25 @@
           <label>出生日期 <input type="date" id="ageBirth" max="9999-12-31"></label>
           <label>出生时间（可选） <input type="time" id="ageTime" step="1"></label>
         </div>
+        <div class="tool-kit-toolbar">
+          <button type="button" class="tool-kit-btn is-ghost" id="ageShare" hidden>生成分享图</button>
+        </div>
         <div class="tool-kit-stats" id="ageResult">
           <p class="tool-kit-placeholder">请选择出生日期</p>
         </div>
       </section>
     </div>
+    <section class="tool-comments" id="toolComments">
+      <h2>评论</h2>
+      <p>算出来的数字准不准？来晒晒你的年龄～</p>
+      <div id="toolGiscus"></div>
+    </section>
     <section class="tool-actions">
       <a class="btn-home" href="./">返回首页</a>
       <a class="btn-ghost" href="tools.html">查看工具箱</a>
     </section>
   </main>
+  <script type="application/json" id="toolPageMeta">{"giscusTerm":"tool-age"}</script>
   <div id="site-footer"></div>
   <div id="site-overlays"></div>
   <script type="module" src="assets/js/tool-age.js?v=20260622140000"></script>
