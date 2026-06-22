@@ -5,7 +5,7 @@ updated: "2022-03-11T15:03:00+08:00"
 author: 兰州小红鸡
 tags: 
 summary: 更新历史 在学习过程中，本文持续更新 2021 12 13：更新nebula官方介绍 2021 12 14：更新编译与部署方式，总结importer导入方式 2021 12 15：…
-cover: assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.png
+cover: assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.webp
 origin: 
 carousel: true
 ---
@@ -85,10 +85,10 @@ Nebula Graph 作为一个典型的图数据库，可以将丰富的关系通过�
 match p=(v:user{uuid:"123"})-[e:click]->(v2)-[e2:swing]->(v3) return p
 ```
 
-![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-01.png)
+![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-01.webp)
 
 甚至更直观的我们还可以看到返回的simItem里面高度重合的部分  
-![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.png)
+![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.webp)
 
 ## 服务架构
 
@@ -136,7 +136,7 @@ Graph 服务主要负责处理查询请求，包括解析查询语句、校验�
 
 ### Storage 服务
 
-![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-05.png)
+![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-05.webp)
 
 和Meta一样，Storage也是用Raft协议作集群。  
 **storage的三个服务层次**
@@ -359,7 +359,7 @@ nebula studio需要 v10.12.0 以上的 Node.js。
 启动成功后，在浏览器地址栏输入 [http://ip](http://ip) address:7001。
 
 如果在浏览器窗口中能看到以下登录界面，表示已经成功部署并启动 Studio。  
-![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-07.png)
+![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-07.webp)
 
 #### 客户端sdk
 
@@ -789,7 +789,7 @@ files:
 
 #### 点配置
 
-![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-08.png)
+![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-08.webp)
 
 #### 边配置
 
@@ -813,7 +813,7 @@ schema:
         index: 3
 ```
 
-![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-09.png)
+![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-09.webp)
 
 ### 使用Exchange导入
 
@@ -930,7 +930,7 @@ nebula-metad.conf
 1.  先启动两台机器的meta服务。
 2.  保证meta服务正常起来后，在分别启动两台机器的graph和storage服务
 
-![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-12.png)
+![](assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-12.webp)
 
 ## nebula 进阶学习
 
