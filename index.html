@@ -7,10 +7,43 @@
   <title>小红鸡 · 记录想法与代码</title>
   <meta name="description" content="桃李春风一杯酒，江湖夜雨十年灯。">
   <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
-  <link rel="stylesheet" href="assets/css/common.css?v=20260512184000">
-  <link rel="stylesheet" href="assets/css/home.css?v=20260521140000">
+  <link rel="stylesheet" href="assets/css/common.css?v=20260514040000">
+  <link rel="stylesheet" href="assets/css/home.css?v=20260514040000">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
-  <link rel="manifest" href="manifest.webmanifest">
+  <style id="critical-home">
+:root{--nav-height:60px;--content-max:980px;--radius:6px;--radius-lg:10px;--primary:#EA6F5A;--text-main:#2F2F2F;--text-secondary:#6B6B6B;--text-tertiary:#9C9C9C;--border:#ECECEC;--bg:#FFF;--bg-soft:#F8F8F8;--nav-bg:rgba(255,255,255,.85);--shadow:0 1px 3px rgba(0,0,0,.04)}
+:root[data-mode=dark],:root[data-theme=dark]{--text-main:#E6E6E6;--text-secondary:#A3A3A3;--border:#2A2A2D;--bg:#131316;--bg-soft:#1A1A1E;--nav-bg:rgba(19,19,22,.78)}
+html,body{margin:0;background:var(--bg);color:var(--text-main);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+.nav{position:sticky;top:0;z-index:100;height:var(--nav-height);background:var(--nav-bg);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:var(--content-max);margin:0 auto;height:100%;display:flex;align-items:center;gap:8px;padding:0 24px}
+.nav-logo{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--text-main)}
+.nav-links{display:flex;gap:2px;flex:0 1 auto;overflow:hidden}
+.nav-link{padding:8px 12px;border-radius:var(--radius);font-size:14px;color:var(--text-secondary);white-space:nowrap}
+.nav-spacer{flex:1}
+.hero{max-width:var(--content-max);margin:28px auto 0;border-radius:var(--radius-lg);background:linear-gradient(135deg,rgba(234,111,90,.08),rgba(234,111,90,.02))}
+.hero-link{display:flex;align-items:center;gap:26px;padding:32px 24px;color:inherit;text-decoration:none}
+.hero-avatar-wrap{width:72px;height:72px;flex:0 0 auto}
+.hero-avatar{width:100%;height:100%;border-radius:50%;background-size:cover;background-position:center;background-color:var(--bg-soft)}
+.layout{max-width:var(--content-max);margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr 260px;gap:36px}
+.home-carousel{max-width:var(--content-max);margin:18px auto 0;padding:0 24px}
+.carousel-viewport{position:relative;height:260px;border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-soft)}
+.post-list{list-style:none;margin:0;padding:0}
+.post-item{display:flex;gap:22px;padding:20px 4px;border-bottom:1px solid var(--border)}
+.post-content{flex:1;min-width:0}
+.post-title{font-size:18px;font-weight:700;margin:0 0 8px;line-height:1.5}
+@media(max-width:880px){.layout{grid-template-columns:1fr}.sidebar{display:none}}
+@media(max-width:820px){.nav-links{display:none}}
+@media(max-width:720px){.hero{margin:8px 12px 0}.layout{padding:0 14px}.home-carousel{padding:0 14px}.carousel-viewport{height:180px}}
+</style>
+  <link rel="preload" href="assets/css/common.css?v=20260514040000" as="style">
+  <link rel="preload" href="assets/css/home.css?v=20260514040000" as="style">
+
+
+
+
+
+<link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#ea6f5a">
   <link rel="apple-touch-icon" href="assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -32,10 +65,209 @@
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"小红鸡","url":"https://gitpull.cn/","logo":"https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}</script>
 </head>
 <body>
-  <div id="site-nav"></div>
+  <div id="site-nav">
+    <nav class="nav">
+      <div class="nav-inner">
+        <button id="navMenuBtn" class="icon-btn nav-menu-btn" type="button" aria-label="菜单">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <a class="nav-logo" href="/">
+          <img class="nav-logo-img" src="https://gitpull.cn/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg" alt="小红鸡">
+          <span>小红鸡</span>
+        </a>
+        <div class="nav-links"><a class="nav-link active" href="/">首页</a><a class="nav-link" href="/archives.html">归档</a><a class="nav-link" href="/series.html">系列</a><a class="nav-link" href="/tools/">工具</a><a class="nav-link" href="/notes.html">随笔</a><a class="nav-link" href="/post/about/">关于</a><a class="nav-link" href="https://yuanqi.tencent.com/webim/#/chat/RhQLBj?appid=2068988279428657408" target="_blank" rel="noopener noreferrer">小助手</a></div>
+        <div class="nav-spacer"></div>
+        <button id="searchBtn" class="icon-btn" title="搜索" aria-label="搜索">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        
+    <button id="themeToggle" class="icon-btn" title="切换日 / 月 / 自动" aria-label="切换日 / 月 / 自动">
+      <svg class="icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      <svg class="icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <svg class="icon-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 3v18M3 12a9 9 0 0 1 9-9v18a9 9 0 0 1-9-9z" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
+    <button id="presetToggle" class="icon-btn" title="选择主题" aria-label="选择主题">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 21a9 9 0 1 0-9-9c0 5 4 5 6 4s2-2 1-3-1-2 1-2 4 0 4-3" fill="currentColor" stroke="none" opacity="0.85"/>
+      </svg>
+    </button>
+        <a class="btn-write" href="/admin/" title="进入创作后台">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          <span class="btn-write-label">创作</span>
+        </a>
+      </div>
+    </nav>
+    <div id="navDrawer" class="nav-drawer is-hidden" aria-hidden="true">
+      <div class="nav-drawer-panel">
+        <div class="nav-drawer-header">
+          <span>导航</span>
+          <button id="navDrawerClose" class="icon-btn" type="button" aria-label="关闭">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="nav-drawer-links"><a class="nav-drawer-link active" href="/">首页</a><a class="nav-drawer-link" href="/archives.html">归档</a><a class="nav-drawer-link" href="/series.html">系列</a><a class="nav-drawer-link" href="/tools/">工具</a><a class="nav-drawer-link" href="/notes.html">随笔</a><a class="nav-drawer-link" href="/post/about/">关于</a><a class="nav-drawer-link" href="https://yuanqi.tencent.com/webim/#/chat/RhQLBj?appid=2068988279428657408" target="_blank" rel="noopener noreferrer">小助手</a></div>
+        <a class="nav-drawer-cta" href="/admin/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          进入创作后台
+        </a>
+      </div>
+    </div>
+  </div>
 
-  <section class="hero" id="hero" hidden></section>
-  <section class="home-carousel" id="homeCarousel" hidden></section>
+  <section class="hero" id="hero" data-shell="prerender">
+    <a class="hero-link" href="/post/about/" aria-label="关于本站">
+      <div class="hero-avatar-wrap">
+        <div class="hero-avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+      </div>
+      <div class="hero-info">
+        <div class="hero-subtitle">桃李春风一杯酒，江湖夜雨十年灯。</div>
+        <div class="hero-stats">
+          <div class="stat"><strong>67</strong>篇文章</div>
+          <div class="stat"><strong>20</strong>个标签</div>
+        </div>
+      </div>
+      <span class="hero-arrow" aria-hidden="true">›</span>
+    </a>
+  </section>
+  <section class="home-carousel" id="homeCarousel" data-shell="prerender">
+    <div class="carousel-viewport">
+      
+        <a class="carousel-slide active" href="/post/welcome/" aria-label="GitBlog：一个带伪后台的博客站点">
+          <img
+            src="assets/uploads/2026/05/1778490605877-blwjij-image.png"
+            fetchpriority="high"
+            alt="GitBlog：一个带伪后台的博客站点"
+            loading="eager"
+            decoding="async">
+          <span class="carousel-shade"></span>
+          <span class="carousel-content">
+            <span class="carousel-badge">置顶推荐</span>
+            <strong>GitBlog：一个带伪后台的博客站点</strong>
+            <em>一个完全静态、托管在 GitHub Pages 上的博客，但带有可以在浏览器里直接写、直接发的&#39;伪后台&#39;。这篇文章记录它能做什么，相比传统方案为什么这样设计，以及如果你也想搭一个，要怎么开始。</em>
+          </span>
+        </a>
+      
+        <a class="carousel-slide" href="/post/20260618/" aria-label="海门回声 | 黑鬼">
+          <img
+            src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E"
+            data-src="assets/uploads/2026/06/heigui-cover.png" fetchpriority="low"
+            alt="海门回声 | 黑鬼"
+            loading="lazy"
+            decoding="async">
+          <span class="carousel-shade"></span>
+          <span class="carousel-content">
+            <span class="carousel-badge">精选文章</span>
+            <strong>海门回声 | 黑鬼</strong>
+            <em>黑鬼已经死了好多年了，大概在我上初中还是高中的时候。听大人们说，是在某一年的春节里，二月的天气还很冷，他像往常一样被铁链子拴在家院子前面的小屋子里，有好几天家人忘了给他送饭，便饿死了。也有人说是冻死的。我后来真的见过他——脸发青，像苔藓，不像电视剧里画着黑眼圈的饿汉。</em>
+          </span>
+        </a>
+      
+        <a class="carousel-slide" href="/post/20260615/" aria-label="用 AI 做好软件项目：上下文工程实践指南">
+          <img
+            src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E"
+            data-src="assets/uploads/2026/06/1781499659393-4hzbpp-image.webp" fetchpriority="low"
+            alt="用 AI 做好软件项目：上下文工程实践指南"
+            loading="lazy"
+            decoding="async">
+          <span class="carousel-shade"></span>
+          <span class="carousel-content">
+            <span class="carousel-badge">精选文章</span>
+            <strong>用 AI 做好软件项目：上下文工程实践指南</strong>
+            <em>在复杂软件项目中引入 AI，常见困境不是模型不够强，而是 每次会话都在重复建立上下文 ——Agent 全量读取大文件、反复追问架构、上一轮的结论无法延续、任务边…</em>
+          </span>
+        </a>
+      
+        <a class="carousel-slide" href="/post/20260601/" aria-label="PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端">
+          <img
+            src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E"
+            data-src="assets/uploads/2026/06/peercache_scaling_ladder.png" fetchpriority="low"
+            alt="PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端"
+            loading="lazy"
+            decoding="async">
+          <span class="carousel-shade"></span>
+          <span class="carousel-content">
+            <span class="carousel-badge">精选文章</span>
+            <strong>PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端</strong>
+            <em>PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它的定位、为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。</em>
+          </span>
+        </a>
+      
+        <a class="carousel-slide" href="/post/20260529/" aria-label="大模型推理的 PD 分离：原理、动机与 Mooncake 的实现">
+          <img
+            src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E"
+            data-src="assets/uploads/2026/05/1780025971901-bu285b-image.webp" fetchpriority="low"
+            alt="大模型推理的 PD 分离：原理、动机与 Mooncake 的实现"
+            loading="lazy"
+            decoding="async">
+          <span class="carousel-shade"></span>
+          <span class="carousel-content">
+            <span class="carousel-badge">精选文章</span>
+            <strong>大模型推理的 PD 分离：原理、动机与 Mooncake 的实现</strong>
+            <em>当我们谈论 LLM 推理优化时，绕不开一个关键词—— PD 分离 （Prefill Decode Disaggregation）。这篇文章从第一性原理出发，讲清…</em>
+          </span>
+        </a>
+      
+        <a class="carousel-slide" href="/post/20260514/" aria-label="CPTI：手机上就能玩的恋爱人格小测验">
+          <img
+            src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E"
+            data-src="assets/uploads/2026/05/cptijietu1.png" fetchpriority="low"
+            alt="CPTI：手机上就能玩的恋爱人格小测验"
+            loading="lazy"
+            decoding="async">
+          <span class="carousel-shade"></span>
+          <span class="carousel-content">
+            <span class="carousel-badge">精选文章</span>
+            <strong>CPTI：手机上就能玩的恋爱人格小测验</strong>
+            <em>CPTI 是一个偏手机体验的恋爱向趣味测验：刷题像刷短内容，最后给你「你像谁」和「谁更适合接住你」两套结果，再配一整套恋爱角色卡。本文只聊怎么玩、能玩出什么，不聊实现细节。</em>
+          </span>
+        </a>
+      
+        <a class="carousel-slide" href="/post/20260415/" aria-label="Smallpond 源码走读：DuckDB × 3FS × Ray 是如何拼成一台分布式数据处理机的">
+          <img
+            src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E"
+            data-src="assets/uploads/2026/05/smallpond-cover.webp" fetchpriority="low"
+            alt="Smallpond 源码走读：DuckDB × 3FS × Ray 是如何拼成一台分布式数据处理机的"
+            loading="lazy"
+            decoding="async">
+          <span class="carousel-shade"></span>
+          <span class="carousel-content">
+            <span class="carousel-badge">精选文章</span>
+            <strong>Smallpond 源码走读：DuckDB × 3FS × Ray 是如何拼成一台分布式数据处理机的</strong>
+            <em>Smallpond 是 DeepSeek 开源的轻量级分布式数据处理框架，专为 10 TB 到 PB 量级的 AI / 数据场景设计。它把 DuckDB 的列式向量化执行、3FS 的高带宽存储、Ray 的任务调度三块拼到一起，做成了\&quot;一台机器\&quot;。本文从架构分层、端到端工作流、Parquet 基础到核心源码走读，把这台\&quot;机器\&quot;的工作原理说清楚。</em>
+          </span>
+        </a>
+      
+        <a class="carousel-slide" href="/post/20260311/" aria-label="3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的">
+          <img
+            src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E"
+            data-src="assets/uploads/2026/05/3fs-usrbio-cover.webp" fetchpriority="low"
+            alt="3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的"
+            loading="lazy"
+            decoding="async">
+          <span class="carousel-shade"></span>
+          <span class="carousel-content">
+            <span class="carousel-badge">精选文章</span>
+            <strong>3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的</strong>
+            <em>DeepSeek 开源的 3FS 在 180 节点集群上实测聚合读取吞吐约 6.6 TiB/s。本文从 FUSE 的性能瓶颈讲起，拆解 3FS 如何通过共享内存、io_uring 风格的环形队列、以及 RDMA 直接传输三层叠加，把数据通路上的每一次拷贝都抠掉。</em>
+          </span>
+        </a>
+      
+      <button class="carousel-btn prev" type="button" aria-label="上一张">‹</button>
+      <button class="carousel-btn next" type="button" aria-label="下一张">›</button>
+      <div class="carousel-dots">
+        <button class="active" type="button" aria-label="第 1 张"></button><button class="" type="button" aria-label="第 2 张"></button><button class="" type="button" aria-label="第 3 张"></button><button class="" type="button" aria-label="第 4 张"></button><button class="" type="button" aria-label="第 5 张"></button><button class="" type="button" aria-label="第 6 张"></button><button class="" type="button" aria-label="第 7 张"></button><button class="" type="button" aria-label="第 8 张"></button>
+      </div>
+    </div>
+  </section>
 
   <main class="layout">
     <section>
@@ -45,16 +277,265 @@
         <div class="tab" data-tab="notes">随笔</div>
       </div>
       <ul id="postList" class="post-list">
-      <li class="post-item"><a href="https://gitpull.cn/post/20260617/"><strong>QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具</strong></a> <time>2026-06-17</time> <span class="tag">#杂七杂八</span><br>一个跑在 Windows 上的 QQ 经典农场（微信小游戏）桌面辅助：用图像识别锁定微信窗口，自动收菜、补种、逛好友农场偷菜，支持虚拟机前台挂机。双击 init.bat 初始化，双击 start.bat 开跑，日志写在 logs/daemo</li>
-      <li class="post-item"><a href="https://gitpull.cn/post/20260616/"><strong>海门回声 | 静谧的生日夜晚</strong></a> <time>2026-06-16</time> <span class="tag">#海门回声</span> <span class="tag">#随想</span><br>二〇〇三年的夏天，南日岛入夜后，田埂旁的杂草里蟋蟀叫成一片，晚风从海面方向吹进村子，带着咸腥和青草的气味。村子里的路坑坑洼洼，月光照在上面，一块亮一块暗。父母在外地打工，十二岁的姐姐和六岁的我留在岛上。那天傍晚，姐姐拎回村口小卖部的一红塑料</li>
-      <li class="post-item"><a href="https://gitpull.cn/post/20260615/"><strong>用 AI 做好软件项目：上下文工程实践指南</strong></a> <time>2026-06-15</time> <span class="tag">#AI 基础设施</span><br>在复杂软件项目中引入 AI，常见困境不是模型不够强，而是 每次会话都在重复建立上下文 ——Agent 全量读取大文件、反复追问架构、上一轮的结论无法延续、任务边…</li>
-      <li class="post-item"><a href="https://gitpull.cn/post/20260601/"><strong>PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端</strong></a> <time>2026-06-01</time> <span class="tag">#分布式存储</span> <span class="tag">#AI 基础设施</span><br>PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata </li>
-      <li class="post-item"><a href="https://gitpull.cn/post/20260529/"><strong>大模型推理的 PD 分离：原理、动机与 Mooncake 的实现</strong></a> <time>2026-05-29</time> <span class="tag">#算法</span> <span class="tag">#分布式存储</span><br>当我们谈论 LLM 推理优化时，绕不开一个关键词—— PD 分离 （Prefill Decode Disaggregation）。这篇文章从第一性原理出发，讲清…</li>
-      <li class="post-item"><a href="https://gitpull.cn/post/20260514/"><strong>CPTI：手机上就能玩的恋爱人格小测验</strong></a> <time>2026-05-14</time> <span class="tag">#杂七杂八</span> <span class="tag">#前端</span><br>CPTI 是一个偏手机体验的恋爱向趣味测验：刷题像刷短内容，最后给你「你像谁」和「谁更适合接住你」两套结果，再配一整套恋爱角色卡。本文只聊怎么玩、能玩出什么，不聊实现细节。</li>
-      <li class="post-item"><a href="https://gitpull.cn/post/welcome/"><strong>GitBlog：一个带伪后台的博客站点</strong></a> <time>2026-05-11</time> <span class="tag">#博客建站</span> <span class="tag">#教程</span><br>一个完全静态、托管在 GitHub Pages 上的博客，但带有可以在浏览器里直接写、直接发的&#39;伪后台&#39;。这篇文章记录它能做什么，相比传统方案为什么这样设计，以及如果你也想搭一个，要怎么开始。</li>
-      <li class="post-item"><a href="https://gitpull.cn/post/about/"><strong>关于小红鸡</strong></a> <time>2026-05-11</time> <span class="tag">#杂七杂八</span><br>关于这个博客和写它的人 —— 一名做系统软件的程序员，这些年从图数据库、推荐系统一路走到大模型推理基础设施（KV 缓存 / RDMA 零拷贝 / 分布式存储），业余写点代码、读点书、记点流水账。</li>
-      <li class="post-item"><a href="https://gitpull.cn/post/20260415/"><strong>Smallpond 源码走读：DuckDB × 3FS × Ray 是如何拼成一台分布式数据处理机的</strong></a> <time>2026-04-15</time> <span class="tag">#分布式存储</span> <span class="tag">#AI 基础设施</span><br>Smallpond 是 DeepSeek 开源的轻量级分布式数据处理框架，专为 10 TB 到 PB 量级的 AI / 数据场景设计。它把 DuckDB 的列式向量化执行、3FS 的高带宽存储、Ray 的任务调度三块拼到一起，做成了\&quot;一台</li>
-      <li class="post-item"><a href="https://gitpull.cn/post/20260311/"><strong>3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的</strong></a> <time>2026-03-11</time> <span class="tag">#分布式存储</span> <span class="tag">#AI 基础设施</span><br>DeepSeek 开源的 3FS 在 180 节点集群上实测聚合读取吞吐约 6.6 TiB/s。本文从 FUSE 的性能瓶颈讲起，拆解 3FS 如何通过共享内存、io_uring 风格的环形队列、以及 RDMA 直接传输三层叠加，把数据通路</li>
+<li class="post-item" data-slug="海门回声-黑鬼">
+      <a class="post-content" href="/post/20260618/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">邻家酒肆</span>
+          <span>·</span>
+          <span>3 天前</span>
+          
+        </div>
+        <h3 class="post-title">海门回声 | 黑鬼</h3>
+        <p class="post-summary">黑鬼已经死了好多年了，大概在我上初中还是高中的时候。听大人们说，是在某一年的春节里，二月的天气还很冷，他像往常一样被铁链子拴在家院子前面的小屋子里，有好几天家人忘了给他送饭，便饿死了。也有人说是冻死的。我后来真的见过他——脸发青，像苔藓，不像电视剧里画着黑眼圈的饿汉。</p>
+        <div class="post-meta">
+          <span class="tag tag-colored" style="--tag-bg:#FFF4D8;--tag-text:#936018;--tag-border:#F2D38A;--tag-dark-bg:#382A12;--tag-dark-text:#F4C76F;--tag-dark-border:#735421;">海门回声</span><span class="tag tag-colored" style="--tag-bg:#F0E9FF;--tag-text:#6843B5;--tag-border:#D7C6F6;--tag-dark-bg:#271E3F;--tag-dark-text:#C5B2FF;--tag-dark-border:#55427F;">随想</span>
+        </div>
+      </a>
+      <a href="/post/20260618/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/06/heigui-cover.png" alt="海门回声 | 黑鬼" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+<li class="post-item" data-slug="qq-farm-assistant-经典农场辅助">
+      <a class="post-content" href="/post/20260617/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">Jimmy</span>
+          <span>·</span>
+          <span>5 天前</span>
+          
+        </div>
+        <h3 class="post-title">QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具</h3>
+        <p class="post-summary">一个跑在 Windows 上的 QQ 经典农场（微信小游戏）桌面辅助：用图像识别锁定微信窗口，自动收菜、补种、逛好友农场偷菜，支持虚拟机前台挂机。双击 init.bat 初始化，双击 start.bat 开跑，日志写在 logs/daemon.log。</p>
+        <div class="post-meta">
+          <span class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;">杂七杂八</span>
+        </div>
+      </a>
+      
+    </li>
+<li class="post-item" data-slug="海门回声-一个寂静的生日夜晚">
+      <a class="post-content" href="/post/20260616/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">邻家酒肆</span>
+          <span>·</span>
+          <span>5 天前</span>
+          
+        </div>
+        <h3 class="post-title">海门回声 | 静谧的生日夜晚</h3>
+        <p class="post-summary">二〇〇三年的夏天，海岛入夜后，田埂旁的杂草里蟋蟀叫成一片，晚风从海面方向吹进村子，带着咸腥和青草的气味。村子里的路坑坑洼洼，月光照在上面，一块亮一块暗。父母在外地打工，十二岁的姐姐和六岁的我留在岛上。那天傍晚，姐姐拎回村口小卖部的一红塑料袋饼干，喊伟华哥过来，客厅里没有开电灯……</p>
+        <div class="post-meta">
+          <span class="tag tag-colored" style="--tag-bg:#FFF4D8;--tag-text:#936018;--tag-border:#F2D38A;--tag-dark-bg:#382A12;--tag-dark-text:#F4C76F;--tag-dark-border:#735421;">海门回声</span><span class="tag tag-colored" style="--tag-bg:#F0E9FF;--tag-text:#6843B5;--tag-border:#D7C6F6;--tag-dark-bg:#271E3F;--tag-dark-text:#C5B2FF;--tag-dark-border:#55427F;">随想</span>
+        </div>
+      </a>
+      
+    </li>
+<li class="post-item" data-slug="用-ai-做好软件项目上下文工程实践指南">
+      <a class="post-content" href="/post/20260615/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">兰州小红鸡</span>
+          <span>·</span>
+          <span>7 天前</span>
+          
+        </div>
+        <h3 class="post-title">用 AI 做好软件项目：上下文工程实践指南</h3>
+        <p class="post-summary">在复杂软件项目中引入 AI，常见困境不是模型不够强，而是 每次会话都在重复建立上下文 ——Agent 全量读取大文件、反复追问架构、上一轮的结论无法延续、任务边…</p>
+        <div class="post-meta">
+          <span class="tag tag-colored" style="--tag-bg:#E6FAFA;--tag-text:#167A7F;--tag-border:#B8E7E8;--tag-dark-bg:#123638;--tag-dark-text:#8EE2E5;--tag-dark-border:#2B6E72;">AI 基础设施</span>
+        </div>
+      </a>
+      <a href="/post/20260615/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/06/1781499659393-4hzbpp-image.webp" alt="用 AI 做好软件项目：上下文工程实践指南" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+<li class="post-item" data-slug="peercache-decentralized-rdma-kv-cache">
+      <a class="post-content" href="/post/20260601/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">兰州小红鸡</span>
+          <span>·</span>
+          <span>21 天前</span>
+          
+        </div>
+        <h3 class="post-title">PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端</h3>
+        <p class="post-summary">PeerCache 是我写的一个面向 SGLang HiCache 的 L3 KV 缓存后端：它做的是跨请求、跨节点的 KV 前缀复用，提供和 Mooncake Store 类似的能力，却砍掉了中心化的 master 与 metadata 服务。单卡能吃到裸 ib_read_bw 的 94%，整机 8 卡聚合 413 GB/s。这篇文章讲清楚它的定位、为什么这样设计、双 MR 模型怎么工作，以及实测性能基线。</p>
+        <div class="post-meta">
+          <span class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;">分布式存储</span><span class="tag tag-colored" style="--tag-bg:#E6FAFA;--tag-text:#167A7F;--tag-border:#B8E7E8;--tag-dark-bg:#123638;--tag-dark-text:#8EE2E5;--tag-dark-border:#2B6E72;">AI 基础设施</span><span class="tag tag-colored" style="--tag-bg:#EEF0F3;--tag-text:#4B5563;--tag-border:#D5DAE1;--tag-dark-bg:#252A33;--tag-dark-text:#CBD5E1;--tag-dark-border:#47515F;">项目介绍</span>
+        </div>
+      </a>
+      <a href="/post/20260601/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/06/peercache_scaling_ladder.png" alt="PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+<li class="post-item" data-slug="大模型推理的-pd-分离原理动机与-mooncake-的实现">
+      <a class="post-content" href="/post/20260529/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">兰州小红鸡</span>
+          <span>·</span>
+          <span>24 天前</span>
+          
+        </div>
+        <h3 class="post-title">大模型推理的 PD 分离：原理、动机与 Mooncake 的实现</h3>
+        <p class="post-summary">当我们谈论 LLM 推理优化时，绕不开一个关键词—— PD 分离 （Prefill Decode Disaggregation）。这篇文章从第一性原理出发，讲清…</p>
+        <div class="post-meta">
+          <span class="tag tag-colored" style="--tag-bg:#FCE8F3;--tag-text:#A33B72;--tag-border:#F2B9D8;--tag-dark-bg:#381B2C;--tag-dark-text:#F7A6CE;--tag-dark-border:#753858;">算法</span><span class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;">分布式存储</span>
+        </div>
+      </a>
+      <a href="/post/20260529/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/05/1780025971901-bu285b-image.webp" alt="大模型推理的 PD 分离：原理、动机与 Mooncake 的实现" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+<li class="post-item" data-slug="cpti-love-personality-test-intro">
+      <a class="post-content" href="/post/20260514/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">Jimmy</span>
+          <span>·</span>
+          <span>1 个月前</span>
+          
+        </div>
+        <h3 class="post-title">CPTI：手机上就能玩的恋爱人格小测验</h3>
+        <p class="post-summary">CPTI 是一个偏手机体验的恋爱向趣味测验：刷题像刷短内容，最后给你「你像谁」和「谁更适合接住你」两套结果，再配一整套恋爱角色卡。本文只聊怎么玩、能玩出什么，不聊实现细节。</p>
+        <div class="post-meta">
+          <span class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;">杂七杂八</span><span class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;">前端</span>
+        </div>
+      </a>
+      <a href="/post/20260514/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/05/cptijietu1.png" alt="CPTI：手机上就能玩的恋爱人格小测验" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+<li class="post-item" data-slug="welcome">
+      <a class="post-content" href="/post/welcome/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">Jimmy</span>
+          <span>·</span>
+          <span>1 个月前</span>
+          <span class="post-pin">置顶</span>
+        </div>
+        <h3 class="post-title">GitBlog：一个带伪后台的博客站点</h3>
+        <p class="post-summary">一个完全静态、托管在 GitHub Pages 上的博客，但带有可以在浏览器里直接写、直接发的&#39;伪后台&#39;。这篇文章记录它能做什么，相比传统方案为什么这样设计，以及如果你也想搭一个，要怎么开始。</p>
+        <div class="post-meta">
+          <span class="tag tag-colored" style="--tag-bg:#EEF0F3;--tag-text:#4B5563;--tag-border:#D5DAE1;--tag-dark-bg:#252A33;--tag-dark-text:#CBD5E1;--tag-dark-border:#47515F;">博客建站</span><span class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;">教程</span><span class="tag tag-colored" style="--tag-bg:#EEF0F3;--tag-text:#4B5563;--tag-border:#D5DAE1;--tag-dark-bg:#252A33;--tag-dark-text:#CBD5E1;--tag-dark-border:#47515F;">项目介绍</span>
+        </div>
+      </a>
+      <a href="/post/welcome/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/05/1778490605877-blwjij-image.png" alt="GitBlog：一个带伪后台的博客站点" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+<li class="post-item" data-slug="about">
+      <a class="post-content" href="/post/about/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">Jimmy</span>
+          <span>·</span>
+          <span>1 个月前</span>
+          
+        </div>
+        <h3 class="post-title">关于小红鸡</h3>
+        <p class="post-summary">关于这个博客和写它的人 —— 一名做系统软件的程序员，这些年从图数据库、推荐系统一路走到大模型推理基础设施（KV 缓存 / RDMA 零拷贝 / 分布式存储），业余写点代码、读点书、记点流水账。</p>
+        <div class="post-meta">
+          <span class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;">杂七杂八</span>
+        </div>
+      </a>
+      <a href="/post/about/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/05/1778491021713-cnnps5-1029bg.jpg" alt="关于小红鸡" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+<li class="post-item" data-slug="smallpond-source-walkthrough">
+      <a class="post-content" href="/post/20260415/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">Jimmy</span>
+          <span>·</span>
+          <span>2 个月前</span>
+          
+        </div>
+        <h3 class="post-title">Smallpond 源码走读：DuckDB × 3FS × Ray 是如何拼成一台分布式数据处理机的</h3>
+        <p class="post-summary">Smallpond 是 DeepSeek 开源的轻量级分布式数据处理框架，专为 10 TB 到 PB 量级的 AI / 数据场景设计。它把 DuckDB 的列式向量化执行、3FS 的高带宽存储、Ray 的任务调度三块拼到一起，做成了\&quot;一台机器\&quot;。本文从架构分层、端到端工作流、Parquet 基础到核心源码走读，把这台\&quot;机器\&quot;的工作原理说清楚。</p>
+        <div class="post-meta">
+          <span class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;">分布式存储</span><span class="tag tag-colored" style="--tag-bg:#E6FAFA;--tag-text:#167A7F;--tag-border:#B8E7E8;--tag-dark-bg:#123638;--tag-dark-text:#8EE2E5;--tag-dark-border:#2B6E72;">AI 基础设施</span><span class="tag tag-colored" style="--tag-bg:#F0E9FF;--tag-text:#6843B5;--tag-border:#D7C6F6;--tag-dark-bg:#271E3F;--tag-dark-text:#C5B2FF;--tag-dark-border:#55427F;">python</span>
+        </div>
+      </a>
+      <a href="/post/20260415/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/05/smallpond-cover.webp" alt="Smallpond 源码走读：DuckDB × 3FS × Ray 是如何拼成一台分布式数据处理机的" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+<li class="post-item" data-slug="3fs-usrbio-zero-copy">
+      <a class="post-content" href="/post/20260311/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">Jimmy</span>
+          <span>·</span>
+          <span>3 个月前</span>
+          
+        </div>
+        <h3 class="post-title">3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的</h3>
+        <p class="post-summary">DeepSeek 开源的 3FS 在 180 节点集群上实测聚合读取吞吐约 6.6 TiB/s。本文从 FUSE 的性能瓶颈讲起，拆解 3FS 如何通过共享内存、io_uring 风格的环形队列、以及 RDMA 直接传输三层叠加，把数据通路上的每一次拷贝都抠掉。</p>
+        <div class="post-meta">
+          <span class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;">分布式存储</span><span class="tag tag-colored" style="--tag-bg:#E6FAFA;--tag-text:#167A7F;--tag-border:#B8E7E8;--tag-dark-bg:#123638;--tag-dark-text:#8EE2E5;--tag-dark-border:#2B6E72;">AI 基础设施</span><span class="tag tag-colored" style="--tag-bg:#FFF4D8;--tag-text:#936018;--tag-border:#F2D38A;--tag-dark-bg:#382A12;--tag-dark-text:#F4C76F;--tag-dark-border:#735421;">C++</span>
+        </div>
+      </a>
+      <a href="/post/20260311/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/05/3fs-usrbio-cover.webp" alt="3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+<li class="post-item" data-slug="多维数组的索引方案与内存设计-16000038">
+      <a class="post-content" href="/post/20220313/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">兰州小红鸡</span>
+          <span>·</span>
+          <span>4 年前</span>
+          
+        </div>
+        <h3 class="post-title">多维数组的索引方案与内存设计</h3>
+        <p class="post-summary">多维数组的内存结构 类似ndarray之类的多维数组，实际上是一个连续的内存地址+一种索引方案。我们可以将一个多维数组对象分为两部分，一部分是实际存储数组数据的连续内存段，另一部分…</p>
+        <div class="post-meta">
+          
+        </div>
+      </a>
+      <a href="/post/20220313/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.png" alt="多维数组的索引方案与内存设计" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+<li class="post-item" data-slug="推荐系统——推荐引擎的架构-15996742">
+      <a class="post-content" href="/post/20220312/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">兰州小红鸡</span>
+          <span>·</span>
+          <span>4 年前</span>
+          
+        </div>
+        <h3 class="post-title">推荐系统——推荐引擎的架构</h3>
+        <p class="post-summary">什么是推荐系统 谈推荐系统之前我们先聊一下搜索系统，推荐系统和搜索系统都是为了解决互联网信息过载的问题，互联网信息的数量远超过人类可以逐一浏览的程度，而搜索引擎便是解决这一问题的代…</p>
+        <div class="post-meta">
+          
+        </div>
+      </a>
+      <a href="/post/20220312/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.jpg" alt="推荐系统——推荐引擎的架构" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+<li class="post-item" data-slug="置顶-nebula-graph-图计算数据库-15993772">
+      <a class="post-content" href="/post/20220311/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">兰州小红鸡</span>
+          <span>·</span>
+          <span>4 年前</span>
+          
+        </div>
+        <h3 class="post-title">nebula graph 图计算数据库</h3>
+        <p class="post-summary">更新历史 在学习过程中，本文持续更新 2021 12 13：更新nebula官方介绍 2021 12 14：更新编译与部署方式，总结importer导入方式 2021 12 15：…</p>
+        <div class="post-meta">
+          
+        </div>
+      </a>
+      <a href="/post/20220311/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.png" alt="nebula graph 图计算数据库" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+<li class="post-item" data-slug="nebula代码走读——从Validator到Executor-15988828">
+      <a class="post-content" href="/post/20220310/">
+        <div class="post-author-row">
+          <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.jpg)"></div>
+          <span class="name">兰州小红鸡</span>
+          <span>·</span>
+          <span>4 年前</span>
+          
+        </div>
+        <h3 class="post-title">nebula代码走读——从Validator到Executor</h3>
+        <p class="post-summary">整体架构 Nebula Graph Query Engine 主要分为四个模块，分别是 Parser、Validator、Optimizer 和 Executor。 Parser …</p>
+        <div class="post-meta">
+          <span class="tag tag-colored" style="--tag-bg:#EEF0F3;--tag-text:#4B5563;--tag-border:#D5DAE1;--tag-dark-bg:#252A33;--tag-dark-text:#CBD5E1;--tag-dark-border:#47515F;">图数据库</span>
+        </div>
+      </a>
+      <a href="/post/20220310/" class="post-thumbnail"><img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E" data-src="assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.png" alt="nebula代码走读——从Validator到Executor" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>
+    </li>
+      <li class="load-more-sentinel" id="loadMoreSentinel" aria-hidden="true">
+           <span class="load-more-spinner"></span>
+           <span class="load-more-text">加载更多</span>
+         </li>
     </ul>
     </section>
     <aside class="sidebar">
@@ -72,6 +553,6 @@
   <div id="site-footer"></div>
   <div id="site-overlays"></div>
 
-  <script type="module" src="assets/js/home.js?v=20260521200000"></script>
+  <script type="module" src="assets/js/home.js?v=20260514040000"></script>
 </body>
 </html>
