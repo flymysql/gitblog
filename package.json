@@ -11,7 +11,8 @@
     "normalize": "node scripts/normalize-tags-and-covers.mjs",
     "strip:wechat": "node scripts/strip-wechat.mjs",
     "release": "node scripts/make-release.mjs",
-    "release:push": "node scripts/make-release.mjs --push"
+    "release:push": "node scripts/make-release.mjs --push",
+    "tools:pages": "node scripts/generate-tool-pages.mjs"
   },
   "devDependencies": {
     "cheerio": "^1.0.0",
