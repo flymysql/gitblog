@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, rmSync
 import { join, basename, extname } from 'node:path';
 import sharp from 'sharp';
 import { buildPrerenderedPostHtml } from './prerender-post-html.mjs';
+import { TOOL_HTML_FILES } from './generate-tool-pages.mjs';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
 const cfgRaw = readFileSync('assets/js/config.js', 'utf8');
@@ -716,3 +717,4 @@ function injectHomeSeo() {
   console.log(`index.html 已注入静态 SEO + 首页列表（${latestForHome.length} 篇）`);
 }
 injectHomeSeo();
+console.log(`tool/*.html 已就绪（${TOOL_HTML_FILES.length} 个工具页，含评论区）`);

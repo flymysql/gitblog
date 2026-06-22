@@ -21,7 +21,7 @@ export function notesFeedTerm() {
  * @param {string} term 文章 slug，或随笔聚合用的 notesFeedTerm()
  * @returns {boolean} 是否已注入脚本
  */
-export function mountGiscusScript(targetEl, term) {
+export function mountGiscusScript(targetEl, term, opts = {}) {
   if (!targetEl || !term) return false;
   const g = CONFIG.giscus;
   if (!g || !g.enabled) {
@@ -72,7 +72,7 @@ export function mountGiscusScript(targetEl, term) {
     'data-input-position': g.inputPosition || 'top',
     'data-theme': resolved,
     'data-lang': g.lang || 'zh-CN',
-    'data-loading': 'lazy',
+    'data-loading': opts.loading || 'lazy',
   };
   if (dataTerm) attrs['data-term'] = dataTerm;
   Object.entries(attrs).forEach(([k, v]) => s.setAttribute(k, v));
