@@ -277,6 +277,6 @@ body{padding-top:var(--nav-height)}
 .post-title{font-size:18px;font-weight:700;margin:0 0 8px;line-height:1.5}
 @media(max-width:880px){.layout{grid-template-columns:1fr}.sidebar{display:none}}
 @media(max-width:820px){.nav-links{display:none}}
-@media(max-width:720px){:root{--nav-height:56px}.nav{padding:0 12px}.hero{margin:8px 12px 0}.layout{padding:0 14px}.home-carousel{padding:0 14px}.carousel-viewport{height:180px}.hero-link{padding:4px 12px}}
+@media(max-width:720px){:root{--nav-height:56px;--home-carousel-mobile-h:180px;--home-mobile-tabs-top:var(--nav-height)}body:has(#homeCarousel:not([hidden])){--home-mobile-tabs-top:calc(var(--nav-height) + var(--home-carousel-mobile-h))}.nav{padding:0 12px}.hero{margin:8px 12px 0}.layout{padding:0 14px}.home-carousel{padding:0 14px}.carousel-viewport{height:180px}.hero-link{padding:4px 12px}.tabs{position:sticky;top:var(--home-mobile-tabs-top);z-index:80;background:var(--bg);margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px}}
 </style>`;
 }
