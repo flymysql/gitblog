@@ -764,16 +764,25 @@
 
 .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
 
-.recent-list { list-style: none; }
+.recent-list { list-style: none; margin: 0; padding: 0; }
 .recent-list li {
-  padding: 6px 0;
-  font-size: 13px;
-  color: var(--text-secondary);
+  margin: 0;
+  padding: 0;
+}
+.recent-list li + li {
+  margin-top: 10px;
+}
+.recent-list a {
   display: -webkit-box;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
   -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  text-decoration: none;
+  word-break: break-word;
 }
 .recent-list a:hover { color: var(--primary); }
 
