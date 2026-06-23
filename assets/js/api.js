@@ -174,7 +174,11 @@ function publicAssetFetchUrl(relPath) {
   return `./${String(relPath || '').replace(/^\//, '')}`;
 }
 
-function cacheBust(url) {
+function cacheBust(url, opts = {}) {
+  const useVersion = opts.version && CONFIG.VERSION;
+  if (useVersion) {
+    return `${url}${String(url).includes('?') ? '&' : '?'}v=${encodeURIComponent(CONFIG.VERSION)}`;
+  }
   return `${url}${String(url).includes('?') ? '&' : '?'}t=${Date.now()}`;
 }
 
@@ -194,7 +198,7 @@ export async function fetchStaticJson(relPath, ms = 15000) {
   const base = publicAssetFetchUrl(rel);
   const tryOnce = async () => {
     try {
-      const res = await fetchWithTimeout(cacheBust(base), { cache: 'no-cache' }, ms);
+      const res = await fetchWithTimeout(cacheBust(base, { version: true }), { cache: 'default' }, ms);
       if (!res || !res.ok) return null;
       return await res.json();
     } catch {
