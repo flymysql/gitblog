@@ -14,6 +14,7 @@ import {
   buildCriticalHomeCss,
   postHrefFromEntry,
 } from './home-shell-html.mjs';
+import { bundleAssets } from './bundle-assets.mjs';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
 const cfgRaw = readFileSync('assets/js/config.js', 'utf8');
@@ -544,6 +545,7 @@ function postShellRootHref(relPath) {
 function rewritePostShellHtml(html) {
   const a = postShellRootHref('assets');
   return html
+    .replace(/\n?\s*<script data-post-slug-redirect>[\s\S]*?<\/script>/g, '')
     .replace(/\bhref="assets\//g, `href="${a}/`)
     .replace(/\bsrc="assets\//g, `src="${a}/`)
     .replace(/\bhref="manifest\.webmanifest"/g, `href="${postShellRootHref('manifest.webmanifest')}"`)
@@ -798,4 +800,5 @@ function injectHomeSeo() {
   console.log(`index.html 已注入首屏壳层 + SEO + 首页列表（${latestForHome.length} 篇）`);
 }
 injectHomeSeo();
+await bundleAssets();
 console.log(`tool/*.html 已就绪（${TOOL_HTML_FILES.length} 个工具页，含评论区）`);
