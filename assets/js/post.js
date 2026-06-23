@@ -11,7 +11,7 @@ import { initPageviews, bszPagePvHtml, trackAndRenderArticleView } from './pagev
 import { setMeta, setJsonLd } from './seo.js';
 import { enhanceMath, enhanceMermaid, enhanceCodeAdvanced } from './enhancers.js';
 import { shareCardHtml, bindShareCard } from './share.js';
-import { mountGiscusScript } from './giscus-embed.js';
+import { giscusTermForPost, mountGiscusScript } from './giscus-embed.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -87,7 +87,7 @@ function renderToc(items) {
   });
 }
 
-function renderGiscus(slug) {
+function renderGiscus(meta, slug) {
   const g = CONFIG.giscus;
   if (!g || !g.enabled) return;
   const article = $('#article');
@@ -95,8 +95,9 @@ function renderGiscus(slug) {
   wrap.className = 'comments';
   article.appendChild(wrap);
 
+  const term = giscusTermForPost({ slug, urlKey: meta && meta.urlKey });
   wrap.innerHTML = `<div class="comments-title">评论</div><div id="giscusBox"></div>`;
-  mountGiscusScript($('#giscusBox'), slug);
+  mountGiscusScript($('#giscusBox'), term);
 }
 
 // ---------- 阅读进度条 ----------
@@ -426,7 +427,7 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
 
   renderSeriesIndex(allPosts, slug, (meta && meta.series) || (data && data.series));
   renderNeighborsAndRelated(allPosts, slug, tags);
-  renderGiscus(slug);
+  renderGiscus(meta, slug);
 
   initPageviews();
   trackAndRenderArticleView(slug);
@@ -525,7 +526,7 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
     const tags = (meta && meta.tags) || [];
     renderSeriesIndex(allPosts, slug, (meta && meta.series) || '');
     renderNeighborsAndRelated(allPosts, slug, tags);
-    renderGiscus(slug);
+    renderGiscus(meta, slug);
     initPageviews();
     trackAndRenderArticleView(slug);
     return;
