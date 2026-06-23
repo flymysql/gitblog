@@ -27,6 +27,7 @@ const JS_ENTRIES = {
   'tool-qrcode.min.js': 'assets/js/tool-qrcode.js',
   'tool-image.min.js': 'assets/js/tool-image.js',
   'tool-network.min.js': 'assets/js/tool-network.js',
+  'tool-farm-seed.min.js': 'assets/js/tool-farm-seed.js',
 };
 
 const CSS_ENTRIES = {
