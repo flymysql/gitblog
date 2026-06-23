@@ -192,23 +192,41 @@ async function fetchWithTimeout(url, options = {}, ms = 15000) {
   }
 }
 
-/** 拉取 build 生成的 JSON（绝对 URL + 超时；失败时静默重试一次） */
+/** 拉取 build 生成的 JSON（绝对 URL + 超时；失败时静默重试一次；同页去重） */
+const staticJsonInflight = new Map();
+
 export async function fetchStaticJson(relPath, ms = 15000) {
   const rel = String(relPath || '').replace(/^\//, '');
-  const base = publicAssetFetchUrl(rel);
-  const tryOnce = async () => {
-    try {
-      const res = await fetchWithTimeout(cacheBust(base, { version: true }), { cache: 'default' }, ms);
-      if (!res || !res.ok) return null;
-      return await res.json();
-    } catch {
-      return null;
-    }
-  };
-  let j = await tryOnce();
-  if (j) return j;
-  j = await tryOnce();
+  const cacheKey = `${rel}::v=${CONFIG.VERSION || ''}`;
+  if (staticJsonInflight.has(cacheKey)) {
+    return staticJsonInflight.get(cacheKey);
+  }
+
+  const promise = (async () => {
+    const base = publicAssetFetchUrl(rel);
+    const tryOnce = async () => {
+      try {
+        const res = await fetchWithTimeout(cacheBust(base, { version: true }), { cache: 'default' }, ms);
+        if (!res || !res.ok) return null;
+        return await res.json();
+      } catch {
+        return null;
+      }
+    };
+    let j = await tryOnce();
+    if (j) return j;
+    j = await tryOnce();
+    return j;
+  })();
+
+  staticJsonInflight.set(cacheKey, promise);
+  const j = await promise;
+  if (!j) staticJsonInflight.delete(cacheKey);
   return j;
+}
+
+export function clearStaticJsonCache() {
+  staticJsonInflight.clear();
 }
 
 // ---------- 文章索引 ----------
