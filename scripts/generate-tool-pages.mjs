@@ -257,6 +257,49 @@ const PAGES = [
         </dl>
       </section>`,
   },
+  {
+    file: 'tools/tool-farm-seed.html',
+    title: '经典农场 · 种子选择助手',
+    description: '根据等级与上线习惯，推荐 QQ 经典农场种什么最划算。公开攻略数据，浏览器本地计算。',
+    eyebrow: 'QQ Classic Farm',
+    h1: '种子选择助手',
+    lead: '选好种子，少踩坑。根据你的等级、土地与上线间隔，算出更合适的种植推荐。',
+    script: 'tool-farm-seed.js',
+    commentsHint: '作物数值有误？欢迎纠错或补充新种子～',
+    body: `
+      <section class="tool-kit-panel is-active farm-seed-page">
+        <div class="farm-sky-deco" aria-hidden="true">
+          <span class="farm-cloud c1"></span>
+          <span class="farm-cloud c2"></span>
+          <span class="farm-hill"></span>
+        </div>
+        <p class="farm-data-note" id="farmDataNote"></p>
+        <div class="farm-goals" id="farmGoals" role="group" aria-label="种植目标"></div>
+        <div class="farm-controls">
+          <label>我的等级 <input type="number" id="farmLevel" min="0" max="99" value="10"></label>
+          <label>最长间隔（小时） <input type="number" id="farmInterval" min="1" max="72" step="0.5" value="8"></label>
+          <label>土地类型
+            <select id="farmLand">
+              <option value="all">全部土地</option>
+              <option value="normal">普通土地</option>
+              <option value="red">红土地</option>
+              <option value="black">黑土地</option>
+              <option value="gold">金土地</option>
+            </select>
+          </label>
+          <label class="farm-check"><input type="checkbox" id="farmLevelOnly" checked> 只显示当前等级能种的</label>
+        </div>
+        <article class="farm-top-pick" id="farmTopPick" hidden></article>
+        <p class="farm-result-desc" id="farmResultDesc"></p>
+        <ul class="farm-crop-list" id="farmCropList" aria-label="作物排行"></ul>
+        <section class="farm-compare" id="farmCompare" hidden>
+          <h3>作物对比</h3>
+          <div class="farm-compare-grid" id="farmCompareGrid"></div>
+        </section>
+        <p class="tool-kit-status" id="farmStatus"></p>
+        <p class="farm-sources" id="farmSources"></p>
+      </section>`,
+  },
 ];
 
 for (const p of PAGES) {
@@ -302,6 +345,7 @@ writeFileSync(`${TOOLS_DIR}/index.html`, `<!DOCTYPE html>
       <a class="tool-card" href="tool-qrcode.html"><span class="tool-icon" aria-hidden="true">▣</span><span class="tool-meta"><strong>二维码生成</strong><em>文本或链接生成 PNG，可下载。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card" href="tool-image.html"><span class="tool-icon" aria-hidden="true">🖼</span><span class="tool-meta"><strong>图片压缩 / WebP</strong><em>本地压缩，输出 WebP、JPEG 或 PNG。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card" href="tool-network.html"><span class="tool-icon" aria-hidden="true">🌐</span><span class="tool-meta"><strong>网络与浏览器信息</strong><em>公网 IP、运营商、UA 与屏幕信息。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
+      <a class="tool-card featured" href="tool-farm-seed.html"><span class="tool-icon" aria-hidden="true">🌾</span><span class="tool-meta"><strong>经典农场 · 种子助手</strong><em>按等级与上线习惯推荐种什么，公开攻略数据。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card featured" href="tool-air-conditioner.html"><span class="tool-icon" aria-hidden="true">❄</span><span class="tool-meta"><strong>在线小空调</strong><em>开关、温度、风速、摆风、白噪音，一键清凉。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card featured" href="https://cpti.cc/" target="_blank" rel="noopener noreferrer"><span class="tool-icon icon-heart" aria-hidden="true">♥</span><span class="tool-meta"><strong>恋爱人格测试</strong><em>从相处方式到喜欢的瞬间，看看你在亲密关系里是哪种人。</em></span><span class="tool-arrow" aria-hidden="true">↗</span></a>
     </section>
