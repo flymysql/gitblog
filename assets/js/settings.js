@@ -168,6 +168,18 @@ function normalizeConfig(config) {
   config.theme.tokens = config.theme.tokens && typeof config.theme.tokens === 'object' ? config.theme.tokens : {};
   config.theme.customCss = String(config.theme.customCss || '');
   config.analytics = config.analytics || { enabled: false, snippet: '' };
+  config.seo = config.seo || {};
+  config.seo.indexNow = config.seo.indexNow || { enabled: false, key: '', pushOnBuild: true };
+  config.seo.baiduPush = config.seo.baiduPush || { enabled: false, site: '', token: '' };
+  config.seo.baiduSiteVerification = String(config.seo.baiduSiteVerification || '').trim();
+  config.seo.googleSiteVerification = String(config.seo.googleSiteVerification || '').trim();
+  config.seo.bingSiteVerification = String(config.seo.bingSiteVerification || '').trim();
+  config.seo.indexNow.enabled = !!config.seo.indexNow.enabled;
+  config.seo.indexNow.key = String(config.seo.indexNow.key || '').trim();
+  config.seo.indexNow.pushOnBuild = config.seo.indexNow.pushOnBuild !== false;
+  config.seo.baiduPush.enabled = !!config.seo.baiduPush.enabled;
+  config.seo.baiduPush.site = String(config.seo.baiduPush.site || '').trim();
+  config.seo.baiduPush.token = String(config.seo.baiduPush.token || '').trim();
   config.pageviews = config.pageviews || { enabled: true, showHomeStats: true, showPostViews: true, showFooterStats: true };
   config.pageviews.saobby = config.pageviews.saobby || { site: { img: '', dashboard: '', label: '' }, extra: [] };
   config.pageviews.saobby.site = config.pageviews.saobby.site || { img: '', dashboard: '', label: '' };
@@ -601,6 +613,33 @@ function settingsContentHtml() {
           </label>
           <label>最大宽度（像素） <input type="number" name="upload.maxWidth" min="320" step="10">
             <span class="settings-hint">超过该宽度会自动缩放，保留比例。1920 适合大屏阅读。</span>
+          </label>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <h3>SEO / 收录推送</h3>
+        <p class="settings-help">站长验证 meta 会注入首页 HTML；IndexNow 可自动通知 Bing/Yandex；百度推送需先在 <a href="https://ziyuan.baidu.com/linksubmit/index" target="_blank" rel="noopener">百度搜索资源平台</a> 获取 token。Google / 搜狗 / 360 仍需在各自站长平台验证并提交 sitemap。</p>
+        <div class="settings-grid">
+          <label class="span-2">百度站长验证码
+            <input name="seo.baiduSiteVerification" placeholder="baidu-site-verification 的 content 值">
+          </label>
+          <label class="span-2">Google Search Console 验证码
+            <input name="seo.googleSiteVerification" placeholder="google-site-verification 的 content 值">
+          </label>
+          <label class="span-2">Bing Webmaster 验证码
+            <input name="seo.bingSiteVerification" placeholder="msvalidate.01 的 content 值">
+          </label>
+          <label class="settings-check"><input type="checkbox" name="seo.indexNow.enabled"> 启用 IndexNow 推送</label>
+          <label class="span-2">IndexNow Key
+            <input name="seo.indexNow.key" placeholder="8–128 位字母数字，build 会生成 {key}.txt 到站点根目录">
+            <span class="settings-hint">在 <a href="https://www.bing.com/indexnow" target="_blank" rel="noopener">Bing IndexNow</a> 查看说明。留空时 build 会生成临时 key 并提示写入配置。</span>
+          </label>
+          <label class="settings-check"><input type="checkbox" name="seo.indexNow.pushOnBuild"> build 完成后自动推送（最近 URL）</label>
+          <label class="settings-check"><input type="checkbox" name="seo.baiduPush.enabled"> 启用百度普通收录 API</label>
+          <label>百度 site 域名 <input name="seo.baiduPush.site" placeholder="gitpull.cn（留空用 site.url 域名）"></label>
+          <label class="span-2">百度推送 token
+            <input name="seo.baiduPush.token" placeholder="在百度搜索资源平台 → 普通收录 → API 提交 获取">
           </label>
         </div>
       </section>

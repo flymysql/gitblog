@@ -15,6 +15,15 @@ import {
   postHrefFromEntry,
 } from './home-shell-html.mjs';
 import { bundleAssets } from './bundle-assets.mjs';
+import {
+  parseSeoFromConfig,
+  buildVerificationMetaHtml,
+  buildWebsiteJsonLd,
+  ensureIndexNowKeyFile,
+  pushIndexNow,
+  pushBaiduUrls,
+  collectPublicUrls,
+} from './seo-build.mjs';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
 const cfgRaw = readFileSync('assets/js/config.js', 'utf8');
@@ -661,10 +670,13 @@ function injectHomeSeo() {
   const homeUrl = baseUrl + '/';
   const homeTitle = SITE_SUBTITLE ? `${SITE_TITLE} · ${SITE_SUBTITLE}` : SITE_TITLE;
   const ogImage = SITE_AVATAR || SITE_LOGO || '';
+  const seo = parseSeoFromConfig(cfgRaw);
+  const verifyMeta = buildVerificationMetaHtml(seo);
   const homeMeta = [
     `<meta name="description" content="${xmlEsc(SITE_DESC || SITE_SUBTITLE || SITE_TITLE)}">`,
     `<meta name="author" content="${xmlEsc(SITE_AUTHOR)}">`,
     `<meta name="robots" content="index, follow">`,
+    verifyMeta,
     `<meta property="og:title" content="${xmlEsc(SITE_TITLE)}">`,
     `<meta property="og:description" content="${xmlEsc(SITE_DESC || SITE_SUBTITLE || '')}">`,
     ogImage ? `<meta property="og:image" content="${xmlEsc(ogImage)}">` : '',
@@ -678,14 +690,14 @@ function injectHomeSeo() {
     ogImage ? `<meta name="twitter:image" content="${xmlEsc(ogImage)}">` : '',
     `<link rel="canonical" href="${xmlEsc(homeUrl)}">`,
   ].filter(Boolean).join('\n  ');
-  const websiteLd = stripUndefinedBuild({
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: SITE_TITLE,
-    description: SITE_DESC,
-    url: homeUrl,
-    inLanguage: SITE_LOCALE,
-    publisher: { '@type': 'Organization', name: SITE_TITLE, logo: SITE_LOGO || undefined },
+  const websiteLd = buildWebsiteJsonLd({
+    siteTitle: SITE_TITLE,
+    siteDesc: SITE_DESC,
+    homeUrl,
+    siteLocale: SITE_LOCALE,
+    siteAuthor: SITE_AUTHOR,
+    siteLogo: SITE_LOGO,
+    siteAvatar: SITE_AVATAR,
   });
   const orgLd = stripUndefinedBuild({
     '@context': 'https://schema.org',
@@ -802,3 +814,44 @@ function injectHomeSeo() {
 injectHomeSeo();
 await bundleAssets();
 console.log(`tool/*.html 已就绪（${TOOL_HTML_FILES.length} 个工具页，含评论区）`);
+
+async function pushSeoOnBuild() {
+  const seo = parseSeoFromConfig(cfgRaw);
+  if (!SITE_URL) return;
+  let host;
+  try { host = new URL(`${SITE_URL}/`).hostname; } catch { return; }
+
+  if (seo.indexNowEnabled) {
+    ensureIndexNowKeyFile(seo, SITE_URL);
+  }
+
+  if (!seo.indexNowEnabled && !seo.baiduPushEnabled) return;
+  if (seo.indexNowEnabled && !seo.indexNowPushOnBuild) {
+    console.log('IndexNow pushOnBuild=false，跳过自动推送（可运行 npm run seo:push）');
+    if (!seo.baiduPushEnabled) return;
+  }
+
+  const toolPaths = TOOL_HTML_FILES.map(f => `tools/${f}`);
+  const urlList = collectPublicUrls({ baseUrl: SITE_URL, visiblePosts, toolPaths });
+
+  if (seo.indexNowEnabled && seo.indexNowPushOnBuild) {
+    const key = String(seo.indexNowKey || '').trim();
+    if (!key) {
+      console.warn('[seo] IndexNow 已启用但缺少 key，请先在后台 SEO 设置中填写或运行 build 查看生成的 key 文件');
+    } else {
+      const keyLocation = `${SITE_URL.replace(/\/$/, '')}/${key}.txt`;
+      const result = await pushIndexNow({ host, key, keyLocation, urlList: urlList.slice(0, 100) });
+      if (result.ok) console.log(`IndexNow 自动推送：${Math.min(urlList.length, 100)} 个 URL`);
+      else console.warn('IndexNow 自动推送未成功，可稍后运行 npm run seo:push');
+    }
+  }
+
+  if (seo.baiduPushEnabled && seo.baiduPushToken) {
+    const site = String(seo.baiduPushSite || host).trim();
+    const result = await pushBaiduUrls({ site, token: seo.baiduPushToken, urlList: urlList.slice(0, 20) });
+    if (result.ok) console.log('百度普通收录 API：已提交最近 URL');
+    else console.warn('百度普通收录 API 未成功：', result.body || result.error);
+  }
+}
+
+await pushSeoOnBuild();

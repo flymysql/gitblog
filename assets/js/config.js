@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260616190000';
+export const VERSION = '20260616200000';
 
 export const CONFIG = {
   repo: {
@@ -76,6 +76,21 @@ export const CONFIG = {
   analytics: {
     enabled: false,
     snippet: ""
+  },
+  seo: {
+    baiduSiteVerification: "",
+    googleSiteVerification: "",
+    bingSiteVerification: "",
+    indexNow: {
+      enabled: false,
+      key: "",
+      pushOnBuild: true
+    },
+    baiduPush: {
+      enabled: false,
+      site: "",
+      token: ""
+    }
   },
   pageviews: {
     enabled: true,
