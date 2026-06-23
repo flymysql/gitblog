@@ -38,8 +38,10 @@ body{padding-top:var(--nav-height)}
 .post-title{font-size:18px;font-weight:700;margin:0 0 8px;line-height:1.5}
 @media(max-width:880px){.layout{grid-template-columns:1fr}.sidebar{display:none}}
 @media(max-width:820px){.nav-links{display:none}}
-@media(max-width:720px){:root{--nav-height:56px}.nav{padding:0 12px}.hero{margin:8px 12px 0}.layout{padding:0 14px}.home-carousel{padding:0 14px}.carousel-viewport{height:180px}.hero-link{padding:4px 12px}}
+@media(max-width:720px){:root{--nav-height:56px;--home-carousel-mobile-h:180px;--home-mobile-tabs-top:var(--nav-height)}body:has(#homeCarousel:not([hidden])){--home-mobile-tabs-top:calc(var(--nav-height) + var(--home-carousel-mobile-h))}.nav{padding:0 12px}.hero{margin:8px 12px 0}.layout{padding:0 14px}.home-carousel{padding:0 14px}.carousel-viewport{height:180px}.hero-link{padding:4px 12px}.tabs{position:sticky;top:var(--home-mobile-tabs-top);z-index:80;background:var(--bg);margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px}}
 </style>
+  <link rel="preload" href="assets/dist/common.min.css?v=20260616240000" as="style">
+  <link rel="preload" href="assets/dist/home.min.css?v=20260616240000" as="style">
   <link rel="preload" href="assets/dist/common.min.css?v=20260616230000" as="style">
   <link rel="preload" href="assets/dist/home.min.css?v=20260616230000" as="style">
   <link rel="preload" href="assets/dist/common.min.css?v=20260616220000" as="style">
@@ -312,7 +314,7 @@ body{padding-top:var(--nav-height)}
           <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.webp)"></div>
           <span class="name">Jimmy</span>
           <span>·</span>
-          <span>5 天前</span>
+          <span>6 天前</span>
           
         </div>
         <h3 class="post-title">QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具</h3>
