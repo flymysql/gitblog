@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260616200000';
+export const VERSION = '20260616210000';
 
 export const CONFIG = {
   repo: {
@@ -82,14 +82,14 @@ export const CONFIG = {
     googleSiteVerification: "",
     bingSiteVerification: "",
     indexNow: {
-      enabled: false,
-      key: "",
+      enabled: true,
+      key: "4cd0a29d6359468ca640b007fb224b3d",
       pushOnBuild: true
     },
     baiduPush: {
-      enabled: false,
-      site: "",
-      token: ""
+      enabled: true,
+      site: "gitpull.cn",
+      token: "4IZFcuY6POlfl96M"
     }
   },
   pageviews: {
