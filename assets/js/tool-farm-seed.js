@@ -24,8 +24,8 @@ let compareIds = new Set();
 let activeGoal = 'xp';
 
 initToolPage({
-  title: '经典农场 · 种子选择助手',
-  description: '根据等级与上线习惯，推荐 QQ 经典农场种什么最划算。公开攻略数据，浏览器本地计算。',
+  title: '微信农场 · 种子选择助手',
+  description: '根据等级与上线习惯，推荐微信农场小程序种什么更划算。数据来自游戏内种子商店配置，浏览器本地计算。',
   path: 'tools/tool-farm-seed.html',
   commentsHint: '作物数值有误？欢迎纠错或补充新种子～',
 });
@@ -56,11 +56,17 @@ function readInputs() {
 
 function formatHours(h) {
   const hours = Number(h) || 0;
+  if (hours < 1 / 60) return `${Math.round(hours * 3600)} 秒`;
   if (hours < 1) return `${Math.round(hours * 60)} 分钟`;
   if (hours < 24) return `${hours % 1 ? hours.toFixed(1) : hours} 小时`;
   const d = Math.floor(hours / 24);
   const r = hours % 24;
   return r ? `${d} 天 ${r % 1 ? r.toFixed(1) : r} 小时` : `${d} 天`;
+}
+
+function cropTimeLabel(crop) {
+  const base = crop.growTimeLabel || formatHours(crop.growHours);
+  return crop.seasons > 1 ? `${base} · ${crop.seasons}季` : base;
 }
 
 function easeScore(crop, intervalH) {
@@ -93,9 +99,9 @@ function buildReason(crop, ctx, scores) {
   const parts = [];
   if (w.xp >= 0.5) parts.push(`经验 ${crop.xpPerHour}/时`);
   if (w.gold >= 0.5) parts.push(`利润 ${crop.profitPerHour} 金/时`);
-  if (w.ease >= 0.5) parts.push(`成熟 ${formatHours(crop.growHours)}，适合你的上线间隔`);
+  if (w.ease >= 0.5) parts.push(`成熟 ${cropTimeLabel(crop)}，适合你的上线间隔`);
   const rounds = Math.floor((ctx.intervalH * 60) / (crop.growHours * 60));
-  if (rounds < 1) return { text: `成熟需 ${formatHours(crop.growHours)}，超过你设置的 ${ctx.intervalH} 小时间隔，容易烂菜。`, warn: true };
+  if (rounds < 1) return { text: `成熟需 ${cropTimeLabel(crop)}，超过你设置的 ${ctx.intervalH} 小时间隔，容易烂菜。`, warn: true };
   if (rounds >= 1 && w.ease >= 0.4) parts.push(`每 ${ctx.intervalH} 小时可收 ${rounds} 轮`);
   if (crop.profitNote) parts.push(crop.profitNote);
   const land = LAND_STYLE[crop.land]?.label || crop.land;
@@ -159,8 +165,7 @@ function renderTopPick(top, ctx) {
         <p class="farm-pick-meta">
           <span class="farm-land-tag ${land.class}">${escapeHtml(land.label)}</span>
           <span>${top.minLevel} 级</span>
-          <span>成熟 ${formatHours(top.growHours)}</span>
-          ${top.seasons > 1 ? `<span>${top.seasons} 季</span>` : ''}
+          <span>成熟 ${cropTimeLabel(top)}</span>
         </p>
         <p class="farm-pick-reason${top.reason.warn ? ' is-warn' : ''}">${escapeHtml(top.reason.text)}</p>
         <div class="farm-pick-stats">
@@ -180,7 +185,7 @@ function renderTopPick(top, ctx) {
 }
 
 function copyRecommendation(crop) {
-  const text = `【经典农场】推荐种：${crop.name}\n成熟 ${formatHours(crop.growHours)} · ${crop.profitPerHour} 金/时 · ${crop.xpPerHour} 经验/时\n${crop.reason.text}`;
+  const text = `【微信农场】推荐种：${crop.name}\n成熟 ${cropTimeLabel(crop)} · ${crop.profitPerHour} 金/时 · ${crop.xpPerHour} 经验/时\n${crop.reason.text}`;
   copyText(text).then(() => setStatus($('farmStatus'), '已复制到剪贴板', true));
 }
 
@@ -213,7 +218,7 @@ function renderList(ranked) {
             <span class="farm-rank">#${i + 1}</span>
             <span class="farm-land-tag ${land.class}">${escapeHtml(land.label)}</span>
           </div>
-          <p class="farm-crop-sub">${c.minLevel} 级 · ${formatHours(c.growHours)}${c.seasons > 1 ? ` · ${c.seasons}季` : ''} · 种子 ${c.seedCost || '免费'}</p>
+          <p class="farm-crop-sub">${c.minLevel} 级 · ${cropTimeLabel(c)} · 种子 ${c.seedCost || '免费'}</p>
           <div class="farm-crop-bars">
             <span title="金币/时"><i style="width:${Math.round(c.scores.goldN * 100)}%"></i></span>
             <span title="经验/时"><i style="width:${Math.round(c.scores.xpN * 100)}%"></i></span>
@@ -251,7 +256,7 @@ function renderCompare(ranked) {
       <dl>
         <div><dt>金币/时</dt><dd><span class="farm-meter"><i style="width:${Math.round((c.profitPerHour / maxGold) * 100)}%"></i></span>${c.profitPerHour}</dd></div>
         <div><dt>经验/时</dt><dd><span class="farm-meter"><i style="width:${Math.round((c.xpPerHour / maxXp) * 100)}%"></i></span>${c.xpPerHour}</dd></div>
-        <div><dt>成熟</dt><dd>${formatHours(c.growHours)}</dd></div>
+        <div><dt>成熟</dt><dd>${cropTimeLabel(c)}</dd></div>
         <div><dt>土地</dt><dd>${escapeHtml(LAND_STYLE[c.land]?.label || c.land)}</dd></div>
       </dl>
     </article>
