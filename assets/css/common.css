@@ -242,10 +242,16 @@ html, body {
   text-size-adjust: 100%;
 }
 html, body {
-  /* hidden 兜底（iOS 14- 不支持 clip），clip 给现代浏览器（不破坏 position: sticky） */
+  /* hidden 兜底（iOS 14- 不支持 clip）；clip 仅放 html，避免 body 上 overflow 破坏 sticky/fixed 导航 */
+  max-width: 100vw;
+}
+html {
   overflow-x: hidden;
   overflow-x: clip;
-  max-width: 100vw;
+}
+
+body:not(.admin-page):not(.editor-page) {
+  padding-top: var(--nav-height);
 }
 
 /* 图片懒加载占位：未注入真实 src 时显示浅灰底，避免空白闪烁与布局抖动 */
@@ -280,15 +286,16 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
 
 /* ---------- 顶部导航 ---------- */
 #site-nav {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 100;
 }
 
 .nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  position: relative;
   height: var(--nav-height);
   background: var(--nav-bg, rgba(255, 255, 255, 0.85));
   backdrop-filter: saturate(180%) blur(12px);
