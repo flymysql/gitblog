@@ -548,7 +548,10 @@ function buildHomeList({ allPosts, tab, q, tag }) {
     },
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${CONFIG.site.url || window.location.origin}/?q={search_term_string}`,
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${(CONFIG.site.url || window.location.origin).replace(/\/$/, '')}/?q={search_term_string}`,
+      },
       'query-input': 'required name=search_term_string',
     },
   });

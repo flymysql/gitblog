@@ -484,15 +484,25 @@ function bindSearchOverlay() {
   const warmIndex = () => { getSearchIndex(); };
   $('#searchBtn').addEventListener('click', warmIndex);
 
+  const runSearch = async (q) => {
+    const [posts, docs] = await Promise.all([getAllPosts(), getSearchIndex()]);
+    renderResults(searchPosts(posts, q, docs), q);
+  };
+
   let timer = null;
   input.addEventListener('input', () => {
     clearTimeout(timer);
     timer = setTimeout(async () => {
-      const q = input.value.trim();
-      const [posts, docs] = await Promise.all([getAllPosts(), getSearchIndex()]);
-      renderResults(searchPosts(posts, q, docs), q);
+      await runSearch(input.value.trim());
     }, 80);
   });
+
+  const urlQ = new URLSearchParams(window.location.search).get('q');
+  if (urlQ && urlQ.trim()) {
+    open();
+    input.value = urlQ.trim();
+    runSearch(urlQ.trim());
+  }
 }
 
 function bindNavDrawer() {
