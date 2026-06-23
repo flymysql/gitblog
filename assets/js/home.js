@@ -366,6 +366,8 @@ function postItemHtml(p, author, avatar) {
 // 懒加载状态：每次切 tab/筛选都会被替换
 let listState = null;
 let mobileHomeStickySync = null;
+/** 首屏预渲染列表仅允许复用一次（切 tab 后必须重绘） */
+let homePrerenderConsumed = false;
 
 function renderList(posts, tab = 'latest') {
   const ul = $('#postList');
@@ -433,6 +435,14 @@ function renderList(posts, tab = 'latest') {
   mobileHomeStickySync?.();
 }
 
+function prerenderListMatches(ul, posts) {
+  const items = [...ul.querySelectorAll('li.post-item')];
+  if (!items.length) return false;
+  const slugs = items.map(li => li.dataset.slug);
+  const expected = posts.slice(0, slugs.length).map(p => p.slug);
+  return slugs.length === expected.length && slugs.every((s, i) => s === expected[i]);
+}
+
 /** 保留 build 预渲染的首页列表 DOM，只绑定懒加载与无限滚动 */
 function bindPrerenderedPostList(posts) {
   const ul = $('#postList');
@@ -441,6 +451,7 @@ function bindPrerenderedPostList(posts) {
 
   const existing = ul.querySelectorAll('li.post-item');
   if (!existing.length) return false;
+  if (!prerenderListMatches(ul, posts)) return false;
 
   const author = CONFIG.site.author;
   const avatar = CONFIG.site.avatar;
@@ -768,7 +779,9 @@ function bindMobileHomeSticky() {
     } else {
       ul.classList.remove('post-list--giscus');
       const filtered = buildHomeList({ allPosts, tab, q: '', tag: activeTag });
-      const reused = tab === 'latest' && !activeTag && bindPrerenderedPostList(filtered);
+      const canReusePrerender = tab === 'latest' && !activeTag && !homePrerenderConsumed;
+      const reused = canReusePrerender && bindPrerenderedPostList(filtered);
+      if (reused) homePrerenderConsumed = true;
       if (!reused) renderList(filtered, tab);
     }
 
