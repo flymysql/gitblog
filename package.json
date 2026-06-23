@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "seo:push": "node scripts/push-search-engines.mjs",
     "build:thumbs": "node scripts/build-thumbnails.mjs",
     "compress:uploads": "node scripts/compress-uploads.mjs",
     "bundle": "node scripts/bundle-assets.mjs",
