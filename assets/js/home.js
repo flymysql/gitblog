@@ -29,14 +29,13 @@ function scheduleRestoreHomeScroll(y) {
   setTimeout(apply, 320);
 }
 
-/** 首页首屏就绪后：空闲时 prefetch 主要 HTML + posts.json，再解析各页 HTML 做 preload / modulepreload（与页面内 ?v= 自动对齐） */
+/** 首页首屏就绪后：空闲时 prefetch 常用页面与 posts.json（轻量，避免首屏争抢带宽） */
 function schedulePrefetchOtherPages() {
   if (typeof document === 'undefined' || !document.head) return;
   if (navigator.connection && navigator.connection.saveData) return;
 
   const basePage = window.location.href;
   const prefetched = new Set();
-  const preloaded = new Set();
 
   function toAbs(href, base = basePage) {
     if (!href) return '';
@@ -59,67 +58,17 @@ function schedulePrefetchOtherPages() {
     document.head.appendChild(link);
   }
 
-  function addPreloadStyle(href) {
-    const abs = toAbs(href);
-    if (!abs || preloaded.has(abs)) return;
-    if ([...document.querySelectorAll('link[rel~="stylesheet"]')].some(l => l.href === abs)) return;
-    preloaded.add(abs);
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.href = abs;
-    link.as = 'style';
-    document.head.appendChild(link);
-  }
-
-  function addModulePreload(href) {
-    const abs = toAbs(href);
-    if (!abs || preloaded.has(abs)) return;
-    if ([...document.querySelectorAll('script[type="module"]')].some(s => s.src === abs)) return;
-    preloaded.add(abs);
-    const link = document.createElement('link');
-    link.rel = 'modulepreload';
-    link.href = abs;
-    document.head.appendChild(link);
-  }
-
-  async function preloadSubresourcesFromPageHtml(pathRel) {
-    const pageUrl = toAbs(rootPath(pathRel));
-    if (!pageUrl) return;
-    try {
-      const res = await fetch(pageUrl, { credentials: 'same-origin' });
-      if (!res.ok) return;
-      const html = await res.text();
-      const doc = new DOMParser().parseFromString(html, 'text/html');
-      doc.querySelectorAll('link[rel="stylesheet"][href], link[rel=stylesheet][href]').forEach(el => {
-        const h = el.getAttribute('href');
-        const abs = toAbs(h, pageUrl);
-        if (abs) addPreloadStyle(abs);
-      });
-      doc.querySelectorAll('script[type="module"][src]').forEach(el => {
-        const s = el.getAttribute('src');
-        const abs = toAbs(s, pageUrl);
-        if (abs) addModulePreload(abs);
-      });
-    } catch {
-      /* 忽略单页失败 */
-    }
-  }
-
-  const run = async () => {
-    const pages = ['tags.html', 'archives.html', 'series.html', 'notes.html', 'post.html', 'tools/'];
-    pages.forEach(p => addPrefetch(rootPath(p)));
+  const run = () => {
+    ['tags.html', 'archives.html'].forEach(p => addPrefetch(rootPath(p)));
     const idx = CONFIG.paths && CONFIG.paths.index ? String(CONFIG.paths.index).replace(/^\//, '') : 'data/posts.json';
-    addPrefetch(rootPath(idx));
-    for (const p of pages) {
-      await preloadSubresourcesFromPageHtml(p);
-    }
+    addPrefetch(rootPath(`${idx}?v=${encodeURIComponent(CONFIG.VERSION || '')}`));
   };
 
   const ric = window.requestIdleCallback;
   if (typeof ric === 'function') {
-    ric(() => { run().catch(() => {}); }, { timeout: 6000 });
+    ric(run, { timeout: 8000 });
   } else {
-    setTimeout(() => { run().catch(() => {}); }, 2200);
+    setTimeout(run, 3000);
   }
 }
 
@@ -482,6 +431,55 @@ function renderList(posts, tab = 'latest') {
   listState = state;
 }
 
+/** 保留 build 预渲染的首页列表 DOM，只绑定懒加载与无限滚动 */
+function bindPrerenderedPostList(posts) {
+  const ul = $('#postList');
+  if (!ul) return false;
+  if (listState && listState.observer) listState.observer.disconnect();
+
+  const existing = ul.querySelectorAll('li.post-item');
+  if (!existing.length) return false;
+
+  const author = CONFIG.site.author;
+  const avatar = CONFIG.site.avatar;
+  bindLazyImages(ul, { eagerCount: 0 });
+
+  const state = { loaded: existing.length, observer: null, loadNext: null };
+  const sentinel = document.getElementById('loadMoreSentinel');
+
+  function loadNext() {
+    const nextChunk = posts.slice(state.loaded, state.loaded + PAGE_SIZE);
+    if (!nextChunk.length) return;
+    const frag = document.createElement('div');
+    frag.innerHTML = nextChunk.map(p => postItemHtml(p, author, avatar)).join('');
+    const inserted = [...frag.children];
+    const anchor = document.getElementById('loadMoreSentinel');
+    inserted.forEach(node => ul.insertBefore(node, anchor));
+    inserted.forEach(node => bindLazyImages(node, { eagerCount: 0 }));
+    state.loaded += nextChunk.length;
+    if (state.loaded >= posts.length && anchor) {
+      if (state.observer) state.observer.disconnect();
+      anchor.outerHTML = `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`;
+    }
+  }
+
+  state.loadNext = loadNext;
+
+  if (sentinel && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      for (const e of entries) if (e.isIntersecting) loadNext();
+    }, { rootMargin: '300px 0px' });
+    observer.observe(sentinel);
+    state.observer = observer;
+  } else if (sentinel) {
+    sentinel.style.cursor = 'pointer';
+    sentinel.addEventListener('click', loadNext);
+  }
+
+  listState = state;
+  return true;
+}
+
 function renderTags(posts) {
   const cloud = $('#tagCloud');
   if (!cloud) return;
@@ -616,7 +614,8 @@ function buildHomeList({ allPosts, tab, q, tag }) {
     } else {
       ul.classList.remove('post-list--giscus');
       const filtered = buildHomeList({ allPosts, tab, q: '', tag: activeTag });
-      renderList(filtered, tab);
+      const reused = tab === 'latest' && !activeTag && bindPrerenderedPostList(filtered);
+      if (!reused) renderList(filtered, tab);
     }
 
     if (pendingRestore) {
