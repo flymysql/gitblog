@@ -4,7 +4,7 @@
 
 import { initSite } from './site.js';
 import { setMeta } from './seo.js';
-import { isGiscusReady, mountGiscusScript, notesFeedTerm } from './giscus-embed.js';
+import { isNotesGiscusReady, mountNotesGiscusScript } from './giscus-embed.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -18,14 +18,14 @@ const $ = sel => document.querySelector(sel);
   const host = $('#notesGiscusHost');
   if (!host) return;
 
-  if (!isGiscusReady()) {
+  if (!isNotesGiscusReady()) {
     host.innerHTML = `
       <div class="comments-hint">
-        请先在 <a href="admin/settings.html">后台 · 站点设置</a> 中启用 giscus，并填写 repo、repoId、category、categoryId。
+        请先在 <a href="admin/settings.html">后台 · 站点设置</a> 中启用 giscus，并填写 repo、repoId 与随笔分类（notesCategoryId）。
       </div>
     `;
     return;
   }
 
-  mountGiscusScript(host, notesFeedTerm());
+  mountNotesGiscusScript(host);
 })();

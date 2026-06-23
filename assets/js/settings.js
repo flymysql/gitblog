@@ -213,6 +213,8 @@ function normalizeConfig(config) {
   config.giscus.emitMetadata = String(config.giscus.emitMetadata ?? '0');
   config.giscus.inputPosition = config.giscus.inputPosition || 'top';
   config.giscus.notesTerm = String(config.giscus.notesTerm || 'gitblog-notes-feed').trim() || 'gitblog-notes-feed';
+  config.giscus.notesCategory = String(config.giscus.notesCategory || 'Announcements').trim() || 'Announcements';
+  config.giscus.notesCategoryId = String(config.giscus.notesCategoryId || 'DIC_kwDOSZ6GIc4C8wdV').trim() || 'DIC_kwDOSZ6GIc4C8wdV';
   config.analytics.enabled = !!config.analytics.enabled;
   config.analytics.snippet = String(config.analytics.snippet || '').trim();
   config.pageviews.enabled = config.pageviews.enabled !== false;
@@ -663,7 +665,12 @@ function settingsContentHtml() {
           <label>language <input name="giscus.lang" placeholder="zh-CN"></label>
           <label class="span-2">随笔讨论标识（notesTerm）
             <input name="giscus.notesTerm" placeholder="gitblog-notes-feed">
-            <span class="settings-hint">首页「随笔」与「随笔」页面共用这一条 giscus 讨论（<code>data-term</code>）。须与 giscus 的 <code>specific</code> mapping 一致；首次留言后会自动创建讨论串。</span>
+            <span class="settings-hint">首页「随笔」与「随笔」页面共用这一条 giscus 讨论（<code>data-term</code>）。须与 giscus 的 <code>specific</code> mapping 一致。</span>
+          </label>
+          <label>随笔 category <input name="giscus.notesCategory" placeholder="Announcements"></label>
+          <label>随笔 categoryId <input name="giscus.notesCategoryId" placeholder="DIC_kwDOSZ6GIc4C8wdV"></label>
+          <label class="span-2">随笔分类说明
+            <span class="settings-hint">随笔历史讨论多在 <code>Announcements</code> 分类（与上方文章评论的 <code>General</code> 可不同）。讨论串已存在时访客可继续回复；若更换 <code>notesTerm</code> 或分类，旧评论将不可见。</span>
           </label>
       </section>
 
