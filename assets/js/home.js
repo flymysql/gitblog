@@ -365,6 +365,7 @@ function postItemHtml(p, author, avatar) {
 
 // 懒加载状态：每次切 tab/筛选都会被替换
 let listState = null;
+let mobileHomeStickySync = null;
 
 function renderList(posts, tab = 'latest') {
   const ul = $('#postList');
@@ -429,6 +430,7 @@ function renderList(posts, tab = 'latest') {
 
   state.observer = observer;
   listState = state;
+  mobileHomeStickySync?.();
 }
 
 /** 保留 build 预渲染的首页列表 DOM，只绑定懒加载与无限滚动 */
@@ -477,6 +479,7 @@ function bindPrerenderedPostList(posts) {
   }
 
   listState = state;
+  mobileHomeStickySync?.();
   return true;
 }
 
@@ -530,7 +533,9 @@ function buildHomeList({ allPosts, tab, q, tag }) {
   return r;
 }
 
-/** 移动端：轮播 + Tab 滚过阈值后 fixed 固定（sticky 在长列表页会失效） */
+/** 移动端：轮播 + Tab 滚过阈值后 fixed；滑过 5 篇后收起 */
+const MOBILE_COLLAPSE_AFTER_POSTS = 5;
+
 function bindMobileHomeSticky() {
   const mq = window.matchMedia('(max-width: 720px)');
   const carousel = $('#homeCarousel');
@@ -543,13 +548,14 @@ function bindMobileHomeSticky() {
 
   const measureCarouselFullH = () => {
     if (!carousel || carousel.hidden) return null;
-    carousel.classList.remove('is-mobile-pinned');
+    carousel.classList.remove('is-mobile-pinned', 'is-mobile-collapsed');
     setPlaceholder(carousel, false, 0);
     carouselFullH = carousel.offsetHeight;
     return carouselFullH;
   };
 
   const carouselPinnedH = () => Math.round((carouselFullH ?? carousel?.offsetHeight ?? 180) * 0.5);
+  const tabsPinnedH = () => tabs.offsetHeight || 48;
 
   const setPlaceholder = (el, pinned, h) => {
     if (!el) return;
@@ -572,6 +578,9 @@ function bindMobileHomeSticky() {
     carouselFullH = null;
     setPlaceholder(carousel, false, 0);
     setPlaceholder(tabs, false, 0);
+    carousel?.classList.remove('is-mobile-collapsed');
+    tabs.classList.remove('is-mobile-collapsed');
+    document.documentElement.removeAttribute('data-home-sticky-collapse');
   };
 
   const measureCarouselPinAt = () => {
@@ -580,13 +589,23 @@ function bindMobileHomeSticky() {
     return carousel.offsetTop - navH();
   };
 
+  const collapseScrollY = (stackBottom) => {
+    const items = document.querySelectorAll('#postList li.post-item');
+    if (items.length < MOBILE_COLLAPSE_AFTER_POSTS) return Infinity;
+    const anchor = items[MOBILE_COLLAPSE_AFTER_POSTS - 1];
+    if (!anchor) return Infinity;
+    return anchor.offsetTop + anchor.offsetHeight - stackBottom;
+  };
+
   const sync = () => {
     if (!mq.matches) {
-      carousel?.classList.remove('is-mobile-pinned');
-      tabs.classList.remove('is-mobile-pinned');
+      carousel?.classList.remove('is-mobile-pinned', 'is-mobile-collapsed');
+      tabs.classList.remove('is-mobile-pinned', 'is-mobile-collapsed');
       document.querySelectorAll('.home-sticky-placeholder').forEach(n => n.remove());
       document.documentElement.style.removeProperty('--home-mobile-tabs-top');
+      document.documentElement.style.removeProperty('--home-mobile-tabs-h');
       document.documentElement.style.removeProperty('--home-carousel-mobile-pinned-h');
+      document.documentElement.removeAttribute('data-home-sticky-collapse');
       carouselPinAt = null;
       carouselFullH = null;
       return;
@@ -598,25 +617,27 @@ function bindMobileHomeSticky() {
       carouselPinAt = measureCarouselPinAt();
     }
 
+    let carouselPinned = false;
     if (hasCarousel && carouselPinAt !== null) {
-      const pinned = window.scrollY >= carouselPinAt;
+      carouselPinned = window.scrollY >= carouselPinAt;
       if (carouselFullH === null) measureCarouselFullH();
       const fullH = carouselFullH ?? carousel.offsetHeight;
-      carousel.classList.toggle('is-mobile-pinned', pinned);
-      setPlaceholder(carousel, pinned, fullH);
       const pinnedH = carouselPinnedH();
       document.documentElement.style.setProperty('--home-carousel-mobile-h', `${fullH}px`);
       document.documentElement.style.setProperty('--home-carousel-mobile-pinned-h', `${pinnedH}px`);
     } else {
-      carousel?.classList.remove('is-mobile-pinned');
+      carousel?.classList.remove('is-mobile-pinned', 'is-mobile-collapsed');
       setPlaceholder(carousel, false, 0);
     }
 
-    const carouselPinned = hasCarousel && carousel.classList.contains('is-mobile-pinned');
+    const tabsH = tabsPinnedH();
+    document.documentElement.style.setProperty('--home-mobile-tabs-h', `${tabsH}px`);
+
     let pinTabs = false;
+    let stackBottom = navH();
     if (hasCarousel) {
       if (carouselPinned) {
-        const stackBottom = navH() + carouselPinnedH();
+        stackBottom = navH() + carouselPinnedH();
         pinTabs = tabs.getBoundingClientRect().top <= stackBottom + 0.5;
         document.documentElement.style.setProperty('--home-mobile-tabs-top', `${stackBottom}px`);
       }
@@ -624,9 +645,29 @@ function bindMobileHomeSticky() {
       pinTabs = tabs.getBoundingClientRect().top <= navH() + 0.5;
       document.documentElement.style.setProperty('--home-mobile-tabs-top', `${navH()}px`);
     }
+
+    if (pinTabs) stackBottom += tabsH;
+
+    const headerPinned = carouselPinned || pinTabs;
+    const collapsed = headerPinned
+      && pinTabs
+      && window.scrollY >= collapseScrollY(stackBottom);
+
+    if (hasCarousel && carouselPinAt !== null) {
+      const fullH = carouselFullH ?? carousel.offsetHeight;
+      carousel.classList.toggle('is-mobile-pinned', carouselPinned);
+      carousel.classList.toggle('is-mobile-collapsed', carouselPinned && collapsed);
+      setPlaceholder(carousel, carouselPinned && !collapsed, fullH);
+    }
+
     tabs.classList.toggle('is-mobile-pinned', pinTabs);
-    setPlaceholder(tabs, pinTabs, tabs.offsetHeight);
+    tabs.classList.toggle('is-mobile-collapsed', pinTabs && collapsed);
+    setPlaceholder(tabs, pinTabs && !collapsed, tabsH);
+
+    document.documentElement.toggleAttribute('data-home-sticky-collapse', collapsed);
   };
+
+  mobileHomeStickySync = sync;
 
   window.addEventListener('scroll', sync, { passive: true });
   window.addEventListener('resize', () => {
