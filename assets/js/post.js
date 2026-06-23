@@ -7,7 +7,7 @@ import { CONFIG } from './config.js';
 import { fetchIndexPublic, fetchPostMarkdownPublic } from './api.js';
 import { renderMarkdown, parseFrontmatter } from './markdown.js';
 import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages, postPath, postPathFromPost, rootPath, isPostPublicPathKey } from './site.js';
-import { initPageviews, bszPagePvHtml, trackAndRenderArticleView } from './pageviews.js';
+import { bszPagePvHtml, trackAndRenderArticleView } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { enhanceMath, enhanceMermaid, enhanceCodeAdvanced } from './enhancers.js';
 import { shareCardHtml, bindShareCard } from './share.js';
@@ -429,8 +429,7 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
   renderNeighborsAndRelated(allPosts, slug, tags);
   renderGiscus(meta, slug);
 
-  initPageviews();
-  trackAndRenderArticleView(slug);
+  trackAndRenderArticleView();
 }
 
 (async function init() {
@@ -460,20 +459,20 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
 
   let meta = null;
   let allPosts = [];
-  try {
-    const idx = await fetchIndexPublic();
-    allPosts = idx.posts || [];
-    if (isPrerendered) {
-      const prerenderSlug = (article.dataset.slug || '').trim();
-      meta = allPosts.find(p => p.slug === prerenderSlug) || null;
-    } else if (qSlug) {
-      meta = allPosts.find(p => p.slug === qSlug) || null;
-    } else if (pathSeg) {
-      meta = allPosts.find(p => p.urlKey === pathSeg)
-        || allPosts.find(p => p.slug === pathSeg)
-        || null;
-    }
-  } catch {}
+
+  if (!isPrerendered) {
+    try {
+      const idx = await fetchIndexPublic();
+      allPosts = idx.posts || [];
+      if (qSlug) {
+        meta = allPosts.find(p => p.slug === qSlug) || null;
+      } else if (pathSeg) {
+        meta = allPosts.find(p => p.urlKey === pathSeg)
+          || allPosts.find(p => p.slug === pathSeg)
+          || null;
+      }
+    } catch {}
+  }
 
   const slug = (meta && meta.slug) || (isPrerendered ? (article.dataset.slug || '').trim() : '') || qSlug || pathSeg;
   if (!slug) {
@@ -502,7 +501,7 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
     const titleEl = article.querySelector('.article-title');
     const title = (titleEl && titleEl.textContent.trim()) || '无标题';
 
-    // 正文已在 HTML 中，先同步做增强，索引数据并行拉取
+    // 正文已在 HTML 中，先同步增强，再单次拉取索引（侧栏/评论/上下篇）
     const items = buildToc(article);
     if (items) renderToc(items);
     sanitizeArticleLayout(article);
@@ -527,8 +526,6 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
     renderSeriesIndex(allPosts, slug, (meta && meta.series) || '');
     renderNeighborsAndRelated(allPosts, slug, tags);
     renderGiscus(meta, slug);
-    initPageviews();
-    trackAndRenderArticleView(slug);
     return;
   }
 
