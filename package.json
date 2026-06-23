@@ -6,6 +6,7 @@
     "build": "node scripts/build.mjs",
     "build:thumbs": "node scripts/build-thumbnails.mjs",
     "compress:uploads": "node scripts/compress-uploads.mjs",
+    "bundle": "node scripts/bundle-assets.mjs",
     "migrate:cnblogs": "node scripts/migrate-cnblogs.mjs",
     "migrate:hexo": "node scripts/migrate-hexo.mjs",
     "fix:hexo-codeblocks": "node scripts/fix-hexo-codeblocks.mjs",
@@ -17,6 +18,7 @@
   },
   "devDependencies": {
     "cheerio": "^1.0.0",
+    "esbuild": "^0.25.12",
     "marked": "^12.0.2",
     "sharp": "^0.34.5",
     "turndown": "^7.2.0",
