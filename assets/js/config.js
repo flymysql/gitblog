@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260616180000';
+export const VERSION = '20260616190000';
 
 export const CONFIG = {
   repo: {
@@ -63,8 +63,8 @@ export const CONFIG = {
     enabled: true,
     repo: "flymysql/gitblog",
     repoId: "R_kgDOSZ6GIQ",
-    category: "Announcements",
-    categoryId: "DIC_kwDOSZ6GIc4C8wdV",
+    category: "General",
+    categoryId: "DIC_kwDOSZ6GIc4C8wdW",
     mapping: "specific",
     strict: "0",
     reactionsEnabled: "1",
