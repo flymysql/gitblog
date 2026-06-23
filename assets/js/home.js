@@ -539,6 +539,17 @@ function bindMobileHomeSticky() {
 
   const navH = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-height')) || 56;
   let carouselPinAt = null;
+  let carouselFullH = null;
+
+  const measureCarouselFullH = () => {
+    if (!carousel || carousel.hidden) return null;
+    carousel.classList.remove('is-mobile-pinned');
+    setPlaceholder(carousel, false, 0);
+    carouselFullH = carousel.offsetHeight;
+    return carouselFullH;
+  };
+
+  const carouselPinnedH = () => Math.round((carouselFullH ?? carousel?.offsetHeight ?? 180) * 0.5);
 
   const setPlaceholder = (el, pinned, h) => {
     if (!el) return;
@@ -558,14 +569,14 @@ function bindMobileHomeSticky() {
 
   const resetMeasure = () => {
     carouselPinAt = null;
+    carouselFullH = null;
     setPlaceholder(carousel, false, 0);
     setPlaceholder(tabs, false, 0);
   };
 
   const measureCarouselPinAt = () => {
     if (!carousel || carousel.hidden) return null;
-    carousel.classList.remove('is-mobile-pinned');
-    setPlaceholder(carousel, false, 0);
+    measureCarouselFullH();
     return carousel.offsetTop - navH();
   };
 
@@ -575,7 +586,9 @@ function bindMobileHomeSticky() {
       tabs.classList.remove('is-mobile-pinned');
       document.querySelectorAll('.home-sticky-placeholder').forEach(n => n.remove());
       document.documentElement.style.removeProperty('--home-mobile-tabs-top');
+      document.documentElement.style.removeProperty('--home-carousel-mobile-pinned-h');
       carouselPinAt = null;
+      carouselFullH = null;
       return;
     }
 
@@ -587,9 +600,13 @@ function bindMobileHomeSticky() {
 
     if (hasCarousel && carouselPinAt !== null) {
       const pinned = window.scrollY >= carouselPinAt;
+      if (carouselFullH === null) measureCarouselFullH();
+      const fullH = carouselFullH ?? carousel.offsetHeight;
       carousel.classList.toggle('is-mobile-pinned', pinned);
-      setPlaceholder(carousel, pinned, carousel.offsetHeight);
-      document.documentElement.style.setProperty('--home-carousel-mobile-h', `${carousel.offsetHeight}px`);
+      setPlaceholder(carousel, pinned, fullH);
+      const pinnedH = carouselPinnedH();
+      document.documentElement.style.setProperty('--home-carousel-mobile-h', `${fullH}px`);
+      document.documentElement.style.setProperty('--home-carousel-mobile-pinned-h', `${pinnedH}px`);
     } else {
       carousel?.classList.remove('is-mobile-pinned');
       setPlaceholder(carousel, false, 0);
@@ -599,7 +616,7 @@ function bindMobileHomeSticky() {
     let pinTabs = false;
     if (hasCarousel) {
       if (carouselPinned) {
-        const stackBottom = navH() + carousel.offsetHeight;
+        const stackBottom = navH() + carouselPinnedH();
         pinTabs = tabs.getBoundingClientRect().top <= stackBottom + 0.5;
         document.documentElement.style.setProperty('--home-mobile-tabs-top', `${stackBottom}px`);
       }
