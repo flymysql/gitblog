@@ -207,14 +207,28 @@ function logoSvg() {
 }
 
 function applyFavicon() {
-  if (!CONFIG.site.favicon && !CONFIG.site.logo && !CONFIG.site.avatar) return;
-  let link = document.head.querySelector('link[rel="icon"]');
-  if (!link) {
-    link = document.createElement('link');
-    link.rel = 'icon';
-    document.head.appendChild(link);
+  const href = CONFIG.site.favicon || CONFIG.site.logo || CONFIG.site.avatar;
+  if (!href) return;
+  let abs = href;
+  try {
+    abs = new URL(href, window.location.href).href;
+  } catch {
+    /* 保留原始 href */
   }
-  link.href = CONFIG.site.favicon || CONFIG.site.logo || CONFIG.site.avatar;
+  const existing = document.head.querySelector('link[rel="icon"]');
+  if (existing) {
+    try {
+      if (new URL(existing.href, window.location.href).href === abs) return;
+    } catch {
+      /* 继续更新 */
+    }
+    existing.href = href;
+    return;
+  }
+  const link = document.createElement('link');
+  link.rel = 'icon';
+  link.href = href;
+  document.head.appendChild(link);
 }
 
 function navResolveHref(href) {
