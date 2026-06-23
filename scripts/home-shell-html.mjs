@@ -207,6 +207,16 @@ export function buildPostItemShell(p, { author, avatar, postHrefFromEntry: hrefF
     </li>`;
 }
 
+export function sortPostsForHomeList(posts) {
+  return [...posts].sort((a, b) => {
+    if ((b.pinned ? 1 : 0) !== (a.pinned ? 1 : 0)) return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+    if (a.pinned && b.pinned && Number(a.pinnedOrder || 0) !== Number(b.pinnedOrder || 0)) {
+      return Number(a.pinnedOrder || 9999) - Number(b.pinnedOrder || 9999);
+    }
+    return new Date(b.date || 0) - new Date(a.date || 0);
+  });
+}
+
 export function pickCarouselItems(posts) {
   const sortFn = (a, b) => {
     if ((b.pinned ? 1 : 0) !== (a.pinned ? 1 : 0)) return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
