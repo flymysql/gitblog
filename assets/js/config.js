@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260618140000';
+export const VERSION = '20260618160000';
 
 export const CONFIG = {
   repo: {
@@ -71,7 +71,9 @@ export const CONFIG = {
     emitMetadata: "0",
     inputPosition: "top",
     lang: "zh-CN",
-    notesTerm: "gitblog-notes-feed"
+    notesTerm: "gitblog-notes-feed",
+    notesCategory: "Announcements",
+    notesCategoryId: "DIC_kwDOSZ6GIc4C8wdV"
   },
   analytics: {
     enabled: false,

@@ -17,6 +17,21 @@ export function notesFeedTerm() {
   return t || 'gitblog-notes-feed';
 }
 
+/** 随笔讨论串所在分类（历史数据在 Announcements，与文章页 General 可分开配置） */
+export function notesGiscusCategory() {
+  const g = CONFIG.giscus || {};
+  return {
+    category: String(g.notesCategory || 'Announcements').trim() || 'Announcements',
+    categoryId: String(g.notesCategoryId || 'DIC_kwDOSZ6GIc4C8wdV').trim() || 'DIC_kwDOSZ6GIc4C8wdV',
+  };
+}
+
+export function isNotesGiscusReady() {
+  const g = CONFIG.giscus;
+  const notes = notesGiscusCategory();
+  return !!(g && g.enabled && g.repoId && notes.categoryId);
+}
+
 /**
  * 文章页 giscus term：优先 urlKey（如 20260616、welcome），否则退回 slug。
  * urlKey 为稳定 ASCII，避免中文 slug 过长；welcome 等已有讨论可继续匹配。
@@ -39,7 +54,9 @@ export function mountGiscusScript(targetEl, term, opts = {}) {
     targetEl.innerHTML = '';
     return false;
   }
-  if (!g.repoId || !g.categoryId) {
+  const category = opts.category || g.category;
+  const categoryId = opts.categoryId || g.categoryId;
+  if (!g.repoId || !categoryId) {
     targetEl.innerHTML = `
       <div class="comments-hint">
         评论已启用但缺少 <code>repoId</code> 或 <code>categoryId</code>，请到
@@ -73,8 +90,8 @@ export function mountGiscusScript(targetEl, term, opts = {}) {
   const attrs = {
     'data-repo': g.repo,
     'data-repo-id': g.repoId,
-    'data-category': g.category,
-    'data-category-id': g.categoryId,
+    'data-category': category,
+    'data-category-id': categoryId,
     'data-mapping': mapping,
     'data-strict': g.strict || '0',
     'data-reactions-enabled': g.reactionsEnabled || '1',
@@ -88,4 +105,14 @@ export function mountGiscusScript(targetEl, term, opts = {}) {
   Object.entries(attrs).forEach(([k, v]) => s.setAttribute(k, v));
   targetEl.appendChild(s);
   return true;
+}
+
+/** 挂载随笔广场 giscus（使用 notesCategoryId，与文章评论分类可不同） */
+export function mountNotesGiscusScript(targetEl, opts = {}) {
+  const notes = notesGiscusCategory();
+  return mountGiscusScript(targetEl, notesFeedTerm(), {
+    ...opts,
+    category: notes.category,
+    categoryId: notes.categoryId,
+  });
 }
