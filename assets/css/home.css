@@ -388,8 +388,28 @@
   }
 }
 @media (max-width: 720px) {
+  :root {
+    --home-carousel-mobile-h: 180px;
+    --home-mobile-tabs-top: var(--nav-height);
+  }
+
+  body:has(#homeCarousel:not([hidden])) {
+    --home-mobile-tabs-top: calc(var(--nav-height) + var(--home-carousel-mobile-h));
+  }
+
   .layout { padding: 0 14px; }
-  .tabs { padding-top: 12px; gap: 0; }
+  .tabs {
+    position: sticky;
+    top: var(--home-mobile-tabs-top);
+    z-index: 80;
+    background: var(--bg);
+    margin-left: -14px;
+    margin-right: -14px;
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-top: 12px;
+    gap: 0;
+  }
   .tab { padding: 10px 12px; font-size: 13.5px; }
   .tab.active::after { left: 12px; right: 12px; }
 }
