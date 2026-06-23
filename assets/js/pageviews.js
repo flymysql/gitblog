@@ -164,7 +164,8 @@ export function articleListPvHtml() {
 export async function renderArticleListViews() {}
 
 export async function trackAndRenderArticleView() {
-  initPageviews();
+  ensureArticlePagePvPlaceholder(document);
+  injectVercountScript();
 }
 
 function escapeHtml(s) {

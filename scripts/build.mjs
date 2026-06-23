@@ -559,7 +559,7 @@ function rewritePostShellHtml(html) {
     .replace(/\bsrc="assets\//g, `src="${a}/`)
     .replace(/\bhref="manifest\.webmanifest"/g, `href="${postShellRootHref('manifest.webmanifest')}"`)
     .replace(/\bhref="rss\.xml"/g, `href="${postShellRootHref('rss.xml')}"`)
-    .replace(/\blink rel="apple-touch-icon" href="assets\//g, `link rel="apple-touch-icon" href="${a}/`);
+    .replace(/\blink rel="(?:icon|apple-touch-icon)" href="assets\//g, (m) => m.replace('href="assets/', `href="${a}/`));
 }
 
 function writeRootPostHtmlRedirect(entries) {
