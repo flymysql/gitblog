@@ -263,7 +263,7 @@ const PAGES = [
     description: '根据等级与上线习惯，推荐 QQ 经典农场种什么最划算。公开攻略数据，浏览器本地计算。',
     eyebrow: 'QQ Classic Farm',
     h1: '种子选择助手',
-    lead: '选好种子，少踩坑。根据你的等级、土地与上线间隔，算出更合适的种植推荐。',
+    lead: '选好种子，少踩坑。根据你的等级与上线间隔，从经典 QQ 农场真实作物中算出更合适的种植推荐。',
     script: 'tool-farm-seed.js',
     commentsHint: '作物数值有误？欢迎纠错或补充新种子～',
     body: `
@@ -280,11 +280,8 @@ const PAGES = [
           <label>最长间隔（小时） <input type="number" id="farmInterval" min="1" max="72" step="0.5" value="8"></label>
           <label>土地类型
             <select id="farmLand">
-              <option value="all">全部土地</option>
+              <option value="all">全部（经典作物均可种）</option>
               <option value="normal">普通土地</option>
-              <option value="red">红土地</option>
-              <option value="black">黑土地</option>
-              <option value="gold">金土地</option>
             </select>
           </label>
           <label class="farm-check"><input type="checkbox" id="farmLevelOnly" checked> 只显示当前等级能种的</label>
