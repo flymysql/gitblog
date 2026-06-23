@@ -13,6 +13,8 @@
       ],
       "cover": "../assets/uploads/2026/06/heigui-cover.webp",
       "carousel": true,
+      "series": "海门回声",
+      "seriesOrder": 2,
       "path": "posts/海门回声-黑鬼.md",
       "urlKey": "20260618",
       "thumbnail": "../assets/uploads/2026/06/heigui-cover.thumb.webp"
@@ -42,6 +44,8 @@
         "海门回声",
         "随想"
       ],
+      "series": "海门回声",
+      "seriesOrder": 1,
       "path": "posts/海门回声-一个寂静的生日夜晚.md",
       "urlKey": "20260616"
     },
