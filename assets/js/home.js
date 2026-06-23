@@ -538,17 +538,35 @@ function bindMobileHomeSticky() {
   if (!tabs) return;
 
   const navH = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-height')) || 56;
+  let carouselPinAt = null;
 
-  const ensurePh = (el) => {
-    if (!el) return null;
+  const setPlaceholder = (el, pinned, h) => {
+    if (!el) return;
     let ph = el.previousElementSibling;
-    if (!ph?.classList?.contains('home-sticky-placeholder')) {
-      ph = document.createElement('div');
-      ph.className = 'home-sticky-placeholder';
-      ph.setAttribute('aria-hidden', 'true');
-      el.parentNode.insertBefore(ph, el);
+    if (pinned) {
+      if (!ph?.classList?.contains('home-sticky-placeholder')) {
+        ph = document.createElement('div');
+        ph.className = 'home-sticky-placeholder';
+        ph.setAttribute('aria-hidden', 'true');
+        el.parentNode.insertBefore(ph, el);
+      }
+      ph.style.height = `${Math.max(0, h)}px`;
+    } else if (ph?.classList?.contains('home-sticky-placeholder')) {
+      ph.remove();
     }
-    return ph;
+  };
+
+  const resetMeasure = () => {
+    carouselPinAt = null;
+    setPlaceholder(carousel, false, 0);
+    setPlaceholder(tabs, false, 0);
+  };
+
+  const measureCarouselPinAt = () => {
+    if (!carousel || carousel.hidden) return null;
+    carousel.classList.remove('is-mobile-pinned');
+    setPlaceholder(carousel, false, 0);
+    return carousel.offsetTop - navH();
   };
 
   const sync = () => {
@@ -557,23 +575,25 @@ function bindMobileHomeSticky() {
       tabs.classList.remove('is-mobile-pinned');
       document.querySelectorAll('.home-sticky-placeholder').forEach(n => n.remove());
       document.documentElement.style.removeProperty('--home-mobile-tabs-top');
+      carouselPinAt = null;
       return;
     }
 
     const hasCarousel = !!(carousel && !carousel.hidden);
 
-    if (hasCarousel) {
-      const cph = ensurePh(carousel);
-      cph.style.height = `${carousel.offsetHeight}px`;
-      const pinCarouselAt = cph.offsetTop - navH();
-      carousel.classList.toggle('is-mobile-pinned', window.scrollY >= pinCarouselAt);
+    if (hasCarousel && carouselPinAt === null) {
+      carouselPinAt = measureCarouselPinAt();
+    }
+
+    if (hasCarousel && carouselPinAt !== null) {
+      const pinned = window.scrollY >= carouselPinAt;
+      carousel.classList.toggle('is-mobile-pinned', pinned);
+      setPlaceholder(carousel, pinned, carousel.offsetHeight);
       document.documentElement.style.setProperty('--home-carousel-mobile-h', `${carousel.offsetHeight}px`);
     } else {
       carousel?.classList.remove('is-mobile-pinned');
+      setPlaceholder(carousel, false, 0);
     }
-
-    const tph = ensurePh(tabs);
-    tph.style.height = `${tabs.offsetHeight}px`;
 
     const carouselPinned = hasCarousel && carousel.classList.contains('is-mobile-pinned');
     let pinTabs = false;
@@ -588,11 +608,18 @@ function bindMobileHomeSticky() {
       document.documentElement.style.setProperty('--home-mobile-tabs-top', `${navH()}px`);
     }
     tabs.classList.toggle('is-mobile-pinned', pinTabs);
+    setPlaceholder(tabs, pinTabs, tabs.offsetHeight);
   };
 
   window.addEventListener('scroll', sync, { passive: true });
-  window.addEventListener('resize', sync, { passive: true });
-  mq.addEventListener('change', sync);
+  window.addEventListener('resize', () => {
+    resetMeasure();
+    sync();
+  }, { passive: true });
+  mq.addEventListener('change', () => {
+    resetMeasure();
+    sync();
+  });
   requestAnimationFrame(sync);
 }
 
