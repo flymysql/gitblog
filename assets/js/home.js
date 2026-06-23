@@ -530,6 +530,72 @@ function buildHomeList({ allPosts, tab, q, tag }) {
   return r;
 }
 
+/** 移动端：轮播 + Tab 滚过阈值后 fixed 固定（sticky 在长列表页会失效） */
+function bindMobileHomeSticky() {
+  const mq = window.matchMedia('(max-width: 720px)');
+  const carousel = $('#homeCarousel');
+  const tabs = document.querySelector('.layout .tabs');
+  if (!tabs) return;
+
+  const navH = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-height')) || 56;
+
+  const ensurePh = (el) => {
+    if (!el) return null;
+    let ph = el.previousElementSibling;
+    if (!ph?.classList?.contains('home-sticky-placeholder')) {
+      ph = document.createElement('div');
+      ph.className = 'home-sticky-placeholder';
+      ph.setAttribute('aria-hidden', 'true');
+      el.parentNode.insertBefore(ph, el);
+    }
+    return ph;
+  };
+
+  const sync = () => {
+    if (!mq.matches) {
+      carousel?.classList.remove('is-mobile-pinned');
+      tabs.classList.remove('is-mobile-pinned');
+      document.querySelectorAll('.home-sticky-placeholder').forEach(n => n.remove());
+      document.documentElement.style.removeProperty('--home-mobile-tabs-top');
+      return;
+    }
+
+    const hasCarousel = !!(carousel && !carousel.hidden);
+
+    if (hasCarousel) {
+      const cph = ensurePh(carousel);
+      cph.style.height = `${carousel.offsetHeight}px`;
+      const pinCarouselAt = cph.offsetTop - navH();
+      carousel.classList.toggle('is-mobile-pinned', window.scrollY >= pinCarouselAt);
+      document.documentElement.style.setProperty('--home-carousel-mobile-h', `${carousel.offsetHeight}px`);
+    } else {
+      carousel?.classList.remove('is-mobile-pinned');
+    }
+
+    const tph = ensurePh(tabs);
+    tph.style.height = `${tabs.offsetHeight}px`;
+
+    const carouselPinned = hasCarousel && carousel.classList.contains('is-mobile-pinned');
+    let pinTabs = false;
+    if (hasCarousel) {
+      if (carouselPinned) {
+        const stackBottom = navH() + carousel.offsetHeight;
+        pinTabs = tabs.getBoundingClientRect().top <= stackBottom + 0.5;
+        document.documentElement.style.setProperty('--home-mobile-tabs-top', `${stackBottom}px`);
+      }
+    } else {
+      pinTabs = tabs.getBoundingClientRect().top <= navH() + 0.5;
+      document.documentElement.style.setProperty('--home-mobile-tabs-top', `${navH()}px`);
+    }
+    tabs.classList.toggle('is-mobile-pinned', pinTabs);
+  };
+
+  window.addEventListener('scroll', sync, { passive: true });
+  window.addEventListener('resize', sync, { passive: true });
+  mq.addEventListener('change', sync);
+  requestAnimationFrame(sync);
+}
+
 (async function init() {
   // 避免 hero 与 footer 各有一份站点 Saobby 图（会各请求一次、+2）
   initSite({ active: './', skipDuplicateSitePv: true });
@@ -637,6 +703,7 @@ function buildHomeList({ allPosts, tab, q, tag }) {
       }
       scheduleRestoreHomeScroll(pr.y);
     }
+    requestAnimationFrame(() => window.dispatchEvent(new Event('scroll')));
   }
 
   document.querySelectorAll('.tab').forEach(el => {
@@ -664,5 +731,6 @@ function buildHomeList({ allPosts, tab, q, tag }) {
   });
 
   refresh();
+  bindMobileHomeSticky();
   schedulePrefetchOtherPages();
 })();
