@@ -13,6 +13,7 @@ import {
   buildCarouselShell,
   buildCriticalHomeCss,
   postHrefFromEntry,
+  sortPostsForHomeList,
 } from './home-shell-html.mjs';
 import { bundleAssets } from './bundle-assets.mjs';
 import {
@@ -775,7 +776,7 @@ function injectHomeSeo() {
   }
 
   const hrefFn = p => postHrefFromEntry(p, postPublicAbsUrl);
-  const latestForHome = visiblePosts.slice(0, 15);
+  const latestForHome = sortPostsForHomeList(visiblePosts).slice(0, 15);
   let listHtml = '';
   if (latestForHome.length) {
     listHtml = latestForHome.map(p => buildPostItemShell(p, {
