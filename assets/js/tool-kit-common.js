@@ -96,5 +96,5 @@ export const TOOL_PAGES = [
   { slug: 'tool-qrcode', title: '二维码生成', icon: '▣' },
   { slug: 'tool-image', title: '图片压缩', icon: '🖼' },
   { slug: 'tool-network', title: '网络信息', icon: '🌐' },
-  { slug: 'tool-farm-seed', title: '种子助手', icon: '🌾' },
+  { slug: 'tool-farm-seed', title: '微信农场种子助手', icon: '🌾' },
 ];
