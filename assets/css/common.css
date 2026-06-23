@@ -279,6 +279,12 @@ input, textarea {
 mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; border-radius: 2px; }
 
 /* ---------- 顶部导航 ---------- */
+#site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
 .nav {
   position: sticky;
   top: 0;
