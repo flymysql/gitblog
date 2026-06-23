@@ -317,6 +317,10 @@
   .home-carousel {
     margin: 12px auto 0;
     padding: 0 14px;
+    position: sticky;
+    top: var(--nav-height);
+    z-index: 90;
+    background: var(--bg);
   }
   .carousel-viewport {
     height: 180px;
@@ -366,10 +370,22 @@
   display: grid;
   grid-template-columns: 1fr 260px;
   gap: 36px;
+  align-items: start;
 }
 @media (max-width: 880px) {
   .layout { grid-template-columns: 1fr; }
   .sidebar { display: none; }
+}
+@media (min-width: 881px) {
+  .sidebar {
+    position: sticky;
+    top: calc(var(--nav-height) + 16px);
+    align-self: start;
+    max-height: calc(100vh - var(--nav-height) - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
 }
 @media (max-width: 720px) {
   .layout { padding: 0 14px; }
