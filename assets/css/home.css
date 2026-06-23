@@ -314,12 +314,14 @@
 }
 
 @media (max-width: 720px) {
+  :root {
+    --home-carousel-mobile-h: 180px;
+    --home-mobile-tabs-top: var(--nav-height);
+  }
+
   .home-carousel {
     margin: 12px auto 0;
     padding: 0 14px;
-    position: sticky;
-    top: var(--nav-height);
-    z-index: 90;
     background: var(--bg);
   }
   .carousel-viewport {
@@ -360,6 +362,50 @@
   .carousel-dots button.active {
     width: 18px;
   }
+
+  .home-carousel.is-mobile-pinned {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 14px;
+    z-index: 90;
+    box-sizing: border-box;
+  }
+
+  .home-sticky-placeholder {
+    width: 100%;
+    pointer-events: none;
+  }
+
+  .layout { padding: 0 14px; }
+  .tabs {
+    background: var(--bg);
+    margin-left: -14px;
+    margin-right: -14px;
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-top: 12px;
+    gap: 0;
+  }
+
+  .tabs.is-mobile-pinned {
+    position: fixed;
+    top: var(--home-mobile-tabs-top, var(--nav-height));
+    left: 0;
+    right: 0;
+    z-index: 80;
+    margin: 0;
+    padding: 12px 14px 0;
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab { padding: 10px 12px; font-size: 13.5px; }
+  .tab.active::after { left: 12px; right: 12px; }
 }
 
 /* ---------- 主体布局 ---------- */
@@ -386,32 +432,6 @@
     overscroll-behavior: contain;
     scrollbar-width: thin;
   }
-}
-@media (max-width: 720px) {
-  :root {
-    --home-carousel-mobile-h: 180px;
-    --home-mobile-tabs-top: var(--nav-height);
-  }
-
-  body:has(#homeCarousel:not([hidden])) {
-    --home-mobile-tabs-top: calc(var(--nav-height) + var(--home-carousel-mobile-h));
-  }
-
-  .layout { padding: 0 14px; }
-  .tabs {
-    position: sticky;
-    top: var(--home-mobile-tabs-top);
-    z-index: 80;
-    background: var(--bg);
-    margin-left: -14px;
-    margin-right: -14px;
-    padding-left: 14px;
-    padding-right: 14px;
-    padding-top: 12px;
-    gap: 0;
-  }
-  .tab { padding: 10px 12px; font-size: 13.5px; }
-  .tab.active::after { left: 12px; right: 12px; }
 }
 
 /* ---------- tab ---------- */
