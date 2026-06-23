@@ -712,21 +712,25 @@ function injectHomeSeo() {
   html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${xmlEsc(homeTitle)}</title>`);
   html = html.replace(/<meta name="description" content="">/, homeMeta.split('\n')[0]);
 
-  // 同步 CSS 版本号 + 首屏关键样式 / preload
-  const cssCommon = `assets/css/common.css?v=${BUILD_VERSION}`;
-  const cssHome = `assets/css/home.css?v=${BUILD_VERSION}`;
+  // 同步 CSS/JS 版本号 + 首屏关键样式（不再重复 preload，stylesheet 已在 head 顶部）
+  const cssCommon = `assets/dist/common.min.css?v=${BUILD_VERSION}`;
+  const cssHome = `assets/dist/home.min.css?v=${BUILD_VERSION}`;
+  const jsHome = `assets/dist/home.min.js?v=${BUILD_VERSION}`;
+  html = html.replace(/assets\/dist\/common\.min\.css\?v=[^"]+/g, cssCommon);
+  html = html.replace(/assets\/dist\/home\.min\.css\?v=[^"]+/g, cssHome);
   html = html.replace(/assets\/css\/common\.css\?v=[^"]+/g, cssCommon);
   html = html.replace(/assets\/css\/home\.css\?v=[^"]+/g, cssHome);
-  html = html.replace(/assets\/js\/home\.js\?v=[^"]+/g, `assets/js/home.js?v=${BUILD_VERSION}`);
+  html = html.replace(/assets\/dist\/home\.min\.js\?v=[^"]+/g, jsHome);
+  html = html.replace(/assets\/js\/home\.js\?v=[^"]+/g, jsHome);
 
-  const headPerf = `${buildCriticalHomeCss()}
-  <link rel="preload" href="${cssCommon}" as="style">
-  <link rel="preload" href="${cssHome}" as="style">`;
+  // 历史 build 会累积 preload（只删了 assets/css/ 路径），一并清掉
+  html = html.replace(/\s*<link rel="preload" href="assets\/(?:dist\/(?:common|home)\.min|css\/(?:common|home))\.css[^"]*" as="style">\s*/gi, '\n');
+
+  const headPerf = buildCriticalHomeCss();
   html = html.replace(/<style id="critical-home">[\s\S]*?<\/style>\s*/i, '');
-  html = html.replace(/\s*<link rel="preload" href="assets\/css\/[^"]+" as="style">\s*/gi, '\n');
   html = html.replace(
     /(<script>\(function\(\)\{var s=localStorage;[\s\S]*?\}\)\(\);<\/script>)/,
-    `$1\n  ${headPerf}`
+    `$1\n  ${headPerf}\n`
   );
 
   const navItems = parseNavItems(cfgRaw);
