@@ -316,6 +316,7 @@
 @media (max-width: 720px) {
   :root {
     --home-carousel-mobile-h: 180px;
+    --home-carousel-mobile-pinned-h: calc(var(--home-carousel-mobile-h) * 0.5);
     --home-mobile-tabs-top: var(--nav-height);
   }
 
@@ -325,8 +326,9 @@
     background: var(--bg);
   }
   .carousel-viewport {
-    height: 180px;
+    height: var(--home-carousel-mobile-h);
     border-radius: 12px;
+    transition: height 0.28s ease;
   }
   .carousel-shade {
     background: linear-gradient(0deg, rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0.1) 68%);
@@ -374,6 +376,47 @@
     padding: 0 14px;
     z-index: 90;
     box-sizing: border-box;
+  }
+
+  .home-carousel.is-mobile-pinned .carousel-viewport {
+    height: var(--home-carousel-mobile-pinned-h);
+  }
+
+  .home-carousel.is-mobile-pinned .carousel-content {
+    left: 12px;
+    right: 12px;
+    bottom: 10px;
+    gap: 4px;
+  }
+
+  .home-carousel.is-mobile-pinned .carousel-badge {
+    height: 18px;
+    padding: 0 6px;
+    font-size: 10px;
+  }
+
+  .home-carousel.is-mobile-pinned .carousel-content strong {
+    font-size: 14px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .home-carousel.is-mobile-pinned .carousel-dots {
+    right: 10px;
+    bottom: 8px;
+    gap: 4px;
+  }
+
+  .home-carousel.is-mobile-pinned .carousel-dots button {
+    width: 5px;
+    height: 5px;
+  }
+
+  .home-carousel.is-mobile-pinned .carousel-dots button.active {
+    width: 14px;
   }
 
   .home-sticky-placeholder {
