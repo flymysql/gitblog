@@ -1,8 +1,9 @@
 // ============================================================================
-// giscus 嵌入：文章页（按 slug）与随笔聚合页（固定 notesTerm）共用
+// giscus 嵌入：文章页（按 urlKey/slug）与随笔聚合页（固定 notesTerm）共用
 // ============================================================================
 
 import { CONFIG } from './config.js';
+import { isPostPublicPathKey } from './site.js';
 
 /** 是否已配置完整，可在页面上挂载评论框 */
 export function isGiscusReady() {
@@ -17,8 +18,18 @@ export function notesFeedTerm() {
 }
 
 /**
+ * 文章页 giscus term：优先 urlKey（如 20260616、welcome），否则退回 slug。
+ * urlKey 为稳定 ASCII，避免中文 slug 过长；welcome 等已有讨论可继续匹配。
+ */
+export function giscusTermForPost({ slug, urlKey } = {}) {
+  const k = String(urlKey || '').trim();
+  if (k && isPostPublicPathKey(k)) return k;
+  return String(slug || '').trim();
+}
+
+/**
  * 在目标元素内注入 giscus client.js（会清空 targetEl 原有内容）
- * @param {string} term 文章 slug，或随笔聚合用的 notesFeedTerm()
+ * @param {string} term 文章 urlKey/slug，或随笔聚合用的 notesFeedTerm()
  * @returns {boolean} 是否已注入脚本
  */
 export function mountGiscusScript(targetEl, term, opts = {}) {
@@ -47,10 +58,9 @@ export function mountGiscusScript(targetEl, term, opts = {}) {
 
   let mapping = (g.mapping || 'specific').toLowerCase();
   let dataTerm = '';
-  if (mapping === 'pathname' || mapping === 'url' || mapping === '') {
+  if (mapping === 'pathname' || mapping === 'url') {
     mapping = 'specific';
     dataTerm = term;
-    console.warn('[giscus] mapping=pathname/url 在本站会让所有文章共用同一条 Discussion，已自动切换为 specific + slug');
   } else if (mapping === 'specific') {
     dataTerm = term;
   }

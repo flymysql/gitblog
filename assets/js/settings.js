@@ -616,7 +616,10 @@ function settingsContentHtml() {
           <label>categoryId <input name="giscus.categoryId"></label>
           <label>mapping
             <input name="giscus.mapping" placeholder="specific">
-            <span class="settings-hint">推荐 <code>specific</code>：每篇文章按 slug 独立绑定一个 Discussion；本站不要用 <code>pathname</code>/<code>url</code>，会让所有文章共用同一条评论流。</span>
+            <span class="settings-hint">推荐 <code>specific</code>：每篇文章按 urlKey（如 <code>20260616</code>、<code>welcome</code>）独立绑定一条 Discussion；旧式 <code>post.html?slug=</code> 仍按 slug。</span>
+          </label>
+          <label class="span-2">category 说明
+            <span class="settings-hint">请选 <code>General</code> 等允许所有人发帖的分类，勿用 <code>Announcements</code>（仅维护者可创建讨论，访客首评会失败）。</span>
           </label>
           <label>language <input name="giscus.lang" placeholder="zh-CN"></label>
           <label class="span-2">随笔讨论标识（notesTerm）
