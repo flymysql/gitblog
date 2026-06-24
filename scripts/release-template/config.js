@@ -85,8 +85,8 @@ export const CONFIG = {
       // 可选：如果想用 GitHub Device Flow 登录而非 PAT，填一个 OAuth App 的 clientId
       clientId: "",
       scope: "repo read:user",
-      // 同源代理路径；GitHub OAuth 不支持浏览器 CORS，需部署 workers/github-device-proxy.js
-      proxyBase: "/api/github-device"
+      // 同源代理路径；留空则禁用 Device Flow（纯静态站点请用 PAT）
+      proxyBase: ""
     }
   },
   paths: {

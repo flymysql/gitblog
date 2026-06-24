@@ -205,7 +205,7 @@ function normalizeConfig(config) {
   config.upload.webpQuality = Number(config.upload.webpQuality) || 0.85;
   config.upload.maxWidth = Number(config.upload.maxWidth) || 1920;
   config.auth = config.auth || {};
-  config.auth.githubDeviceFlow = config.auth.githubDeviceFlow || { clientId: '', scope: 'repo read:user', proxyBase: '/api/github-device' };
+  config.auth.githubDeviceFlow = config.auth.githubDeviceFlow || { clientId: '', scope: 'repo read:user', proxyBase: '' };
   if (!['auto', 'light', 'dark'].includes(config.theme.default)) config.theme.default = 'auto';
 
   config.giscus.strict = String(config.giscus.strict ?? '0');
@@ -236,7 +236,7 @@ function normalizeConfig(config) {
     .filter(it => it.name || it.img || it.dashboard);
   config.auth.githubDeviceFlow.clientId = String(config.auth.githubDeviceFlow.clientId || '').trim();
   config.auth.githubDeviceFlow.scope = String(config.auth.githubDeviceFlow.scope || 'repo read:user').trim();
-  config.auth.githubDeviceFlow.proxyBase = String(config.auth.githubDeviceFlow.proxyBase || '/api/github-device').trim() || '/api/github-device';
+  config.auth.githubDeviceFlow.proxyBase = String(config.auth.githubDeviceFlow.proxyBase || '').trim();
 }
 
 function validateConfig(config) {
@@ -518,11 +518,11 @@ function settingsContentHtml() {
 
       <section class="settings-card">
         <h3>登录方式</h3>
-        <p class="settings-help">默认仍保留 PAT 登录。若要启用 Device Flow，需要在 GitHub 创建 OAuth App，并把 Client ID 填到这里；scope 建议保留 <code>repo read:user</code>。GitHub OAuth 不支持浏览器直连，需部署 <code>workers/github-device-proxy.js</code> 并绑定 <code>/api/github-device/*</code> 路由。</p>
+        <p class="settings-help">默认仍保留 PAT 登录（推荐，纯静态站点无需额外服务）。Device Flow 需 GitHub OAuth App 的 Client ID，且 GitHub 不支持浏览器直连——只有在你有源站服务器时，部署 <code>proxy/github-device-proxy.mjs</code> 并填写代理路径后才可用。</p>
         <div class="settings-grid">
           <label>Device Flow Client ID <input name="auth.githubDeviceFlow.clientId" placeholder="GitHub OAuth App Client ID"></label>
           <label>Device Flow Scope <input name="auth.githubDeviceFlow.scope" placeholder="repo read:user"></label>
-          <label class="span-2">Device Flow 代理路径 <input name="auth.githubDeviceFlow.proxyBase" placeholder="/api/github-device"></label>
+          <label class="span-2">Device Flow 代理路径 <input name="auth.githubDeviceFlow.proxyBase" placeholder="留空禁用；例 /api/github-device"></label>
         </div>
       </section>
 

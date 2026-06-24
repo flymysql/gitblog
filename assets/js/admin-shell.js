@@ -13,6 +13,7 @@ import {
   loginWithDeviceFlow,
   logout,
   isAuthorized,
+  isDeviceFlowAvailable,
   getToken,
   getUser,
   popReturnTo,
@@ -75,6 +76,8 @@ function showToast(msg, kind = '') {
 
 function renderLogin(host) {
   const tokenUrl = buildTokenCreateUrl();
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const deviceFlowAvailable = isDeviceFlowAvailable();
   host.innerHTML = `
     <div class="admin-page-fullscreen">
       <div class="login-wrap">
@@ -85,8 +88,8 @@ function renderLogin(host) {
             </svg>
           </div>
           <h1>登录创作后台</h1>
-          <p>粘贴你的 GitHub Personal Access Token，文章会以 commit 形式直接推到仓库。<br>
-          <a href="${tokenUrl}" target="_blank" rel="noopener" style="color:var(--primary)">点这里生成 token →</a></p>
+          <p>${isMobile ? '手机端推荐粘贴 GitHub Personal Access Token 登录。' : '粘贴你的 GitHub Personal Access Token，文章会以 commit 形式直接推到仓库。'}<br>
+          <a href="${tokenUrl}"${isMobile ? '' : ' target="_blank" rel="noopener"'} style="color:var(--primary)">点这里生成 token →</a></p>
           <form id="loginForm" autocomplete="off" style="text-align:left">
             <label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px">Personal Access Token</label>
             <div style="position:relative;margin-bottom:14px">
@@ -99,7 +102,7 @@ function renderLogin(host) {
               <input type="checkbox" id="remember" checked> 在此设备保持登录
             </label>
             <button type="submit" class="btn-github" id="btnLogin">验证并登录</button>
-            <button type="button" class="btn-device" id="btnDeviceLogin">使用 GitHub Device Flow 登录</button>
+            ${deviceFlowAvailable ? '<button type="button" class="btn-device" id="btnDeviceLogin">使用 GitHub Device Flow 登录</button>' : ''}
             <div id="deviceLoginBox" class="device-login-box" hidden></div>
             <div id="loginError" style="display:none;margin-top:12px;color:#d9534f;font-size:13px;text-align:center"></div>
           </form>
@@ -141,63 +144,60 @@ function renderLogin(host) {
 
   const deviceBtn = $('#btnDeviceLogin');
   const deviceBox = $('#deviceLoginBox');
-  const deviceEnabled = !!(CONFIG.auth && CONFIG.auth.githubDeviceFlow && CONFIG.auth.githubDeviceFlow.clientId);
-  if (!deviceEnabled) {
-    deviceBtn.disabled = true;
-    deviceBtn.title = '请先在 config.js / 后台设置中配置 auth.githubDeviceFlow.clientId';
-  }
-  deviceBtn.addEventListener('click', async () => {
-    const $err = $('#loginError');
-    $err.style.display = 'none';
-    deviceBtn.disabled = true;
-    deviceBtn.textContent = '等待 GitHub 授权…';
-    try {
-      await loginWithDeviceFlow({
-        remember: $('#remember').checked,
-        onCode: info => {
-          const isMobile = window.matchMedia('(max-width: 768px)').matches;
-          const verifyUrl = info.verification_uri_complete || info.verification_uri;
-          deviceBox.hidden = false;
-          deviceBox.innerHTML = `
-            <div>${isMobile ? '复制验证码，然后在 GitHub 页面输入：' : '在新页面输入验证码：'}</div>
+  if (deviceBtn) {
+    deviceBtn.addEventListener('click', async () => {
+      const $err = $('#loginError');
+      $err.style.display = 'none';
+      deviceBtn.disabled = true;
+      deviceBtn.textContent = '等待 GitHub 授权…';
+      try {
+        await loginWithDeviceFlow({
+          remember: $('#remember').checked,
+          onCode: info => {
+            const isMobileView = window.matchMedia('(max-width: 768px)').matches;
+            const verifyUrl = info.verification_uri_complete || info.verification_uri;
+            deviceBox.hidden = false;
+            deviceBox.innerHTML = `
+            <div>${isMobileView ? '复制验证码，然后在 GitHub 页面输入：' : '在新页面输入验证码：'}</div>
             <strong id="deviceUserCode">${escapeHtml(info.user_code)}</strong>
             <button type="button" class="btn-copy-code" id="btnCopyDeviceCode">复制验证码</button>
-            <a class="btn-device-open" href="${escapeHtml(verifyUrl)}"${isMobile ? '' : ' target="_blank" rel="noopener"'}>
-              ${isMobile ? '前往 GitHub 授权' : '打开 GitHub 授权页面 →'}
+            <a class="btn-device-open" href="${escapeHtml(verifyUrl)}"${isMobileView ? '' : ' target="_blank" rel="noopener"'}>
+              ${isMobileView ? '前往 GitHub 授权' : '打开 GitHub 授权页面 →'}
             </a>
             <div class="device-login-hint">完成 GitHub 授权后请保持此页打开，会自动完成登录</div>
           `;
-          const copyBtn = $('#btnCopyDeviceCode');
-          if (copyBtn) {
-            copyBtn.addEventListener('click', async () => {
-              try {
-                await navigator.clipboard.writeText(info.user_code);
-                showToast('验证码已复制');
-              } catch {
-                const range = document.createRange();
-                const node = $('#deviceUserCode');
-                if (node) {
-                  range.selectNodeContents(node);
-                  const sel = window.getSelection();
-                  sel.removeAllRanges();
-                  sel.addRange(range);
+            const copyBtn = $('#btnCopyDeviceCode');
+            if (copyBtn) {
+              copyBtn.addEventListener('click', async () => {
+                try {
+                  await navigator.clipboard.writeText(info.user_code);
+                  showToast('验证码已复制');
+                } catch {
+                  const range = document.createRange();
+                  const node = $('#deviceUserCode');
+                  if (node) {
+                    range.selectNodeContents(node);
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                  }
+                  showToast('请手动复制验证码');
                 }
-                showToast('请手动复制验证码');
-              }
-            });
-          }
-        },
-      });
-      const back = popReturnTo();
-      if (back && back !== window.location.href) window.location.href = back;
-      else window.location.reload();
-    } catch (err) {
-      $err.textContent = err.message || String(err);
-      $err.style.display = '';
-      deviceBtn.disabled = !deviceEnabled;
-      deviceBtn.textContent = '使用 GitHub Device Flow 登录';
-    }
-  });
+              });
+            }
+          },
+        });
+        const back = popReturnTo();
+        if (back && back !== window.location.href) window.location.href = back;
+        else window.location.reload();
+      } catch (err) {
+        $err.textContent = err.message || String(err);
+        $err.style.display = '';
+        deviceBtn.disabled = false;
+        deviceBtn.textContent = '使用 GitHub Device Flow 登录';
+      }
+    });
+  }
 }
 
 function renderUnauthorized(host) {

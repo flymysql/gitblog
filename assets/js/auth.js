@@ -74,7 +74,14 @@ function encodeFormBody(fields) {
 
 function getDeviceFlowEndpoints() {
   const cfg = (CONFIG.auth && CONFIG.auth.githubDeviceFlow) || {};
-  const proxyBase = String(cfg.proxyBase || '/api/github-device').replace(/\/$/, '');
+  const proxyBase = String(cfg.proxyBase || '').trim().replace(/\/$/, '');
+  if (!proxyBase) {
+    throw new Error(
+      '未配置 Device Flow 代理（auth.githubDeviceFlow.proxyBase）。' +
+      'GitHub OAuth 不支持浏览器直连，纯静态站点请直接粘贴 PAT 登录。' +
+      '若源站有 nginx，可部署 proxy/github-device-proxy.mjs 并反代 /api/github-device/*。'
+    );
+  }
   const origin = proxyBase.startsWith('http')
     ? proxyBase
     : `${window.location.origin}${proxyBase.startsWith('/') ? proxyBase : `/${proxyBase}`}`;
@@ -99,9 +106,9 @@ async function deviceFlowPost(url, fields) {
     const msg = e && e.message ? e.message : String(e);
     if (/failed to fetch|networkerror|load failed/i.test(msg)) {
       throw new Error(
-        '无法连接 GitHub 授权服务（Failed to fetch）。' +
-        'GitHub OAuth 接口不支持浏览器直连，请部署 workers/github-device-proxy.js 并绑定路由 /api/github-device/*，' +
-        '或在 config.js 配置 auth.githubDeviceFlow.proxyBase。手机端也可直接粘贴 PAT 登录。'
+        '无法连接 GitHub 授权代理（Failed to fetch）。' +
+        '请确认 proxy/github-device-proxy.mjs 已在源站运行，且 nginx 已反代 /api/github-device/*。' +
+        '纯静态站点请直接粘贴 PAT 登录。'
       );
     }
     throw new Error('网络请求失败：' + msg);
@@ -113,7 +120,7 @@ async function deviceFlowPost(url, fields) {
   } catch {
     if (res.status === 404) {
       throw new Error(
-        'Device Flow 代理未就绪（404）。请部署 workers/github-device-proxy.js 到 /api/github-device/*，' +
+        'Device Flow 代理未就绪（404）。请确认源站已部署 proxy/github-device-proxy.mjs，' +
         '或改用 PAT 登录。'
       );
     }
@@ -159,6 +166,11 @@ export async function loginWithDeviceFlow({ remember = true, onCode } = {}) {
     }
   }
   throw new Error('Device Flow 登录超时，请重试');
+}
+
+export function isDeviceFlowAvailable() {
+  const cfg = CONFIG.auth && CONFIG.auth.githubDeviceFlow;
+  return !!(cfg && cfg.clientId && String(cfg.proxyBase || '').trim());
 }
 
 export function logout(returnTo) {
