@@ -55,6 +55,14 @@ function getNestedStr(section, key) {
   const m = cfgRaw.match(re);
   return m ? m[1] : '';
 }
+
+function getSaobbySiteLabel() {
+  const m = cfgRaw.match(/saobby\s*:\s*\{[\s\S]*?site\s*:\s*\{[\s\S]*?label\s*:\s*"([^"]*)"/);
+  return m ? m[1] : '总访问';
+}
+
+const SHOW_HOME_STATS = getSectionBool('pageviews', 'showHomeStats', true);
+const SAOBBY_SITE_LABEL = getSaobbySiteLabel();
 const POSTS_DIR = 'posts';
 const INDEX_FILE = 'data/posts.json';
 const OG_DIR = 'assets/og';
@@ -754,6 +762,8 @@ function injectHomeSeo() {
     postCount: visiblePosts.length,
     tagCount: tagSet.size,
     pathPrefix: SITE_PATH_PREFIX,
+    showSiteStats: SHOW_HOME_STATS,
+    siteStatsLabel: SAOBBY_SITE_LABEL,
   });
   html = html.replace(
     /<section class="hero" id="hero"[^>]*>[\s\S]*?<\/section>/,

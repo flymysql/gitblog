@@ -140,6 +140,30 @@ function renderHero(posts) {
   `;
 }
 
+/** 移动端首屏预渲染 hero 缺少访客统计位时补上（defer 路径不调 renderHero） */
+function hydratePrerenderHeroStats() {
+  const hero = $('#hero');
+  if (!hero) return;
+  const statsEl = hero.querySelector('.hero-stats');
+  if (!statsEl || statsEl.querySelector('[data-saobby-slot="site"]')) return;
+  if ((CONFIG.pageviews || {}).showHomeStats === false) return;
+
+  let postCount = 0;
+  let tagCount = 0;
+  statsEl.querySelectorAll('.stat').forEach(el => {
+    const text = el.textContent || '';
+    const pm = text.match(/(\d+)\s*篇文章/);
+    const tm = text.match(/(\d+)\s*个标签/);
+    if (pm) postCount = Number(pm[1]);
+    if (tm) tagCount = Number(tm[1]);
+  });
+
+  statsEl.innerHTML = `
+    <div class="stat"><strong>${postCount}</strong>篇文章</div>
+    <div class="stat"><strong>${tagCount}</strong>个标签</div>
+    ${bszSiteStatsHtml()}`;
+}
+
 /** 签名单行：在可用宽度内通过缩小字号展示全文（无省略号）；再按 .hero-info 总高度设头像正方形 */
 let heroAvatarResizeObserver = null;
 let heroAvatarResizeFallbackBound = false;
@@ -853,6 +877,7 @@ function bindMobileHomeSticky() {
   }
 
   bindHeroAvatarSizeSync();
+  hydratePrerenderHeroStats();
   // hero-stats 异步插入后高度会变，需重新对齐头像占位
   initPageviews();
   bindHeroAvatarSizeSync();
