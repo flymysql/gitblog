@@ -16,6 +16,7 @@ const EMOJI_GROUPS = [
 ];
 
 let _app = null;
+let _authReady = null;
 let _sdkPromise = null;
 
 function escapeHtml(s) {
@@ -39,19 +40,33 @@ function loadScript(src) {
   });
 }
 
+async function ensureCloudBaseAuth(app) {
+  if (_authReady) return _authReady;
+  _authReady = (async () => {
+    const auth = app.auth();
+    try {
+      const state = await auth.getLoginState();
+      if (!state) await auth.signInAnonymously();
+    } catch (err) {
+      throw new Error('CloudBase 匿名登录失败，请在控制台开启「匿名登录」：' + (err.message || err));
+    }
+  })();
+  return _authReady;
+}
+
 async function getCloudBaseApp() {
   if (_app) return _app;
   if (!_sdkPromise) {
-    _sdkPromise = loadScript(SDK_URL).then(() => {
+    _sdkPromise = loadScript(SDK_URL).then(async () => {
       const cfg = CONFIG.cloudbase || {};
       const envId = String(cfg.envId || '').trim();
       if (!envId) throw new Error('缺少 cloudbase.envId');
-      // eslint-disable-next-line no-undef
       // eslint-disable-next-line no-undef
       _app = cloudbase.init({
         env: envId,
         region: String(cfg.region || 'ap-shanghai').trim() || 'ap-shanghai',
       });
+      await ensureCloudBaseAuth(_app);
       return _app;
     });
   }

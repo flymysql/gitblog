@@ -330,6 +330,7 @@ writeFileSync(`${TOOLS_DIR}/index.html`, `<!DOCTYPE html>
   <meta name="theme-color" content="#ea6f5a">
   <link rel="apple-touch-icon" href="/assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
 </head>
 <body>
   <div id="site-nav"></div>
