@@ -130,6 +130,24 @@ embedBaseUrl: 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com',
 | `COMMENT_MODERATION` | `1` 开启审核，`0` 直接显示 |
 | `COMMENT_SALT` | 随机字符串，用于 IP hash |
 | `ALLOWED_ORIGINS` | HTTP 模式跨域来源（embed 模式可忽略） |
+| `REPLY_NOTIFY_ENABLED` | `1` 开启回复邮件通知（须配置 SMTP） |
+| `SMTP_HOST` | SMTP 服务器，如 `smtp.qq.com` |
+| `SMTP_PORT` | 端口，SSL 通常 `465`，TLS 用 `587` |
+| `SMTP_USER` | SMTP 登录账号 |
+| `SMTP_PASS` | SMTP 授权码/密码 |
+| `SMTP_FROM` | 发件人地址（可留空，默认用 `SMTP_USER`） |
+
+### 回复与 @ 提及
+
+- 点击评论「回复」会在该楼层下展开回复框，并自动填入 `@昵称`
+- 回复嵌套显示在原评论下方
+- 被回复者邮箱不会公开，仅用于通知
+
+### 回复邮件通知（可选）
+
+当被回复的评论**留有邮箱**时，云函数会异步发送通知邮件。默认关闭，配置 SMTP 后设 `REPLY_NOTIFY_ENABLED=1` 即可。
+
+QQ 邮箱示例：在 QQ 邮箱设置中开启 SMTP，使用授权码作为 `SMTP_PASS`。
 
 ## 8. 前端配置
 
