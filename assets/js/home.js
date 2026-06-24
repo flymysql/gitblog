@@ -7,7 +7,7 @@ import { fetchIndexPublic } from './api.js';
 import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPathFromPost, postPath, rootPath, thumbUrlFor } from './site.js';
 import { initPageviews, bszSiteStatsHtml } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
-import { isNotesGiscusReady, mountNotesGiscusScript } from './giscus-embed.js';
+import { isCommentsReady, mountNotesComments } from './comments-embed.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -886,8 +886,8 @@ function bindMobileHomeSticky() {
       if (listState && listState.observer) listState.observer.disconnect();
       listState = null;
       ul.classList.add('post-list--giscus');
-      if (!isNotesGiscusReady()) {
-        ul.innerHTML = `<li class="empty">请先在后台启用 giscus 并填写完整配置（含随笔分类 notesCategoryId）。随笔内容通过评论发布（与 <a href="notes.html">随笔页</a> 同一条讨论）。</li>`;
+      if (!isCommentsReady('notes')) {
+        ul.innerHTML = `<li class="empty">请先在后台启用评论（CloudBase 或 giscus）并填写完整配置。随笔与 <a href="notes.html">随笔页</a> 共用同一条讨论。</li>`;
       } else {
         ul.innerHTML = `
           <li class="home-giscus-only">
@@ -895,7 +895,7 @@ function bindMobileHomeSticky() {
             <div class="home-notes-giscus" id="homeNotesGiscusRoot"></div>
           </li>`;
         const root = $('#homeNotesGiscusRoot');
-        if (root) mountNotesGiscusScript(root);
+        if (root) mountNotesComments(root);
       }
     } else {
       ul.classList.remove('post-list--giscus');

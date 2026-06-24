@@ -56,6 +56,21 @@ export const CONFIG = {
     lang: "zh-CN",
     notesTerm: "gitblog-notes-feed"
   },
+  comments: {
+    provider: "giscus"
+  },
+  cloudbase: {
+    enabled: false,
+    envId: "",
+    region: "ap-shanghai",
+    functionName: "gitblog-comments",
+    placeholderNick: "访客",
+    moderation: false,
+    maxLength: 5000,
+    allowImage: true,
+    pageSize: 50,
+    notesTerm: "gitblog-notes-feed"
+  },
   analytics: {
     enabled: false,
     snippet: ""
