@@ -19,6 +19,7 @@ export function toolPageHtml({ title, description, eyebrow, h1, lead, body, scri
   <meta name="theme-color" content="#ea6f5a">
   <link rel="apple-touch-icon" href="/assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
 </head>
 <body>
   <div id="site-nav"></div>
