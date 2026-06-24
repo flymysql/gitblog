@@ -41,13 +41,53 @@ tcb fn deploy gitblog-comments
 
 评论读写全部走云函数，前端不直连数据库。
 
-## 3.1 匿名登录（必开，否则报 you can't request without auth）
+## 3.1 安全来源 / 跨域（必做，否则浏览器报 CORS）
+
+博客域名 `https://gitpull.cn` 不在白名单时，会出现：
+
+`blocked by CORS policy ... tcb-api.tencentcloudapi.com`
+
+**控制台操作**（环境 `gitbolg-d7gmnsrw46e011706`）：
+
+1. 打开 [CloudBase 控制台](https://console.cloud.tencent.com/tcb) → 你的环境 → **环境配置** → **安全来源**（或「安全配置 → Web 安全域名」）
+2. 添加（**不要**带 `https://`）：
+   - `gitpull.cn`
+   - `www.gitpull.cn`
+3. 等待 **1～2 分钟** 生效
+
+**命令行**（可选）：
+
+```bash
+tcb cors add gitpull.cn,www.gitpull.cn -e gitbolg-d7gmnsrw46e011706
+```
+
+## 3.2 开启云函数 HTTP 访问（推荐，默认走 HTTP 不调 SDK）
+
+前端默认 `accessMode: 'http'`，直接请求：
+
+`https://gitbolg-d7gmnsrw46e011706.ap-shanghai.app.tcloudbase.com/gitblog-comments`
+
+控制台步骤：
+
+1. **云函数** → `gitblog-comments` → **HTTP 访问** / **HTTP 访问服务** → **开启**
+2. **重新部署**云函数（本仓库 `cloudbase/functions/gitblog-comments` 已支持 `OPTIONS` 与 CORS 响应头）
+3. 若默认域名不可用，在 `config.js` 的 `cloudbase.httpUrl` 填入控制台显示的完整 HTTP 地址
+
+云函数环境变量（可选）：
+
+| 变量 | 说明 |
+|------|------|
+| `ALLOWED_ORIGINS` | 允许跨域来源，默认 `https://gitpull.cn,https://www.gitpull.cn` |
+
+## 3.3 匿名登录（仅 accessMode 为 sdk 时需要）
+
+若改回 Web SDK 模式（`accessMode: 'sdk'`），还需：
 
 控制台 → **登录授权** → 开启 **匿名登录**。
 
-前端调用云函数前会自动 `signInAnonymously()`。若未开启，评论区会提示鉴权失败。
+前端会在 `callFunction` 前自动 `signInAnonymously()`。
 
-云函数 → `gitblog-comments` → **权限控制**：勾选允许 **未登录用户** / 所有用户调用（视控制台文案而定）。
+云函数 → **权限控制**：允许未登录用户调用。
 
 ## 4. 云存储
 

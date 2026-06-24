@@ -45,6 +45,8 @@ export const CONFIG = {
     envId: "",
     region: "ap-shanghai",
     functionName: "gitblog-comments",
+    accessMode: "http",
+    httpUrl: "",
     placeholderNick: "访客",
     moderation: false,
     maxLength: 5000,
