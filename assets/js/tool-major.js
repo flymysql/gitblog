@@ -1,15 +1,20 @@
-import { initToolPage, $, escapeHtml, copyText } from './tool-kit-common.js';
-import { INTEREST_OPTIONS, SKILL_DIMS, DISCIPLINE_META, SUBJECTS } from './tool-major-data.js';
+import { initToolPage, mountToolComments, $, escapeHtml, copyText } from './tool-kit-common.js';
+import { INTEREST_OPTIONS, SKILL_DIMS, DISCIPLINE_META, SUBJECTS, getMajorById, majorReferenceLinks, describeMajorTraits } from './tool-major-data.js';
 import { scoreMajors, formatResultText } from './tool-major-engine.js';
+import { drawMajorResultShareImage, drawMajorDetailShareImage, showShareImagePreview, toolPageUrl } from './tool-share-image.js';
+
+const COMMENTS_HINT = '你测出来适合什么专业？来聊聊你的志愿想法～';
 
 initToolPage({
   title: '高考专业倾向测评',
   description: '通过兴趣、能力与发展规划问卷，推荐适合你的本科专业方向。仅供参考，不构成正式志愿填报建议。',
   path: 'tools/tool-major.html',
-  commentsHint: '你测出来适合什么专业？来聊聊你的志愿想法～',
+  commentsHint: COMMENTS_HINT,
+  deferComments: true,
 });
 
 const STORAGE_KEY = 'gitblog-major-quiz-v1';
+const RESULT_KEY = 'gitblog-major-last-result';
 const TOTAL_STEPS = 5;
 
 const state = {
@@ -30,6 +35,11 @@ const state = {
   parentPref: '',
 };
 
+let view = 'quiz';
+let lastPayload = null;
+let detailMajorId = '';
+let commentsMounted = false;
+
 function loadState() {
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
@@ -44,8 +54,48 @@ function saveState() {
   } catch { /* ignore */ }
 }
 
+function loadLastResult() {
+  try {
+    const raw = sessionStorage.getItem(RESULT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveLastResult(payload) {
+  try {
+    sessionStorage.setItem(RESULT_KEY, JSON.stringify(payload));
+  } catch { /* ignore */ }
+}
+
 function getAnswers() {
   return { ...state };
+}
+
+function majorDetailUrl(id) {
+  return toolPageUrl('tools/tool-major.html', `major=${encodeURIComponent(id)}`);
+}
+
+function syncChrome() {
+  const hero = document.querySelector('.tool-kit-hero');
+  if (hero) {
+    hero.hidden = !(view === 'quiz' && state.step === 1);
+  }
+}
+
+function setView(next) {
+  view = next;
+  $('majorQuiz').hidden = view !== 'quiz';
+  $('majorResult').hidden = view !== 'result';
+  $('majorDetail').hidden = view !== 'detail';
+  syncChrome();
+}
+
+function ensureResultComments() {
+  if (commentsMounted || view !== 'result') return;
+  mountToolComments('tool-major', COMMENTS_HINT, 'majorGiscus');
+  commentsMounted = true;
 }
 
 function renderProgress() {
@@ -209,6 +259,7 @@ function renderStep() {
   renderProgress();
   $('majorPrev').hidden = state.step <= 1;
   $('majorNext').textContent = state.step >= TOTAL_STEPS ? '查看推荐' : '下一步';
+  syncChrome();
 }
 
 function moneyReadout(v) {
@@ -289,10 +340,15 @@ function validateStep() {
   return true;
 }
 
+function getScoreForMajor(majorId) {
+  const hit = lastPayload?.results?.find(r => r.major.id === majorId);
+  return hit?.score || null;
+}
+
 function renderResults(payload) {
-  $('majorQuiz').hidden = true;
-  const result = $('majorResult');
-  result.hidden = false;
+  lastPayload = payload;
+  saveLastResult(payload);
+  setView('result');
 
   $('majorProfile').textContent = payload.profile;
   $('majorFilterNote').textContent = payload.filteredCount > 0
@@ -316,17 +372,76 @@ function renderResults(payload) {
             ${r.reasons.map(x => `<li>${escapeHtml(x)}</li>`).join('')}
           </ul>
           <p class="major-result-caution">${escapeHtml(r.major.cautions)}</p>
+          <a class="major-result-detail-link" href="${majorDetailUrl(r.major.id)}">查看详情</a>
         </div>
       </article>
     `;
   }).join('');
 
-  result.dataset.text = formatResultText(payload);
+  $('majorResult').dataset.text = formatResultText(payload);
+  ensureResultComments();
+}
+
+function renderDetail(majorId) {
+  const major = getMajorById(majorId);
+  if (!major) {
+    setView('quiz');
+    return;
+  }
+
+  detailMajorId = majorId;
+  const meta = DISCIPLINE_META[major.discipline] || { hue: 12, icon: '专' };
+  const score = getScoreForMajor(majorId);
+  const traits = describeMajorTraits(major);
+  const links = majorReferenceLinks(major);
+
+  $('majorDetailBody').innerHTML = `
+    <header class="major-detail-header">
+      <div class="major-detail-icon" style="--major-hue:${meta.hue}">${escapeHtml(meta.icon)}</div>
+      <div class="major-detail-head-text">
+        <p class="major-detail-discipline">${escapeHtml(major.discipline)}</p>
+        <h2 class="major-detail-title">${escapeHtml(major.name)}</h2>
+        ${score ? `<p class="major-detail-score">与你匹配 ${score}%</p>` : ''}
+      </div>
+    </header>
+    <p class="major-detail-summary">${escapeHtml(major.summary)}</p>
+    <section class="major-detail-block">
+      <h3>典型去向</h3>
+      <ul class="major-detail-careers">
+        ${major.careers.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
+      </ul>
+    </section>
+    ${traits.length ? `
+    <section class="major-detail-block">
+      <h3>专业特点</h3>
+      <ul class="major-detail-traits">
+        ${traits.map(t => `<li>${escapeHtml(t)}</li>`).join('')}
+      </ul>
+    </section>` : ''}
+    <section class="major-detail-block">
+      <h3>填报提醒</h3>
+      <p class="major-detail-caution">${escapeHtml(major.cautions)}</p>
+    </section>
+    <section class="major-detail-block">
+      <h3>延伸阅读</h3>
+      <div class="major-detail-links">
+        ${links.map(link => `
+          <a class="major-detail-link-card" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">
+            <strong>${escapeHtml(link.label)}</strong>
+            <span>${escapeHtml(link.desc || '')}</span>
+          </a>
+        `).join('')}
+      </div>
+    </section>
+  `;
+
+  setView('detail');
+  history.replaceState(null, '', majorDetailUrl(majorId));
 }
 
 function showQuiz() {
-  $('majorResult').hidden = true;
-  $('majorQuiz').hidden = false;
+  setView('quiz');
+  history.replaceState(null, '', toolPageUrl('tools/tool-major.html'));
 }
 
 function resetQuiz() {
@@ -348,12 +463,27 @@ function resetQuiz() {
     parentPref: '',
   });
   sessionStorage.removeItem(STORAGE_KEY);
+  sessionStorage.removeItem(RESULT_KEY);
+  lastPayload = null;
+  detailMajorId = '';
   showQuiz();
   renderStep();
 }
 
+function routeFromUrl() {
+  const majorId = new URLSearchParams(location.search).get('major');
+  if (majorId) {
+    lastPayload = loadLastResult();
+    renderDetail(majorId);
+    return true;
+  }
+  return false;
+}
+
 loadState();
-renderStep();
+if (!routeFromUrl()) {
+  renderStep();
+}
 
 $('majorPrev').addEventListener('click', () => {
   if (state.step > 1) {
@@ -387,5 +517,73 @@ $('majorCopy').addEventListener('click', async () => {
     setTimeout(() => { $('majorCopy').textContent = '复制结果'; }, 1500);
   } catch {
     $('majorCopy').textContent = '复制失败';
+  }
+});
+
+$('majorDetailBack').addEventListener('click', () => {
+  if (lastPayload) {
+    setView('result');
+    history.replaceState(null, '', toolPageUrl('tools/tool-major.html'));
+    ensureResultComments();
+    return;
+  }
+  showQuiz();
+  renderStep();
+});
+
+$('majorCards').addEventListener('click', (e) => {
+  const link = e.target.closest('.major-result-detail-link');
+  if (!link) return;
+  e.preventDefault();
+  const id = new URL(link.href).searchParams.get('major');
+  if (id) renderDetail(id);
+});
+
+$('majorShare').addEventListener('click', async () => {
+  if (!lastPayload) return;
+  const btn = $('majorShare');
+  btn.disabled = true;
+  btn.textContent = '生成中…';
+  try {
+    const pageUrl = toolPageUrl('tools/tool-major.html');
+    const canvas = await drawMajorResultShareImage({
+      profile: lastPayload.profile,
+      results: lastPayload.results,
+      pageUrl,
+    });
+    showShareImagePreview(canvas, {
+      title: '专业推荐分享图',
+      filename: 'major-result.png',
+    });
+  } catch (e) {
+    alert(`分享图生成失败：${e.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '生成分享图';
+  }
+});
+
+$('majorDetailShare').addEventListener('click', async () => {
+  const major = getMajorById(detailMajorId);
+  if (!major) return;
+  const btn = $('majorDetailShare');
+  btn.disabled = true;
+  btn.textContent = '生成中…';
+  try {
+    const pageUrl = majorDetailUrl(detailMajorId);
+    const canvas = await drawMajorDetailShareImage({
+      major,
+      score: getScoreForMajor(detailMajorId),
+      pageUrl,
+    });
+    showShareImagePreview(canvas, {
+      title: `${major.name} 分享图`,
+      filename: `major-${detailMajorId}.png`,
+    });
+  } catch (e) {
+    alert(`分享图生成失败：${e.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '生成分享图';
   }
 });
