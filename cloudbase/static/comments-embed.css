@@ -130,13 +130,22 @@ body { padding: 0 2px 8px; }
 
 .cb-field--avatar {
   grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.cb-field--avatar.cb-field--avatar-open {
+  align-items: flex-start;
 }
 
 .cb-avatar-picker-label {
   display: block;
   font-size: 12px;
   color: var(--text-secondary);
-  margin-bottom: 8px;
+  margin-bottom: 0;
+  flex: 0 0 auto;
 }
 
 .cb-avatar-current {
@@ -149,6 +158,7 @@ body { padding: 0 2px 8px; }
   cursor: pointer;
   overflow: hidden;
   display: block;
+  flex: 0 0 auto;
 }
 
 .cb-avatar-current img {
@@ -158,17 +168,18 @@ body { padding: 0 2px 8px; }
   display: block;
 }
 
-.cb-avatar-picker[hidden] {
-  display: none !important;
-}
-
 .cb-avatar-picker {
-  display: flex;
+  display: none;
   flex-wrap: wrap;
   gap: 6px;
   max-height: 112px;
   overflow: auto;
   padding: 2px;
+  flex: 1 1 100%;
+}
+
+.cb-avatar-picker.is-open {
+  display: flex;
 }
 
 .cb-avatar-option {
@@ -197,10 +208,6 @@ body { padding: 0 2px 8px; }
 .cb-avatar-option.is-selected {
   border-color: var(--primary);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 35%, transparent);
-}
-
-.cb-field--avatar .cb-avatar-picker:not([hidden]) {
-  margin-top: 8px;
 }
 
 .cb-comment-main { flex: 1; min-width: 0; }
