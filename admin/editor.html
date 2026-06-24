@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
   <title>编辑文章</title>
-  <link rel="stylesheet" href="../assets/css/common.css?v=20260615140000">
-  <link rel="stylesheet" href="../assets/css/admin.css?v=20260615140000">
-  <link rel="stylesheet" href="../assets/css/post.css?v=20260615140000">
+  <link rel="stylesheet" href="../assets/css/common.css?v=20260618180000">
+  <link rel="stylesheet" href="../assets/css/admin.css?v=20260618180000">
+  <link rel="stylesheet" href="../assets/css/post.css?v=20260618180000">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
   <link rel="manifest" href="../manifest.webmanifest">
@@ -22,93 +22,116 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         后台
       </a>
-      <a class="btn btn-primary studio-btn-new" href="./editor.html">新建</a>
-      <button type="button" class="studio-icon-btn studio-only-mobile" id="btnToggleNav" title="文章列表" aria-label="文章列表">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-      </button>
+      <a class="btn btn-primary studio-btn-new studio-only-desktop" href="./editor.html">新建</a>
     </div>
     <div class="studio-header-center">
       <span class="editor-status" id="status">未登录</span>
     </div>
     <div class="studio-header-right">
-      <div class="editor-mode-switch" role="tablist" aria-label="编辑模式">
+      <div class="editor-mode-switch studio-only-desktop" role="tablist" aria-label="编辑模式">
         <button type="button" class="editor-mode-btn is-active" data-mode="markdown" role="tab" aria-selected="true" title="Markdown 源码">Markdown</button>
         <button type="button" class="editor-mode-btn" data-mode="rich" role="tab" aria-selected="false" title="富文本模式">富文本</button>
       </div>
-      <div class="editor-toggle-row">
+      <div class="editor-toggle-row studio-only-desktop">
         <label><input type="checkbox" id="draftToggle"> 草稿</label>
         <label><input type="checkbox" id="pinnedToggle"> 置顶</label>
         <label title="需有封面"><input type="checkbox" id="carouselToggle"> 轮播</label>
       </div>
-      <button id="themeToggle" class="icon-btn" title="切换主题">
+      <button id="themeToggle" class="icon-btn studio-only-desktop" title="切换主题">
         <svg class="icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         <svg class="icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         <svg class="icon-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
       </button>
-      <button class="btn btn-secondary studio-only-mobile" id="btnPreview" type="button">预览</button>
-      <button class="btn btn-secondary studio-only-mobile" id="btnToggleOutline" type="button" title="目录">目录</button>
-      <button class="btn btn-secondary" id="btnDelete" style="display:none" type="button">删除</button>
-      <button class="btn btn-primary" id="btnPublish" type="button">发布</button>
+      <button class="btn btn-secondary studio-only-desktop" id="btnDelete" style="display:none" type="button">删除</button>
+      <button class="btn btn-primary studio-only-desktop" id="btnPublish" type="button">发布</button>
     </div>
   </header>
 
   <div class="studio-shell" id="studioShell">
+    <div class="studio-drawer-backdrop" id="studioDrawerBackdrop" hidden></div>
+
     <aside class="studio-nav" id="studioNav">
       <div class="studio-side-head">
-        <strong>文章</strong>
-        <button type="button" class="studio-side-toggle" id="navCollapseBtn" title="收起侧栏" aria-label="收起侧栏">‹</button>
-      </div>
-      <div class="studio-nav-search">
-        <input id="docSearch" type="search" placeholder="搜索标题或 slug…" autocomplete="off">
-      </div>
-      <nav class="studio-doc-list" id="docList" aria-label="文章列表"></nav>
-
-      <div class="studio-nav-meta" id="editorMeta">
-        <div class="editor-meta-toolbar">
-          <span>文章信息</span>
-          <button type="button" class="editor-meta-collapse" id="metaCollapseBtn" aria-expanded="true" aria-controls="editorMeta">收起</button>
+        <div class="studio-nav-tabs" role="tablist" aria-label="侧栏">
+          <button type="button" class="studio-nav-tab is-active" data-nav-tab="list" role="tab" aria-selected="true">列表</button>
+          <button type="button" class="studio-nav-tab" data-nav-tab="settings" role="tab" aria-selected="false">设置</button>
         </div>
-        <div class="studio-meta-body">
-          <label class="studio-field">作者 <input id="author" placeholder="作者"></label>
-          <label class="studio-field">封面 <input id="cover" placeholder="封面图 URL"></label>
-          <label class="studio-field">slug <input id="slug" placeholder="自动生成"></label>
-          <div class="editor-series-field" id="seriesField">
-            <span class="editor-meta-label">专栏</span>
-            <div class="editor-selected-tags" id="selectedSeries" aria-live="polite"></div>
-            <div class="editor-tag-input-row">
-              <input id="seriesInput" placeholder="输入专栏名，或从下方选择" list="seriesNameList" autocomplete="off">
-              <datalist id="seriesNameList"></datalist>
-              <button class="btn btn-secondary" id="addSeriesBtn" type="button">加入专栏</button>
+        <button type="button" class="studio-side-toggle studio-only-desktop" id="navCollapseBtn" title="收起侧栏" aria-label="收起侧栏">‹</button>
+        <button type="button" class="studio-side-close studio-only-mobile" id="navCloseBtn" aria-label="关闭">×</button>
+      </div>
+
+      <div class="studio-nav-panel is-active" data-nav-panel="list">
+        <div class="studio-nav-search">
+          <input id="docSearch" type="search" placeholder="搜索标题或 slug…" autocomplete="off">
+        </div>
+        <nav class="studio-doc-list" id="docList" aria-label="文章列表"></nav>
+      </div>
+
+      <div class="studio-nav-panel" data-nav-panel="settings" id="editorMeta">
+        <div class="studio-meta-scroll">
+          <section class="studio-meta-section">
+            <h3 class="studio-meta-section-title">基础信息</h3>
+            <div class="studio-meta-grid">
+              <label class="studio-field">作者<input id="author" placeholder="作者" autocomplete="off"></label>
+              <label class="studio-field">slug<input id="slug" placeholder="自动生成" autocomplete="off"></label>
+              <label class="studio-field studio-field-full">封面<input id="cover" placeholder="封面图 URL" autocomplete="off"></label>
             </div>
-            <div class="editor-tag-suggestions" id="seriesSuggestions"></div>
-            <label class="studio-field studio-series-order" id="seriesOrderWrap" hidden>
-              专栏内排序
-              <input id="seriesOrder" type="number" min="1" step="1" placeholder="如 1、2、3（越小越靠前）">
-            </label>
-          </div>
-          <div class="studio-field studio-summary-field">
-            <span class="editor-meta-label">摘要</span>
-            <p class="studio-summary-text" id="summaryPreview">发布时自动从正文提取，也可点下方「生成摘要」</p>
-          </div>
-          <div class="editor-tag-field">
-            <span class="editor-meta-label">标签</span>
-            <input id="tags" type="hidden">
-            <div class="editor-selected-tags" id="selectedTags" aria-live="polite"></div>
-            <div class="editor-tag-input-row">
-              <input id="tagInput" placeholder="输入标签后回车">
-              <button class="btn btn-secondary" id="addTagBtn" type="button">添加</button>
+            <div class="studio-summary-box">
+              <span class="editor-meta-label">摘要</span>
+              <p class="studio-summary-text" id="summaryPreview">发布时自动从正文提取，也可点「生成摘要」</p>
+              <button type="button" class="studio-inline-btn" id="btnGenSummaryMeta">生成摘要</button>
             </div>
-            <div class="editor-tag-suggestions" id="tagSuggestions"></div>
-          </div>
-          <div class="editor-counter-field" id="counterField" hidden>
-            <span class="editor-meta-label">独立计数器（saobby）</span>
+          </section>
+
+          <section class="studio-meta-section">
+            <h3 class="studio-meta-section-title">专栏</h3>
+            <div class="editor-series-field" id="seriesField">
+              <div class="editor-selected-tags" id="selectedSeries" aria-live="polite"></div>
+              <div class="editor-tag-input-row">
+                <input id="seriesInput" placeholder="专栏名称" list="seriesNameList" autocomplete="off">
+                <datalist id="seriesNameList"></datalist>
+                <button class="btn btn-secondary" id="addSeriesBtn" type="button">加入</button>
+              </div>
+              <div class="editor-tag-suggestions" id="seriesSuggestions"></div>
+              <label class="studio-field studio-series-order" id="seriesOrderWrap" hidden>
+                专栏内排序<input id="seriesOrder" type="number" min="1" step="1" placeholder="1、2、3…">
+              </label>
+            </div>
+          </section>
+
+          <section class="studio-meta-section">
+            <h3 class="studio-meta-section-title">标签</h3>
+            <div class="editor-tag-field">
+              <input id="tags" type="hidden">
+              <div class="editor-selected-tags" id="selectedTags" aria-live="polite"></div>
+              <div class="editor-tag-input-row">
+                <input id="tagInput" placeholder="输入后回车" autocomplete="off">
+                <button class="btn btn-secondary" id="addTagBtn" type="button">添加</button>
+              </div>
+              <div class="editor-tag-suggestions" id="tagSuggestions"></div>
+            </div>
+          </section>
+
+          <section class="studio-meta-section">
+            <h3 class="studio-meta-section-title">发布选项</h3>
+            <div class="studio-check-grid studio-only-mobile">
+              <label class="studio-check"><input type="checkbox" id="draftToggleMobile"> 草稿</label>
+              <label class="studio-check"><input type="checkbox" id="pinnedToggleMobile"> 置顶</label>
+              <label class="studio-check"><input type="checkbox" id="carouselToggleMobile"> 轮播</label>
+            </div>
+            <p class="studio-meta-hint studio-only-mobile">移动端使用富文本编辑；发布选项与桌面端同步。</p>
+            <button type="button" class="btn btn-secondary studio-btn-block studio-only-mobile" id="btnDeleteMobile" style="display:none">删除文章</button>
+          </section>
+
+          <section class="editor-counter-field studio-meta-section" id="counterField" hidden>
+            <h3 class="studio-meta-section-title">独立计数器</h3>
             <div class="editor-counter-row">
-              <button type="button" class="btn btn-secondary" id="counterCreateBtn">创建计数器…</button>
+              <button type="button" class="btn btn-secondary" id="counterCreateBtn">创建…</button>
               <button type="button" class="btn" id="counterPasteBtn">粘贴 URL…</button>
               <button type="button" class="btn" id="counterClearBtn" hidden>清除</button>
             </div>
             <div class="editor-counter-summary" id="counterSummary"></div>
-          </div>
+          </section>
         </div>
       </div>
     </aside>
@@ -120,22 +143,22 @@
 
       <div class="studio-workspace" id="studioWorkspace">
         <section class="studio-panel studio-panel-source">
-          <header class="studio-panel-head"><span>编辑</span></header>
+          <header class="studio-panel-head studio-only-desktop"><span>编辑</span></header>
           <div class="studio-panel-body studio-source-body">
             <textarea class="editor-textarea" id="content" placeholder="开始用 Markdown 写作。支持拖拽 / 粘贴上传图片"></textarea>
             <div id="vditorHost" class="editor-vditor-host" hidden></div>
             <div id="dropHint" class="editor-drop-hint" hidden>松开以上传图片</div>
           </div>
-          <footer class="studio-panel-foot">
+          <footer class="studio-panel-foot studio-only-desktop">
             <button type="button" class="studio-foot-btn" id="footAddTag">+ 添加标签</button>
             <button type="button" class="studio-foot-btn" id="footAddSeries">+ 加入专栏</button>
             <button type="button" class="studio-foot-btn studio-foot-btn-ai" id="btnGenSummary">生成摘要</button>
           </footer>
         </section>
 
-        <div class="studio-splitter" id="studioSplitter" role="separator" aria-orientation="vertical" aria-label="调整编辑与预览宽度"></div>
+        <div class="studio-splitter studio-only-desktop" id="studioSplitter" role="separator" aria-orientation="vertical" aria-label="调整编辑与预览宽度"></div>
 
-        <section class="studio-panel studio-panel-preview">
+        <section class="studio-panel studio-panel-preview studio-only-desktop">
           <header class="studio-panel-head"><span>预览</span></header>
           <div class="studio-panel-body editor-preview" id="previewPane">
             <h1 class="article-title" id="previewTitle">预览</h1>
@@ -145,7 +168,7 @@
       </div>
     </main>
 
-    <aside class="studio-outline" id="studioOutline">
+    <aside class="studio-outline studio-only-desktop" id="studioOutline">
       <div class="studio-side-head">
         <strong>目录</strong>
         <button type="button" class="studio-side-toggle" id="outlineCollapseBtn" title="收起目录" aria-label="收起目录">›</button>
@@ -156,7 +179,19 @@
     </aside>
   </div>
 
+  <nav class="studio-mobile-bar studio-only-mobile" aria-label="移动端操作">
+    <button type="button" class="studio-mobile-btn" id="btnMobileList">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      <span>文章</span>
+    </button>
+    <button type="button" class="studio-mobile-btn" id="btnMobileSettings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <span>设置</span>
+    </button>
+    <button type="button" class="studio-mobile-btn studio-mobile-btn-primary" id="btnPublishMobile">发布</button>
+  </nav>
+
   <script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
-  <script type="module" src="../assets/js/editor.js?v=20260615140000"></script>
+  <script type="module" src="../assets/js/editor.js?v=20260618180000"></script>
 </body>
 </html>
