@@ -459,8 +459,8 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
   if (custom) {
     url = new URL(custom);
   } else {
-    const base = String(cfg.embedBaseUrl || '').trim()
-      || `https://${envId}.tcloudbaseapp.com`;
+    const base = String(cfg.embedBaseUrl || '').trim();
+    if (!base) return null;
     const page = String(cfg.embedPage || 'comments-embed.html').trim() || 'comments-embed.html';
     url = new URL(page, base.endsWith('/') ? base : `${base}/`);
   }
@@ -474,9 +474,15 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
   return url.toString();
 }
 
+const EMBED_BASE_HINT = '请在 config.js 或后台设置填写 <code>embedBaseUrl</code>，值为 <code>tcb hosting deploy</code> 输出中的完整域名（形如 <code>https://{envId}-{数字}.tcloudbaseapp.com</code>，不是 <code>{envId}.tcloudbaseapp.com</code>）。';
+
 function mountCloudBaseEmbed(targetEl, path, opts = {}) {
   const cfg = cloudbaseCfg();
   const src = resolveEmbedPageUrl(cfg, path, opts);
+  if (!src) {
+    targetEl.innerHTML = `<div class="comments-hint">${EMBED_BASE_HINT}</div>`;
+    return false;
+  }
   targetEl.innerHTML = `
     <div class="cb-embed-wrap">
       <iframe
@@ -486,7 +492,7 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
         referrerpolicy="strict-origin-when-cross-origin"
         src="${escapeHtml(src)}"
       ></iframe>
-      <p class="cb-embed-hint comments-hint">评论由 CloudBase 提供；若空白请先执行 <code>tcb hosting deploy ./static</code> 部署嵌入页（见 cloudbase/README.md）。</p>
+      <p class="cb-embed-hint comments-hint">评论由 CloudBase 提供；若空白或 404，请核对 <code>embedBaseUrl</code> 是否与 <code>tcb hosting deploy</code> 输出一致（见 cloudbase/README.md）。</p>
     </div>
   `;
   const iframe = targetEl.querySelector('.cb-embed-frame');
