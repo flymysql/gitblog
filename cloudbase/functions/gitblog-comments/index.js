@@ -68,7 +68,10 @@ function sanitizeHtml(raw) {
     }
     if (t === 'span') {
       const cls = pick('class');
-      return cls === 'cb-uploading' ? '<span class="cb-uploading">' : '<span>';
+      if (cls === 'cb-uploading' || cls === 'cb-mention') {
+        return cls === 'cb-mention' ? '<span class="cb-mention">' : '<span class="cb-uploading">';
+      }
+      return '<span>';
     }
     return `<${t}>`;
   });
@@ -129,9 +132,56 @@ function publicComment(row) {
     nick: row.nick || '访客',
     contentHtml: row.contentHtml,
     parentId: row.parentId || null,
+    replyToNick: row.replyToNick || null,
     createdAt: row.createdAt,
     createdAtIso: row.createdAtIso,
   };
+}
+
+function isValidEmail(s) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || '').trim());
+}
+
+function ensureMentionHtml(html, nick) {
+  const name = String(nick || '访客').trim() || '访客';
+  const plain = stripPlain(html);
+  const mention = `@${name}`;
+  if (plain.startsWith(mention)) return html;
+  const safe = name.replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+  );
+  return `<span class="cb-mention">@${safe}</span> ${html}`.trim();
+}
+
+function isReplyNotifyEnabled() {
+  return String(process.env.REPLY_NOTIFY_ENABLED || '0') === '1'
+    && String(process.env.SMTP_HOST || '').trim()
+    && String(process.env.SMTP_USER || '').trim();
+}
+
+async function sendReplyNotifyEmail({ to, parentNick, replyNick, excerpt, pageTitle, pageUrl }) {
+  if (!isValidEmail(to) || !isReplyNotifyEnabled()) return;
+  const nodemailer = require('nodemailer');
+  const port = Number(process.env.SMTP_PORT) || 465;
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port,
+    secure: port !== 587,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS || '',
+    },
+  });
+  const title = String(pageTitle || '博客').slice(0, 80);
+  const url = String(pageUrl || '').slice(0, 500);
+  const from = String(process.env.SMTP_FROM || process.env.SMTP_USER).trim();
+  await transporter.sendMail({
+    from,
+    to,
+    subject: `【${title}】${replyNick} 回复了你的评论`,
+    text: `${replyNick} 在《${title}》回复了 @${parentNick}：\n\n${excerpt}\n\n查看原文：${url}`,
+    html: `<p><strong>${replyNick}</strong> 在《${title}》回复了 <strong>@${parentNick}</strong>：</p><blockquote>${excerpt.replace(/</g, '&lt;')}</blockquote><p><a href="${url}">查看原文</a></p>`,
+  });
 }
 
 async function handleGet(event) {
@@ -152,7 +202,7 @@ async function handleGet(event) {
 
 async function handlePost(event, context) {
   const path = String(event.path || '').trim();
-  const contentHtml = sanitizeHtml(event.contentHtml);
+  let contentHtml = sanitizeHtml(event.contentHtml);
   const plain = stripPlain(contentHtml);
   if (!path) return jsonErr('缺少 path');
   if (!plain) return jsonErr('评论内容不能为空');
@@ -162,16 +212,32 @@ async function handlePost(event, context) {
   const ipHash = hashIp(ip);
   if (!(await checkRate(ipHash))) return jsonErr('操作过于频繁，请稍后再试', 429);
 
+  const parentId = event.parentId ? String(event.parentId).trim() : null;
+  let parentDoc = null;
+  let replyToNick = null;
+  if (parentId) {
+    const got = await db.collection(COLLECTION).doc(parentId).get();
+    parentDoc = got?.data?.[0] || null;
+    if (!parentDoc || parentDoc.path !== path) return jsonErr('回复目标不存在');
+    if ((parentDoc.status || 'visible') !== 'visible') return jsonErr('无法回复该评论');
+    replyToNick = String(parentDoc.nick || '访客').trim() || '访客';
+    contentHtml = ensureMentionHtml(contentHtml, replyToNick);
+  }
+
   const moderation = String(process.env.COMMENT_MODERATION || '0') === '1';
   const now = Date.now();
+  const pageTitle = String(event.pageTitle || '').slice(0, 200);
+  const pageUrl = String(event.pageUrl || '').slice(0, 500);
+  const nick = String(event.nick || '').trim().slice(0, 40) || '访客';
   const doc = {
     path,
-    nick: String(event.nick || '').trim().slice(0, 40) || '访客',
+    nick,
     email: String(event.email || '').trim().slice(0, 120),
     contentHtml,
-    parentId: event.parentId ? String(event.parentId).trim() : null,
-    pageTitle: String(event.pageTitle || '').slice(0, 200),
-    pageUrl: String(event.pageUrl || '').slice(0, 500),
+    parentId,
+    replyToNick,
+    pageTitle,
+    pageUrl,
     status: moderation ? 'pending' : 'visible',
     createdAt: now,
     createdAtIso: new Date(now).toISOString(),
@@ -180,6 +246,19 @@ async function handlePost(event, context) {
   };
 
   const addRes = await db.collection(COLLECTION).add(doc);
+
+  if (parentDoc && isValidEmail(parentDoc.email) && !moderation) {
+    const excerpt = stripPlain(contentHtml).slice(0, 200);
+    sendReplyNotifyEmail({
+      to: parentDoc.email,
+      parentNick: replyToNick,
+      replyNick: nick,
+      excerpt,
+      pageTitle,
+      pageUrl,
+    }).catch(err => console.error('reply notify failed', err));
+  }
+
   return jsonOk({ id: addRes.id, status: doc.status });
 }
 
