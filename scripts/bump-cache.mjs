@@ -41,6 +41,7 @@ const PWA_BLOCK = rel => [
   `<meta name="theme-color" content="#ea6f5a">`,
   `<link rel="apple-touch-icon" href="${rel}assets/icon.svg">`,
   `<meta name="apple-mobile-web-app-capable" content="yes">`,
+  `<meta name="mobile-web-app-capable" content="yes">`,
 ].join('\n  ');
 
 const htmls = walk('.');

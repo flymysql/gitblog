@@ -41,6 +41,14 @@ tcb fn deploy gitblog-comments
 
 评论读写全部走云函数，前端不直连数据库。
 
+## 3.1 匿名登录（必开，否则报 you can't request without auth）
+
+控制台 → **登录授权** → 开启 **匿名登录**。
+
+前端调用云函数前会自动 `signInAnonymously()`。若未开启，评论区会提示鉴权失败。
+
+云函数 → `gitblog-comments` → **权限控制**：勾选允许 **未登录用户** / 所有用户调用（视控制台文案而定）。
+
 ## 4. 云存储
 
 云函数会将评论图片上传到云存储路径 `comments/{path}/...`。
