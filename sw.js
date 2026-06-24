@@ -34,6 +34,7 @@ const PRECACHE_ASSETS = [
   'assets/dist/tool-image.min.js?v=20260624150000',
   'assets/dist/tool-network.min.js?v=20260624150000',
   'assets/dist/tool-farm-seed.min.js?v=20260624150000',
+  'assets/dist/tool-major.min.js?v=20260624150000',
 ];
 
 // 安装阶段预缓存关键文件，确保彻底离线也能至少打开首页和 offline.html

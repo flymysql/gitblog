@@ -28,6 +28,7 @@ const JS_ENTRIES = {
   'tool-image.min.js': 'assets/js/tool-image.js',
   'tool-network.min.js': 'assets/js/tool-network.js',
   'tool-farm-seed.min.js': 'assets/js/tool-farm-seed.js',
+  'tool-major.min.js': 'assets/js/tool-major.js',
 };
 
 const CSS_ENTRIES = {
