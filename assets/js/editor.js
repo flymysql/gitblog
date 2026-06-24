@@ -56,6 +56,9 @@ const state = {
   editorMode: 'markdown',  // markdown | rich
   selectedTags: [],
   availableTags: [],
+  selectedSeries: '',
+  seriesOrder: '',
+  availableSeries: [],
   counter: { img: '', dashboard: '' }, // 文章独立 saobby 计数器
   docList: [],
   docSearch: '',
@@ -118,12 +121,13 @@ async function loadPost(slug) {
     $('#draftToggle').checked = !!data.draft;
     $('#pinnedToggle').checked = !!data.pinned;
     $('#carouselToggle').checked = !!data.carousel;
+    setEditorSeries(data.series || '', data.seriesOrder);
     setEditorCounter(data.counter || { img: '', dashboard: '' });
     setContent(content);
     document.title = `编辑：${data.title || slug}`;
     renderSummaryPreview();
     setStatus('已加载', 'saved');
-    $('#btnDelete').style.display = '';
+    syncDeleteButtons(true);
     updatePreview();
     refreshEditorLayout();
   } catch (e) {
@@ -219,10 +223,22 @@ function renderDocList(filter = '') {
            href="./editor.html?slug=${encodeURIComponent(p.slug)}"
            title="${escapeHtml(p.title || p.slug)}">
           <span class="studio-doc-title">${escapeHtml(p.title || p.slug)}</span>
+          ${p.series ? `<span class="studio-doc-badge studio-doc-series">${escapeHtml(p.series)}</span>` : ''}
           ${p.draft ? '<span class="studio-doc-badge">草稿</span>' : ''}
         </a>
       `).join('')
     : '<p class="studio-nav-empty">没有匹配的文章</p>';
+
+  refreshSeriesFromDocList();
+}
+
+function refreshSeriesFromDocList() {
+  const names = state.docList.map(p => normalizeSeriesName(p.series)).filter(Boolean);
+  if (state.selectedSeries) names.push(state.selectedSeries);
+  state.availableSeries = [...new Set([...state.availableSeries, ...names])]
+    .sort((a, b) => a.localeCompare(b, 'zh-CN'));
+  renderSeriesPicker();
+  renderSeriesDatalist();
 }
 
 function toCommaList(s) {
@@ -406,6 +422,254 @@ function bindTagPicker() {
   });
 }
 
+function normalizeSeriesName(name) {
+  return String(name || '').trim();
+}
+
+function suggestSeriesOrder(seriesName) {
+  const name = normalizeSeriesName(seriesName);
+  if (!name) return '';
+  const inSeries = state.docList.filter(p => normalizeSeriesName(p.series) === name && p.slug !== state.loadedSlug);
+  const max = inSeries.reduce((m, p) => Math.max(m, Number(p.seriesOrder) || 0), 0);
+  return String(max + 1);
+}
+
+function setEditorSeries(series, order) {
+  state.selectedSeries = normalizeSeriesName(series);
+  const orderEl = $('#seriesOrder');
+  const orderWrap = $('#seriesOrderWrap');
+  const input = $('#seriesInput');
+  if (input) input.value = state.selectedSeries;
+  if (orderEl) {
+    const n = order == null || order === '' ? '' : String(order);
+    state.seriesOrder = n;
+    orderEl.value = n;
+  }
+  if (orderWrap) orderWrap.hidden = !state.selectedSeries;
+  renderSeriesPicker();
+  renderSeriesDatalist();
+}
+
+function renderSeriesDatalist() {
+  const list = $('#seriesNameList');
+  if (!list) return;
+  list.innerHTML = state.availableSeries
+    .map(s => `<option value="${escapeHtml(s)}"></option>`)
+    .join('');
+}
+
+function renderSeriesPicker() {
+  const selected = $('#selectedSeries');
+  const suggestions = $('#seriesSuggestions');
+  const orderWrap = $('#seriesOrderWrap');
+  if (!selected || !suggestions) return;
+
+  selected.innerHTML = state.selectedSeries
+    ? `<button class="editor-tag-chip selected" type="button" data-remove-series title="点击移除专栏">
+        ${escapeHtml(state.selectedSeries)}<span>×</span>
+      </button>`
+    : '<span class="editor-tag-empty">尚未加入专栏</span>';
+
+  if (orderWrap) orderWrap.hidden = !state.selectedSeries;
+
+  const q = ($('#seriesInput') && $('#seriesInput').value.trim().toLowerCase()) || '';
+  const names = state.availableSeries
+    .filter(s => s !== state.selectedSeries)
+    .filter(s => !q || s.toLowerCase().includes(q))
+    .slice(0, 24);
+
+  suggestions.innerHTML = names.length
+    ? names.map(s => `<button class="editor-tag-chip" type="button" data-add-series="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join('')
+    : '<span class="editor-tag-empty">输入新专栏名后点「加入专栏」</span>';
+}
+
+function addEditorSeries(raw) {
+  const name = normalizeSeriesName(raw);
+  if (!name) {
+    showToast('请输入专栏名称', 'error');
+    return;
+  }
+  state.selectedSeries = name;
+  if (!state.availableSeries.includes(name)) {
+    state.availableSeries.push(name);
+    state.availableSeries.sort((a, b) => a.localeCompare(b, 'zh-CN'));
+  }
+  const input = $('#seriesInput');
+  if (input) input.value = name;
+  const orderEl = $('#seriesOrder');
+  if (orderEl && !orderEl.value.trim()) {
+    const suggested = suggestSeriesOrder(name);
+    orderEl.value = suggested;
+    state.seriesOrder = suggested;
+  }
+  renderSeriesPicker();
+  renderSeriesDatalist();
+  showToast(`已加入专栏「${name}」`);
+}
+
+function removeEditorSeries() {
+  state.selectedSeries = '';
+  state.seriesOrder = '';
+  const input = $('#seriesInput');
+  const orderEl = $('#seriesOrder');
+  if (input) input.value = '';
+  if (orderEl) orderEl.value = '';
+  renderSeriesPicker();
+}
+
+function bindSeriesPicker() {
+  const input = $('#seriesInput');
+  const addBtn = $('#addSeriesBtn');
+  const selected = $('#selectedSeries');
+  const suggestions = $('#seriesSuggestions');
+  const orderEl = $('#seriesOrder');
+  if (!input || !addBtn || !selected || !suggestions) return;
+
+  addBtn.addEventListener('click', () => addEditorSeries(input.value));
+  input.addEventListener('input', renderSeriesPicker);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addEditorSeries(input.value);
+    }
+  });
+  suggestions.addEventListener('click', e => {
+    const btn = e.target.closest('[data-add-series]');
+    if (btn) addEditorSeries(btn.dataset.addSeries);
+  });
+  selected.addEventListener('click', e => {
+    if (e.target.closest('[data-remove-series]')) removeEditorSeries();
+  });
+  if (orderEl) {
+    orderEl.addEventListener('input', () => {
+      state.seriesOrder = orderEl.value.trim();
+    });
+  }
+}
+
+async function loadAvailableSeries() {
+  try {
+    const idx = await readIndex();
+    const names = [];
+    for (const p of ((idx && idx.data && idx.data.posts) || [])) {
+      const s = normalizeSeriesName(p.series);
+      if (s) names.push(s);
+    }
+    if (state.selectedSeries) names.push(state.selectedSeries);
+    state.availableSeries = [...new Set(names)].sort((a, b) => a.localeCompare(b, 'zh-CN'));
+    renderSeriesPicker();
+    renderSeriesDatalist();
+  } catch (e) {
+    console.warn('专栏列表加载失败', e);
+  }
+}
+
+const MOBILE_EDITOR_MQ = window.matchMedia('(max-width: 960px)');
+
+function isMobileEditor() {
+  return MOBILE_EDITOR_MQ.matches;
+}
+
+function updateEditorLayoutMode() {
+  const shell = $('#studioShell');
+  if (!shell) return;
+  const rich = state.editorMode === 'rich' || isMobileEditor();
+  shell.classList.toggle('is-rich-mode', rich);
+  document.body.classList.toggle('is-mobile-editor', isMobileEditor());
+  refreshEditorLayout();
+}
+
+async function applyEditorViewport() {
+  updateEditorLayoutMode();
+  if (isMobileEditor() && state.editorMode !== 'rich') {
+    await switchEditorMode('rich');
+  }
+}
+
+function switchNavTab(tab) {
+  document.querySelectorAll('.studio-nav-tab').forEach(btn => {
+    const active = btn.dataset.navTab === tab;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  document.querySelectorAll('.studio-nav-panel').forEach(panel => {
+    panel.classList.toggle('is-active', panel.dataset.navPanel === tab);
+  });
+}
+
+function openNavDrawer(tab = 'list') {
+  switchNavTab(tab);
+  const shell = $('#studioShell');
+  const backdrop = $('#studioDrawerBackdrop');
+  if (shell) shell.classList.add('is-mobile-nav-open');
+  if (backdrop) backdrop.hidden = false;
+}
+
+function closeNavDrawer() {
+  const shell = $('#studioShell');
+  const backdrop = $('#studioDrawerBackdrop');
+  if (shell) shell.classList.remove('is-mobile-nav-open');
+  if (backdrop) backdrop.hidden = true;
+}
+
+function openMetaSettings(section) {
+  switchNavTab('settings');
+  if (isMobileEditor()) openNavDrawer('settings');
+  if (section === 'series') $('#seriesInput')?.focus();
+  else if (section === 'tags') $('#tagInput')?.focus();
+}
+
+function syncDeleteButtons(show) {
+  const vis = show ? '' : 'none';
+  const del = $('#btnDelete');
+  const delM = $('#btnDeleteMobile');
+  if (del) del.style.display = vis;
+  if (delM) delM.style.display = vis;
+}
+
+function bindNavTabs() {
+  document.querySelectorAll('.studio-nav-tab').forEach(btn => {
+    btn.addEventListener('click', () => switchNavTab(btn.dataset.navTab));
+  });
+  $('#navCloseBtn')?.addEventListener('click', closeNavDrawer);
+  $('#studioDrawerBackdrop')?.addEventListener('click', closeNavDrawer);
+}
+
+function bindMobileTogglesSync() {
+  const pairs = [
+    ['draftToggle', 'draftToggleMobile'],
+    ['pinnedToggle', 'pinnedToggleMobile'],
+    ['carouselToggle', 'carouselToggleMobile'],
+  ];
+  pairs.forEach(([desktopId, mobileId]) => {
+    const d = $('#' + desktopId);
+    const m = $('#' + mobileId);
+    if (!d || !m) return;
+    const syncFromDesktop = () => { m.checked = d.checked; };
+    const syncFromMobile = () => { d.checked = m.checked; };
+    d.addEventListener('change', syncFromDesktop);
+    m.addEventListener('change', syncFromMobile);
+    syncFromDesktop();
+  });
+}
+
+function bindMobileChrome() {
+  $('#btnMobileList')?.addEventListener('click', () => openNavDrawer('list'));
+  $('#btnMobileSettings')?.addEventListener('click', () => openNavDrawer('settings'));
+  $('#btnPublishMobile')?.addEventListener('click', () => $('#btnPublish')?.click());
+  $('#btnDeleteMobile')?.addEventListener('click', () => $('#btnDelete')?.click());
+  $('#btnGenSummaryMeta')?.addEventListener('click', () => $('#btnGenSummary')?.click());
+  MOBILE_EDITOR_MQ.addEventListener('change', () => applyEditorViewport());
+}
+
+function focusSeriesPanel() {
+  openMetaSettings('series');
+}
+
+function focusTagPanel() {
+  openMetaSettings('tags');
+}
+
 function validateBeforePublish({ title, slug, content, tags, summary, allPosts, isUpdate }) {
   const errs = [];
   if (!title.trim()) errs.push('标题不能为空');
@@ -432,6 +696,8 @@ async function publish() {
   const pinned = $('#pinnedToggle').checked;
   const carousel = $('#carouselToggle').checked;
   const summary = state.data.summary || extractSummary(content, 80);
+  const series = normalizeSeriesName(state.selectedSeries || ($('#seriesInput') && $('#seriesInput').value));
+  const seriesOrderRaw = ($('#seriesOrder') && $('#seriesOrder').value.trim()) || state.seriesOrder || '';
   if (carousel && !cover) {
     if (!confirm('当前文章没有封面图，无法进入首页轮播。\n\n继续发布会取消「轮播」勾选。是否继续？')) return;
   }
@@ -466,6 +732,13 @@ async function publish() {
   if (draft) data.draft = true;
   if (pinned) data.pinned = true;
   if (carousel && cover) data.carousel = true;
+  if (series) {
+    data.series = series;
+    if (seriesOrderRaw !== '') {
+      const n = Number(seriesOrderRaw);
+      if (!Number.isNaN(n) && n > 0) data.seriesOrder = n;
+    }
+  }
   const counter = state.counter || {};
   if (counter.img || counter.dashboard) {
     data.counter = {
@@ -533,6 +806,8 @@ async function publish() {
       draft,
       pinned,
       carousel: carousel && !!cover,
+      series: data.series,
+      seriesOrder: data.seriesOrder,
       counter: data.counter,
       path: state.loadedPath,
       removeSlug: isRename ? state.loadedSlug : null,
@@ -544,6 +819,7 @@ async function publish() {
     showToast(draft ? '草稿已保存' : '发布成功，几十秒后线上生效');
     loadDocList();
     renderSummaryPreview();
+    closeNavDrawer();
 
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.set('slug', slug);
@@ -564,7 +840,7 @@ async function publish() {
   }
 }
 
-async function updateIndex({ slug, title, date, updated, author, summary, tags, cover, draft, pinned, carousel, counter, path, removeSlug }) {
+async function updateIndex({ slug, title, date, updated, author, summary, tags, cover, draft, pinned, carousel, series, seriesOrder, counter, path, removeSlug }) {
   const idx = await readIndex();
   const data = idx ? idx.data : { posts: [] };
   if (!Array.isArray(data.posts)) data.posts = [];
@@ -579,6 +855,8 @@ async function updateIndex({ slug, title, date, updated, author, summary, tags, 
   if (draft) entry.draft = true;
   if (pinned) entry.pinned = true;
   if (carousel && cover) entry.carousel = true;
+  if (series) entry.series = series;
+  if (seriesOrder != null && !Number.isNaN(Number(seriesOrder))) entry.seriesOrder = Number(seriesOrder);
   if (counter && (counter.img || counter.dashboard)) {
     entry.counter = {
       img: String(counter.img || ''),
@@ -819,6 +1097,10 @@ async function setupVditor(initialMd) {
 
 async function switchEditorMode(target) {
   if (!target || target === state.editorMode) return;
+  if (target === 'markdown' && isMobileEditor()) {
+    showToast('移动端仅支持富文本编辑');
+    return;
+  }
   const buttons = document.querySelectorAll('.editor-mode-btn');
 
   if (target === 'rich') {
@@ -854,7 +1136,6 @@ async function switchEditorMode(target) {
     state.editorMode = 'rich';
     const sourcePanel = document.querySelector('.studio-panel-source') || document.querySelector('.editor-pane');
     if (sourcePanel) sourcePanel.classList.add('is-rich');
-    refreshEditorLayout();
   } else {
     // 富文本 → Markdown：取 Vditor markdown 灌回 EasyMDE
     if (state.vditor && state.vditorReady) {
@@ -868,7 +1149,6 @@ async function switchEditorMode(target) {
     if (sourcePanel) sourcePanel.classList.remove('is-rich');
     setStatus('已切换到 Markdown', 'saved');
     if (state.mde && state.mde.codemirror) state.mde.codemirror.refresh();
-    refreshEditorLayout();
   }
 
   buttons.forEach(b => {
@@ -877,6 +1157,7 @@ async function switchEditorMode(target) {
     b.setAttribute('aria-selected', active ? 'true' : 'false');
   });
   updatePreview();
+  updateEditorLayoutMode();
 }
 
 function bindEditorModeSwitch() {
@@ -955,35 +1236,12 @@ function bindEditorLayoutRefresh() {
   setTimeout(run, 800);
 }
 
-function bindMetaCollapse() {
-  const meta = $('#editorMeta');
-  const btn = $('#metaCollapseBtn');
-  if (!meta || !btn) return;
-
-  const key = 'editor_meta_collapsed';
-  const collapsed = localStorage.getItem(key) === '1';
-  meta.classList.toggle('is-collapsed', collapsed);
-  btn.textContent = collapsed ? '展开' : '收起';
-  btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-
-  btn.addEventListener('click', () => {
-    const next = !meta.classList.contains('is-collapsed');
-    meta.classList.toggle('is-collapsed', next);
-    btn.textContent = next ? '展开' : '收起';
-    btn.setAttribute('aria-expanded', next ? 'false' : 'true');
-    localStorage.setItem(key, next ? '1' : '0');
-    refreshEditorLayout();
-  });
-}
-
 function bindStudioChrome() {
   const shell = $('#studioShell');
   const workspace = $('#studioWorkspace');
   const splitter = $('#studioSplitter');
   const navBtn = $('#navCollapseBtn');
   const outlineBtn = $('#outlineCollapseBtn');
-  const mobileNavBtn = $('#btnToggleNav');
-  const mobileOutlineBtn = $('#btnToggleOutline');
   const docSearch = $('#docSearch');
   const footAddTag = $('#footAddTag');
   const btnGenSummary = $('#btnGenSummary');
@@ -1006,19 +1264,6 @@ function bindStudioChrome() {
     if (localStorage.getItem('studio_outline_collapsed') === '1') shell.classList.add('is-outline-collapsed');
   }
 
-  if (mobileNavBtn && shell) {
-    mobileNavBtn.addEventListener('click', () => {
-      shell.classList.toggle('is-mobile-nav-open');
-      shell.classList.remove('is-mobile-outline-open');
-    });
-  }
-  if (mobileOutlineBtn && shell) {
-    mobileOutlineBtn.addEventListener('click', () => {
-      shell.classList.toggle('is-mobile-outline-open');
-      shell.classList.remove('is-mobile-nav-open');
-    });
-  }
-
   if (docSearch) {
     docSearch.addEventListener('input', () => {
       state.docSearch = docSearch.value;
@@ -1026,18 +1271,10 @@ function bindStudioChrome() {
     });
   }
 
-  if (footAddTag) {
-    footAddTag.addEventListener('click', () => {
-      const meta = $('#editorMeta');
-      if (meta) meta.classList.remove('is-collapsed');
-      const nav = $('#studioNav');
-      if (nav) nav.scrollTop = nav.scrollHeight;
-      $('#tagInput')?.focus();
-      if (window.matchMedia('(max-width: 960px)').matches && shell) {
-        shell.classList.add('is-mobile-nav-open');
-      }
-    });
-  }
+  if (footAddTag) footAddTag.addEventListener('click', focusTagPanel);
+
+  const footAddSeries = $('#footAddSeries');
+  if (footAddSeries) footAddSeries.addEventListener('click', focusSeriesPanel);
 
   if (btnGenSummary) {
     btnGenSummary.addEventListener('click', () => {
@@ -1183,14 +1420,18 @@ function setupEasyMDE() {
 
   setupEasyMDE();
   bindEditorLayoutRefresh();
-  bindMetaCollapse();
+  bindNavTabs();
   bindStudioChrome();
+  bindMobileChrome();
+  bindMobileTogglesSync();
   bindEditorModeSwitch();
   setupDragAndPaste();
   bindTagPicker();
+  bindSeriesPicker();
   bindCounterPanel();
   renderEditorCounter();
   loadAvailableTags();
+  loadAvailableSeries();
   loadDocList();
 
   ['title'].forEach(id => {
@@ -1206,22 +1447,6 @@ function setupEasyMDE() {
 
   $('#btnPublish').addEventListener('click', publish);
   $('#btnDelete').addEventListener('click', deletePost);
-  $('#btnPreview').addEventListener('click', () => {
-    const shell = $('#studioShell');
-    if (shell) {
-      if (shell.classList.contains('is-preview-only')) {
-        shell.classList.remove('is-preview-only');
-        shell.classList.add('is-edit-only');
-      } else if (shell.classList.contains('is-edit-only')) {
-        shell.classList.remove('is-edit-only');
-      } else {
-        shell.classList.add('is-preview-only');
-      }
-      refreshEditorLayout();
-      return;
-    }
-    document.querySelectorAll('.editor-pane').forEach(el => el.classList.toggle('preview-mode'));
-  });
 
   // 自动草稿到 localStorage
   const draftKey = 'editor_draft_' + (initialSlug || 'new');
@@ -1233,6 +1458,7 @@ function setupEasyMDE() {
         $('#title').value = d.title || '';
         setContent(d.content || '');
         setEditorTags(toCommaList(d.tags || ''));
+        setEditorSeries(d.series || '', d.seriesOrder);
         $('#cover').value = d.cover || '';
         $('#slug').value = d.slug || '';
       } else {
@@ -1246,6 +1472,8 @@ function setupEasyMDE() {
       title: $('#title').value,
       content: getContent(),
       tags: $('#tags').value,
+      series: state.selectedSeries,
+      seriesOrder: ($('#seriesOrder') && $('#seriesOrder').value) || state.seriesOrder,
       cover: $('#cover').value,
       slug: $('#slug').value,
       savedAt: new Date().toISOString(),
@@ -1266,4 +1494,5 @@ function setupEasyMDE() {
   } else {
     updatePreview();
   }
+  await applyEditorViewport();
 })();
