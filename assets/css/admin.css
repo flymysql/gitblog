@@ -377,6 +377,40 @@
   color: var(--primary);
   font-family: var(--font-mono);
 }
+.device-login-box .btn-copy-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0 10px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text-main);
+  font-size: 13px;
+  cursor: pointer;
+}
+.device-login-box .btn-copy-code:hover { border-color: var(--primary); color: var(--primary); }
+.device-login-box .btn-device-open {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+}
+.device-login-box .btn-device-open:hover { opacity: 0.92; }
+.device-login-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
 .device-login-box a { color: var(--primary); }
 
 [data-theme="dark"] .btn-github { background: #2A2F36; }

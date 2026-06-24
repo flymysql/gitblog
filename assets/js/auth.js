@@ -66,6 +66,62 @@ export async function loginWithToken(token, { remember = true } = {}) {
   return user;
 }
 
+function encodeFormBody(fields) {
+  return Object.entries(fields)
+    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+    .join('&');
+}
+
+function getDeviceFlowEndpoints() {
+  const cfg = (CONFIG.auth && CONFIG.auth.githubDeviceFlow) || {};
+  const proxyBase = String(cfg.proxyBase || '/api/github-device').replace(/\/$/, '');
+  const origin = proxyBase.startsWith('http')
+    ? proxyBase
+    : `${window.location.origin}${proxyBase.startsWith('/') ? proxyBase : `/${proxyBase}`}`;
+  return {
+    code: `${origin}/code`,
+    accessToken: `${origin}/access_token`,
+  };
+}
+
+async function deviceFlowPost(url, fields) {
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: encodeFormBody(fields),
+    });
+  } catch (e) {
+    const msg = e && e.message ? e.message : String(e);
+    if (/failed to fetch|networkerror|load failed/i.test(msg)) {
+      throw new Error(
+        '无法连接 GitHub 授权服务（Failed to fetch）。' +
+        'GitHub OAuth 接口不支持浏览器直连，请部署 workers/github-device-proxy.js 并绑定路由 /api/github-device/*，' +
+        '或在 config.js 配置 auth.githubDeviceFlow.proxyBase。手机端也可直接粘贴 PAT 登录。'
+      );
+    }
+    throw new Error('网络请求失败：' + msg);
+  }
+
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    if (res.status === 404) {
+      throw new Error(
+        'Device Flow 代理未就绪（404）。请部署 workers/github-device-proxy.js 到 /api/github-device/*，' +
+        '或改用 PAT 登录。'
+      );
+    }
+    throw new Error(`GitHub 授权服务返回异常（HTTP ${res.status}）`);
+  }
+  return { res, data };
+}
+
 export async function loginWithDeviceFlow({ remember = true, onCode } = {}) {
   const cfg = CONFIG.auth && CONFIG.auth.githubDeviceFlow;
   const clientId = cfg && cfg.clientId;
@@ -73,35 +129,25 @@ export async function loginWithDeviceFlow({ remember = true, onCode } = {}) {
     throw new Error('尚未配置 GitHub Device Flow Client ID。请先在后台设置里填写 OAuth App 的 Client ID。');
   }
   const scope = (cfg.scope || 'repo read:user').trim();
-  const startRes = await fetch('https://github.com/login/device/code', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ client_id: clientId, scope }),
+  const endpoints = getDeviceFlowEndpoints();
+  const { res: startRes, data: start } = await deviceFlowPost(endpoints.code, {
+    client_id: clientId,
+    scope,
   });
-  const start = await startRes.json();
-  if (!startRes.ok || start.error) throw new Error(start.error_description || start.error || '无法启动 Device Flow');
+  if (!startRes.ok || start.error) {
+    throw new Error(start.error_description || start.error || '无法启动 Device Flow');
+  }
   if (onCode) onCode(start);
 
   const startedAt = Date.now();
   let interval = Number(start.interval || 5) * 1000;
   while (Date.now() - startedAt < Number(start.expires_in || 900) * 1000) {
     await new Promise(r => setTimeout(r, interval));
-    const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        client_id: clientId,
-        device_code: start.device_code,
-        grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
-      }),
+    const { data: tokenData } = await deviceFlowPost(endpoints.accessToken, {
+      client_id: clientId,
+      device_code: start.device_code,
+      grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
     });
-    const tokenData = await tokenRes.json();
     if (tokenData.error === 'authorization_pending') continue;
     if (tokenData.error === 'slow_down') {
       interval += 5000;
