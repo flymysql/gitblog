@@ -11,7 +11,7 @@ import { bszPagePvHtml, trackAndRenderArticleView } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { enhanceMath, enhanceMermaid, enhanceCodeAdvanced } from './enhancers.js';
 import { shareCardHtml, bindShareCard } from './share.js';
-import { giscusTermForPost, mountComments, getCommentsProvider } from './comments-embed.js';
+import { commentPathForPost, mountComments, getCommentsProvider } from './comments-embed.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -94,9 +94,9 @@ function renderCommentsSection(meta, slug) {
   wrap.className = 'comments';
   article.appendChild(wrap);
 
-  const term = giscusTermForPost({ slug, urlKey: meta && meta.urlKey });
-  wrap.innerHTML = `<div class="comments-title">评论</div><div id="giscusBox"></div>`;
-  mountComments($('#giscusBox'), term, {
+  const term = commentPathForPost({ slug, urlKey: meta && meta.urlKey });
+  wrap.innerHTML = `<div class="comments-title">评论</div><div id="commentsRoot"></div>`;
+  mountComments($('#commentsRoot'), term, {
     pageTitle: meta?.title || document.title,
     pageUrl: location.href,
   });

@@ -161,7 +161,7 @@ function normalizeConfig(config) {
   config.site.url = String(config.site.url || '').replace(/\/+$/, '');
   config.site.social = config.site.social || {};
   config.paths = config.paths || {};
-  config.giscus = config.giscus || {};
+  config.cloudbase = config.cloudbase || {};
   config.theme = config.theme || { default: 'auto' };
   config.theme.preset = config.theme.preset || 'jianshu';
   config.theme.allowReaderPresetSwitch = config.theme.allowReaderPresetSwitch !== false;
@@ -208,19 +208,9 @@ function normalizeConfig(config) {
   config.auth.githubDeviceFlow = config.auth.githubDeviceFlow || { clientId: '', scope: 'repo read:user' };
   if (!['auto', 'light', 'dark'].includes(config.theme.default)) config.theme.default = 'auto';
 
-  config.giscus.strict = String(config.giscus.strict ?? '0');
-  config.giscus.reactionsEnabled = String(config.giscus.reactionsEnabled ?? '1');
-  config.giscus.emitMetadata = String(config.giscus.emitMetadata ?? '0');
-  config.giscus.inputPosition = config.giscus.inputPosition || 'top';
-  config.giscus.notesTerm = String(config.giscus.notesTerm || 'gitblog-notes-feed').trim() || 'gitblog-notes-feed';
-  config.giscus.notesCategory = String(config.giscus.notesCategory || 'Announcements').trim() || 'Announcements';
-  config.giscus.notesCategoryId = String(config.giscus.notesCategoryId || 'DIC_kwDOSZ6GIc4C8wdV').trim() || 'DIC_kwDOSZ6GIc4C8wdV';
+  delete config.giscus;
+  delete config.comments;
 
-  config.comments = config.comments || {};
-  const provider = String(config.comments.provider || '').trim().toLowerCase();
-  config.comments.provider = ['giscus', 'cloudbase', 'none'].includes(provider) ? provider : 'giscus';
-
-  config.cloudbase = config.cloudbase || {};
   config.cloudbase.enabled = !!config.cloudbase.enabled;
   config.cloudbase.envId = String(config.cloudbase.envId || '').trim();
   config.cloudbase.region = String(config.cloudbase.region || 'ap-shanghai').trim() || 'ap-shanghai';
@@ -230,7 +220,7 @@ function normalizeConfig(config) {
   config.cloudbase.maxLength = Math.min(Math.max(Number(config.cloudbase.maxLength) || 5000, 500), 12000);
   config.cloudbase.allowImage = config.cloudbase.allowImage !== false;
   config.cloudbase.pageSize = Math.min(Math.max(Number(config.cloudbase.pageSize) || 50, 10), 200);
-  config.cloudbase.notesTerm = String(config.cloudbase.notesTerm || config.giscus.notesTerm || 'gitblog-notes-feed').trim() || 'gitblog-notes-feed';
+  config.cloudbase.notesTerm = String(config.cloudbase.notesTerm || 'gitblog-notes-feed').trim() || 'gitblog-notes-feed';
 
   config.analytics.enabled = !!config.analytics.enabled;
   config.analytics.snippet = String(config.analytics.snippet || '').trim();
@@ -664,26 +654,12 @@ function settingsContentHtml() {
       </section>
 
       <section class="settings-card">
-        <h3>评论</h3>
-        <p class="settings-help">选择评论方式：<strong>CloudBase</strong> 适合国内读者（昵称/邮箱即可评、富文本）；<strong>giscus</strong> 依赖 GitHub 登录。</p>
+        <h3>评论（CloudBase）</h3>
+        <p class="settings-help">国内读者昵称/邮箱即可评论，支持富文本与图片。需先在仓库 <code>cloudbase/</code> 部署云函数 <code>gitblog-comments</code>，详见 <code>cloudbase/README.md</code>。</p>
         <div class="settings-grid">
-          <label>评论方式
-            <select name="comments.provider">
-              <option value="giscus">giscus（GitHub Discussions）</option>
-              <option value="cloudbase">CloudBase（腾讯云）</option>
-              <option value="none">关闭评论</option>
-            </select>
-          </label>
-        </div>
-      </section>
-
-      <section class="settings-card">
-        <h3>CloudBase 评论</h3>
-        <p class="settings-help">需先在仓库 <code>cloudbase/</code> 部署云函数，详见 <code>cloudbase/README.md</code>。环境 ID 为公开信息，可填在此处。</p>
-        <div class="settings-grid">
-          <label class="settings-check"><input type="checkbox" name="cloudbase.enabled"> 启用 CloudBase 评论组件</label>
+          <label class="settings-check"><input type="checkbox" name="cloudbase.enabled"> 启用评论区</label>
           <label class="span-2">环境 ID（envId）
-            <input name="cloudbase.envId" placeholder="例如 cloud1-xxx">
+            <input name="cloudbase.envId" placeholder="gitbolg-d7gmnsrw46e011706">
           </label>
           <label>地域 region
             <input name="cloudbase.region" placeholder="ap-shanghai">
@@ -701,37 +677,9 @@ function settingsContentHtml() {
           <label class="settings-check"><input type="checkbox" name="cloudbase.moderation"> 前端提示「待审核」（须云函数环境变量 COMMENT_MODERATION=1）</label>
           <label class="span-2">随笔讨论 path（notesTerm）
             <input name="cloudbase.notesTerm" placeholder="gitblog-notes-feed">
-            <span class="settings-hint">与 giscus 的 notesTerm 含义相同：首页「随笔」与 notes.html 共用。</span>
+            <span class="settings-hint">首页「随笔」与 notes.html 共用此 path。</span>
           </label>
         </div>
-      </section>
-
-      <section class="settings-card">
-        <h3>评论（giscus）</h3>
-        <p class="settings-help">需要先在 GitHub 仓库启用 Discussions，然后到 giscus.app 生成 repoId 和 categoryId。</p>
-        <div class="settings-grid">
-          <label class="settings-check"><input type="checkbox" name="giscus.enabled"> 启用 giscus 评论</label>
-          <label>repo <input name="giscus.repo" placeholder="owner/repo"></label>
-          <label>repoId <input name="giscus.repoId"></label>
-          <label>category <input name="giscus.category"></label>
-          <label>categoryId <input name="giscus.categoryId"></label>
-          <label>mapping
-            <input name="giscus.mapping" placeholder="specific">
-            <span class="settings-hint">推荐 <code>specific</code>：每篇文章按 urlKey（如 <code>20260616</code>、<code>welcome</code>）独立绑定一条 Discussion；旧式 <code>post.html?slug=</code> 仍按 slug。</span>
-          </label>
-          <label class="span-2">category 说明
-            <span class="settings-hint">请选 <code>General</code> 等允许所有人发帖的分类，勿用 <code>Announcements</code>（仅维护者可创建讨论，访客首评会失败）。</span>
-          </label>
-          <label>language <input name="giscus.lang" placeholder="zh-CN"></label>
-          <label class="span-2">随笔讨论标识（notesTerm）
-            <input name="giscus.notesTerm" placeholder="gitblog-notes-feed">
-            <span class="settings-hint">首页「随笔」与「随笔」页面共用这一条 giscus 讨论（<code>data-term</code>）。须与 giscus 的 <code>specific</code> mapping 一致。</span>
-          </label>
-          <label>随笔 category <input name="giscus.notesCategory" placeholder="Announcements"></label>
-          <label>随笔 categoryId <input name="giscus.notesCategoryId" placeholder="DIC_kwDOSZ6GIc4C8wdV"></label>
-          <label class="span-2">随笔分类说明
-            <span class="settings-hint">随笔历史讨论多在 <code>Announcements</code> 分类（与上方文章评论的 <code>General</code> 可不同）。讨论串已存在时访客可继续回复；若更换 <code>notesTerm</code> 或分类，旧评论将不可见。</span>
-          </label>
       </section>
 
       <section class="settings-card">
