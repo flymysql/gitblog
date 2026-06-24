@@ -63,7 +63,7 @@ export function majorQuizOgSvg({
   <text x="120" y="142" fill="#ea6f5a" font-size="30" font-weight="700" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${svgEsc(siteTitle)}</text>
   ${titleLines.map((line, i) => `<text x="120" y="${248 + i * 72}" fill="#222" font-size="52" font-weight="800" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${svgEsc(line)}</text>`).join('\n  ')}
   <text x="120" y="430" fill="#666" font-size="28" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${svgEsc(subtitle)}</text>
-  <g filter="url(#capShadow)">${graduationCapSvg(900, 248, 1)}</g>
+  <g filter="url(#capShadow)">${graduationCapSvg(960, 268, 1.22)}</g>
   <text x="1080" y="500" text-anchor="end" fill="#999" font-size="24" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${svgEsc(author)}</text>
 </svg>`;
 }

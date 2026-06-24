@@ -10,7 +10,7 @@ function htmlEsc(s) {
 function toolOgMetaHtml({ title, description, path, ogSlug, siteUrl }) {
   if (!ogSlug || !siteUrl) return '';
   const pageUrl = `${siteUrl.replace(/\/$/, '')}/${String(path).replace(/^\//, '')}`;
-  const image = `${siteUrl.replace(/\/$/, '')}/assets/og/${ogSlug}.png`;
+  const image = `${siteUrl.replace(/\/$/, '')}/assets/og/${ogSlug}.png?ogv=2`;
   return `
   <meta property="og:title" content="${htmlEsc(title)}">
   <meta property="og:description" content="${htmlEsc(description)}">
