@@ -202,22 +202,12 @@ class CommentRichEditor {
   _render() {
     this.root.innerHTML = `
       <div class="cb-editor">
-        <div class="cb-editor-toolbar" role="toolbar" aria-label="评论格式">
-          <button type="button" class="cb-tb" data-cmd="bold" title="粗体"><b>B</b></button>
-          <button type="button" class="cb-tb" data-cmd="italic" title="斜体"><i>I</i></button>
-          <button type="button" class="cb-tb" data-cmd="underline" title="下划线"><u>U</u></button>
-          <button type="button" class="cb-tb" data-cmd="strikeThrough" title="删除线"><s>S</s></button>
-          <span class="cb-tb-sep"></span>
-          <button type="button" class="cb-tb" data-cmd="insertUnorderedList" title="列表">≡</button>
-          <button type="button" class="cb-tb" data-cmd="formatBlock" data-value="blockquote" title="引用">❝</button>
-          <button type="button" class="cb-tb" data-cmd="createLink" title="链接">🔗</button>
-          <button type="button" class="cb-tb" data-cmd="inlineCode" title="行内代码">&lt;/&gt;</button>
-          <span class="cb-tb-sep"></span>
+        <div class="cb-editor-toolbar cb-editor-toolbar--simple" role="toolbar" aria-label="评论工具">
           <button type="button" class="cb-tb" data-action="emoji" title="表情">😊</button>
           ${this.allowImage ? '<button type="button" class="cb-tb" data-action="image" title="插入图片">🖼</button>' : ''}
         </div>
         <div class="cb-editor-emoji" hidden></div>
-        <div class="cb-editor-body" contenteditable="true" data-placeholder="写下你的想法…" role="textbox" aria-multiline="true"></div>
+        <div class="cb-editor-body" contenteditable="true" data-placeholder="写下你的想法…支持表情与粘贴图片" role="textbox" aria-multiline="true"></div>
         <div class="cb-editor-foot">
           <span class="cb-editor-count">0 / ${this.maxLength}</span>
         </div>
@@ -238,7 +228,7 @@ class CommentRichEditor {
 
   _bind() {
     this.toolbar.addEventListener('click', e => {
-      const btn = e.target.closest('[data-cmd], [data-action]');
+      const btn = e.target.closest('[data-action]');
       if (!btn) return;
       e.preventDefault();
       const action = btn.dataset.action;
@@ -248,24 +238,7 @@ class CommentRichEditor {
       }
       if (action === 'image') {
         this.fileInput.click();
-        return;
       }
-      const cmd = btn.dataset.cmd;
-      if (cmd === 'createLink') {
-        const url = window.prompt('链接地址（https://）');
-        if (url) document.execCommand('createLink', false, url);
-        return;
-      }
-      if (cmd === 'inlineCode') {
-        this._wrapInlineCode();
-        return;
-      }
-      if (cmd === 'formatBlock') {
-        document.execCommand('formatBlock', false, btn.dataset.value || 'p');
-        return;
-      }
-      document.execCommand(cmd, false, null);
-      this.body.focus();
     });
 
     this.emojiPanel.addEventListener('click', e => {
@@ -295,21 +268,6 @@ class CommentRichEditor {
   _insertText(text) {
     this.body.focus();
     document.execCommand('insertText', false, text);
-    this._syncCount();
-  }
-
-  _wrapInlineCode() {
-    const sel = window.getSelection();
-    if (!sel || !sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    const code = document.createElement('code');
-    if (range.collapsed) {
-      code.textContent = 'code';
-      range.insertNode(code);
-    } else {
-      code.appendChild(range.extractContents());
-      range.insertNode(code);
-    }
     this._syncCount();
   }
 
@@ -435,7 +393,7 @@ async function mount() {
           </label>
         </div>
         <div class="cb-compose-editor"></div>
-        <p class="cb-compose-hint">支持粗体、链接、引用、表情与图片；Ctrl/⌘ + Enter 提交</p>
+        <p class="cb-compose-hint">支持表情与图片；Ctrl/⌘ + Enter 提交</p>
         <div class="cb-compose-actions">
           <span class="cb-compose-status" aria-live="polite"></span>
           <button type="submit" class="cb-submit">发表评论</button>

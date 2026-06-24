@@ -196,10 +196,21 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   padding: 6px 8px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-soft);
+}
+
+.cb-editor-toolbar--simple {
+  gap: 6px;
+  padding: 8px 10px;
+}
+
+.cb-editor-toolbar--simple .cb-tb {
+  min-width: 34px;
+  height: 32px;
+  font-size: 17px;
 }
 
 .cb-tb {
