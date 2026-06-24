@@ -1036,6 +1036,14 @@ function closeAllInlineReplies(root) {
 }
 
 function mountInlineReply(slot, ctx) {
+  if (isMobileComposeActive()) {
+    ctx.mobileCtrl?.open({
+      parentId: ctx.parentId || '',
+      replyNick: ctx.replyNick || '访客',
+      replyBtn: null,
+    });
+    return;
+  }
   const { parentId, replyNick, path, callApi, onSuccess } = ctx;
   const commentsRoot = slot.closest('.cb-comments');
   closeAllInlineReplies(commentsRoot);
