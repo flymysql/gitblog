@@ -773,20 +773,34 @@ body { padding: 0 2px 8px; }
 
 .cb-mobile-compose-trigger {
   display: block;
+  box-sizing: border-box;
   width: 100%;
   margin: 0 0 12px;
-  padding: 8px 0;
-  border: none;
-  background: none;
-  color: var(--primary);
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--bg-soft);
+  color: var(--text-tertiary);
   font-size: 14px;
-  font-weight: 500;
+  line-height: 1.4;
+  font-weight: 400;
   text-align: left;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cb-mobile-compose-trigger:active {
+  background: var(--bg-elev);
 }
 
 .cb-comments--flat .cb-mobile-compose-trigger {
-  padding-left: 0;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* 打开底部抽屉时隐藏假输入框，取消后恢复 */
+.cb-comments--mobile-dock.cb-comments--compose-only > .cb-mobile-compose-trigger {
+  display: none !important;
 }
 
 .cb-mobile-sheet-header { display: none; }
@@ -865,6 +879,30 @@ body { padding: 0 2px 8px; }
 
 .cb-comments--mobile-dock .cb-compose.is-sheet-open {
   animation: cb-sheet-up 0.2s ease;
+}
+
+.cb-compose--mobile-portal.is-sheet-open .cb-compose-footer:not([hidden]),
+.cb-comments--mobile-dock .cb-compose.is-sheet-open .cb-compose-footer:not([hidden]) {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.cb-compose--mobile-portal.is-sheet-open .cb-compose-footer-avatar,
+.cb-comments--mobile-dock .cb-compose.is-sheet-open .cb-compose-footer-avatar {
+  flex: 0 0 auto;
+}
+
+.cb-compose--mobile-portal.is-sheet-open .cb-compose-footer .cb-compose-status:empty,
+.cb-comments--mobile-dock .cb-compose.is-sheet-open .cb-compose-footer .cb-compose-status:empty {
+  display: none;
+}
+
+.cb-compose--mobile-portal.is-sheet-open .cb-compose-footer .cb-submit,
+.cb-comments--mobile-dock .cb-compose.is-sheet-open .cb-compose-footer .cb-submit {
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 @media (max-width: 640px) {
