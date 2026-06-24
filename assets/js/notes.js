@@ -21,7 +21,7 @@ const $ = sel => document.querySelector(sel);
   if (!isCommentsReady('notes')) {
     host.innerHTML = `
       <div class="comments-hint">
-        请先在 <a href="admin/settings.html">后台 · 站点设置</a> 中启用评论（CloudBase 或 giscus），并填写完整配置。
+        请先在 <a href="admin/settings.html">后台 · 站点设置</a> 中启用 CloudBase 评论并填写 envId。
       </div>
     `;
     return;
