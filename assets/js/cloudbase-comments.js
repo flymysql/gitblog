@@ -490,6 +490,30 @@ function isMobileCommentDock() {
   return typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
 }
 
+/** 仅文章页在移动端使用底部悬浮评论栏；工具页、随笔等保持桌面布局 */
+function shouldUseMobileCommentDock(opts = {}) {
+  const ctx = String(opts.context || 'post').trim().toLowerCase();
+  return ctx === 'post' && isMobileCommentDock();
+}
+
+const COMMENTS_END_HINT_MORE = '没有更多评论了~';
+const COMMENTS_END_HINT_EMPTY = '暂无评论，来留下一条评论吧~';
+
+function syncCommentsEndHint(targetEl, commentCount) {
+  const hint = targetEl.closest('.comments')?.querySelector('.comments-end-hint');
+  if (!hint) return;
+  const empty = Number(commentCount) === 0;
+  hint.textContent = empty ? COMMENTS_END_HINT_EMPTY : COMMENTS_END_HINT_MORE;
+  hint.hidden = false;
+}
+
+function resolveEmbedFrameMinHeight({ composeOpen, commentCount } = {}) {
+  const mobile = isMobileCommentDock();
+  if (composeOpen) return 160;
+  if (mobile && Number(commentCount) === 0) return 48;
+  return mobile ? 160 : 320;
+}
+
 /** 移动端：评论表单底部抽屉（直连模式） */
 function bindMobileComposeSheet(form, editor, { onClose, onOpen } = {}) {
   if (!isMobileCommentDock()) {
@@ -886,7 +910,7 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
   if (httpUrl) url.searchParams.set('httpUrl', httpUrl);
   const assetVer = String(cfg.embedAssetVersion || '').trim();
   if (assetVer) url.searchParams.set('v', assetVer);
-  if (typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches) {
+  if (shouldUseMobileCommentDock(opts)) {
     url.searchParams.set('mobileDock', '1');
   }
   return url.toString();
@@ -925,14 +949,20 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
           const ch = Number(e.data.composeHeight) || h;
           iframe.style.height = `${Math.min(Math.max(ch, 160), Math.round(window.innerHeight * 0.85))}px`;
         } else {
-          iframe.style.height = `${Math.min(Math.max(h, 320), 2400)}px`;
+          const minH = resolveEmbedFrameMinHeight(e.data);
+          iframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
         }
       }
       if (hint && e.data.ready) hint.hidden = true;
+      if (e.data.ready && Object.prototype.hasOwnProperty.call(e.data, 'commentCount')) {
+        syncCommentsEndHint(targetEl, e.data.commentCount);
+      }
     }
   };
   window.addEventListener('message', onMessage);
-  bindMobileEmbedDock(embedWrap, iframe);
+  if (shouldUseMobileCommentDock(opts)) {
+    bindMobileEmbedDock(embedWrap, iframe);
+  }
   return true;
 }
 
@@ -1010,7 +1040,9 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
 
   bindComposeReveal(form, editor, { metaEl, actionsEl });
 
-  const mobileDock = bindMobileDirectDock(root, form, editor);
+  const mobileDock = shouldUseMobileCommentDock(opts)
+    ? bindMobileDirectDock(root, form, editor)
+    : null;
 
   let comments = [];
 
@@ -1022,7 +1054,8 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
       comments = res.comments || [];
       listEl.innerHTML = comments.length
         ? comments.map(c => renderCommentItem(c)).join('')
-        : '<p class="cb-empty">暂无评论，来说第一句吧。</p>';
+        : '';
+      syncCommentsEndHint(targetEl, comments.length);
       loadingEl.hidden = true;
       listEl.hidden = false;
     } catch (err) {
