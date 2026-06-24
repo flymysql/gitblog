@@ -215,9 +215,12 @@ function normalizeConfig(config) {
   config.cloudbase.envId = String(config.cloudbase.envId || '').trim();
   config.cloudbase.region = String(config.cloudbase.region || 'ap-shanghai').trim() || 'ap-shanghai';
   config.cloudbase.functionName = String(config.cloudbase.functionName || 'gitblog-comments').trim() || 'gitblog-comments';
-  const accessMode = String(config.cloudbase.accessMode || 'http').trim().toLowerCase();
-  config.cloudbase.accessMode = accessMode === 'sdk' ? 'sdk' : 'http';
+  const accessMode = String(config.cloudbase.accessMode || 'embed').trim().toLowerCase();
+  config.cloudbase.accessMode = ['embed', 'http', 'sdk'].includes(accessMode) ? accessMode : 'embed';
   config.cloudbase.httpUrl = String(config.cloudbase.httpUrl || '').trim();
+  config.cloudbase.embedUrl = String(config.cloudbase.embedUrl || '').trim();
+  config.cloudbase.embedBaseUrl = String(config.cloudbase.embedBaseUrl || '').trim();
+  config.cloudbase.embedPage = String(config.cloudbase.embedPage || 'comments-embed.html').trim() || 'comments-embed.html';
   config.cloudbase.placeholderNick = String(config.cloudbase.placeholderNick || '访客').trim() || '访客';
   config.cloudbase.moderation = !!config.cloudbase.moderation;
   config.cloudbase.maxLength = Math.min(Math.max(Number(config.cloudbase.maxLength) || 5000, 500), 12000);
@@ -658,7 +661,7 @@ function settingsContentHtml() {
 
       <section class="settings-card">
         <h3>评论（CloudBase）</h3>
-        <p class="settings-help">国内读者昵称/邮箱即可评论。部署与跨域配置见 <code>cloudbase/README.md</code>（须把 <strong>gitpull.cn</strong> 加入 CloudBase 安全来源，并开启云函数 HTTP 访问）。</p>
+        <p class="settings-help">国内读者昵称/邮箱即可评论。免费版无法添加自定义安全域名，默认使用 <strong>iframe 嵌入</strong>（见 <code>cloudbase/README.md</code>）。升级个人版后可改用 HTTP / SDK 直连。</p>
         <div class="settings-grid">
           <label class="settings-check"><input type="checkbox" name="cloudbase.enabled"> 启用评论区</label>
           <label class="span-2">环境 ID（envId）
@@ -666,11 +669,15 @@ function settingsContentHtml() {
           </label>
           <label>访问方式
             <select name="cloudbase.accessMode">
-              <option value="http">HTTP（推荐，避免 SDK CORS）</option>
-              <option value="sdk">Web SDK callFunction</option>
+              <option value="embed">iframe 嵌入（免费版推荐）</option>
+              <option value="http">HTTP 直连（须升级套餐并配置安全域名）</option>
+              <option value="sdk">Web SDK callFunction（须升级套餐并配置安全域名）</option>
             </select>
           </label>
-          <label class="span-2">HTTP 地址（可选，留空自动生成）
+          <label class="span-2">嵌入页完整 URL（可选，留空用默认托管域）
+            <input name="cloudbase.embedUrl" placeholder="https://gitbolg-xxx.tcloudbaseapp.com/comments-embed.html">
+          </label>
+          <label class="span-2">HTTP 地址（accessMode=http 时，可选）
             <input name="cloudbase.httpUrl" placeholder="https://gitbolg-xxx.ap-shanghai.app.tcloudbase.com/gitblog-comments">
           </label>
           <label>地域 region
