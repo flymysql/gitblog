@@ -1,4 +1,4 @@
-/** 高考专业倾向测评 — 兴趣标签、问卷选项、专业库 */
+/** 大学专业倾向测评 — 兴趣标签、问卷选项、专业库 */
 
 export const INTEREST_OPTIONS = [
   { id: 'tech', label: '科技数码' },
