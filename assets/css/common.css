@@ -987,7 +987,7 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
     position: fixed;
     right: 0;
     bottom: 0;
-    z-index: 2;
+    z-index: -1;
     pointer-events: none;
     user-select: none;
     max-width: min(300px, 26vw);
