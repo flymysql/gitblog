@@ -6,6 +6,10 @@
 import { CONFIG } from './config.js';
 
 const PROFILE_KEY = 'gitblog-comment-profile-v1';
+const GUEST_NICK_COOKIE = 'gitblog_guest_nick';
+const GUEST_NICK_COOKIE_MAX_AGE_DAYS = 365;
+const GUEST_NICK_ADJS = ['快乐', '热心', '佛系', '可爱', '神秘', '躺平', '元气', '沉思', '打卡', '随手'];
+const GUEST_NICK_NOUNS = ['小鸡', '访客', '码农', '旅人', '吃瓜选手', '夜猫子', '冲浪人', '书虫', '种花人', '路人甲'];
 const SDK_URL = 'https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js';
 
 const EMOJI_GROUPS = [
@@ -222,6 +226,53 @@ function saveProfile({ nick, email }) {
   try {
     localStorage.setItem(PROFILE_KEY, JSON.stringify({ nick: nick || '', email: email || '' }));
   } catch { /* ignore */ }
+}
+
+function readGuestNickCookie() {
+  const m = document.cookie.match(new RegExp(`(?:^|; )${GUEST_NICK_COOKIE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}=([^;]*)`));
+  return m ? decodeURIComponent(m[1]) : '';
+}
+
+function writeGuestNickCookie(nick) {
+  const safe = encodeURIComponent(String(nick || '').slice(0, 40));
+  const maxAge = GUEST_NICK_COOKIE_MAX_AGE_DAYS * 86400;
+  document.cookie = `${GUEST_NICK_COOKIE}=${safe}; path=/; max-age=${maxAge}; SameSite=Lax`;
+}
+
+function randomGuestNick() {
+  const adj = GUEST_NICK_ADJS[Math.floor(Math.random() * GUEST_NICK_ADJS.length)];
+  const noun = GUEST_NICK_NOUNS[Math.floor(Math.random() * GUEST_NICK_NOUNS.length)];
+  const num = String(Math.floor(100 + Math.random() * 900));
+  return `${adj}${noun}${num}`;
+}
+
+function getOrCreateGuestNick() {
+  const cached = readGuestNickCookie();
+  if (cached) return cached;
+  const nick = randomGuestNick();
+  writeGuestNickCookie(nick);
+  return nick;
+}
+
+/** 未填昵称时自动生成并写入 cookie；用户自填昵称也会缓存 */
+function resolveCommentNick(inputNick) {
+  const trimmed = String(inputNick || '').trim();
+  if (trimmed) {
+    writeGuestNickCookie(trimmed);
+    return trimmed.slice(0, 40);
+  }
+  return getOrCreateGuestNick();
+}
+
+function prefillCommentNick(inputEl) {
+  if (!inputEl || inputEl.value.trim()) return;
+  const profile = readProfile();
+  if (profile.nick) {
+    inputEl.value = profile.nick;
+    return;
+  }
+  const cached = readGuestNickCookie();
+  inputEl.value = cached || getOrCreateGuestNick();
 }
 
 function formatTime(ts) {
@@ -847,7 +898,7 @@ function mountInlineReply(slot, ctx) {
   const emailInput = panel.querySelector('[name="email"]');
   const statusEl = panel.querySelector('.cb-inline-reply-status');
   const profile = readProfile();
-  if (profile.nick) nickInput.value = profile.nick;
+  prefillCommentNick(nickInput);
   if (profile.email) emailInput.value = profile.email;
   const maxLength = Number(cfg.maxLength) || 5000;
   const allowImage = cfg.allowImage !== false;
@@ -886,7 +937,7 @@ function mountInlineReply(slot, ctx) {
       statusEl.classList.add('is-error');
       return;
     }
-    const nick = nickInput.value.trim() || profile.nick || '';
+    const nick = resolveCommentNick(nickInput.value);
     const email = emailInput.value.trim() || profile.email || '';
     submitBtn.disabled = true;
     statusEl.classList.remove('is-error');
@@ -1083,7 +1134,7 @@ function mountCloudBaseDirect(targetEl, path, opts = {}) {
   const editorHost = root.querySelector('.cb-compose-editor');
 
   const profile = readProfile();
-  if (profile.nick) nickInput.value = profile.nick;
+  prefillCommentNick(nickInput);
   if (profile.email) emailInput.value = profile.email;
 
   const editor = new CommentRichEditor(editorHost, {
@@ -1150,7 +1201,7 @@ function mountCloudBaseDirect(targetEl, path, opts = {}) {
       statusEl.classList.add('is-error');
       return;
     }
-    const nick = nickInput.value.trim();
+    const nick = resolveCommentNick(nickInput.value);
     const email = emailInput.value.trim();
     const submitBtn = form.querySelector('.cb-submit');
     submitBtn.disabled = true;
