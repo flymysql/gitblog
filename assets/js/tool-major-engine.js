@@ -198,7 +198,7 @@ export function scoreMajors(answers) {
 
 export function formatResultText({ profile, results, filteredCount }) {
   const lines = [
-    '【高考专业倾向测评结果】',
+    '【大学专业倾向测评结果】',
     profile,
     '',
     `共 ${results.length} 个推荐专业（已按选科过滤 ${filteredCount} 个不匹配项）：`,
