@@ -1,13 +1,16 @@
 /**
  * 从微信农场小程序游戏配置生成 data/farm-crops.json
  * 数据源：gameConfig/Plant.json + seed-shop + ItemInfo（社区从游戏协议导出）
+ * 土地类型按解锁等级分段（与常见作物效率表「土地」列一致）
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GAME = join(ROOT, 'data/game');
+const OVERRIDES_PATH = join(ROOT, 'data/farm-crop-overrides.json');
+const EXTRA_PATH = join(ROOT, 'data/farm-crop-extra.json');
 
 const EMOJI = {
   白萝卜: '🥬', 胡萝卜: '🥕', 大白菜: '🥬', 大蒜: '🧄', 大葱: '🧅', 水稻: '🌾', 小麦: '🌾', 玉米: '🌽',
@@ -25,13 +28,34 @@ const EMOJI = {
   桑葚: '🫐', 榴莲: '🍈', 猪笼草: '🪴', 苦瓜: '🥒', 杏子: '🍑', 芭蕉: '🍌', 橄榄: '🫒', 灯笼果: '🟡', 薄荷: '🌿',
   鳄梨: '🥑', 无花果: '🟢', 葫芦: '🫒', 火龙果: '🐉', 荔枝: '🔴', 月柿: '🍅', 柠檬: '🍋', 番石榴: '🍐', 山竹: '🟣',
   天堂鸟: '🦜', 金桔: '🍊', 依米花: '✨', 人参果: '🥝', 天山雪莲: '❄️', 何首乌: '🌿', 似血杜鹃: '🌺',
+  新春红灯笼: '🏮', 新春红包: '🧧',
 };
 
-const LAND = { 1: 'normal', 2: 'red', 3: 'black', 4: 'gold' };
-const SKIP = new Set(['新春红包']);
+/** 按解锁等级推断所需土地（与效率表「土地」列 1–5 对应） */
+export function landFromLevel(minLevel) {
+  const lv = Number(minLevel) || 1;
+  if (lv >= 90) return 'purple';
+  if (lv >= 60) return 'gold';
+  if (lv >= 40) return 'black';
+  if (lv >= 28) return 'red';
+  return 'normal';
+}
 
 function loadJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
+}
+
+function loadOverrides() {
+  if (!existsSync(OVERRIDES_PATH)) return {};
+  const raw = loadJson(OVERRIDES_PATH);
+  const { _comment, ...rest } = raw;
+  return rest;
+}
+
+function loadExtraRows() {
+  if (!existsSync(EXTRA_PATH)) return [];
+  const raw = loadJson(EXTRA_PATH);
+  return Array.isArray(raw) ? raw : [];
 }
 
 function fruitPrice(itemMap, fruitId) {
@@ -40,45 +64,70 @@ function fruitPrice(itemMap, fruitId) {
   return Number(item.price ?? item.sell_price ?? item.sellPrice ?? 0) || 0;
 }
 
+function round2(n) {
+  return Math.round(n * 100) / 100;
+}
+
 export function generateFarmCrops() {
   const shop = loadJson(join(GAME, 'seed-shop.json'));
-  const plants = loadJson(join(GAME, 'Plant.json'));
   const items = loadJson(join(GAME, 'ItemInfo.json'));
+  const overrides = loadOverrides();
+  const shopRows = [...shop.rows, ...loadExtraRows()];
 
-  const plantMap = new Map(plants.map(p => [Number(p.id), p]));
   const itemMap = new Map(items.map(i => [Number(i.id), i]));
 
   const crops = [];
-  for (const row of shop.rows) {
-    if (!row.name || SKIP.has(row.name)) continue;
-    const plant = plantMap.get(Number(row.plantId)) || {};
-    const seasons = Number(row.seasons) || 1;
-    const growSec = Number(row.growTimeSec) || 0;
+  for (const row of shopRows) {
+    if (!row.name) continue;
+
+    const patch = overrides[row.name] || {};
+    const name = patch.name || row.name;
+    const seasons = Number(patch.seasons ?? row.seasons) || 1;
+    const growSec = Number(patch.growTimeSec ?? row.growTimeSec) || 0;
     if (growSec <= 0) continue;
 
-    const growHours = Math.round(((growSec * seasons) / 3600) * 10000) / 10000;
-    const unit = fruitPrice(itemMap, row.fruitId);
-    const sellTotal = unit * (Number(row.fruitCount) || 0) * seasons;
-    const seedCost = Number(row.price) || 0;
+    const minLevel = Number(patch.requiredLevel ?? row.requiredLevel) || 1;
+    const fruitCount = Number(patch.fruitCount ?? row.fruitCount) || 0;
+    const fruitId = patch.fruitId ?? row.fruitId;
+    const unitPrice = fruitPrice(itemMap, fruitId);
+    const seedCost = Number(patch.price ?? row.price) || 0;
+    const harvestExp = Number(patch.exp ?? row.exp) || 0;
+
+    const growMinutes = round2((growSec / 60) * seasons);
+    const growHours = round2(growMinutes / 60);
+    const sellTotal = unitPrice * fruitCount * seasons;
     const profit = sellTotal - seedCost;
-    const profitPerHour = growHours > 0 ? Math.round((profit / growHours) * 100) / 100 : 0;
+    const profitPerHour = growHours > 0 ? round2(profit / growHours) : 0;
+    const incomePerMin = growMinutes > 0 ? round2(profit / growMinutes) : 0;
+
     const xpPerHour = Number(row.expPerHour) || (growHours > 0
-      ? Math.round(((Number(row.exp) || 0) * seasons / growHours) * 100) / 100
+      ? round2((harvestExp * seasons) / growHours)
       : 0);
+    const expPerMin = growMinutes > 0 ? round2((harvestExp * seasons) / growMinutes) : 0;
+
+    const land = landFromLevel(minLevel);
+    const landTier = land === 'normal' ? 1 : land === 'red' ? 2 : land === 'black' ? 3 : land === 'gold' ? 4 : 5;
 
     crops.push({
       id: `s${row.seedId}`,
-      name: row.name,
-      emoji: EMOJI[row.name] || '🌱',
-      minLevel: Number(row.requiredLevel) || 1,
+      name,
+      emoji: EMOJI[name] || EMOJI[row.name] || '🌱',
+      minLevel,
       growHours,
-      growTimeLabel: row.growTimeStr || '',
+      growMinutes,
+      growTimeLabel: patch.growTimeStr || row.growTimeStr || '',
       seasons,
+      harvestExp,
+      fruitCount,
+      unitPrice,
       seedCost,
       sellTotal,
       profitPerHour,
+      incomePerMin,
       xpPerHour,
-      land: LAND[Number(plant.land_level_need)] || 'normal',
+      expPerMin,
+      land,
+      landTier,
     });
   }
 
@@ -89,16 +138,25 @@ export function generateFarmCrops() {
     updated: shop.exportedAt || new Date().toISOString(),
     game: '微信农场',
     disclaimer:
-      '作物数据来自微信农场小程序游戏内种子商店与 Plant/Item 配置（社区协议导出，非 2009 年页游版 QQ 农场）。未计入施肥、土地加成与被偷损失；请以游戏内商店为准。',
+      '作物数据来自微信农场小程序游戏内种子商店与 Plant/Item 配置（社区协议导出），并按社区作物效率表校正土地类型与部分数值。未计入施肥、土地产量加成与被偷损失；请以游戏内商店为准。',
     sources: [
       'https://github.com/linguo2625469/qq-farm-bot/tree/main/gameConfig',
       'https://github.com/linguo2625469/qq-farm-bot/blob/main/tools/seed-shop-merged-export.json',
+      'https://www.yishu.pro/oss/FarmCalc/',
     ],
     landLabels: {
       normal: '普通土地',
       red: '红土地',
       black: '黑土地',
       gold: '金土地',
+      purple: '紫晶土地',
+    },
+    landTiers: {
+      normal: { tier: 1, levelRange: '1–27' },
+      red: { tier: 2, levelRange: '28–39' },
+      black: { tier: 3, levelRange: '40–59' },
+      gold: { tier: 4, levelRange: '60–89' },
+      purple: { tier: 5, levelRange: '90+' },
     },
     crops,
   };

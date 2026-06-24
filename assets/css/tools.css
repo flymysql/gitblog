@@ -1357,6 +1357,7 @@
 .land-red { background: #fde8e8; color: #c0392b; }
 .land-black { background: #e8e8e8; color: #333; }
 .land-gold { background: #fff3cd; color: #b8860b; }
+.land-purple { background: #f0e6ff; color: #7b3fbf; }
 
 .farm-result-desc {
   margin: 0 0 0.65rem;
