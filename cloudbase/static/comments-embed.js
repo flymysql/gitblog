@@ -172,7 +172,12 @@ function sanitizeCommentHtml(raw) {
         const n = attr.name.toLowerCase();
         if (tag === 'A' && (n === 'href' || n === 'title' || n === 'target' || n === 'rel')) return;
         if (tag === 'IMG' && (n === 'src' || n === 'alt' || n === 'title' || n === 'loading')) return;
-        if (tag === 'SPAN' && n === 'class') return;
+        if (tag === 'SPAN' && n === 'class') {
+          const cls = child.getAttribute('class') || '';
+          if (cls === 'cb-mention' || cls === 'cb-uploading') return;
+          child.removeAttribute(attr.name);
+          return;
+        }
         child.removeAttribute(attr.name);
       });
       if (tag === 'A') {
@@ -386,6 +391,12 @@ class CommentRichEditor {
     this._syncCount();
   }
 
+  setMentionPrefix(nick) {
+    const name = String(nick || '访客').trim() || '访客';
+    this.body.innerHTML = `<span class="cb-mention">@${escapeHtml(name)}</span>&nbsp;`;
+    this._syncCount();
+  }
+
   isValid() {
     const len = this.getPlainLength();
     return len > 0 && len <= this.maxLength;
@@ -394,6 +405,8 @@ class CommentRichEditor {
 
 function renderCommentItem(c) {
   const nick = escapeHtml(c.nick || '访客');
+  const nickRaw = escapeHtml(c.nick || '访客');
+  const replyTo = c.replyToNick ? escapeHtml(c.replyToNick) : '';
   const hue = avatarColor(c.nick);
   const content = sanitizeCommentHtml(c.contentHtml || '');
   const replies = (c.replies || []).map(r => renderCommentItem(r)).join('');
@@ -402,17 +415,134 @@ function renderCommentItem(c) {
       <div class="cb-comment-avatar" style="--cb-avatar-hue:${hue}" aria-hidden="true">${nick.slice(0, 1).toUpperCase()}</div>
       <div class="cb-comment-main">
         <header class="cb-comment-head">
+          ${replyTo ? `<span class="cb-comment-reply-badge">回复 <span class="cb-mention">@${replyTo}</span></span>` : ''}
           <strong class="cb-comment-nick">${nick}</strong>
           <time class="cb-comment-time">${escapeHtml(formatTime(c.createdAt))}</time>
         </header>
         <div class="cb-comment-body">${content || '<p></p>'}</div>
         <footer class="cb-comment-actions">
-          <button type="button" class="cb-link-btn" data-reply="${escapeHtml(c._id)}">回复</button>
+          <button type="button" class="cb-link-btn" data-reply="${escapeHtml(c._id)}" data-reply-nick="${nickRaw}">回复</button>
         </footer>
+        <div class="cb-inline-reply-slot"></div>
         ${replies ? `<div class="cb-replies">${replies}</div>` : ''}
       </div>
     </article>
   `;
+}
+
+function closeAllInlineReplies(root) {
+  if (!root) return;
+  root.querySelectorAll('.cb-inline-reply').forEach(el => el.remove());
+  root.querySelectorAll('[data-reply].is-active').forEach(btn => btn.classList.remove('is-active'));
+}
+
+function mountInlineReply(slot, ctx) {
+  const { parentId, replyNick, path, callApi, onSuccess } = ctx;
+  const commentsRoot = slot.closest('.cb-comments');
+  closeAllInlineReplies(commentsRoot);
+
+  const panel = document.createElement('div');
+  panel.className = 'cb-inline-reply';
+  panel.innerHTML = `
+    <div class="cb-inline-reply-head">回复 <span class="cb-mention">@${escapeHtml(replyNick)}</span></div>
+    <div class="cb-inline-reply-editor"></div>
+    <div class="cb-inline-reply-actions">
+      <button type="button" class="cb-link-btn" data-cancel-reply>取消</button>
+      <button type="button" class="cb-submit cb-submit--sm" data-submit-reply>发送</button>
+    </div>
+    <span class="cb-inline-reply-status" aria-live="polite"></span>
+  `;
+  slot.appendChild(panel);
+
+  const editorHost = panel.querySelector('.cb-inline-reply-editor');
+  const statusEl = panel.querySelector('.cb-inline-reply-status');
+  const editor = new CommentRichEditor(editorHost, {
+    allowImage: cfg.allowImage,
+    maxLength: cfg.maxLength,
+    onUpload: async file => {
+      const base64 = await fileToBase64(file);
+      const res = await callApi({
+        action: 'UPLOAD',
+        path,
+        fileName: file.name,
+        mime: file.type,
+        base64,
+      });
+      return res.url;
+    },
+  });
+  editor.setMentionPrefix(replyNick);
+
+  const replyBtn = commentsRoot?.querySelector(`[data-reply="${CSS.escape(parentId)}"]`);
+  replyBtn?.classList.add('is-active');
+
+  panel.querySelector('[data-cancel-reply]').addEventListener('click', () => {
+    panel.remove();
+    replyBtn?.classList.remove('is-active');
+    postHeight(true);
+  });
+
+  const submitBtn = panel.querySelector('[data-submit-reply]');
+  const doSubmit = async () => {
+    statusEl.textContent = '';
+    if (!editor.isValid()) {
+      statusEl.textContent = editor.getPlainLength() > cfg.maxLength ? '内容过长' : '请输入回复内容';
+      statusEl.classList.add('is-error');
+      return;
+    }
+    const profile = readProfile();
+    submitBtn.disabled = true;
+    statusEl.classList.remove('is-error');
+    statusEl.textContent = '发送中…';
+    try {
+      await callApi({
+        action: 'POST',
+        path,
+        nick: profile.nick || '',
+        email: profile.email || '',
+        contentHtml: editor.getHtml(),
+        parentId,
+        pageTitle: cfg.pageTitle || document.title,
+        pageUrl: params.get('pageUrl') || '',
+      });
+      saveProfile({ nick: profile.nick, email: profile.email });
+      closeAllInlineReplies(commentsRoot);
+      await onSuccess();
+    } catch (err) {
+      statusEl.textContent = err.message || '发送失败';
+      statusEl.classList.add('is-error');
+    } finally {
+      submitBtn.disabled = false;
+      postHeight(true);
+    }
+  };
+
+  submitBtn.addEventListener('click', doSubmit);
+  editorHost.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      doSubmit();
+    }
+  });
+
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  editor.body.focus();
+  postHeight(true);
+}
+
+function bindCommentListInteractions(listEl, ctx) {
+  listEl.addEventListener('click', e => {
+    const btn = e.target.closest('[data-reply]');
+    if (!btn || e.target.closest('.cb-inline-reply')) return;
+    e.preventDefault();
+    const slot = btn.closest('.cb-comment-main')?.querySelector('.cb-inline-reply-slot');
+    if (!slot) return;
+    mountInlineReply(slot, {
+      ...ctx,
+      parentId: btn.dataset.reply || '',
+      replyNick: btn.dataset.replyNick || '访客',
+    });
+  });
 }
 
 function showError(root, message) {
@@ -445,12 +575,11 @@ async function mount() {
           </label>
         </div>
         <div class="cb-compose-editor"></div>
-        <p class="cb-compose-hint">支持表情与图片；Ctrl/⌘ + Enter 提交</p>
+        <p class="cb-compose-hint">发表新评论；点「回复」可在对应楼层下回复并自动 @ 对方。留邮箱可在被回复时收到通知。</p>
         <div class="cb-compose-actions">
           <span class="cb-compose-status" aria-live="polite"></span>
           <button type="submit" class="cb-submit">发表评论</button>
         </div>
-        <input type="hidden" name="parentId" value="">
       </form>
     </div>
   `;
@@ -459,7 +588,6 @@ async function mount() {
   const loadingEl = root.querySelector('.cb-comments-loading');
   const form = root.querySelector('.cb-compose');
   const statusEl = root.querySelector('.cb-compose-status');
-  const parentInput = form.querySelector('[name="parentId"]');
   const nickInput = form.querySelector('[name="nick"]');
   const emailInput = form.querySelector('[name="email"]');
   const editorHost = root.querySelector('.cb-compose-editor');
@@ -502,14 +630,7 @@ async function mount() {
     }
   }
 
-  listEl.addEventListener('click', e => {
-    const btn = e.target.closest('[data-reply]');
-    if (!btn) return;
-    parentInput.value = btn.dataset.reply || '';
-    statusEl.textContent = '正在回复一条评论…';
-    form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    editor.body.focus();
-  });
+  bindCommentListInteractions(listEl, { path: cfg.path, callApi, onSuccess: loadList });
 
   form.addEventListener('keydown', e => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -539,13 +660,12 @@ async function mount() {
         nick,
         email,
         contentHtml: editor.getHtml(),
-        parentId: parentInput.value.trim() || null,
+        parentId: null,
         pageTitle: cfg.pageTitle || document.title,
         pageUrl: params.get('pageUrl') || '',
       });
       saveProfile({ nick, email });
       editor.clear();
-      parentInput.value = '';
       statusEl.textContent = cfg.moderation ? '已提交，待审核通过后显示' : '发表成功';
       await loadList();
     } catch (err) {
