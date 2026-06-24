@@ -1,0 +1,8 @@
+{
+  "*": {
+    "invoke": true
+  },
+  "gitblog-comments": {
+    "invoke": true
+  }
+}

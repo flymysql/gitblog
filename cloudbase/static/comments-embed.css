@@ -85,10 +85,11 @@ body { padding: 0 2px 8px; }
 .cb-comment {
   display: flex;
   gap: 12px;
-  padding: 14px 0;
+  padding: 16px 0;
   border-bottom: 1px solid var(--border);
 }
-.cb-comment:last-child { border-bottom: none; }
+.cb-comment:first-child { padding-top: 4px; }
+.cb-comment:last-child { border-bottom: none; padding-bottom: 4px; }
 
 .cb-comment-avatar {
   flex: 0 0 36px;
@@ -179,17 +180,17 @@ body { padding: 0 2px 8px; }
 }
 
 .cb-compose {
-  padding: 16px;
+  padding: 16px 18px;
   background: var(--bg-soft);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .cb-compose-meta {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 .cb-field {
@@ -201,13 +202,15 @@ body { padding: 0 2px 8px; }
 }
 
 .cb-field input {
-  height: 36px;
-  padding: 0 10px;
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--bg-elev);
   color: var(--text-main);
   font-size: 13.5px;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 .cb-field input:focus {
   outline: none;
@@ -226,10 +229,21 @@ body { padding: 0 2px 8px; }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   padding: 6px 8px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-soft);
+}
+
+.cb-editor-toolbar--simple {
+  gap: 6px;
+  padding: 8px 10px;
+}
+
+.cb-editor-toolbar--simple .cb-tb {
+  min-width: 34px;
+  height: 32px;
+  font-size: 17px;
 }
 
 .cb-tb {
@@ -359,7 +373,7 @@ body { padding: 0 2px 8px; }
   cursor: not-allowed;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 360px) {
   .cb-compose-meta { grid-template-columns: 1fr; }
   .cb-compose { padding: 12px; }
   .cb-editor-body { min-height: 100px; }
