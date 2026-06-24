@@ -273,3 +273,117 @@ export async function drawAgeShareImage({ birthLabel, ageLine, livedDays, livedH
   await drawQrBlock(ctx, pageUrl, '扫码计算', W, H);
   return canvas;
 }
+
+/** 高考专业测评 · 结果总览分享图 */
+export async function drawMajorResultShareImage({ profile, results, pageUrl }) {
+  const W = 750;
+  const H = 1200;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#f6f9ff');
+  grad.addColorStop(0.45, '#fff8f6');
+  grad.addColorStop(1, '#ffe8e0');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = '#ea6f5a';
+  ctx.font = `bold 34px ${FONT}`;
+  ctx.fillText('高考专业倾向测评', 48, 68);
+
+  ctx.fillStyle = '#888';
+  ctx.font = `20px ${FONT}`;
+  ctx.fillText('我的专业推荐', 48, 104);
+
+  ctx.fillStyle = '#333';
+  ctx.font = `24px ${FONT}`;
+  wrapText(ctx, profile, 48, 148, W - 96, 36, 3);
+
+  let y = 260;
+  const top = (results || []).slice(0, 5);
+  for (let i = 0; i < top.length; i++) {
+    const r = top[i];
+    ctx.fillStyle = 'rgba(255,255,255,0.88)';
+    roundRect(ctx, 40, y, W - 80, 88, 14);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+    ctx.stroke();
+
+    ctx.fillStyle = '#ea6f5a';
+    ctx.font = `bold 22px ${FONT}`;
+    ctx.fillText(String(i + 1), 56, y + 36);
+
+    ctx.fillStyle = '#222';
+    ctx.font = `bold 26px ${FONT}`;
+    const title = String(r.major?.name || '').slice(0, 14);
+    ctx.fillText(title, 88, y + 38);
+
+    ctx.fillStyle = '#888';
+    ctx.font = `20px ${FONT}`;
+    ctx.fillText(`${r.major?.discipline || ''} · 匹配 ${r.score}%`, 88, y + 68);
+
+    y += 100;
+  }
+
+  ctx.fillStyle = '#aaa';
+  ctx.font = `18px ${FONT}`;
+  ctx.fillText('仅供参考，请结合分数与招生章程填报', 48, H - 220);
+
+  await drawQrBlock(ctx, pageUrl, '扫码测评', W, H);
+  return canvas;
+}
+
+/** 高考专业测评 · 单专业分享图 */
+export async function drawMajorDetailShareImage({ major, score, pageUrl }) {
+  const W = 750;
+  const H = 1000;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#fff5f2');
+  grad.addColorStop(1, '#ffffff');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = '#ea6f5a';
+  ctx.font = `bold 30px ${FONT}`;
+  ctx.fillText('专业倾向推荐', 48, 64);
+
+  ctx.fillStyle = '#999';
+  ctx.font = `22px ${FONT}`;
+  ctx.fillText(major.discipline || '', 48, 100);
+
+  ctx.fillStyle = '#1a1a1a';
+  ctx.font = `bold 40px ${FONT}`;
+  wrapText(ctx, major.name, 48, 150, W - 96, 48, 2);
+
+  if (score) {
+    ctx.fillStyle = '#ea6f5a';
+    ctx.font = `bold 28px ${FONT}`;
+    ctx.fillText(`匹配度 ${score}%`, 48, 250);
+  }
+
+  ctx.fillStyle = '#444';
+  ctx.font = `26px ${FONT}`;
+  wrapText(ctx, major.summary, 48, score ? 300 : 260, W - 96, 40, 4);
+
+  const careers = (major.careers || []).slice(0, 3).join(' · ');
+  if (careers) {
+    ctx.fillStyle = '#666';
+    ctx.font = `22px ${FONT}`;
+    ctx.fillText(`去向：${careers}`, 48, 480);
+  }
+
+  ctx.fillStyle = '#bbb';
+  ctx.font = `18px ${FONT}`;
+  wrapText(ctx, major.cautions, 48, 540, W - 96, 30, 3);
+
+  await drawQrBlock(ctx, pageUrl, '查看详情', W, H);
+  return canvas;
+}
