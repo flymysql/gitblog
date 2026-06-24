@@ -85,10 +85,11 @@ body { padding: 0 2px 8px; }
 .cb-comment {
   display: flex;
   gap: 12px;
-  padding: 14px 0;
+  padding: 16px 0;
   border-bottom: 1px solid var(--border);
 }
-.cb-comment:last-child { border-bottom: none; }
+.cb-comment:first-child { padding-top: 4px; }
+.cb-comment:last-child { border-bottom: none; padding-bottom: 4px; }
 
 .cb-comment-avatar {
   flex: 0 0 36px;
@@ -179,17 +180,17 @@ body { padding: 0 2px 8px; }
 }
 
 .cb-compose {
-  padding: 16px;
+  padding: 16px 18px;
   background: var(--bg-soft);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .cb-compose-meta {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 .cb-field {
