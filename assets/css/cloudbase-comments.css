@@ -561,7 +561,7 @@ body.cb-has-mobile-dock {
     cursor: pointer;
   }
 
-  /* 直连模式：表单固定底栏，页面可继续滚动 */
+  /* 直连模式：表单固定底栏，高度随内容撑开，页面可继续滚动 */
   .cb-comments--compose-pinned .cb-compose.is-sheet-open {
     position: fixed;
     left: 0;
@@ -569,8 +569,8 @@ body.cb-has-mobile-dock {
     bottom: 0;
     z-index: 900;
     display: block !important;
-    max-height: min(85vh, 640px);
-    overflow: auto;
+    max-height: none;
+    overflow: visible;
     margin: 0;
     padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
     border: none;
@@ -578,6 +578,12 @@ body.cb-has-mobile-dock {
     background: var(--bg-elev);
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
     animation: cb-sheet-up 0.24s ease;
+  }
+
+  .cb-compose.is-sheet-open .cb-editor-body {
+    max-height: none;
+    overflow: hidden;
+    min-height: 48px;
   }
 
   @keyframes cb-sheet-up {
@@ -596,5 +602,6 @@ body.cb-has-mobile-dock {
     padding: 0 8px;
     font-size: 13px;
   }
-  .cb-editor-body { min-height: 100px; }
+  .cb-compose:not(.is-sheet-open) .cb-editor-body { min-height: 100px; }
+  .cb-compose.is-sheet-open .cb-editor-body { min-height: 48px; }
 }
