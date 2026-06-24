@@ -522,6 +522,20 @@ function bindComposeReveal(form, editor, { metaEl, actionsEl }) {
   refresh();
 }
 
+function bindInlineReplyReveal(editor, metaEl) {
+  const refresh = () => {
+    if (metaEl) metaEl.hidden = editor.getPlainLength() <= 0;
+    editor._autosizeBody?.();
+    postHeight(true);
+  };
+  const prevOnChange = editor.onChange;
+  editor.onChange = len => {
+    prevOnChange?.(len);
+    refresh();
+  };
+  refresh();
+}
+
 function bindMobileComposeSheet(form, editor) {
   if (!cfg.mobileDock) {
     return { open: () => {}, close: () => {}, notifySubmitted: () => {} };
@@ -606,12 +620,23 @@ function mountInlineReply(slot, ctx) {
   const { parentId, replyNick, path, callApi, onSuccess } = ctx;
   const commentsRoot = slot.closest('.cb-comments');
   closeAllInlineReplies(commentsRoot);
+  const placeholderNick = String(cfg.placeholderNick || '访客').trim() || '访客';
 
   const panel = document.createElement('div');
   panel.className = 'cb-inline-reply';
   panel.innerHTML = `
     <div class="cb-inline-reply-head">回复 ${escapeHtml(replyNick)}</div>
     <div class="cb-inline-reply-editor"></div>
+    <div class="cb-inline-reply-meta cb-compose-meta" hidden>
+      <label class="cb-field">
+        <span>昵称</span>
+        <input type="text" name="nick" maxlength="40" placeholder="${escapeHtml(placeholderNick)}（可选）" autocomplete="nickname">
+      </label>
+      <label class="cb-field">
+        <span>邮箱</span>
+        <input type="email" name="email" maxlength="120" placeholder="可选，用于接收回复通知" autocomplete="email">
+      </label>
+    </div>
     <div class="cb-inline-reply-actions">
       <button type="button" class="cb-link-btn" data-cancel-reply>取消</button>
       <button type="button" class="cb-submit cb-submit--sm" data-submit-reply>发送</button>
@@ -621,7 +646,13 @@ function mountInlineReply(slot, ctx) {
   slot.appendChild(panel);
 
   const editorHost = panel.querySelector('.cb-inline-reply-editor');
+  const metaEl = panel.querySelector('.cb-inline-reply-meta');
+  const nickInput = panel.querySelector('[name="nick"]');
+  const emailInput = panel.querySelector('[name="email"]');
   const statusEl = panel.querySelector('.cb-inline-reply-status');
+  const profile = readProfile();
+  if (profile.nick) nickInput.value = profile.nick;
+  if (profile.email) emailInput.value = profile.email;
   const editor = new CommentRichEditor(editorHost, {
     allowImage: cfg.allowImage,
     maxLength: cfg.maxLength,
@@ -638,6 +669,7 @@ function mountInlineReply(slot, ctx) {
       return { url: res.url, fileId: res.fileId };
     },
   });
+  bindInlineReplyReveal(editor, metaEl);
   // 不再自动插入 @ 前缀
 
   const replyBtn = commentsRoot?.querySelector(`[data-reply="${CSS.escape(parentId)}"]`);
@@ -657,7 +689,8 @@ function mountInlineReply(slot, ctx) {
       statusEl.classList.add('is-error');
       return;
     }
-    const profile = readProfile();
+    const nick = nickInput.value.trim() || profile.nick || '';
+    const email = emailInput.value.trim() || profile.email || '';
     submitBtn.disabled = true;
     statusEl.classList.remove('is-error');
     statusEl.textContent = '发送中…';
@@ -665,14 +698,14 @@ function mountInlineReply(slot, ctx) {
       await callApi({
         action: 'POST',
         path,
-        nick: profile.nick || '',
-        email: profile.email || '',
+        nick,
+        email,
         contentHtml: editor.getHtml(),
         parentId,
         pageTitle: cfg.pageTitle || document.title,
         pageUrl: cfg.pageUrl || params.get('pageUrl') || '',
       });
-      saveProfile({ nick: profile.nick, email: profile.email });
+      saveProfile({ nick, email });
       closeAllInlineReplies(commentsRoot);
       await onSuccess();
     } catch (err) {
