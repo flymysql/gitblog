@@ -120,15 +120,334 @@ export function getMajorById(id) {
   return MAJORS.find(m => m.id === id) || null;
 }
 
+/** 全专业通用：教育部/学信网官方入口 */
+const COMMON_REFERENCE_LINKS = [
+  {
+    label: '阳光高考 · 专业库',
+    url: 'https://gaokao.chsi.com.cn/zyk/zybk/',
+    desc: '教育部官方本科专业介绍、主干课程与就业概况',
+  },
+  {
+    label: '阳光高考 · 专业解读',
+    url: 'https://gaokao.chsi.com.cn/zyk/zybk/zyjd/listPage/',
+    desc: '热门与新增专业的官方深度解读文章',
+  },
+  {
+    label: '学职平台',
+    url: 'https://xz.chsi.com.cn/',
+    desc: '职业百科、发展路径与职业倾向测评（学信网旗下）',
+  },
+];
+
+/** 按学科门类补充的权威资源 */
+const DISCIPLINE_REFERENCE_LINKS = {
+  工学: [
+    {
+      label: '工程教育专业认证',
+      url: 'https://www.ceeaa.org.cn/',
+      desc: '了解工科专业培养目标、毕业要求与认证标准',
+    },
+  ],
+  理学: [
+    {
+      label: '研招网 · 硕士专业目录',
+      url: 'https://yz.chsi.com.cn/zyk/',
+      desc: '基础学科深造需对照的研究生招生专业目录',
+    },
+  ],
+  医学: [
+    {
+      label: '国家医学考试中心',
+      url: 'https://www.nmec.org.cn/',
+      desc: '医师、护士等执业资格考试与政策发布',
+    },
+  ],
+  经济学: [
+    {
+      label: '国家统计局',
+      url: 'https://www.stats.gov.cn/',
+      desc: '宏观经济数据与就业、行业统计公报',
+    },
+  ],
+  管理学: [
+    {
+      label: '中国人事考试网',
+      url: 'https://www.cpta.com.cn/',
+      desc: '经济师、人力资源管理师等职业资格报名',
+    },
+  ],
+  法学: [
+    {
+      label: '国家法律法规数据库',
+      url: 'https://flk.npc.gov.cn/',
+      desc: '查阅现行法律条文，法学学习常用工具',
+    },
+  ],
+  文学: [
+    {
+      label: '中国语言文字网',
+      url: 'https://www.china-language.edu.cn/',
+      desc: '国家语委主办，语言文字规范与学术资源',
+    },
+  ],
+  教育学: [
+    {
+      label: '中小学教师资格考试',
+      url: 'https://ntce.neea.edu.cn/',
+      desc: '教师资格证报名、考试大纲与成绩查询',
+    },
+  ],
+  艺术学: [
+    {
+      label: '文化和旅游部',
+      url: 'https://www.mct.gov.cn/',
+      desc: '艺术行业政策、人才培养与职业资格信息',
+    },
+  ],
+  农学: [
+    {
+      label: '农业农村部',
+      url: 'https://www.moa.gov.cn/',
+      desc: '现代农业政策、农技推广与行业动态',
+    },
+  ],
+  历史学: [
+    {
+      label: '国家文物局',
+      url: 'https://www.ncha.gov.cn/',
+      desc: '文博、考古与文化遗产相关事业与政策',
+    },
+  ],
+  哲学: [
+    {
+      label: '中国社会科学网',
+      url: 'https://www.cssn.cn/',
+      desc: '人文社科研究与学术资讯',
+    },
+  ],
+};
+
+/** 单个专业的执业资格、行业入口 */
+const MAJOR_REFERENCE_LINKS = {
+  law: [
+    {
+      label: '国家统一法律职业资格考试',
+      url: 'https://nje.examos.cn/XHFDNEW/index.html',
+      desc: '法考报名、大纲、报考条件与公告',
+    },
+  ],
+  accounting: [
+    {
+      label: '中国注册会计师协会',
+      url: 'https://www.cicpa.org.cn/',
+      desc: 'CPA 考试报名与注册会计师职业发展',
+    },
+  ],
+  finance: [
+    {
+      label: '中国证券业协会',
+      url: 'https://www.sac.net.cn/',
+      desc: '证券从业资格、行业自律与从业规范',
+    },
+  ],
+  clinical: [
+    {
+      label: '住院医师规范化培训',
+      url: 'https://www.chinaresident.cn/',
+      desc: '医学生毕业后规培基地目录与培训信息',
+    },
+  ],
+  nursing: [
+    {
+      label: '护士执业资格考试',
+      url: 'https://www.nmec.org.cn/',
+      desc: '护士执业注册与资格考试政策',
+    },
+  ],
+  pharmacy: [
+    {
+      label: '国家药品监督管理局',
+      url: 'https://www.nmpa.gov.cn/',
+      desc: '执业药师、药品注册与医药监管政策',
+    },
+  ],
+  architecture: [
+    {
+      label: '住房和城乡建设部',
+      url: 'https://www.mohurd.gov.cn/',
+      desc: '注册建筑师等工程建设领域执业资格',
+    },
+  ],
+  urban_planning: [
+    {
+      label: '住房和城乡建设部',
+      url: 'https://www.mohurd.gov.cn/',
+      desc: '注册城乡规划师等执业资格与行业政策',
+    },
+  ],
+  electrical: [
+    {
+      label: '国家电网招聘平台',
+      url: 'https://zhaopin.sgcc.com.cn/',
+      desc: '电力系统方向重要就业渠道与校招信息',
+    },
+  ],
+  education: [
+    {
+      label: '教育部教师工作司',
+      url: 'http://www.moe.gov.cn/jyb_sy/zyjs/',
+      desc: '教师培养、教师资格与准入政策',
+    },
+  ],
+  preschool: [
+    {
+      label: '中小学教师资格考试',
+      url: 'https://ntce.neea.edu.cn/',
+      desc: '幼师资格通常需考取相应学段教师资格证',
+    },
+  ],
+  chinese: [
+    {
+      label: '中小学教师资格考试',
+      url: 'https://ntce.neea.edu.cn/',
+      desc: '语文教师方向需考取相应学段教师资格证',
+    },
+  ],
+  english: [
+    {
+      label: '中国教育考试网',
+      url: 'https://www.neea.edu.cn/',
+      desc: '四六级、教师资格、托福雅思等考试报名',
+    },
+  ],
+  public_admin: [
+    {
+      label: '中央机关及其直属机构考试录用公务员',
+      url: 'https://www.scs.gov.cn/',
+      desc: '国考公告、职位表与报考政策',
+    },
+  ],
+  politics: [
+    {
+      label: '中央机关及其直属机构考试录用公务员',
+      url: 'https://www.scs.gov.cn/',
+      desc: '思政、党务等方向的公考职位查询',
+    },
+  ],
+  cs: [
+    {
+      label: '中国计算机学会',
+      url: 'https://www.ccf.org.cn/',
+      desc: '计算机领域学术活动、竞赛与职业发展方向',
+    },
+  ],
+  software: [
+    {
+      label: '中国计算机学会',
+      url: 'https://www.ccf.org.cn/',
+      desc: '软件工程、系统能力认证与行业活动',
+    },
+  ],
+  ai: [
+    {
+      label: '中国人工智能学会',
+      url: 'https://www.caai.cn/',
+      desc: '人工智能学术动态与人才培养信息',
+    },
+  ],
+  data_science: [
+    {
+      label: '中国计算机学会',
+      url: 'https://www.ccf.org.cn/',
+      desc: '数据科学、大数据相关竞赛与学术资源',
+    },
+  ],
+  psychology: [
+    {
+      label: '中国心理学会',
+      url: 'https://www.cpsbeijing.org/',
+      desc: '心理学专业标准、伦理与执业发展信息',
+    },
+  ],
+  social_work: [
+    {
+      label: '中国社会工作学会',
+      url: 'http://www.csws.org.cn/',
+      desc: '社会工作专业标准、岗位与行业发展',
+    },
+  ],
+  geography: [
+    {
+      label: '自然资源部',
+      url: 'https://www.mnr.gov.cn/',
+      desc: 'GIS、自然资源调查与国土空间规划政策',
+    },
+  ],
+  energy: [
+    {
+      label: '国家能源局',
+      url: 'https://www.nea.gov.cn/',
+      desc: '新能源、光伏储能等行业政策与发展规划',
+    },
+  ],
+  journalism: [
+    {
+      label: '国家新闻出版署',
+      url: 'https://www.nppa.gov.cn/',
+      desc: '新闻出版、记者职业资格与行业管理',
+    },
+  ],
+  tcm: [
+    {
+      label: '国家中医药管理局',
+      url: 'http://www.natcm.gov.cn/',
+      desc: '中医药教育、医师资格与行业政策',
+    },
+  ],
+};
+
+function traitReferenceLinks(major) {
+  const links = [];
+  const t = major.traits || {};
+  if (t.gradSchool >= 8 && !links.some(l => l.url.includes('yz.chsi'))) {
+    links.push({
+      label: '研招网 · 硕士专业目录',
+      url: 'https://yz.chsi.com.cn/zyk/',
+      desc: '该专业深造比例较高，可提前了解硕士招生方向',
+    });
+  }
+  if (t.publicService >= 8 && !['public_admin', 'politics', 'chinese'].includes(major.id)) {
+    links.push({
+      label: '中央机关及其直属机构考试录用公务员',
+      url: 'https://www.scs.gov.cn/',
+      desc: '体制内岗位较多，可查阅国考省考职位与报考条件',
+    });
+  }
+  return links;
+}
+
+function dedupeLinks(links) {
+  const seen = new Set();
+  return links.filter(link => {
+    const key = link.url;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 export function majorReferenceLinks(major) {
-  const q = encodeURIComponent(major.name);
   const custom = major.links || [];
-  const defaults = [
-    { label: '阳光高考', url: 'https://gaokao.chsi.com.cn/', desc: '教育部阳光高考信息平台' },
-    { label: `${major.name} · 学什么`, url: `https://www.baidu.com/s?wd=${q}%20专业%20学什么%20就业`, desc: '搜索专业介绍与就业方向' },
-    { label: `${major.name} · 知乎讨论`, url: `https://www.zhihu.com/search?type=content&q=${q}%E4%B8%93%E4%B8%9A`, desc: '看看学长学姐的经验分享' },
-  ];
-  return custom.length ? [...custom, ...defaults] : defaults;
+  const discipline = DISCIPLINE_REFERENCE_LINKS[major.discipline] || [];
+  const specific = MAJOR_REFERENCE_LINKS[major.id] || [];
+  const traits = traitReferenceLinks(major);
+  return dedupeLinks([
+    ...custom,
+    ...specific,
+    ...discipline,
+    ...traits,
+    ...COMMON_REFERENCE_LINKS,
+  ]).slice(0, 6);
 }
 
 export function describeMajorTraits(major) {
