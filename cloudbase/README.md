@@ -61,10 +61,9 @@ tcb fn deploy gitblog-comments
 在 [后台设置](/admin/settings.html) 或 `assets/js/config.js`：
 
 ```js
-comments: { provider: 'cloudbase' },
 cloudbase: {
   enabled: true,
-  envId: 'your-env-id',
+  envId: 'gitbolg-d7gmnsrw46e011706',
   region: 'ap-shanghai',
   functionName: 'gitblog-comments',
   placeholderNick: '访客',
@@ -76,7 +75,7 @@ cloudbase: {
 },
 ```
 
-`provider` 设为 `cloudbase` 后，文章页/工具页/随笔页将使用 CloudBase 评论；设为 `giscus` 则继续使用 GitHub Discussions。
+`enabled: true` 且填写 `envId` 后，文章页/工具页/随笔页将加载 CloudBase 评论区（不再使用 GitHub giscus）。
 
 ## 7. API 说明
 

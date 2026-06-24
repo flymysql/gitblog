@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260615180000';
+export const VERSION = '20260615190000';
 
 export const CONFIG = {
   repo: {
@@ -59,28 +59,9 @@ export const CONFIG = {
       rss: "rss.xml"
     }
   },
-  giscus: {
-    enabled: true,
-    repo: "flymysql/gitblog",
-    repoId: "R_kgDOSZ6GIQ",
-    category: "General",
-    categoryId: "DIC_kwDOSZ6GIc4C8wdW",
-    mapping: "specific",
-    strict: "0",
-    reactionsEnabled: "1",
-    emitMetadata: "0",
-    inputPosition: "top",
-    lang: "zh-CN",
-    notesTerm: "gitblog-notes-feed",
-    notesCategory: "Announcements",
-    notesCategoryId: "DIC_kwDOSZ6GIc4C8wdV"
-  },
-  comments: {
-    provider: "giscus"
-  },
   cloudbase: {
-    enabled: false,
-    envId: "",
+    enabled: true,
+    envId: "gitbolg-d7gmnsrw46e011706",
     region: "ap-shanghai",
     functionName: "gitblog-comments",
     placeholderNick: "访客",
