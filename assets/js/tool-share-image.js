@@ -147,6 +147,81 @@ export function closeShareImagePreview() {
 
 const FONT = 'system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
 
+/** 学士帽矢量绘制（与 scripts/tool-og.mjs 几何一致） */
+function drawGraduationCap(ctx, cx, cy, scale = 1) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
+  ctx.shadowColor = 'rgba(0,0,0,0.18)';
+  ctx.shadowBlur = 14;
+  ctx.shadowOffsetY = 10;
+
+  ctx.beginPath();
+  ctx.moveTo(0, -108);
+  ctx.lineTo(172, 0);
+  ctx.lineTo(0, 108);
+  ctx.lineTo(-172, 0);
+  ctx.closePath();
+  ctx.fillStyle = '#242424';
+  ctx.fill();
+
+  ctx.shadowColor = 'transparent';
+  ctx.beginPath();
+  ctx.moveTo(0, -96);
+  ctx.lineTo(150, 0);
+  ctx.lineTo(0, 96);
+  ctx.lineTo(-150, 0);
+  ctx.closePath();
+  ctx.fillStyle = '#2f2f2f';
+  ctx.fill();
+
+  roundRect(ctx, -86, 92, 172, 40, 8);
+  ctx.fillStyle = '#242424';
+  ctx.fill();
+  roundRect(ctx, -78, 100, 156, 24, 6);
+  ctx.fillStyle = '#3a3a3a';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(118, -18, 9, 0, Math.PI * 2);
+  ctx.fillStyle = '#ea6f5a';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(118, -18);
+  ctx.bezierCurveTo(132, 36, 128, 96, 122, 148);
+  ctx.strokeStyle = '#ea6f5a';
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(122, 154, 16, 0, Math.PI * 2);
+  ctx.fillStyle = '#ea6f5a';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(122, 154, 9, 0, Math.PI * 2);
+  ctx.fillStyle = '#ff8f7a';
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/** 大学专业倾向测评分享图头部：标题 + 学士帽 */
+function drawMajorShareHeader(ctx, { title, subtitle, y = 68 }) {
+  drawGraduationCap(ctx, 600, y + 18, 0.46);
+
+  ctx.fillStyle = '#ea6f5a';
+  ctx.font = `bold 34px ${FONT}`;
+  ctx.fillText(title, 48, y);
+
+  if (subtitle) {
+    ctx.fillStyle = '#888';
+    ctx.font = `20px ${FONT}`;
+    ctx.fillText(subtitle, 48, y + 36);
+  }
+}
+
 /** 今日运势分享图 */
 export async function drawFortuneShareImage({ grade, level, text, good, bad, color, num, name, pageUrl }) {
   const W = 750;
@@ -274,7 +349,7 @@ export async function drawAgeShareImage({ birthLabel, ageLine, livedDays, livedH
   return canvas;
 }
 
-/** 高考专业测评 · 结果总览分享图 */
+/** 大学专业倾向测评 · 结果总览分享图 */
 export async function drawMajorResultShareImage({ profile, results, pageUrl }) {
   const W = 750;
   const H = 1200;
@@ -290,13 +365,7 @@ export async function drawMajorResultShareImage({ profile, results, pageUrl }) {
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  ctx.fillStyle = '#ea6f5a';
-  ctx.font = `bold 34px ${FONT}`;
-  ctx.fillText('高考专业倾向测评', 48, 68);
-
-  ctx.fillStyle = '#888';
-  ctx.font = `20px ${FONT}`;
-  ctx.fillText('我的专业推荐', 48, 104);
+  drawMajorShareHeader(ctx, { title: '大学专业倾向测评', subtitle: '我的专业推荐' });
 
   ctx.fillStyle = '#333';
   ctx.font = `24px ${FONT}`;
@@ -336,7 +405,7 @@ export async function drawMajorResultShareImage({ profile, results, pageUrl }) {
   return canvas;
 }
 
-/** 高考专业测评 · 单专业分享图 */
+/** 大学专业倾向测评 · 单专业分享图 */
 export async function drawMajorDetailShareImage({ major, score, pageUrl }) {
   const W = 750;
   const H = 1000;
@@ -351,13 +420,7 @@ export async function drawMajorDetailShareImage({ major, score, pageUrl }) {
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  ctx.fillStyle = '#ea6f5a';
-  ctx.font = `bold 30px ${FONT}`;
-  ctx.fillText('专业倾向推荐', 48, 64);
-
-  ctx.fillStyle = '#999';
-  ctx.font = `22px ${FONT}`;
-  ctx.fillText(major.discipline || '', 48, 100);
+  drawMajorShareHeader(ctx, { title: '专业倾向推荐', subtitle: major.discipline || '', y: 64 });
 
   ctx.fillStyle = '#1a1a1a';
   ctx.font = `bold 40px ${FONT}`;
