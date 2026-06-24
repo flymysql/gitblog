@@ -16,6 +16,7 @@ const LAND_STYLE = {
   red: { label: '红土', class: 'land-red' },
   black: { label: '黑土', class: 'land-black' },
   gold: { label: '金土', class: 'land-gold' },
+  purple: { label: '紫晶', class: 'land-purple' },
 };
 
 let meta = null;
