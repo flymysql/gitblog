@@ -17,12 +17,12 @@
         "COMMENT_MODERATION": "0",
         "COMMENT_SALT": "change-me-in-console",
         "ALLOWED_ORIGINS": "https://gitpull.cn,https://www.gitpull.cn",
-        "REPLY_NOTIFY_ENABLED": "0",
-        "SMTP_HOST": "",
+        "REPLY_NOTIFY_ENABLED": "1",
+        "SMTP_HOST": "smtp.qq.com",
         "SMTP_PORT": "465",
-        "SMTP_USER": "",
+        "SMTP_USER": "237199972@qq.com",
         "SMTP_PASS": "",
-        "SMTP_FROM": ""
+        "SMTP_FROM": "237199972@qq.com"
       }
     }
   ]

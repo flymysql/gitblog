@@ -15,7 +15,8 @@
     "strip:wechat": "node scripts/strip-wechat.mjs",
     "release": "node scripts/make-release.mjs",
     "release:push": "node scripts/make-release.mjs --push",
-    "tools:pages": "node scripts/generate-tool-pages.mjs"
+    "tools:pages": "node scripts/generate-tool-pages.mjs",
+    "cloudbase:deploy-comments": "node cloudbase/deploy-comments-fn.mjs -e gitbolg-d7gmnsrw46e011706"
   },
   "devDependencies": {
     "cheerio": "^1.0.0",
