@@ -80,7 +80,7 @@
 <h2>上下文工程：核心方法论</h2>
 <p>上下文工程的目标，是让 AI 在有限 token 预算内，尽快获得<strong>正确、足够、可执行</strong>的项目认知，而不是把整仓代码塞进上下文窗口。</p>
 <p>推荐将项目上下文分为四层，由粗到细、由静到动：</p>
-<p><img src="/assets/uploads/2026/06/1781499659393-4hzbpp-image.webp" alt="image.png" width="1058" height="821" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/06/1781499659393-4hzbpp-image.thumb.webp" alt="image.png" width="1058" height="821" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/06/1781499659393-4hzbpp-image.webp" data-thumb="/assets/uploads/2026/06/1781499659393-4hzbpp-image.thumb.webp" class="progressive-img"></p>
 <h3>L1：规则与黑名单——控制 Agent 的默认行为</h3>
 <p>规则层解决「Agent 不该做什么」。写入 IDE 规则目录且设为 <code>alwaysApply</code> 的条目，会在每次会话自动生效，无需人工重复。</p>
 <p>建议纳入的关键约束：</p>
@@ -145,7 +145,7 @@
 <p>L4 的价值在于：数周后遇到「当时为什么选这个方案」，不必重读代码推导，直接 recall 即可。</p>
 <h3>上下文工程的整体工作流</h3>
 <p>将四层串联，单次任务的推荐路径如下：</p>
-<p><img src="/assets/uploads/2026/06/1781499690211-lsx8gv-image.webp" alt="image.png" width="1062" height="610" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/06/1781499690211-lsx8gv-image.thumb.webp" alt="image.png" width="1062" height="610" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/06/1781499690211-lsx8gv-image.webp" data-thumb="/assets/uploads/2026/06/1781499690211-lsx8gv-image.thumb.webp" class="progressive-img"></p>
 <hr>
 <h2>Token 节省与高效产出</h2>
 <p>上下文工程落地后，token 节省来自多个环节的叠加，而非单一 Prompt 技巧。</p>
@@ -239,7 +239,7 @@
 </tbody></table>
 <p>CCE 擅长「用自然语言问代码在哪」；Serena 擅长「这个函数被谁调用」。复杂项目建议<strong>两者都配</strong>。</p>
 <h3>整体流程概览</h3>
-<p><img src="/assets/uploads/2026/06/1781499747805-cvhrz5-image.webp" alt="image.png" width="1224" height="955" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/06/1781499747805-cvhrz5-image.thumb.webp" alt="image.png" width="1224" height="955" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/06/1781499747805-cvhrz5-image.webp" data-thumb="/assets/uploads/2026/06/1781499747805-cvhrz5-image.thumb.webp" class="progressive-img"></p>
 <p>预计耗时：首次约 15～30 分钟（含索引构建，视仓库大小而定）。索引建立后，日常只需重启 IDE 即可使用。</p>
 <hr>
 <h3>第 0 步：前置条件</h3>
@@ -505,7 +505,7 @@ alwaysApply: true
 └── cce                              # CCE CLI（pip install 或 shim 脚本生成）
 </code></pre>
 <p>各层与目录的对应关系：</p>
-<p><img src="/assets/uploads/2026/06/1781499783979-opbsyu-image.webp" alt="image.png" width="936" height="831" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/06/1781499783979-opbsyu-image.thumb.webp" alt="image.png" width="936" height="831" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/06/1781499783979-opbsyu-image.webp" data-thumb="/assets/uploads/2026/06/1781499783979-opbsyu-image.thumb.webp" class="progressive-img"></p>
 <p><strong>新成员上手路径（结合上图）：</strong></p>
 <ol>
 <li><code>git clone</code> 拿到左侧「进 git」的全部文件</li>
@@ -686,7 +686,7 @@ alwaysApply: true
 <p>注意：AI 生成的文档与命令示例，<strong>须经人工在实际环境执行核对</strong>，不可默认正确。</p>
 <hr>
 <h2>核心原则</h2>
-<p><img src="/assets/uploads/2026/06/1781499811553-b0cmrf-image.webp" alt="image.png" width="1095" height="410" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/06/1781499811553-b0cmrf-image.thumb.webp" alt="image.png" width="1095" height="410" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/06/1781499811553-b0cmrf-image.webp" data-thumb="/assets/uploads/2026/06/1781499811553-b0cmrf-image.thumb.webp" class="progressive-img"></p>
 <ol>
 <li><strong>先建上下文，再写代码。</strong> 四层记忆到位后，AI 才能稳定产出。</li>
 <li><strong>检索优先，全量 Read 是最后手段。</strong> token 节省与定位精度的基础。</li>

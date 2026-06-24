@@ -2,6 +2,8 @@
 import { load as loadHtml } from 'cheerio';
 import { renderMarkdown, escapeHtml } from './markdown-render.mjs';
 import sharp from 'sharp';
+import { existsSync } from 'node:fs';
+import { thumbPathFor, normalizeLocalImagePath } from './thumbnail-lib.mjs';
 
 const TAG_PALETTE = [
   { bg: '#FFE8E3', text: '#C44732', border: '#F7C5BA', darkBg: '#3A211D', darkText: '#FFB2A3', darkBorder: '#6F3B32' },
@@ -112,6 +114,20 @@ async function fixContentAssetUrls(html, sitePathPrefix, siteOrigin) {
     }
     if (!$(el).attr('loading')) $(el).attr('loading', 'lazy');
     if (!$(el).attr('decoding')) $(el).attr('decoding', 'async');
+    const fixedFull = publicImageUrl(src, sitePathPrefix, siteOrigin);
+    if (fixedFull) {
+      $(el).attr('data-full-src', fixedFull);
+      const local = normalizeLocalImagePath(src);
+      const thumbLocal = local && existsSync(thumbPathFor(local)) ? thumbPathFor(local) : null;
+      if (thumbLocal) {
+        const thumbUrl = publicImageUrl(thumbLocal, sitePathPrefix, siteOrigin);
+        $(el).attr('data-thumb', thumbUrl);
+        $(el).attr('src', thumbUrl);
+      } else {
+        $(el).attr('src', fixedFull);
+      }
+      $(el).addClass('progressive-img');
+    }
   }
   root.find('a[href]').each((_, el) => {
     const href = $(el).attr('href') || '';
