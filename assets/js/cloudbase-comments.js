@@ -510,6 +510,7 @@ function bindMobileComposeSheet(form, editor, { onClose, onOpen } = {}) {
   }
 
   const close = () => {
+    if (!form.classList.contains('is-sheet-open')) return;
     form.classList.remove('is-sheet-open');
     root?.classList.remove('cb-comments--compose-only');
     const listEl = root?.querySelector('.cb-comments-list');
@@ -521,18 +522,21 @@ function bindMobileComposeSheet(form, editor, { onClose, onOpen } = {}) {
   };
 
   const open = () => {
-    form.classList.add('is-sheet-open');
-    root?.classList.add('cb-comments--compose-only');
-    const listEl = root?.querySelector('.cb-comments-list');
-    const loadingEl = root?.querySelector('.cb-comments-loading');
-    if (listEl) listEl.hidden = true;
-    if (loadingEl) loadingEl.hidden = true;
-    onOpen?.();
+    const wasOpen = form.classList.contains('is-sheet-open');
+    if (!wasOpen) {
+      form.classList.add('is-sheet-open');
+      root?.classList.add('cb-comments--compose-only');
+      const listEl = root?.querySelector('.cb-comments-list');
+      const loadingEl = root?.querySelector('.cb-comments-loading');
+      if (listEl) listEl.hidden = true;
+      if (loadingEl) loadingEl.hidden = true;
+      onOpen?.();
+    }
     editor._autosizeBody?.();
     setTimeout(() => {
       editor._autosizeBody?.();
       editor.body.focus();
-    }, 120);
+    }, wasOpen ? 0 : 120);
   };
 
   form.querySelector('.cb-mobile-sheet-close')?.addEventListener('click', close);
@@ -615,6 +619,7 @@ function bindMobileEmbedDock(embedWrap, iframe) {
   const { dock } = createMobileDockChrome();
   let composeOpen = false;
   let sectionVisible = false;
+  let openGuardUntil = 0;
 
   const postDockState = visible => {
     try {
@@ -636,16 +641,17 @@ function bindMobileEmbedDock(embedWrap, iframe) {
 
   const openCompose = () => {
     composeOpen = true;
+    openGuardUntil = Date.now() + 300;
     syncDock();
     embedWrap.classList.add('cb-embed-wrap--compose-pinned');
     iframe.contentWindow?.postMessage({ type: 'gitblog-comments-compose-open' }, '*');
   };
 
   const closeCompose = () => {
+    if (!composeOpen && !embedWrap.classList.contains('cb-embed-wrap--compose-pinned')) return;
     composeOpen = false;
     embedWrap.classList.remove('cb-embed-wrap--compose-pinned');
     syncDock();
-    iframe.contentWindow?.postMessage({ type: 'gitblog-comments-compose-close' }, '*');
   };
 
   dock.querySelector('.cb-mobile-dock-trigger')?.addEventListener('click', openCompose);
@@ -654,6 +660,14 @@ function bindMobileEmbedDock(embedWrap, iframe) {
     if (e.source !== iframe?.contentWindow) return;
     if (e.data?.type === 'gitblog-comments-compose-close') closeCompose();
     if (e.data?.type === 'gitblog-comments-compose-submitted') closeCompose();
+    if (
+      e.data?.type === 'gitblog-comments-height'
+      && e.data.composeOpen === false
+      && composeOpen
+      && Date.now() > openGuardUntil
+    ) {
+      closeCompose();
+    }
   };
   window.addEventListener('message', onMessage);
 
