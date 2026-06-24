@@ -17,6 +17,7 @@ import {
 } from './home-shell-html.mjs';
 import { bundleAssets } from './bundle-assets.mjs';
 import { buildAllThumbnails, thumbPathFor } from './thumbnail-lib.mjs';
+import { majorQuizOgSvg } from './tool-og.mjs';
 import {
   parseSeoFromConfig,
   buildVerificationMetaHtml,
@@ -554,6 +555,32 @@ for (const post of ogEntries) {
   }
 }
 console.log(`OG 分享图已生成：${ogEntries.length} 张 SVG，${ogPngCount} 张 PNG`);
+
+// 工具页 OG（学士帽主视觉，供微信分享抓取）
+const TOOL_OG_PAGES = [
+  {
+    slug: 'tool-major',
+    svg: () => majorQuizOgSvg({
+      title: '大学专业倾向测评',
+      subtitle: '兴趣、能力与规划问卷',
+      siteTitle: SITE_TITLE,
+      author: SITE_AUTHOR,
+    }),
+  },
+];
+for (const tool of TOOL_OG_PAGES) {
+  const svg = tool.svg();
+  writeFileSync(join(OG_DIR, `${tool.slug}.svg`), svg);
+  try {
+    await sharp(Buffer.from(svg)).resize(1200, 630, { fit: 'cover' }).png().toFile(join(OG_DIR, `${tool.slug}.png`));
+    ogPngCount++;
+  } catch (e) {
+    console.warn(`[og] 工具页 PNG 转换失败 ${tool.slug}:`, e.message);
+  }
+}
+if (TOOL_OG_PAGES.length) {
+  console.log(`工具页 OG 分享图已生成：${TOOL_OG_PAGES.map(t => t.slug).join(', ')}`);
+}
 
 // ---------- post/{urlKey}/index.html（/post/YYYYMMDD/ 与 post.js 一致） ----------
 /** 壳内 href/src 用站点根绝对路径，避免在 /post/xxx/ 下相对路径变成 /post/xxx/assets/… 或 SW 缓存旧壳错位 */

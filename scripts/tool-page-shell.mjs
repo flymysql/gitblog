@@ -1,5 +1,31 @@
 /** 生成独立工具页 HTML 壳（构建脚本 / 手工维护共用模板） */
-export function toolPageHtml({ title, description, eyebrow, h1, lead, body, script, commentsHint, hideGlobalComments = false, hideToolActions = false }) {
+function htmlEsc(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function toolOgMetaHtml({ title, description, path, ogSlug, siteUrl }) {
+  if (!ogSlug || !siteUrl) return '';
+  const pageUrl = `${siteUrl.replace(/\/$/, '')}/${String(path).replace(/^\//, '')}`;
+  const image = `${siteUrl.replace(/\/$/, '')}/assets/og/${ogSlug}.png`;
+  return `
+  <meta property="og:title" content="${htmlEsc(title)}">
+  <meta property="og:description" content="${htmlEsc(description)}">
+  <meta property="og:image" content="${htmlEsc(image)}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="${htmlEsc(pageUrl)}">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${htmlEsc(title)}">
+  <meta name="twitter:description" content="${htmlEsc(description)}">
+  <meta name="twitter:image" content="${htmlEsc(image)}">`;
+}
+
+export function toolPageHtml({ title, description, eyebrow, h1, lead, body, script, commentsHint, hideGlobalComments = false, hideToolActions = false, ogSlug = '', siteUrl = '', pagePath = '' }) {
   const v = '20260622140000';
   const giscusTerm = String(script || '').replace(/\.js$/i, '');
   const hint = commentsHint || '使用体验、bug 反馈或建议，欢迎留言。';
@@ -10,7 +36,7 @@ export function toolPageHtml({ title, description, eyebrow, h1, lead, body, scri
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
   <title>${title} · 加载中…</title>
-  <meta name="description" content="${description}">
+  <meta name="description" content="${description}">${toolOgMetaHtml({ title, description, path: pagePath || `tools/${String(script || '').replace(/\.js$/i, '')}.html`, ogSlug, siteUrl })}
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
   <link rel="stylesheet" href="/assets/css/common.css?v=${v}">
   <link rel="stylesheet" href="/assets/css/tools.css?v=${v}">
