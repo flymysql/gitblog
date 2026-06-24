@@ -82,10 +82,63 @@ function cloudbaseCfg() {
   return CONFIG.cloudbase || {};
 }
 
+const CORS_HINT = 'CloudBase 跨域：请在控制台 → 环境配置 → 安全来源 添加 gitpull.cn 与 www.gitpull.cn，并为云函数开启 HTTP 访问（详见 cloudbase/README.md）';
+
+function resolveHttpUrl(cfg) {
+  const custom = String(cfg.httpUrl || '').trim();
+  if (custom) return custom;
+  const envId = String(cfg.envId || '').trim();
+  const region = String(cfg.region || 'ap-shanghai').trim() || 'ap-shanghai';
+  const fn = String(cfg.functionName || 'gitblog-comments').trim() || 'gitblog-comments';
+  return `https://${envId}.${region}.app.tcloudbase.com/${fn}`;
+}
+
+function useHttpAccess(cfg) {
+  const mode = String(cfg.accessMode || 'http').trim().toLowerCase();
+  return mode !== 'sdk';
+}
+
+async function callCommentApiHttp(payload) {
+  const cfg = cloudbaseCfg();
+  const url = resolveHttpUrl(cfg);
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    throw new Error(CORS_HINT);
+  }
+  let result;
+  try {
+    result = await res.json();
+  } catch {
+    throw new Error(`评论服务响应异常（HTTP ${res.status}）`);
+  }
+  if (!result || result.ok === false) {
+    throw new Error(result?.message || `评论服务请求失败（HTTP ${res.status}）`);
+  }
+  return result;
+}
+
 async function callCommentApi(payload) {
+  if (useHttpAccess(cloudbaseCfg())) {
+    return callCommentApiHttp(payload);
+  }
   const app = await getCloudBaseApp();
   const fn = String(cloudbaseCfg().functionName || 'gitblog-comments').trim() || 'gitblog-comments';
-  const res = await app.callFunction({ name: fn, data: payload });
+  let res;
+  try {
+    res = await app.callFunction({ name: fn, data: payload });
+  } catch (err) {
+    const msg = String(err?.message || err || '');
+    if (/auth|CORS|fetch|network|Failed/i.test(msg)) {
+      throw new Error(CORS_HINT);
+    }
+    throw err;
+  }
   const result = res?.result;
   if (!result || result.ok === false) {
     throw new Error(result?.message || '评论服务请求失败');
