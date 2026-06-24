@@ -571,9 +571,14 @@ function decorImageUrl(path) {
   return rootPath(rel);
 }
 
+function isPcCornerViewport() {
+  return window.matchMedia('(min-width: 821px)').matches;
+}
+
 function mountPcCornerDecor() {
   const decor = CONFIG.decor || {};
   if (!decor.enabled || !decor.pcCornerImage) return;
+  if (!isPcCornerViewport()) return;
   if (location.pathname.includes('/admin/')) return;
   if (document.getElementById('site-pc-corner-decor')) return;
   const wrap = document.createElement('div');
