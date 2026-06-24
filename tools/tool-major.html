@@ -18,8 +18,8 @@
   <meta name="twitter:description" content="通过兴趣、能力与发展规划问卷，推荐适合你的本科专业方向。仅供参考，不构成正式志愿填报建议。">
   <meta name="twitter:image" content="https://gitpull.cn/assets/og/tool-major.png?ogv=2">
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
-  <link rel="stylesheet" href="/assets/dist/common.min.css?v=20260624180000">
-  <link rel="stylesheet" href="/assets/dist/tools.min.css?v=20260624180000">
+  <link rel="stylesheet" href="/assets/css/common.css?v=20260622190000">
+  <link rel="stylesheet" href="/assets/css/tools.css?v=20260622190000">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
   <link rel="manifest" href="/manifest.webmanifest">
   <meta name="theme-color" content="#ea6f5a">
@@ -55,6 +55,30 @@
         <p class="major-result-profile" id="majorProfile"></p>
         <p class="major-result-filter-note" id="majorFilterNote"></p>
         <div class="major-result-cards" id="majorCards"></div>
+        <section class="major-admission-panel" id="majorAdmission">
+          <h2 class="major-admission-heading">分数定位院校</h2>
+          <p class="major-admission-desc">输入今年高考分数与省内排名（位次），结合上方专业倾向，参考往年录取分数线为你推荐院校专业（冲 / 稳 / 保）。</p>
+          <form class="major-admission-form" id="majorAdmissionForm">
+            <label class="major-admission-field">
+              <span class="major-quiz-label">所在省份</span>
+              <select class="major-admission-input" id="majorAdmissionProvince" required>
+                <option value="">请选择省份</option>
+              </select>
+            </label>
+            <label class="major-admission-field">
+              <span class="major-quiz-label">高考分数</span>
+              <input class="major-admission-input" id="majorAdmissionScore" type="number" inputmode="numeric" min="200" max="900" placeholder="如 625" required>
+            </label>
+            <label class="major-admission-field">
+              <span class="major-quiz-label">省排名（位次）</span>
+              <input class="major-admission-input" id="majorAdmissionRank" type="number" inputmode="numeric" min="1" placeholder="如 8500" required>
+            </label>
+            <button type="submit" class="tool-kit-btn" id="majorAdmissionSubmit">查看院校推荐</button>
+          </form>
+          <p class="major-admission-error tool-kit-error" id="majorAdmissionError" hidden></p>
+          <div class="major-school-recs" id="majorSchoolRecs" hidden></div>
+          <p class="tool-kit-hint major-admission-note">院校分数线为根据 2024 年各省投档数据整理的参考值，实际录取受招生计划、大小年等因素影响，请以当年招生章程与官方系统为准。</p>
+        </section>
         <div class="major-quiz-actions tool-kit-toolbar">
           <button type="button" class="tool-kit-btn is-ghost" id="majorShare">生成分享图</button>
           <button type="button" class="tool-kit-btn is-ghost" id="majorCopy">复制结果</button>
@@ -81,6 +105,6 @@
   <script type="application/json" id="toolPageMeta">{"giscusTerm":"tool-major"}</script>
   <div id="site-footer"></div>
   <div id="site-overlays"></div>
-  <script type="module" src="/assets/dist/tool-major.min.js?v=20260624180000"></script>
+  <script type="module" src="/assets/js/tool-major.js?v=20260622190000"></script>
 </body>
 </html>

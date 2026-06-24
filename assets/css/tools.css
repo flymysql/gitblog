@@ -2140,6 +2140,171 @@
   color: var(--text-tertiary);
 }
 
+/* 分数定位院校 */
+.major-admission-panel {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.major-admission-heading {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.major-admission-desc {
+  margin: 0 0 16px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.major-admission-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.major-admission-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.major-admission-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-elev);
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.major-admission-input:focus {
+  outline: 2px solid color-mix(in srgb, var(--primary) 35%, transparent);
+  border-color: var(--primary);
+}
+
+.major-admission-error {
+  margin-top: 10px;
+}
+
+.major-admission-note {
+  margin-top: 14px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.major-school-recs {
+  margin-top: 18px;
+}
+
+.major-school-recs-head {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.major-school-tier {
+  margin-bottom: 18px;
+}
+
+.major-school-tier-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.major-school-tier-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.major-school-tier-badge.is-reach { background: #e67e22; }
+.major-school-tier-badge.is-match { background: #2e9f6b; }
+.major-school-tier-badge.is-safety { background: #4a7fd4; }
+
+.major-school-tier-hint {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+
+.major-school-list {
+  display: grid;
+  gap: 10px;
+}
+
+.major-school-card {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-elev);
+}
+
+.major-school-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.major-school-name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.major-school-major {
+  margin: 0;
+  font-size: 13px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.major-school-meta {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.major-school-empty {
+  margin: 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--bg-soft);
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 720px) {
+  .major-admission-form {
+    grid-template-columns: 1fr;
+  }
+
+  .major-admission-form .tool-kit-btn {
+    width: 100%;
+  }
+}
+
 @media (max-width: 640px) {
   .major-result-card {
     grid-template-columns: 40px 1fr;
