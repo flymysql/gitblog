@@ -791,81 +791,83 @@ body { padding: 0 2px 8px; }
 
 .cb-mobile-sheet-header { display: none; }
 
+/* mobile-dock 由 JS 开启（含父页 mobileDock=1），不依赖 iframe 内 matchMedia */
+.cb-comments--mobile-dock > .cb-compose {
+  display: none !important;
+}
+
+.cb-comments--mobile-dock .cb-inline-reply {
+  display: none !important;
+}
+
+.cb-compose--mobile-portal:not(.is-sheet-open) {
+  display: none !important;
+}
+
+.cb-comments--mobile-dock.cb-comments--compose-only .cb-comments-list,
+.cb-comments--mobile-dock.cb-comments--compose-only .cb-comments-loading {
+  display: none !important;
+}
+
+.cb-comments--mobile-dock .cb-mobile-sheet-header,
+.cb-compose--mobile-portal .cb-mobile-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.cb-mobile-sheet-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.cb-mobile-sheet-close {
+  border: none;
+  background: none;
+  padding: 4px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.cb-compose--mobile-portal.is-sheet-open,
+.cb-comments--mobile-dock .cb-compose.is-sheet-open {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 900;
+  display: block !important;
+  max-height: none;
+  overflow: visible;
+  margin: 0;
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  border: none;
+  border-radius: 16px 16px 0 0;
+  background: var(--bg-elev);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
+  animation: cb-sheet-up 0.24s ease;
+}
+
+.cb-compose.is-sheet-open .cb-editor-body {
+  max-height: none;
+  overflow: hidden;
+  min-height: 48px;
+}
+
+@keyframes cb-sheet-up {
+  from { transform: translateY(8px); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.cb-comments--mobile-dock .cb-compose.is-sheet-open {
+  animation: cb-sheet-up 0.2s ease;
+}
+
 @media (max-width: 640px) {
-  .cb-comments--mobile-dock > .cb-compose {
-    display: none !important;
-  }
-
-  .cb-comments--mobile-dock .cb-inline-reply {
-    display: none !important;
-  }
-
-  .cb-compose--mobile-portal:not(.is-sheet-open) {
-    display: none !important;
-  }
-
-  .cb-comments--mobile-dock.cb-comments--compose-only .cb-comments-list,
-  .cb-comments--mobile-dock.cb-comments--compose-only .cb-comments-loading {
-    display: none !important;
-  }
-
-  .cb-mobile-sheet-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 10px;
-  }
-
-  .cb-mobile-sheet-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-main);
-  }
-
-  .cb-mobile-sheet-close {
-    border: none;
-    background: none;
-    padding: 4px 0;
-    font-size: 14px;
-    color: var(--text-secondary);
-    cursor: pointer;
-  }
-
-  .cb-compose--mobile-portal.is-sheet-open,
-  .cb-comments--mobile-dock .cb-compose.is-sheet-open {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 900;
-    display: block !important;
-    max-height: none;
-    overflow: visible;
-    margin: 0;
-    padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
-    border: none;
-    border-radius: 16px 16px 0 0;
-    background: var(--bg-elev);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
-    animation: cb-sheet-up 0.24s ease;
-  }
-
-  .cb-compose.is-sheet-open .cb-editor-body {
-    max-height: none;
-    overflow: hidden;
-    min-height: 48px;
-  }
-
-  @keyframes cb-sheet-up {
-    from { transform: translateY(8px); opacity: 0.6; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-
-  .cb-comments--mobile-dock .cb-compose.is-sheet-open {
-    animation: cb-sheet-up 0.2s ease;
-  }
-
   .cb-compose-meta {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 8px;
