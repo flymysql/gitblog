@@ -113,6 +113,67 @@ body { padding: 0 2px 8px; }
   font-weight: 600;
   color: #fff;
   background: hsl(var(--cb-avatar-hue, 12), 62%, 52%);
+  overflow: hidden;
+}
+
+.cb-comment-avatar--img {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+}
+
+.cb-comment-avatar--img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cb-field--avatar {
+  grid-column: 1 / -1;
+}
+
+.cb-avatar-picker-label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.cb-avatar-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 112px;
+  overflow: auto;
+  padding: 2px;
+}
+
+.cb-avatar-option {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: var(--bg-elev);
+  cursor: pointer;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.cb-avatar-option img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cb-avatar-option:hover {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+}
+
+.cb-avatar-option.is-selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 35%, transparent);
 }
 
 .cb-comment-main { flex: 1; min-width: 0; }
