@@ -210,16 +210,97 @@ async function handleUpload(event, context) {
   return jsonOk({ url, fileId });
 }
 
+async function dispatch(event, context) {
+  const action = String(event?.action || '').toUpperCase();
+  if (action === 'GET') return await handleGet(event);
+  if (action === 'POST') return await handlePost(event, context);
+  if (action === 'UPLOAD') return await handleUpload(event, context);
+  return jsonErr('未知 action');
+}
+
+function getAllowedOrigins() {
+  return String(process.env.ALLOWED_ORIGINS || 'https://gitpull.cn,https://www.gitpull.cn,http://127.0.0.1:8788,http://localhost:8788')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+function pickOrigin(requestOrigin) {
+  const allowed = getAllowedOrigins();
+  if (requestOrigin && allowed.includes(requestOrigin)) return requestOrigin;
+  return allowed[0] || 'https://gitpull.cn';
+}
+
+function corsHeaders(origin) {
+  return {
+    'Access-Control-Allow-Origin': pickOrigin(origin),
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
+  };
+}
+
+function isHttpEvent(event) {
+  return !!(event && (event.httpMethod || event.method));
+}
+
+function httpResponse(statusCode, body, origin) {
+  return {
+    statusCode,
+    headers: {
+      ...corsHeaders(origin),
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+    body: typeof body === 'string' ? body : JSON.stringify(body),
+  };
+}
+
+function buildHttpContext(event, context) {
+  const headers = event.headers || {};
+  const ip = context?.requestContext?.sourceIp
+    || event.requestContext?.sourceIp
+    || String(headers['x-forwarded-for'] || headers['X-Forwarded-For'] || '').split(',')[0]?.trim()
+    || '';
+  return {
+    ...context,
+    requestContext: {
+      ...(context?.requestContext || {}),
+      sourceIp: ip,
+      userAgent: String(headers['user-agent'] || headers['User-Agent'] || '').slice(0, 300),
+    },
+  };
+}
+
 exports.main = async (event, context) => {
   try {
     await ensureCollections();
-    const action = String(event?.action || '').toUpperCase();
-    if (action === 'GET') return await handleGet(event);
-    if (action === 'POST') return await handlePost(event, context);
-    if (action === 'UPLOAD') return await handleUpload(event, context);
-    return jsonErr('未知 action');
+
+    if (isHttpEvent(event)) {
+      const origin = event.headers?.origin || event.headers?.Origin || '';
+      const method = String(event.httpMethod || event.method || '').toUpperCase();
+      if (method === 'OPTIONS') {
+        return httpResponse(204, '', origin);
+      }
+      let payload = event;
+      if (event.body != null && event.body !== '') {
+        try {
+          payload = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
+        } catch {
+          return httpResponse(400, jsonErr('JSON 解析失败'), origin);
+        }
+      }
+      const result = await dispatch(payload, buildHttpContext(event, context));
+      const code = result.ok === false ? Number(result.code) || 400 : 200;
+      return httpResponse(code, result, origin);
+    }
+
+    return await dispatch(event, context);
   } catch (err) {
     console.error(err);
+    if (isHttpEvent(event)) {
+      const origin = event.headers?.origin || event.headers?.Origin || '';
+      return httpResponse(500, jsonErr(err.message || '服务器错误', 500), origin);
+    }
     return jsonErr(err.message || '服务器错误', 500);
   }
 };
