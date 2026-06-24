@@ -28,6 +28,7 @@ const cfg = {
   allowImage: true,
   pageSize: 50,
   mobileDock: params.get('mobileDock') === '1',
+  context: String(params.get('context') || 'post').trim().toLowerCase(),
 };
 
 const mode = String(params.get('mode') || 'light').trim().toLowerCase();
@@ -722,7 +723,7 @@ async function mount() {
   }
 
   root.innerHTML = `
-    <div class="cb-comments" data-path="${escapeHtml(cfg.path)}">
+    <div class="cb-comments${cfg.context === 'tool' ? ' cb-comments--flat' : ''}" data-path="${escapeHtml(cfg.path)}">
       <form class="cb-compose cb-compose--minimal" novalidate>
         <div class="cb-compose-editor"></div>
         <div class="cb-compose-meta" hidden>
