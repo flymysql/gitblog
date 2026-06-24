@@ -1,12 +1,9 @@
-// ============================================================================
-// CloudBase 评论区：昵称/邮箱（可选）+ 富文本（表情、图片、基础格式）
-// 通过云函数 gitblog-comments 读写数据库，不在前端暴露密钥
-// ============================================================================
-
-import { CONFIG } from './config.js';
-
-const PROFILE_KEY = 'gitblog-comment-profile-v1';
+/**
+ * CloudBase 评论嵌入页（托管于 {envId}.tcloudbaseapp.com）
+ * 通过 URL 参数接收 path/env/region，用 Web SDK 调云函数，避免博客域跨域。
+ */
 const SDK_URL = 'https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js';
+const PROFILE_KEY = 'gitblog-comment-profile-v1';
 
 const EMOJI_GROUPS = [
   ['😀', '😁', '😂', '🤣', '😊', '😇', '🙂', '😉', '😍', '🥰', '😘', '😋'],
@@ -15,9 +12,25 @@ const EMOJI_GROUPS = [
   ['🌸', '🌿', '☀️', '🌙', '⭐', '🍵', '☕', '🍜', '🎈', '📚', '💡', '🚀'],
 ];
 
+const params = new URLSearchParams(location.search);
+const cfg = {
+  path: String(params.get('path') || '').trim(),
+  envId: String(params.get('env') || '').trim(),
+  region: String(params.get('region') || 'ap-shanghai').trim() || 'ap-shanghai',
+  functionName: String(params.get('fn') || 'gitblog-comments').trim() || 'gitblog-comments',
+  pageTitle: String(params.get('title') || '').trim(),
+  placeholderNick: '访客',
+  moderation: false,
+  maxLength: 5000,
+  allowImage: true,
+  pageSize: 50,
+};
+
+const mode = String(params.get('mode') || 'light').trim().toLowerCase();
+document.documentElement.setAttribute('data-mode', mode === 'dark' ? 'dark' : 'light');
+
 let _app = null;
-let _authReady = null;
-let _sdkPromise = null;
+let _heightTimer = null;
 
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
@@ -40,105 +53,42 @@ function loadScript(src) {
   });
 }
 
-async function ensureCloudBaseAuth(app) {
-  if (_authReady) return _authReady;
-  _authReady = (async () => {
-    const auth = app.auth();
+function postHeight(ready = false) {
+  clearTimeout(_heightTimer);
+  _heightTimer = setTimeout(() => {
+    const h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
     try {
-      const state = await auth.getLoginState();
-      if (!state) await auth.signInAnonymously();
-    } catch (err) {
-      throw new Error('CloudBase 匿名登录失败，请在控制台开启「匿名登录」：' + (err.message || err));
-    }
-  })();
-  return _authReady;
+      window.parent.postMessage({ type: 'gitblog-comments-height', height: h, ready }, '*');
+    } catch { /* ignore */ }
+  }, 80);
 }
 
-async function getCloudBaseApp() {
+function observeHeight() {
+  postHeight(true);
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(() => postHeight(true));
+    ro.observe(document.body);
+  } else {
+    window.addEventListener('load', () => postHeight(true));
+    setInterval(() => postHeight(true), 1500);
+  }
+}
+
+async function getApp() {
   if (_app) return _app;
-  if (!_sdkPromise) {
-    _sdkPromise = loadScript(SDK_URL).then(async () => {
-      const cfg = CONFIG.cloudbase || {};
-      const envId = String(cfg.envId || '').trim();
-      if (!envId) throw new Error('缺少 cloudbase.envId');
-      // eslint-disable-next-line no-undef
-      _app = cloudbase.init({
-        env: envId,
-        region: String(cfg.region || 'ap-shanghai').trim() || 'ap-shanghai',
-      });
-      await ensureCloudBaseAuth(_app);
-      return _app;
-    });
-  }
-  return _sdkPromise;
+  await loadScript(SDK_URL);
+  if (!cfg.envId) throw new Error('缺少 env 参数');
+  // eslint-disable-next-line no-undef
+  _app = cloudbase.init({ env: cfg.envId, region: cfg.region });
+  const auth = _app.auth();
+  const state = await auth.getLoginState();
+  if (!state) await auth.signInAnonymously();
+  return _app;
 }
 
-export function isCloudBaseReady() {
-  const c = CONFIG.cloudbase || {};
-  return !!(c.enabled && String(c.envId || '').trim());
-}
-
-function cloudbaseCfg() {
-  return CONFIG.cloudbase || {};
-}
-
-const CORS_HINT = 'CloudBase 跨域：免费版无法添加 gitpull.cn 安全域名，请将 accessMode 改为 embed 并部署 cloudbase/static（详见 cloudbase/README.md）；升级个人版后可添加安全域名并使用 http/sdk 模式';
-
-function resolveHttpUrl(cfg) {
-  const custom = String(cfg.httpUrl || '').trim();
-  if (custom) return custom;
-  const envId = String(cfg.envId || '').trim();
-  const region = String(cfg.region || 'ap-shanghai').trim() || 'ap-shanghai';
-  const fn = String(cfg.functionName || 'gitblog-comments').trim() || 'gitblog-comments';
-  return `https://${envId}.${region}.app.tcloudbase.com/${fn}`;
-}
-
-function useHttpAccess(cfg) {
-  const mode = String(cfg.accessMode || 'embed').trim().toLowerCase();
-  return mode === 'http';
-}
-
-async function callCommentApiHttp(payload) {
-  const cfg = cloudbaseCfg();
-  const url = resolveHttpUrl(cfg);
-  let res;
-  try {
-    res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-  } catch {
-    throw new Error(CORS_HINT);
-  }
-  let result;
-  try {
-    result = await res.json();
-  } catch {
-    throw new Error(`评论服务响应异常（HTTP ${res.status}）`);
-  }
-  if (!result || result.ok === false) {
-    throw new Error(result?.message || `评论服务请求失败（HTTP ${res.status}）`);
-  }
-  return result;
-}
-
-async function callCommentApi(payload) {
-  if (useHttpAccess(cloudbaseCfg())) {
-    return callCommentApiHttp(payload);
-  }
-  const app = await getCloudBaseApp();
-  const fn = String(cloudbaseCfg().functionName || 'gitblog-comments').trim() || 'gitblog-comments';
-  let res;
-  try {
-    res = await app.callFunction({ name: fn, data: payload });
-  } catch (err) {
-    const msg = String(err?.message || err || '');
-    if (/auth|CORS|fetch|network|Failed/i.test(msg)) {
-      throw new Error(CORS_HINT);
-    }
-    throw err;
-  }
+async function callApi(payload) {
+  const app = await getApp();
+  const res = await app.callFunction({ name: cfg.functionName, data: payload });
   const result = res?.result;
   if (!result || result.ok === false) {
     throw new Error(result?.message || '评论服务请求失败');
@@ -146,8 +96,7 @@ async function callCommentApi(payload) {
   return result;
 }
 
-/** 展示用 HTML 白名单净化（服务端也会再滤一遍） */
-export function sanitizeCommentHtml(raw) {
+function sanitizeCommentHtml(raw) {
   const tpl = document.createElement('template');
   tpl.innerHTML = String(raw || '');
   const allowed = new Set([
@@ -230,6 +179,18 @@ function avatarColor(name) {
   return hues[h % hues.length];
 }
 
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const s = String(reader.result || '');
+      resolve(s.includes(',') ? s.split(',')[1] : s);
+    };
+    reader.onerror = () => reject(new Error('读取图片失败'));
+    reader.readAsDataURL(file);
+  });
+}
+
 class CommentRichEditor {
   constructor(root, { allowImage = true, maxLength = 5000, onUpload } = {}) {
     this.root = root;
@@ -259,7 +220,7 @@ class CommentRichEditor {
           ${this.allowImage ? '<button type="button" class="cb-tb" data-action="image" title="插入图片">🖼</button>' : ''}
         </div>
         <div class="cb-editor-emoji" hidden></div>
-        <div class="cb-editor-body" contenteditable="true" data-placeholder="写下你的想法…支持 Markdown 风格快捷键与粘贴图片" role="textbox" aria-multiline="true"></div>
+        <div class="cb-editor-body" contenteditable="true" data-placeholder="写下你的想法…" role="textbox" aria-multiline="true"></div>
         <div class="cb-editor-foot">
           <span class="cb-editor-count">0 / ${this.maxLength}</span>
         </div>
@@ -271,10 +232,6 @@ class CommentRichEditor {
     this.emojiPanel = this.root.querySelector('.cb-editor-emoji');
     this.countEl = this.root.querySelector('.cb-editor-count');
     this.fileInput = this.root.querySelector('.cb-editor-file');
-    this._renderEmoji();
-  }
-
-  _renderEmoji() {
     this.emojiPanel.innerHTML = EMOJI_GROUPS.map(row =>
       `<div class="cb-emoji-row">${row.map(e =>
         `<button type="button" class="cb-emoji-btn" data-emoji="${e}">${e}</button>`
@@ -395,9 +352,9 @@ class CommentRichEditor {
           return [...t.content.childNodes];
         })()
       );
-    } catch (err) {
+    } catch {
       this.root.querySelector('.cb-uploading')?.remove();
-      throw err;
+      throw new Error('图片上传失败');
     }
     this._syncCount();
   }
@@ -428,18 +385,18 @@ class CommentRichEditor {
   }
 }
 
-function renderCommentItem(c, { onReply }) {
+function renderCommentItem(c) {
   const nick = escapeHtml(c.nick || '访客');
   const hue = avatarColor(c.nick);
   const content = sanitizeCommentHtml(c.contentHtml || '');
-  const replies = (c.replies || []).map(r => renderCommentItem(r, { onReply })).join('');
+  const replies = (c.replies || []).map(r => renderCommentItem(r)).join('');
   return `
     <article class="cb-comment${c.parentId ? ' is-reply' : ''}" data-id="${escapeHtml(c._id)}">
       <div class="cb-comment-avatar" style="--cb-avatar-hue:${hue}" aria-hidden="true">${nick.slice(0, 1).toUpperCase()}</div>
       <div class="cb-comment-main">
         <header class="cb-comment-head">
           <strong class="cb-comment-nick">${nick}</strong>
-          <time class="cb-comment-time" datetime="${escapeHtml(c.createdAtIso || '')}">${escapeHtml(formatTime(c.createdAt))}</time>
+          <time class="cb-comment-time">${escapeHtml(formatTime(c.createdAt))}</time>
         </header>
         <div class="cb-comment-body">${content || '<p></p>'}</div>
         <footer class="cb-comment-actions">
@@ -451,83 +408,29 @@ function renderCommentItem(c, { onReply }) {
   `;
 }
 
-function resolveEmbedPageUrl(cfg, path, opts = {}) {
-  const custom = String(cfg.embedUrl || '').trim();
-  const envId = String(cfg.envId || '').trim();
-  const region = String(cfg.region || 'ap-shanghai').trim() || 'ap-shanghai';
-  let url;
-  if (custom) {
-    url = new URL(custom);
-  } else {
-    const base = String(cfg.embedBaseUrl || '').trim()
-      || `https://${envId}.tcloudbaseapp.com`;
-    const page = String(cfg.embedPage || 'comments-embed.html').trim() || 'comments-embed.html';
-    url = new URL(page, base.endsWith('/') ? base : `${base}/`);
-  }
-  url.searchParams.set('path', path);
-  url.searchParams.set('env', envId);
-  url.searchParams.set('region', region);
-  url.searchParams.set('fn', String(cfg.functionName || 'gitblog-comments').trim() || 'gitblog-comments');
-  const mode = document.documentElement.getAttribute('data-mode') || 'light';
-  url.searchParams.set('mode', mode);
-  if (opts.pageTitle) url.searchParams.set('title', String(opts.pageTitle).slice(0, 120));
-  return url.toString();
+function showError(root, message) {
+  root.innerHTML = `<div class="comments-hint">${escapeHtml(message)}</div>`;
+  postHeight(true);
 }
 
-function mountCloudBaseEmbed(targetEl, path, opts = {}) {
-  const cfg = cloudbaseCfg();
-  const src = resolveEmbedPageUrl(cfg, path, opts);
-  targetEl.innerHTML = `
-    <div class="cb-embed-wrap">
-      <iframe
-        class="cb-embed-frame"
-        title="评论区"
-        loading="lazy"
-        referrerpolicy="strict-origin-when-cross-origin"
-        src="${escapeHtml(src)}"
-      ></iframe>
-      <p class="cb-embed-hint comments-hint">评论由 CloudBase 提供；若空白请先执行 <code>tcb hosting deploy ./static</code> 部署嵌入页（见 cloudbase/README.md）。</p>
-    </div>
-  `;
-  const iframe = targetEl.querySelector('.cb-embed-frame');
-  const hint = targetEl.querySelector('.cb-embed-hint');
-  const onMessage = e => {
-    if (!e.data || e.data.type !== 'gitblog-comments-height') return;
-    if (e.source !== iframe?.contentWindow) return;
-    const h = Number(e.data.height);
-    if (h > 0 && iframe) iframe.style.height = `${Math.min(Math.max(h, 320), 2400)}px`;
-    if (hint && e.data.ready) hint.hidden = true;
-  };
-  window.addEventListener('message', onMessage);
-  return true;
-}
+async function mount() {
+  const root = document.getElementById('gitblog-comments-root');
+  if (!root) return;
 
-/**
- * 挂载 CloudBase 评论区
- * @param {HTMLElement} targetEl
- * @param {string} path 页面标识（urlKey / notesTerm / tool path）
- */
-export function mountCloudBaseComments(targetEl, path, opts = {}) {
-  if (!targetEl || !path) return false;
-  const cfg = cloudbaseCfg();
-  const mode = String(cfg.accessMode || 'embed').trim().toLowerCase();
-  if (mode === 'embed') {
-    return mountCloudBaseEmbed(targetEl, path, opts);
+  if (!cfg.path) {
+    showError(root, '缺少 path 参数');
+    return;
   }
 
-  const maxLength = Number(cfg.maxLength) || 5000;
-  const allowImage = cfg.allowImage !== false;
-  const placeholderNick = String(cfg.placeholderNick || '访客').trim() || '访客';
-
-  targetEl.innerHTML = `
-    <div class="cb-comments" data-path="${escapeHtml(path)}">
+  root.innerHTML = `
+    <div class="cb-comments" data-path="${escapeHtml(cfg.path)}">
       <div class="cb-comments-loading" aria-live="polite">评论加载中…</div>
       <div class="cb-comments-list" hidden></div>
       <form class="cb-compose" novalidate>
         <div class="cb-compose-meta">
           <label class="cb-field">
             <span>昵称</span>
-            <input type="text" name="nick" maxlength="40" placeholder="${escapeHtml(placeholderNick)}（可选）" autocomplete="nickname">
+            <input type="text" name="nick" maxlength="40" placeholder="${escapeHtml(cfg.placeholderNick)}（可选）" autocomplete="nickname">
           </label>
           <label class="cb-field">
             <span>邮箱</span>
@@ -545,7 +448,6 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
     </div>
   `;
 
-  const root = targetEl.querySelector('.cb-comments');
   const listEl = root.querySelector('.cb-comments-list');
   const loadingEl = root.querySelector('.cb-comments-loading');
   const form = root.querySelector('.cb-compose');
@@ -560,13 +462,13 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
   if (profile.email) emailInput.value = profile.email;
 
   const editor = new CommentRichEditor(editorHost, {
-    allowImage,
-    maxLength,
+    allowImage: cfg.allowImage,
+    maxLength: cfg.maxLength,
     onUpload: async file => {
       const base64 = await fileToBase64(file);
-      const res = await callCommentApi({
+      const res = await callApi({
         action: 'UPLOAD',
-        path,
+        path: cfg.path,
         fileName: file.name,
         mime: file.type,
         base64,
@@ -575,21 +477,21 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
     },
   });
 
-  let comments = [];
-
   async function loadList() {
     loadingEl.hidden = false;
     listEl.hidden = true;
     try {
-      const res = await callCommentApi({ action: 'GET', path, limit: Number(cfg.pageSize) || 50 });
-      comments = res.comments || [];
+      const res = await callApi({ action: 'GET', path: cfg.path, limit: cfg.pageSize });
+      const comments = res.comments || [];
       listEl.innerHTML = comments.length
-        ? comments.map(c => renderCommentItem(c, {})).join('')
+        ? comments.map(c => renderCommentItem(c)).join('')
         : '<p class="cb-empty">暂无评论，来说第一句吧。</p>';
       loadingEl.hidden = true;
       listEl.hidden = false;
+      postHeight(true);
     } catch (err) {
       loadingEl.innerHTML = `<div class="comments-hint">${escapeHtml(err.message || '加载失败')}</div>`;
+      postHeight(true);
     }
   }
 
@@ -613,7 +515,7 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
     e.preventDefault();
     statusEl.textContent = '';
     if (!editor.isValid()) {
-      statusEl.textContent = editor.getPlainLength() > maxLength ? '内容过长' : '请输入评论内容';
+      statusEl.textContent = editor.getPlainLength() > cfg.maxLength ? '内容过长' : '请输入评论内容';
       statusEl.classList.add('is-error');
       return;
     }
@@ -624,15 +526,15 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
     statusEl.classList.remove('is-error');
     statusEl.textContent = '提交中…';
     try {
-      await callCommentApi({
+      await callApi({
         action: 'POST',
-        path,
+        path: cfg.path,
         nick,
         email,
         contentHtml: editor.getHtml(),
         parentId: parentInput.value.trim() || null,
-        pageTitle: opts.pageTitle || document.title,
-        pageUrl: opts.pageUrl || location.href,
+        pageTitle: cfg.pageTitle || document.title,
+        pageUrl: params.get('pageUrl') || '',
       });
       saveProfile({ nick, email });
       editor.clear();
@@ -644,21 +546,20 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
       statusEl.classList.add('is-error');
     } finally {
       submitBtn.disabled = false;
+      postHeight(true);
     }
   });
 
-  loadList();
-  return true;
+  observeHeight();
+
+  try {
+    await loadList();
+  } catch (err) {
+    showError(root, err.message || '初始化失败');
+  }
 }
 
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const s = String(reader.result || '');
-      resolve(s.includes(',') ? s.split(',')[1] : s);
-    };
-    reader.onerror = () => reject(new Error('读取图片失败'));
-    reader.readAsDataURL(file);
-  });
-}
+mount().catch(err => {
+  const root = document.getElementById('gitblog-comments-root');
+  if (root) showError(root, err.message || '加载失败');
+});
