@@ -609,6 +609,8 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
   if (pageUrl) url.searchParams.set('pageUrl', pageUrl.slice(0, 500));
   const httpUrl = String(cfg.httpUrl || '').trim();
   if (httpUrl) url.searchParams.set('httpUrl', httpUrl);
+  const assetVer = String(cfg.embedAssetVersion || '').trim();
+  if (assetVer) url.searchParams.set('v', assetVer);
   return url.toString();
 }
 
