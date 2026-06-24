@@ -1,12 +1,11 @@
 ---
 title: GitBlog：一个带伪后台的博客站点
 date: "2026-05-11T16:50:00+08:00"
-updated: "2026-05-11T09:11:44.875Z"
+updated: "2026-06-24T02:30:47.261Z"
 author: Jimmy
 tags: [博客建站, 教程, 项目介绍]
 cover: ../assets/uploads/2026/05/1778490605877-blwjij-image.webp
 summary: "一个完全静态、托管在 GitHub Pages 上的博客，但带有可以在浏览器里直接写、直接发的'伪后台'。这篇文章记录它能做什么，相比传统方案为什么这样设计，以及如果你也想搭一个，要怎么开始。"
-pinned: true
 carousel: true
 ---
 
