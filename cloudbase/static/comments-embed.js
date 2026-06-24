@@ -788,7 +788,123 @@ function bindInlineReplyReveal(editor, metaEl) {
   refresh();
 }
 
-function bindMobileComposeSheet(form, editor) {
+function isEmbedIframe() {
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+}
+
+function syncMobileTeaser(root, sheetOpen) {
+  const teaser = root?.querySelector('.cb-mobile-compose-teaser');
+  if (!teaser) return;
+  const parentDock = root?.classList.contains('cb-parent-dock-visible');
+  teaser.hidden = !!sheetOpen || parentDock;
+}
+
+function bindInFrameMobileTeaser(root, mobileCtrl, { hideWhenParentDock = false } = {}) {
+  if (!cfg.mobileDock || hideWhenParentDock || !root || !mobileCtrl) return;
+  let teaser = root.querySelector('.cb-mobile-compose-teaser');
+  if (!teaser) {
+    teaser = document.createElement('button');
+    teaser.type = 'button';
+    teaser.className = 'cb-mobile-compose-teaser';
+    teaser.textContent = '说点什么…';
+    teaser.addEventListener('click', () => {
+      mobileCtrl.clearReply();
+      mobileCtrl.open();
+    });
+    const anchor = root.querySelector('.cb-comments-loading') || root.querySelector('.cb-comments-list');
+    if (anchor) root.insertBefore(teaser, anchor);
+    else root.appendChild(teaser);
+  }
+  syncMobileTeaser(root, root.querySelector('.cb-compose')?.classList.contains('is-sheet-open'));
+}
+
+function createMobileComposeController(root, form, editor) {
+  const state = {
+    mode: 'new',
+    parentId: null,
+    replyNick: null,
+    replyBtn: null,
+  };
+
+  const updateSheetTitle = () => {
+    const title = form.querySelector('.cb-mobile-sheet-title');
+    if (!title) return;
+    title.textContent = state.mode === 'reply' && state.replyNick
+      ? `回复 ${state.replyNick}`
+      : '发表评论';
+  };
+
+  const clearReply = () => {
+    state.replyBtn?.classList.remove('is-active');
+    state.mode = 'new';
+    state.parentId = null;
+    state.replyNick = null;
+    state.replyBtn = null;
+    updateSheetTitle();
+  };
+
+  const setReply = ({ parentId, replyNick, replyBtn }) => {
+    closeAllInlineReplies(root);
+    clearReply();
+    state.mode = 'reply';
+    state.parentId = parentId;
+    state.replyNick = replyNick;
+    state.replyBtn = replyBtn;
+    replyBtn?.classList.add('is-active');
+    updateSheetTitle();
+  };
+
+  const sheet = bindMobileComposeSheet(form, editor, {
+    onOpen: () => {
+      syncMobileTeaser(root, true);
+      postHeight(true);
+    },
+    onClose: () => {
+      clearReply();
+      syncMobileTeaser(root, false);
+      postHeight(true);
+    },
+  });
+
+  const onMessage = e => {
+    if (e.data?.type === 'gitblog-comments-compose-open') {
+      if (e.data.parentId) {
+        setReply({
+          parentId: e.data.parentId,
+          replyNick: e.data.replyNick || '访客',
+          replyBtn: null,
+        });
+      } else {
+        clearReply();
+      }
+      sheet.open();
+      return;
+    }
+    if (e.data?.type === 'gitblog-comments-compose-close') sheet.close();
+  };
+  window.addEventListener('message', onMessage);
+
+  return {
+    sheet,
+    setReply,
+    clearReply,
+    getParentId: () => (state.mode === 'reply' ? state.parentId : null),
+    open: replyCtx => {
+      if (replyCtx?.parentId) setReply(replyCtx);
+      else clearReply();
+      sheet.open();
+    },
+    close: () => sheet.close(),
+    notifySubmitted: () => sheet.notifySubmitted(),
+    cleanup: () => window.removeEventListener('message', onMessage),
+  };
+}
+
+function bindMobileComposeSheet(form, editor, { onClose, onOpen } = {}) {
   if (!cfg.mobileDock) {
     return { open: () => {}, close: () => {}, notifySubmitted: () => {} };
   }
@@ -815,6 +931,7 @@ function bindMobileComposeSheet(form, editor) {
     if (listEl?.innerHTML) listEl.hidden = false;
     if (loadingEl) loadingEl.hidden = true;
     editor.body.blur();
+    onClose?.();
     postHeight(true);
     try {
       window.parent.postMessage({ type: 'gitblog-comments-compose-close' }, '*');
@@ -830,6 +947,7 @@ function bindMobileComposeSheet(form, editor) {
       const loadingEl = root?.querySelector('.cb-comments-loading');
       if (listEl) listEl.hidden = true;
       if (loadingEl) loadingEl.hidden = true;
+      onOpen?.();
       postHeight(true);
     }
     setTimeout(() => {
@@ -842,10 +960,10 @@ function bindMobileComposeSheet(form, editor) {
   form.querySelector('.cb-mobile-sheet-close')?.addEventListener('click', close);
 
   window.addEventListener('message', e => {
-    if (e.data?.type === 'gitblog-comments-compose-open') open();
-    if (e.data?.type === 'gitblog-comments-compose-close') close();
     if (e.data?.type === 'gitblog-comments-dock' && root) {
       root.style.paddingBottom = e.data.visible ? 'calc(56px + env(safe-area-inset-bottom))' : '';
+      root.classList.toggle('cb-parent-dock-visible', !!e.data.visible);
+      syncMobileTeaser(root, form.classList.contains('is-sheet-open'));
       postHeight(true);
     }
   });
@@ -998,6 +1116,14 @@ function bindCommentListInteractions(listEl, ctx) {
     const btn = e.target.closest('[data-reply]');
     if (!btn || e.target.closest('.cb-inline-reply')) return;
     e.preventDefault();
+    if (cfg.mobileDock && ctx.mobileCtrl) {
+      ctx.mobileCtrl.open({
+        parentId: btn.dataset.reply || '',
+        replyNick: btn.dataset.replyNick || '访客',
+        replyBtn: btn,
+      });
+      return;
+    }
     const slot = btn.closest('.cb-comment-main')?.querySelector('.cb-inline-reply-slot');
     if (!slot) return;
     mountInlineReply(slot, {
@@ -1046,15 +1172,16 @@ async function mount() {
     </div>
   `;
 
-  const listEl = root.querySelector('.cb-comments-list');
-  const loadingEl = root.querySelector('.cb-comments-loading');
-  const form = root.querySelector('.cb-compose');
-  const statusEl = root.querySelector('.cb-compose-status');
+  const commentsRoot = root.querySelector('.cb-comments') || root;
+  const listEl = commentsRoot.querySelector('.cb-comments-list');
+  const loadingEl = commentsRoot.querySelector('.cb-comments-loading');
+  const form = commentsRoot.querySelector('.cb-compose');
+  const statusEl = commentsRoot.querySelector('.cb-compose-status');
   const metaEl = form.querySelector('.cb-compose-meta');
   const actionsEl = form.querySelector('.cb-compose-actions');
   const nickInput = form.querySelector('[name="nick"]');
   const emailInput = form.querySelector('[name="email"]');
-  const editorHost = root.querySelector('.cb-compose-editor');
+  const editorHost = commentsRoot.querySelector('.cb-compose-editor');
 
   const profile = readProfile();
   prefillCommentNick(nickInput);
@@ -1080,7 +1207,15 @@ async function mount() {
 
   bindComposeReveal(form, editor, { metaEl, actionsEl });
 
-  const mobileSheet = bindMobileComposeSheet(form, editor);
+  const mobileCtrl = cfg.mobileDock
+    ? createMobileComposeController(commentsRoot, form, editor)
+    : null;
+
+  if (cfg.mobileDock && isEmbedIframe()) {
+    bindInFrameMobileTeaser(commentsRoot, mobileCtrl, {
+      hideWhenParentDock: cfg.context === 'post',
+    });
+  }
 
   async function loadList() {
     loadingEl.hidden = false;
@@ -1102,7 +1237,7 @@ async function mount() {
     }
   }
 
-  bindCommentListInteractions(listEl, { path: cfg.path, callApi, onSuccess: loadList });
+  bindCommentListInteractions(listEl, { path: cfg.path, callApi, onSuccess: loadList, mobileCtrl });
 
   form.addEventListener('keydown', e => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -1134,14 +1269,14 @@ async function mount() {
         email,
         avatar,
         contentHtml: editor.getHtml(),
-        parentId: null,
+        parentId: mobileCtrl?.getParentId() ?? null,
         pageTitle: cfg.pageTitle || document.title,
         pageUrl: cfg.pageUrl || params.get('pageUrl') || '',
       });
       saveProfile({ nick, email, avatar });
       editor.clear();
       statusEl.textContent = cfg.moderation ? '已提交，待审核通过后显示' : '发表成功';
-      mobileSheet.notifySubmitted();
+      mobileCtrl?.notifySubmitted?.();
       await loadList();
     } catch (err) {
       statusEl.textContent = err.message || '发表失败';
