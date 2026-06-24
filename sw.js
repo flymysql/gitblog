@@ -3,7 +3,7 @@
 // 与 ?v=VERSION 的 cache-busting 协同：CACHE_NAME 用 release VERSION 区分批次
 // ============================================================================
 
-const SW_VERSION = '20260615210000';
+const SW_VERSION = '20260624080000';
 const STATIC_CACHE = `static-${SW_VERSION}`;
 const PAGE_CACHE = `pages-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
@@ -12,28 +12,28 @@ const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
 const OFFLINE_URL = 'offline.html';
 
 const PRECACHE_ASSETS = [
-  'assets/dist/common.min.css?v=20260615210000',
-  'assets/dist/home.min.css?v=20260615210000',
-  'assets/dist/post.min.css?v=20260615210000',
-  'assets/dist/tools.min.css?v=20260615210000',
-  'assets/dist/admin.min.css?v=20260615210000',
-  'assets/dist/home.min.js?v=20260615210000',
-  'assets/dist/post.min.js?v=20260615210000',
-  'assets/dist/tags.min.js?v=20260615210000',
-  'assets/dist/archives.min.js?v=20260615210000',
-  'assets/dist/series.min.js?v=20260615210000',
-  'assets/dist/notes.min.js?v=20260615210000',
-  'assets/dist/tools.min.js?v=20260615210000',
-  'assets/dist/tool-age.min.js?v=20260615210000',
-  'assets/dist/tool-fortune.min.js?v=20260615210000',
-  'assets/dist/tool-json.min.js?v=20260615210000',
-  'assets/dist/tool-codec.min.js?v=20260615210000',
-  'assets/dist/tool-timestamp.min.js?v=20260615210000',
-  'assets/dist/tool-regex.min.js?v=20260615210000',
-  'assets/dist/tool-qrcode.min.js?v=20260615210000',
-  'assets/dist/tool-image.min.js?v=20260615210000',
-  'assets/dist/tool-network.min.js?v=20260615210000',
-  'assets/dist/tool-farm-seed.min.js?v=20260615210000',
+  'assets/dist/common.min.css?v=20260624080000',
+  'assets/dist/home.min.css?v=20260624080000',
+  'assets/dist/post.min.css?v=20260624080000',
+  'assets/dist/tools.min.css?v=20260624080000',
+  'assets/dist/admin.min.css?v=20260624080000',
+  'assets/dist/home.min.js?v=20260624080000',
+  'assets/dist/post.min.js?v=20260624080000',
+  'assets/dist/tags.min.js?v=20260624080000',
+  'assets/dist/archives.min.js?v=20260624080000',
+  'assets/dist/series.min.js?v=20260624080000',
+  'assets/dist/notes.min.js?v=20260624080000',
+  'assets/dist/tools.min.js?v=20260624080000',
+  'assets/dist/tool-age.min.js?v=20260624080000',
+  'assets/dist/tool-fortune.min.js?v=20260624080000',
+  'assets/dist/tool-json.min.js?v=20260624080000',
+  'assets/dist/tool-codec.min.js?v=20260624080000',
+  'assets/dist/tool-timestamp.min.js?v=20260624080000',
+  'assets/dist/tool-regex.min.js?v=20260624080000',
+  'assets/dist/tool-qrcode.min.js?v=20260624080000',
+  'assets/dist/tool-image.min.js?v=20260624080000',
+  'assets/dist/tool-network.min.js?v=20260624080000',
+  'assets/dist/tool-farm-seed.min.js?v=20260624080000',
 ];
 
 // 安装阶段预缓存关键文件，确保彻底离线也能至少打开首页和 offline.html
