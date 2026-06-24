@@ -11,7 +11,8 @@
       "installDependency": true,
       "envVariables": {
         "COMMENT_MODERATION": "0",
-        "COMMENT_SALT": "change-me-in-console"
+        "COMMENT_SALT": "change-me-in-console",
+        "ALLOWED_ORIGINS": "https://gitpull.cn,https://www.gitpull.cn"
       }
     }
   ]

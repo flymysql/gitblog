@@ -215,6 +215,9 @@ function normalizeConfig(config) {
   config.cloudbase.envId = String(config.cloudbase.envId || '').trim();
   config.cloudbase.region = String(config.cloudbase.region || 'ap-shanghai').trim() || 'ap-shanghai';
   config.cloudbase.functionName = String(config.cloudbase.functionName || 'gitblog-comments').trim() || 'gitblog-comments';
+  const accessMode = String(config.cloudbase.accessMode || 'http').trim().toLowerCase();
+  config.cloudbase.accessMode = accessMode === 'sdk' ? 'sdk' : 'http';
+  config.cloudbase.httpUrl = String(config.cloudbase.httpUrl || '').trim();
   config.cloudbase.placeholderNick = String(config.cloudbase.placeholderNick || '访客').trim() || '访客';
   config.cloudbase.moderation = !!config.cloudbase.moderation;
   config.cloudbase.maxLength = Math.min(Math.max(Number(config.cloudbase.maxLength) || 5000, 500), 12000);
@@ -655,11 +658,20 @@ function settingsContentHtml() {
 
       <section class="settings-card">
         <h3>评论（CloudBase）</h3>
-        <p class="settings-help">国内读者昵称/邮箱即可评论，支持富文本与图片。需先在仓库 <code>cloudbase/</code> 部署云函数 <code>gitblog-comments</code>，详见 <code>cloudbase/README.md</code>。</p>
+        <p class="settings-help">国内读者昵称/邮箱即可评论。部署与跨域配置见 <code>cloudbase/README.md</code>（须把 <strong>gitpull.cn</strong> 加入 CloudBase 安全来源，并开启云函数 HTTP 访问）。</p>
         <div class="settings-grid">
           <label class="settings-check"><input type="checkbox" name="cloudbase.enabled"> 启用评论区</label>
           <label class="span-2">环境 ID（envId）
             <input name="cloudbase.envId" placeholder="gitbolg-d7gmnsrw46e011706">
+          </label>
+          <label>访问方式
+            <select name="cloudbase.accessMode">
+              <option value="http">HTTP（推荐，避免 SDK CORS）</option>
+              <option value="sdk">Web SDK callFunction</option>
+            </select>
+          </label>
+          <label class="span-2">HTTP 地址（可选，留空自动生成）
+            <input name="cloudbase.httpUrl" placeholder="https://gitbolg-xxx.ap-shanghai.app.tcloudbase.com/gitblog-comments">
           </label>
           <label>地域 region
             <input name="cloudbase.region" placeholder="ap-shanghai">
