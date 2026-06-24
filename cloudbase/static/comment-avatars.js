@@ -1,6 +1,6 @@
 // 评论头像：flymysql/cpti generated-avatars/thumbs
 export const COMMENT_AVATAR_BASE =
-  'https://raw.githubusercontent.com/flymysql/cpti/main/generated-avatars/thumbs';
+  'https://cdn.jsdelivr.net/gh/flymysql/cpti@main/generated-avatars/thumbs';
 
 export const COMMENT_AVATAR_FILES = [
   'badboy.webp',
