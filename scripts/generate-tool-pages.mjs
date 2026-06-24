@@ -314,6 +314,7 @@ const PAGES = [
     script: 'tool-major.js',
     commentsHint: '你测出来适合什么专业？来聊聊你的志愿想法～',
     hideGlobalComments: true,
+    hideToolActions: true,
     body: `
       <section class="tool-kit-panel is-active major-quiz-wrap" id="majorQuiz">
         <div class="major-quiz-progress-row">
@@ -322,7 +323,7 @@ const PAGES = [
         </div>
         <div id="majorQuizSteps"></div>
         <p class="major-quiz-error tool-kit-error" id="majorQuizError" hidden></p>
-        <div class="major-quiz-actions tool-kit-toolbar">
+        <div class="major-quiz-actions major-quiz-step-actions tool-kit-toolbar">
           <button type="button" class="tool-kit-btn is-ghost" id="majorPrev" hidden>上一步</button>
           <button type="button" class="tool-kit-btn" id="majorNext">下一步</button>
         </div>

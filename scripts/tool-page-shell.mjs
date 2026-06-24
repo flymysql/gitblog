@@ -1,5 +1,5 @@
 /** 生成独立工具页 HTML 壳（构建脚本 / 手工维护共用模板） */
-export function toolPageHtml({ title, description, eyebrow, h1, lead, body, script, commentsHint, hideGlobalComments = false }) {
+export function toolPageHtml({ title, description, eyebrow, h1, lead, body, script, commentsHint, hideGlobalComments = false, hideToolActions = false }) {
   const v = '20260622140000';
   const giscusTerm = String(script || '').replace(/\.js$/i, '');
   const hint = commentsHint || '使用体验、bug 反馈或建议，欢迎留言。';
@@ -37,10 +37,10 @@ export function toolPageHtml({ title, description, eyebrow, h1, lead, body, scri
       <p>${hint}</p>
       <div id="toolGiscus"></div>
     </section>`}
-    <section class="tool-actions">
+    ${hideToolActions ? '' : `<section class="tool-actions">
       <a class="btn-home" href="/">返回首页</a>
       <a class="btn-ghost" href="/tools/">查看工具箱</a>
-    </section>
+    </section>`}
   </main>
   <script type="application/json" id="toolPageMeta">${JSON.stringify({ giscusTerm })}</script>
   <div id="site-footer"></div>
