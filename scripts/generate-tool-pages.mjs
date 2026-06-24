@@ -304,6 +304,41 @@ const PAGES = [
         <p class="farm-sources" id="farmSources"></p>
       </section>`,
   },
+  {
+    file: 'tools/tool-major.html',
+    title: '高考专业倾向测评',
+    description: '通过兴趣、能力与发展规划问卷，推荐适合你的本科专业方向。仅供参考，不构成正式志愿填报建议。',
+    eyebrow: 'Major Quiz',
+    h1: '高考专业倾向测评',
+    lead: '回答几个关于兴趣、能力与规划的问题，获取适合你的本科专业推荐。结果仅供参考，请结合分数与招生章程填报。',
+    script: 'tool-major.js',
+    commentsHint: '你测出来适合什么专业？来聊聊你的志愿想法～',
+    body: `
+      <section class="tool-kit-panel is-active major-quiz-wrap" id="majorQuiz">
+        <div class="major-quiz-progress-row">
+          <span class="major-quiz-step-label" id="majorStepLabel">第 1 / 5 步</span>
+          <div class="major-quiz-progress" id="majorProgress" aria-hidden="true"></div>
+        </div>
+        <div id="majorQuizSteps"></div>
+        <p class="major-quiz-error tool-kit-error" id="majorQuizError" hidden></p>
+        <div class="major-quiz-actions tool-kit-toolbar">
+          <button type="button" class="tool-kit-btn is-ghost" id="majorPrev" hidden>上一步</button>
+          <button type="button" class="tool-kit-btn" id="majorNext">下一步</button>
+        </div>
+        <p class="tool-kit-hint major-quiz-disclaimer">本测评仅供娱乐与参考，不能替代官方志愿填报系统、招生章程及老师建议。</p>
+      </section>
+      <section class="tool-kit-panel major-quiz-result" id="majorResult" hidden>
+        <h2 class="major-result-heading">你的专业倾向画像</h2>
+        <p class="major-result-profile" id="majorProfile"></p>
+        <p class="major-result-filter-note" id="majorFilterNote"></p>
+        <div class="major-result-cards" id="majorCards"></div>
+        <div class="major-quiz-actions tool-kit-toolbar">
+          <button type="button" class="tool-kit-btn is-ghost" id="majorCopy">复制结果</button>
+          <button type="button" class="tool-kit-btn" id="majorRetry">重新测评</button>
+        </div>
+        <p class="tool-kit-hint major-quiz-disclaimer">请结合高考分数、位次、院校层次与当年招生政策综合填报。祝金榜题名！</p>
+      </section>`,
+  },
 ];
 
 for (const p of PAGES) {
@@ -350,6 +385,7 @@ writeFileSync(`${TOOLS_DIR}/index.html`, `<!DOCTYPE html>
       <a class="tool-card" href="tool-qrcode.html"><span class="tool-icon" aria-hidden="true">▣</span><span class="tool-meta"><strong>二维码生成</strong><em>文本或链接生成 PNG，可下载。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card" href="tool-image.html"><span class="tool-icon" aria-hidden="true">🖼</span><span class="tool-meta"><strong>图片压缩 / WebP</strong><em>本地压缩，输出 WebP、JPEG 或 PNG。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card" href="tool-network.html"><span class="tool-icon" aria-hidden="true">🌐</span><span class="tool-meta"><strong>网络与浏览器信息</strong><em>公网 IP、运营商、UA 与屏幕信息。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
+      <a class="tool-card featured" href="tool-major.html"><span class="tool-icon" aria-hidden="true">🎓</span><span class="tool-meta"><strong>高考专业倾向测评</strong><em>兴趣、能力与规划问卷，推荐适合你的本科专业方向。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card featured" href="tool-farm-seed.html"><span class="tool-icon" aria-hidden="true">🌾</span><span class="tool-meta"><strong>微信农场 · 种子助手</strong><em>按等级与上线习惯推荐种什么，游戏内真实作物数据。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card featured" href="tool-air-conditioner.html"><span class="tool-icon" aria-hidden="true">❄</span><span class="tool-meta"><strong>在线小空调</strong><em>开关、温度、风速、摆风、白噪音，一键清凉。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card featured" href="https://cpti.cc/" target="_blank" rel="noopener noreferrer"><span class="tool-icon icon-heart" aria-hidden="true">♥</span><span class="tool-meta"><strong>恋爱人格测试</strong><em>从相处方式到喜欢的瞬间，看看你在亲密关系里是哪种人。</em></span><span class="tool-arrow" aria-hidden="true">↗</span></a>
