@@ -723,7 +723,8 @@ function isMobileDock() {
 }
 
 function isMobileComposeActive() {
-  return window.matchMedia('(max-width: 640px)').matches;
+  // 与 isMobileDock 一致：父页 mobileDock=1 时 iframe 内 viewport 可能仍 >640px
+  return isMobileDock();
 }
 
 function shouldShowPersistentMobileDock() {

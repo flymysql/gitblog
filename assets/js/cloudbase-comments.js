@@ -778,7 +778,7 @@ function shouldShowPersistentMobileDock(opts = {}) {
 }
 
 function isMobileComposeActive() {
-  return typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
+  return isMobileCommentDock();
 }
 
 function syncEmbedComposePin(embedWrap, open) {
