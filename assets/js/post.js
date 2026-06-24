@@ -6,7 +6,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic, fetchPostMarkdownPublic } from './api.js';
 import { renderMarkdown, parseFrontmatter } from './markdown.js';
-import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages, postPath, postPathFromPost, rootPath, isPostPublicPathKey } from './site.js';
+import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages, postPath, postPathFromPost, rootPath, isPostPublicPathKey, thumbUrlFor } from './site.js';
 import { bszPagePvHtml, trackAndRenderArticleView } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { enhanceMath, enhanceMermaid, enhanceCodeAdvanced } from './enhancers.js';
@@ -187,15 +187,34 @@ function enhanceImages(article) {
 
   article.querySelectorAll('img').forEach(img => {
     const rawSrc = img.getAttribute('src') || '';
-    if (
-      rawSrc
-      && !/^https?:\/\//i.test(rawSrc)
-      && !rawSrc.startsWith('//')
-      && !rawSrc.startsWith('data:')
-      && !rawSrc.startsWith('blob:')
-    ) {
-      const fixed = publicImageUrl(rawSrc);
-      if (fixed) img.setAttribute('src', fixed);
+    if (!img.dataset.fullSrc) {
+      if (
+        rawSrc
+        && !/^https?:\/\//i.test(rawSrc)
+        && !rawSrc.startsWith('//')
+        && !rawSrc.startsWith('data:')
+        && !rawSrc.startsWith('blob:')
+      ) {
+        const fixed = publicImageUrl(rawSrc);
+        if (fixed) {
+          if (!/\.thumb\.webp(?:\?|$)/i.test(fixed)) {
+            img.setAttribute('src', fixed);
+            img.dataset.fullSrc = fixed;
+          } else {
+            img.dataset.fullSrc = fixed.replace(/\.thumb\.webp(\?.*)?$/i, '.webp$1');
+          }
+        }
+      } else if (rawSrc) {
+        img.dataset.fullSrc = rawSrc;
+      }
+    }
+    const full = img.dataset.fullSrc || '';
+    if (!img.dataset.thumb) {
+      const thumbRel = thumbUrlFor(full);
+      if (thumbRel) {
+        const thumb = publicImageUrl(thumbRel);
+        if (thumb && thumb !== full) img.dataset.thumb = thumb;
+      }
     }
     // 清除老内容里的固定 width / height（公众号常见 width="600"），让图按容器宽度自适应
     if (img.hasAttribute('width')) img.removeAttribute('width');
@@ -203,7 +222,7 @@ function enhanceImages(article) {
     if (img.style && img.style.width) img.style.width = '';
     if (img.style && img.style.height) img.style.height = '';
     img.style.cursor = 'zoom-in';
-    img.addEventListener('click', () => openLightbox(img.dataset.src || img.src, img.alt));
+    img.addEventListener('click', () => openLightbox(img.dataset.fullSrc || img.dataset.src || img.src, img.alt));
   });
   // 真正的懒加载：第一张图首屏 eager（LCP 友好），其它图视口附近才下载
   bindLazyImages(article, { eagerCount: 1 });

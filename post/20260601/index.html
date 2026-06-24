@@ -65,7 +65,7 @@
         <a class="article-edit" href="/admin/editor.html?slug=peercache-decentralized-rdma-kv-cache" title="编辑此文">编辑</a>
       </div>
     </header>
-    <div class="article-body"><p><img src="/assets/uploads/2026/06/peercache_scaling_ladder.webp" alt="PeerCache GET 吞吐：单卡 → 整机" width="1120" height="560" loading="lazy" decoding="async"></p>
+    <div class="article-body"><p><img src="/assets/uploads/2026/06/peercache_scaling_ladder.thumb.webp" alt="PeerCache GET 吞吐：单卡 → 整机" width="1120" height="560" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/06/peercache_scaling_ladder.webp" data-thumb="/assets/uploads/2026/06/peercache_scaling_ladder.thumb.webp" class="progressive-img"></p>
 <blockquote>
 <p><strong>项目地址</strong>：<a href="https://flymysql.github.io/PeerCache/zh/">flymysql.github.io/PeerCache</a></p>
 <p>一句话介绍：一个<strong>去中心化、点对点、RDMA 零拷贝的 SGLang L3（HiCache）存储后端</strong>，专门做<strong>跨请求、跨节点的 KV（前缀）缓存复用</strong>。它提供和 Mooncake Store 类似的复用能力，但<strong>没有中心化的 master 和 metadata 服务</strong>。单卡能吃到裸 <code>ib_read_bw</code> 的 <strong>94%</strong>，整机 8 卡聚合 <strong>413 GB/s（3.3 Tbps）</strong>。</p>
@@ -373,7 +373,7 @@
 </tr>
 </tbody></table>
 <h3>总览：从单卡到整机</h3>
-<p><img src="/assets/uploads/2026/06/peercache_scaling_ladder.webp" alt="PeerCache GET 吞吐：从单卡到整机的扩展阶梯" width="1120" height="560" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/06/peercache_scaling_ladder.thumb.webp" alt="PeerCache GET 吞吐：从单卡到整机的扩展阶梯" width="1120" height="560" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/06/peercache_scaling_ladder.webp" data-thumb="/assets/uploads/2026/06/peercache_scaling_ladder.thumb.webp" class="progressive-img"></p>
 <table>
 <thead>
 <tr>
@@ -430,7 +430,7 @@
 <p>PeerCache 落在裸 <code>ib_read_bw</code> 的 <strong>~6% 以内</strong>。这点差距来自目录查找 + 每批编排；开启 <code>--dir-cache-ttl</code> 后，热的、静态的工作集上目录 RPC 基本被摊掉。这说明零拷贝读路径上几乎没有引入额外开销。</p>
 <h3>2 · 单进程多卡（multi-rail）</h3>
 <p>设置 <code>--devices d1,…,d8</code>，一个进程就会每卡开一条 rail，并在一次释放 GIL 的 C++ 调用（<code>batch_read_multi</code>）里把每批 READ 横跨所有 rail 分发。</p>
-<p><img src="/assets/uploads/2026/06/peercache_single_process_scaling.webp" alt="PeerCache 单进程 8 rail：吞吐 vs 线程数" width="1050" height="588" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/06/peercache_single_process_scaling.thumb.webp" alt="PeerCache 单进程 8 rail：吞吐 vs 线程数" width="1050" height="588" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/06/peercache_single_process_scaling.webp" data-thumb="/assets/uploads/2026/06/peercache_single_process_scaling.thumb.webp" class="progressive-img"></p>
 <table>
 <thead>
 <tr>
@@ -461,7 +461,7 @@
 <p>所以 multi-rail 让一个进程能用上多张卡，但单个 Python 进程吃不满全部 8 卡——那需要多进程。</p>
 <h3>3 · 整机——多进程跨 8 卡</h3>
 <p>生产形态（也是吃满每张卡的方式）是每卡一个进程组——正是 SGLang TP=8 部署的运行方式（8 个 rank，各绑本地网卡）。这里：<strong>8 卡 × 每卡 8 个读进程，128 KiB 页</strong>。</p>
-<p><img src="/assets/uploads/2026/06/peercache_per_card.webp" alt="PeerCache 整机 8 卡：每卡 GET 吞吐" width="1120" height="588" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/06/peercache_per_card.thumb.webp" alt="PeerCache 整机 8 卡：每卡 GET 吞吐" width="1120" height="588" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/06/peercache_per_card.webp" data-thumb="/assets/uploads/2026/06/peercache_per_card.thumb.webp" class="progressive-img"></p>
 <table>
 <thead>
 <tr>

@@ -4,7 +4,7 @@
 
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
-import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPathFromPost, postPath, rootPath } from './site.js';
+import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPathFromPost, postPath, rootPath, thumbUrlFor } from './site.js';
 import { initPageviews, bszSiteStatsHtml } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { isNotesGiscusReady, mountNotesGiscusScript } from './giscus-embed.js';
@@ -89,6 +89,20 @@ function schedulePrefetchOtherPages() {
 
 function publicImageUrl(url) {
   return String(url || '').replace(/^\.\.\/assets\//, 'assets/');
+}
+
+function progressiveImgAttrs(fullUrl, { eager = false, alt = '' } = {}) {
+  const full = publicImageUrl(fullUrl);
+  const thumbRel = thumbUrlFor(full);
+  const thumb = thumbRel ? publicImageUrl(thumbRel) : full;
+  const hasUpgrade = thumb !== full;
+  const loading = eager ? 'eager' : 'lazy';
+  const fp = eager ? 'high' : 'low';
+  const src = eager ? (hasUpgrade ? thumb : full) : LAZY_PLACEHOLDER;
+  const dataSrc = eager || !hasUpgrade ? '' : ` data-src="${escapeHtml(thumb)}"`;
+  const thumbAttr = hasUpgrade ? ` data-thumb="${escapeHtml(thumb)}"` : '';
+  const fullAttr = ` data-full-src="${escapeHtml(full)}"`;
+  return `src="${escapeHtml(src)}"${dataSrc}${thumbAttr}${fullAttr} alt="${escapeHtml(alt)}" loading="${loading}" decoding="async" fetchpriority="${fp}" class="lazy-pending progressive-img"`;
 }
 
 function renderHero(posts) {
@@ -226,11 +240,8 @@ function renderCarousel(posts) {
       ${items.map((p, i) => `
         <a class="carousel-slide${i === 0 ? ' active' : ''}" href="${postPathFromPost(p)}" aria-label="${escapeHtml(p.title || '文章')}">
           <img
-            src="${escapeHtml(i === 0 ? publicImageUrl(p.cover) : LAZY_PLACEHOLDER)}"
-            ${i === 0 ? 'fetchpriority="high"' : `data-src="${escapeHtml(publicImageUrl(p.cover))}" fetchpriority="low"`}
-            alt="${escapeHtml(p.title || '')}"
-            loading="${i === 0 ? 'eager' : 'lazy'}"
-            decoding="async">
+            ${progressiveImgAttrs(p.cover, { eager: i === 0 })}
+            alt="${escapeHtml(p.title || '')}">
           <span class="carousel-shade"></span>
           <span class="carousel-content">
             ${p.pinned ? '<span class="carousel-badge">置顶推荐</span>' : '<span class="carousel-badge">精选文章</span>'}
@@ -381,7 +392,7 @@ function postItemHtml(p, author, avatar) {
           ${(p.tags || []).slice(0, 3).map(t => tagHtml(t)).join('')}
         </div>
       </a>
-      ${p.cover ? `<a href="${postPathFromPost(p)}" class="post-thumbnail"><img src="${LAZY_PLACEHOLDER}" data-src="${escapeHtml(publicImageUrl(p.thumbnail || p.cover))}" alt="${escapeHtml(p.title || '')}" loading="lazy" decoding="async" fetchpriority="low"></a>` : ''}
+      ${p.cover ? `<a href="${postPathFromPost(p)}" class="post-thumbnail"><img ${progressiveImgAttrs(p.cover, { alt: p.title || '' })}></a>` : ''}
     </li>
   `;
 }

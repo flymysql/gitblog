@@ -62,7 +62,8 @@
       "cover": "../assets/uploads/2026/06/1781499659393-4hzbpp-image.webp",
       "carousel": true,
       "path": "posts/用-ai-做好软件项目上下文工程实践指南.md",
-      "urlKey": "20260615"
+      "urlKey": "20260615",
+      "thumbnail": "../assets/uploads/2026/06/1781499659393-4hzbpp-image.thumb.webp"
     },
     {
       "slug": "peercache-decentralized-rdma-kv-cache",
@@ -79,7 +80,8 @@
       "cover": "../assets/uploads/2026/06/peercache_scaling_ladder.webp",
       "carousel": true,
       "path": "posts/peercache-decentralized-rdma-kv-cache.md",
-      "urlKey": "20260601"
+      "urlKey": "20260601",
+      "thumbnail": "../assets/uploads/2026/06/peercache_scaling_ladder.thumb.webp"
     },
     {
       "slug": "大模型推理的-pd-分离原理动机与-mooncake-的实现",
@@ -95,7 +97,8 @@
       "cover": "../assets/uploads/2026/05/1780025971901-bu285b-image.webp",
       "carousel": true,
       "path": "posts/大模型推理的-pd-分离原理动机与-mooncake-的实现.md",
-      "urlKey": "20260529"
+      "urlKey": "20260529",
+      "thumbnail": "../assets/uploads/2026/05/1780025971901-bu285b-image.thumb.webp"
     },
     {
       "slug": "cpti-love-personality-test-intro",
@@ -111,7 +114,8 @@
       "cover": "assets/uploads/2026/05/cptijietu1.webp",
       "carousel": true,
       "path": "posts/cpti-love-personality-test-intro.md",
-      "urlKey": "20260514"
+      "urlKey": "20260514",
+      "thumbnail": "assets/uploads/2026/05/cptijietu1.thumb.webp"
     },
     {
       "slug": "welcome",
@@ -143,7 +147,8 @@
       ],
       "cover": "../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.webp",
       "path": "posts/about.md",
-      "urlKey": "about"
+      "urlKey": "about",
+      "thumbnail": "../assets/uploads/2026/05/1778491021713-cnnps5-1029bg.thumb.webp"
     },
     {
       "slug": "smallpond-source-walkthrough",
@@ -182,7 +187,8 @@
       "series": "DeepSeek 数据基础设施巡礼",
       "seriesOrder": 1,
       "path": "posts/3fs-usrbio-zero-copy.md",
-      "urlKey": "20260311"
+      "urlKey": "20260311",
+      "thumbnail": "assets/uploads/2026/05/3fs-usrbio-cover.thumb.webp"
     },
     {
       "slug": "多维数组的索引方案与内存设计-16000038",
@@ -194,7 +200,8 @@
       "tags": [],
       "cover": "assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.webp",
       "path": "posts/多维数组的索引方案与内存设计-16000038.md",
-      "urlKey": "20220313"
+      "urlKey": "20220313",
+      "thumbnail": "assets/uploads/2026/05/多维数组的索引方案与内存设计-16000038-01.thumb.webp"
     },
     {
       "slug": "推荐系统——推荐引擎的架构-15996742",
@@ -206,7 +213,8 @@
       "tags": [],
       "cover": "assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.webp",
       "path": "posts/推荐系统——推荐引擎的架构-15996742.md",
-      "urlKey": "20220312"
+      "urlKey": "20220312",
+      "thumbnail": "assets/uploads/2026/05/推荐系统——推荐引擎的架构-15996742-02.thumb.webp"
     },
     {
       "slug": "置顶-nebula-graph-图计算数据库-15993772",
@@ -219,7 +227,8 @@
       "cover": "assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.webp",
       "carousel": true,
       "path": "posts/置顶-nebula-graph-图计算数据库-15993772.md",
-      "urlKey": "20220311"
+      "urlKey": "20220311",
+      "thumbnail": "assets/uploads/2026/05/置顶-nebula-graph-图计算数据库-15993772-02.thumb.webp"
     },
     {
       "slug": "nebula代码走读——从Validator到Executor-15988828",
@@ -233,7 +242,8 @@
       ],
       "cover": "assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.webp",
       "path": "posts/nebula代码走读——从Validator到Executor-15988828.md",
-      "urlKey": "20220310"
+      "urlKey": "20220310",
+      "thumbnail": "assets/uploads/2026/05/nebula代码走读——从Validator到Executor-15988828-01.thumb.webp"
     },
     {
       "slug": "推荐召回-向量召回之U2I学习总结-15986952",
@@ -395,7 +405,8 @@
       ],
       "cover": "assets/uploads/2026/05/12月6日杂谈-5027c817-01.webp",
       "path": "posts/12月6日杂谈-5027c817.md",
-      "urlKey": "20181206"
+      "urlKey": "20181206",
+      "thumbnail": "assets/uploads/2026/05/12月6日杂谈-5027c817-01.thumb.webp"
     },
     {
       "slug": "小程序开发之接入Bmob后端云作为后端数据库-93621394",
@@ -515,7 +526,8 @@
       ],
       "cover": "assets/uploads/2026/05/用回valine评论系统valine评论框样式美化-2d5da13e-01.webp",
       "path": "posts/用回valine评论系统valine评论框样式美化-2d5da13e.md",
-      "urlKey": "20181101"
+      "urlKey": "20181101",
+      "thumbnail": "assets/uploads/2026/05/用回valine评论系统valine评论框样式美化-2d5da13e-01.thumb.webp"
     },
     {
       "slug": "sql学习笔记2-5f5ec841",
@@ -559,7 +571,8 @@
       ],
       "cover": "assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.webp",
       "path": "posts/服务端搭建ssr教程-651cfd47.md",
-      "urlKey": "20181025"
+      "urlKey": "20181025",
+      "thumbnail": "assets/uploads/2026/05/服务端搭建ssr教程-651cfd47-01.thumb.webp"
     },
     {
       "slug": "解决来必力评论系统加载慢的问题-3453c710",
@@ -629,7 +642,8 @@
       ],
       "cover": "assets/uploads/2026/05/MarkDown的用法学习笔记-93e22221-02.webp",
       "path": "posts/MarkDown的用法学习笔记-93e22221.md",
-      "urlKey": "20181006"
+      "urlKey": "20181006",
+      "thumbnail": "assets/uploads/2026/05/MarkDown的用法学习笔记-93e22221-02.thumb.webp"
     },
     {
       "slug": "windows上的vim配置打造超级舒心又有逼格的编辑器-1a3fd97",
@@ -986,7 +1000,8 @@
       "tags": [],
       "cover": "assets/uploads/2026/05/用python做一个C类编译器——语法翻译器-15995704-01.webp",
       "path": "posts/用python做一个C类编译器——语法翻译器-15995704.md",
-      "urlKey": "20170101"
+      "urlKey": "20170101",
+      "thumbnail": "assets/uploads/2026/05/用python做一个C类编译器——语法翻译器-15995704-01.thumb.webp"
     }
   ]
 }
