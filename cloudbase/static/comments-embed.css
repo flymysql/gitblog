@@ -269,7 +269,8 @@ body { padding: 0 2px 8px; }
 }
 
 .cb-compose-meta[hidden],
-.cb-compose-actions[hidden] {
+.cb-compose-actions[hidden],
+.cb-inline-reply-meta[hidden] {
   display: none !important;
 }
 
@@ -500,6 +501,10 @@ body { padding: 0 2px 8px; }
 .cb-inline-reply-editor .cb-editor-body {
   min-height: 88px;
   max-height: 200px;
+}
+
+.cb-inline-reply-meta:not([hidden]) {
+  margin-top: 10px;
 }
 
 .cb-inline-reply-actions {
