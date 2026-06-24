@@ -61,7 +61,6 @@ function applyMode(choice) {
   html.setAttribute('data-mode', mode);
   html.setAttribute('data-theme', mode); // 兼容旧 [data-theme="dark"] 选择器
   html.dataset.themeChoice = choice || 'auto';
-  notifyGiscus(mode);
   document.dispatchEvent(new CustomEvent('themechange', { detail: { mode, choice } }));
 }
 
@@ -134,21 +133,6 @@ export function initTheme() {
   const m = window.matchMedia('(prefers-color-scheme: dark)');
   m.addEventListener('change', () => {
     if (getStoredMode() === 'auto') applyMode('auto');
-  });
-}
-
-// ---------- giscus 同步 ----------
-function notifyGiscus(mode) {
-  const theme = mode === 'dark' ? 'dark' : 'light';
-  document.querySelectorAll('iframe.giscus-frame').forEach(iframe => {
-    try {
-      iframe.contentWindow.postMessage(
-        { giscus: { setConfig: { theme } } },
-        'https://giscus.app'
-      );
-    } catch {
-      /* cross-origin / 未就绪 */
-    }
   });
 }
 

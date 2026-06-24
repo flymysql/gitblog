@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260624125045';
+export const VERSION = '20260615190000';
 
 export const CONFIG = {
   repo: {
@@ -58,25 +58,6 @@ export const CONFIG = {
       email: "flyphp@outlook.com",
       rss: "rss.xml"
     }
-  },
-  giscus: {
-    enabled: true,
-    repo: "flymysql/gitblog",
-    repoId: "R_kgDOSZ6GIQ",
-    category: "General",
-    categoryId: "DIC_kwDOSZ6GIc4C8wdW",
-    mapping: "specific",
-    strict: "0",
-    reactionsEnabled: "1",
-    emitMetadata: "0",
-    inputPosition: "top",
-    lang: "zh-CN",
-    notesTerm: "gitblog-notes-feed",
-    notesCategory: "Announcements",
-    notesCategoryId: "DIC_kwDOSZ6GIc4C8wdV"
-  },
-  comments: {
-    provider: "giscus"
   },
   cloudbase: {
     enabled: true,

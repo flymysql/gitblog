@@ -30,7 +30,7 @@ export function mountToolComments(term, hint) {
     if (p) p.textContent = hint;
   }
   if (getCommentsProvider() === 'none' || !isCommentsReady('post')) {
-    host.innerHTML = '<div class="tool-comments-hint">留言板未启用。可在后台设置里打开 CloudBase 或 giscus 评论。</div>';
+    host.innerHTML = '<div class="tool-comments-hint">留言板未启用。请在后台设置里配置 CloudBase envId 并部署云函数。</div>';
     return;
   }
   host.innerHTML = '<p class="tool-comments-loading" aria-live="polite">评论加载中…</p>';
