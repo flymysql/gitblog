@@ -6,7 +6,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic, fetchPostMarkdownPublic } from './api.js';
 import { renderMarkdown, parseFrontmatter } from './markdown.js';
-import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages, postPath, postPathFromPost, rootPath, isPostPublicPathKey, thumbUrlFor } from './site.js';
+import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages, postPath, postPathFromPost, rootPath, isPostPublicPathKey, thumbUrlFor, LAZY_PLACEHOLDER } from './site.js';
 import { bszPagePvHtml, trackAndRenderArticleView } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { enhanceMath, enhanceMermaid, enhanceCodeAdvanced } from './enhancers.js';
@@ -99,7 +99,11 @@ function renderCommentsSection(meta, slug) {
   article.appendChild(wrap);
 
   const term = commentPathForPost({ slug, urlKey: meta && meta.urlKey });
-  wrap.innerHTML = `<div class="comments-title">评论</div><div id="commentsRoot"></div>`;
+  wrap.innerHTML = `
+    <div class="comments-title">评论</div>
+    <div id="commentsRoot"></div>
+    <p class="comments-end-hint" aria-hidden="true">没有更多评论了~</p>
+  `;
   mountComments($('#commentsRoot'), term, {
     pageTitle: meta?.title || document.title,
     pageUrl: location.href,
@@ -403,21 +407,48 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
       `;
     }
     article.appendChild(sec);
+    if (mobile) bindRelatedCardThumbs(sec);
   }
+}
+
+function bindRelatedCardThumbs(sec) {
+  const imgs = sec.querySelectorAll('.post-related-card-media img[data-src]');
+  if (!imgs.length) return;
+
+  const load = () => {
+    for (const img of imgs) {
+      const src = img.dataset.src;
+      if (!src) continue;
+      img.src = src;
+      img.removeAttribute('data-src');
+      img.classList.remove('lazy-pending');
+    }
+  };
+
+  const schedule = () => {
+    const ric = window.requestIdleCallback;
+    if (ric) ric(load, { timeout: 2000 });
+    else setTimeout(load, 100);
+  };
+
+  if (document.readyState === 'complete') schedule();
+  else window.addEventListener('load', schedule, { once: true });
 }
 
 function renderRelatedCard(p) {
   const href = postPathFromPost(p);
   const title = escapeHtml(p.title || '无标题');
   const date = fmtDate(p.date);
-  const tag = (p.tags || [])[0];
-  const cover = p.cover ? absolutePublicImageUrl(p.cover) : '';
-  const thumb = cover ? thumbUrlFor(cover) : '';
+  const tag = (p.tags || [])[0] || '';
+  const coverRel = p.cover ? publicImageUrl(p.cover) : '';
+  const thumbRel = coverRel ? thumbUrlFor(coverRel) : '';
+  const thumbSrc = thumbRel ? publicImageUrl(thumbRel) : '';
+  const placeholderLabel = escapeHtml(tag || '随笔');
   return `
     <a class="post-related-card" href="${href}">
-      ${thumb
-        ? `<span class="post-related-card-media"><img src="${escapeHtml(thumb)}" alt="" loading="lazy" decoding="async"></span>`
-        : `<span class="post-related-card-media post-related-card-media--placeholder" aria-hidden="true"><span>文</span></span>`}
+      ${thumbSrc
+        ? `<span class="post-related-card-media"><img src="${LAZY_PLACEHOLDER}" data-src="${escapeHtml(thumbSrc)}" alt="" loading="lazy" decoding="async" class="lazy-pending"></span>`
+        : `<span class="post-related-card-media post-related-card-media--placeholder" aria-hidden="true"><span>${placeholderLabel}</span></span>`}
       <span class="post-related-card-body">
         <span class="post-related-card-title">${title}</span>
         <span class="post-related-card-meta">${escapeHtml(date)}${tag ? ` · ${escapeHtml(tag)}` : ''}</span>
