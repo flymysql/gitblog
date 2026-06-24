@@ -1,7 +1,0 @@
-name = "gitblog-github-device-proxy"
-main = "github-device-proxy.js"
-compatibility_date = "2024-01-01"
-
-# 部署后请在 Cloudflare Dashboard 添加路由，例如：
-#   gitpull.cn/api/github-device/*
-# 或修改为你的站点域名。
