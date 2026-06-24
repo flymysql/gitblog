@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 /** 生成 9 个独立工具页 HTML（输出到 tools/ 目录） */
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { basename } from 'node:path';
 import { toolPageHtml } from './tool-page-shell.mjs';
 import { generateFarmCrops } from './generate-farm-crops.mjs';
 
 generateFarmCrops();
+
+const cfgRaw = readFileSync('assets/js/config.js', 'utf8');
+const SITE_URL = (cfgRaw.match(/url:\s*['"]([^'"]+)['"]/) || [])[1]?.replace(/\/$/, '') || '';
 
 const V = '20260622190000';
 const TOOLS_DIR = 'tools';
@@ -306,12 +309,13 @@ const PAGES = [
   },
   {
     file: 'tools/tool-major.html',
-    title: '高考专业倾向测评',
+    title: '大学专业倾向测评',
     description: '通过兴趣、能力与发展规划问卷，推荐适合你的本科专业方向。仅供参考，不构成正式志愿填报建议。',
     eyebrow: 'Major Quiz',
-    h1: '高考专业倾向测评',
+    h1: '大学专业倾向测评',
     lead: '回答几个关于兴趣、能力与规划的问题，获取适合你的本科专业推荐。结果仅供参考，请结合分数与招生章程填报。',
     script: 'tool-major.js',
+    ogSlug: 'tool-major',
     commentsHint: '你测出来适合什么专业？来聊聊你的志愿想法～',
     hideGlobalComments: true,
     hideToolActions: true,
@@ -357,7 +361,12 @@ const PAGES = [
 ];
 
 for (const p of PAGES) {
-  writeFileSync(p.file, toolPageHtml({ ...p, description: p.description }).replace(/v=20260622140000/g, `v=${V}`));
+  writeFileSync(p.file, toolPageHtml({
+    ...p,
+    description: p.description,
+    siteUrl: SITE_URL,
+    pagePath: p.file,
+  }).replace(/v=20260622140000/g, `v=${V}`));
   console.log('wrote', p.file);
   const oldName = basename(p.file);
   writeRedirect(oldName, `${TOOLS_DIR}/${oldName}`);
@@ -400,7 +409,7 @@ writeFileSync(`${TOOLS_DIR}/index.html`, `<!DOCTYPE html>
       <a class="tool-card" href="tool-qrcode.html"><span class="tool-icon" aria-hidden="true">▣</span><span class="tool-meta"><strong>二维码生成</strong><em>文本或链接生成 PNG，可下载。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card" href="tool-image.html"><span class="tool-icon" aria-hidden="true">🖼</span><span class="tool-meta"><strong>图片压缩 / WebP</strong><em>本地压缩，输出 WebP、JPEG 或 PNG。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card" href="tool-network.html"><span class="tool-icon" aria-hidden="true">🌐</span><span class="tool-meta"><strong>网络与浏览器信息</strong><em>公网 IP、运营商、UA 与屏幕信息。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
-      <a class="tool-card featured" href="tool-major.html"><span class="tool-icon" aria-hidden="true">🎓</span><span class="tool-meta"><strong>高考专业倾向测评</strong><em>兴趣、能力与规划问卷，推荐适合你的本科专业方向。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
+      <a class="tool-card featured" href="tool-major.html"><span class="tool-icon" aria-hidden="true">🎓</span><span class="tool-meta"><strong>大学专业倾向测评</strong><em>兴趣、能力与规划问卷，推荐适合你的本科专业方向。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card featured" href="tool-farm-seed.html"><span class="tool-icon" aria-hidden="true">🌾</span><span class="tool-meta"><strong>微信农场 · 种子助手</strong><em>按等级与上线习惯推荐种什么，游戏内真实作物数据。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card featured" href="tool-air-conditioner.html"><span class="tool-icon" aria-hidden="true">❄</span><span class="tool-meta"><strong>在线小空调</strong><em>开关、温度、风速、摆风、白噪音，一键清凉。</em></span><span class="tool-arrow" aria-hidden="true">›</span></a>
       <a class="tool-card featured" href="https://cpti.cc/" target="_blank" rel="noopener noreferrer"><span class="tool-icon icon-heart" aria-hidden="true">♥</span><span class="tool-meta"><strong>恋爱人格测试</strong><em>从相处方式到喜欢的瞬间，看看你在亲密关系里是哪种人。</em></span><span class="tool-arrow" aria-hidden="true">↗</span></a>

@@ -1,4 +1,5 @@
 import { initToolPage, mountToolComments, $, escapeHtml, copyText } from './tool-kit-common.js';
+import { CONFIG } from './config.js';
 import { INTEREST_OPTIONS, SKILL_DIMS, DISCIPLINE_META, SUBJECTS, getMajorById, majorReferenceLinks, describeMajorTraits } from './tool-major-data.js';
 import { scoreMajors, formatResultText } from './tool-major-engine.js';
 import { drawMajorResultShareImage, drawMajorDetailShareImage, showShareImagePreview, toolPageUrl } from './tool-share-image.js';
@@ -6,9 +7,10 @@ import { drawMajorResultShareImage, drawMajorDetailShareImage, showShareImagePre
 const COMMENTS_HINT = '你测出来适合什么专业？来聊聊你的志愿想法～';
 
 initToolPage({
-  title: '高考专业倾向测评',
+  title: '大学专业倾向测评',
   description: '通过兴趣、能力与发展规划问卷，推荐适合你的本科专业方向。仅供参考，不构成正式志愿填报建议。',
   path: 'tools/tool-major.html',
+  image: `${(CONFIG.site.url || location.origin).replace(/\/$/, '')}/assets/og/tool-major.png`,
   commentsHint: COMMENTS_HINT,
   deferComments: true,
 });
