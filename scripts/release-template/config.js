@@ -39,26 +39,7 @@ export const CONFIG = {
       rss: "rss.xml"
     }
   },
-  // 评论：默认关闭，需要的话去 https://giscus.app 拿到 repoId / categoryId 再启用
-  giscus: {
-    enabled: false,
-    repo: "",
-    repoId: "",
-    category: "Announcements",
-    categoryId: "",
-    // ⚠ 推荐 specific（每篇文章按 slug 独立绑定一条 Discussion）
-    // 不要用 pathname / url，否则所有文章会共用同一条评论流
-    mapping: "specific",
-    strict: "0",
-    reactionsEnabled: "1",
-    emitMetadata: "0",
-    inputPosition: "top",
-    lang: "zh-CN",
-    notesTerm: "gitblog-notes-feed"
-  },
-  comments: {
-    provider: "giscus"
-  },
+  // 评论：CloudBase（部署 cloudbase/functions/gitblog-comments 后填写 envId）
   cloudbase: {
     enabled: false,
     envId: "",
