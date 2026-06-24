@@ -174,10 +174,19 @@
 }
 
 /* ---------- 发表框 ---------- */
-.cb-compose--minimal {
+.cb-compose {
+  padding: 16px 18px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.cb-compose.cb-compose--minimal {
   padding: 0;
   background: transparent;
   border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .cb-compose-meta[hidden],
@@ -198,13 +207,6 @@
 @keyframes cb-fade-in {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-.cb-compose {
-  padding: 16px 18px;
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: 12px;
 }
 
 .cb-compose-meta {
@@ -613,7 +615,7 @@ body.cb-has-mobile-dock {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 8px;
   }
-  .cb-compose { padding: 12px; }
+  .cb-compose:not(.cb-compose--minimal) { padding: 12px; }
   .cb-field { font-size: 11px; }
   .cb-field input {
     height: 36px;
