@@ -103,7 +103,25 @@ embedBaseUrl: 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com',
 | `static/comments-embed.js` | 评论 UI + SDK 调用云函数（HTTP 兜底） |
 | `static/comments-embed.css` | 样式（支持 light/dark） |
 
-更新评论 UI 后需重新执行 `tcb hosting deploy ./static`。
+更新评论 UI 后需重新执行静态托管部署（**仅 `npm run build` 不会更新 iframe 内的编辑框**）：
+
+```bash
+cd cloudbase
+node deploy-static-embed.mjs
+# 或：tcb hosting deploy ./static -e gitbolg-d7gmnsrw46e011706
+```
+
+同时递增 `config.js` 中的 `embedAssetVersion`，并同步 `comments-embed.html` 里 CSS/JS 的 `?v=` 参数，避免 CDN/浏览器缓存旧版 JS。
+
+### 编辑框样式没变化？
+
+博客使用 **embed 模式**时，评论区在 CloudBase 托管域名下的 iframe 里加载，与博客 `npm run build` 无关。
+
+1. 确认线上嵌入 JS 是否旧版：打开  
+   `https://{embedBaseUrl}/comments-embed.js`  
+   若仍含 `data-cmd="bold"` 等粗体按钮，说明 **未部署** `cloudbase/static/`。
+2. 在本仓库执行 `node cloudbase/deploy-static-embed.mjs`（需已 `tcb login`）。
+3. 合并/发布博客后硬刷新，或用无痕窗口访问。
 
 ## 5. 数据库与安全
 
