@@ -185,8 +185,19 @@ export function postHrefFromEntry(p, postPublicAbsUrl) {
   }
 }
 
-export function buildHeroShell({ description, avatar, postCount, tagCount, pathPrefix }) {
+export function buildHeroShell({
+  description,
+  avatar,
+  postCount,
+  tagCount,
+  pathPrefix,
+  showSiteStats = true,
+  siteStatsLabel = '总访问',
+}) {
   const aboutHref = buildRootPath('post/about/', pathPrefix);
+  const saobbyStat = showSiteStats
+    ? `<div class="stat saobby-slot saobby-slot-stat" data-saobby-slot="site" data-saobby-prefix="${escapeHtml(siteStatsLabel)}" hidden></div>`
+    : '';
   return `<a class="hero-link" href="${escapeHtml(aboutHref)}" aria-label="关于本站">
       <div class="hero-avatar-wrap">
         <div class="hero-avatar" style="background-image:url(${escapeHtml(avatar || '')})"></div>
@@ -196,6 +207,7 @@ export function buildHeroShell({ description, avatar, postCount, tagCount, pathP
         <div class="hero-stats">
           <div class="stat"><strong>${postCount}</strong>篇文章</div>
           <div class="stat"><strong>${tagCount}</strong>个标签</div>
+          ${saobbyStat}
         </div>
       </div>
       <span class="hero-arrow" aria-hidden="true">›</span>
