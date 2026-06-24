@@ -243,8 +243,12 @@
 
 .cb-compose-meta[hidden],
 .cb-compose-actions[hidden],
-.cb-inline-reply-meta[hidden] {
+.cb-inline-reply-meta[hidden]:not(.is-visible) {
   display: none !important;
+}
+
+.cb-inline-reply-meta.is-visible {
+  display: grid !important;
 }
 
 .cb-compose-meta:not([hidden]) {
@@ -511,16 +515,24 @@
   max-height: 200px;
 }
 
-.cb-inline-reply-meta:not([hidden]) {
-  margin-top: 10px;
+.cb-inline-reply-meta:not([hidden]),
+.cb-inline-reply-meta.is-visible {
+  margin-bottom: 10px;
 }
 
 .cb-inline-reply-actions {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  margin-top: 10px;
+}
+
+.cb-inline-reply-buttons {
+  display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 10px;
 }
 
 .cb-inline-reply-status {

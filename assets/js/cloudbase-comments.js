@@ -490,17 +490,39 @@ function bindComposeReveal(form, editor, { metaEl, actionsEl }) {
   refresh();
 }
 
-function bindInlineReplyReveal(editor, metaEl, onRefresh) {
-  const refresh = () => {
-    if (metaEl) metaEl.hidden = editor.getPlainLength() <= 0;
-    editor._autosizeBody?.();
-    onRefresh?.();
-  };
+function editorHasContent(editor) {
+  const body = editor?.body;
+  if (!body) return false;
+  if (String(body.innerText || '').replace(/\u200b/g, '').trim().length > 0) return true;
+  return !!body.querySelector('img, .cb-uploading');
+}
+
+function syncReplyMetaVisibility(editor, metaEl) {
+  if (!metaEl) return;
+  const show = editorHasContent(editor);
+  if (show) {
+    metaEl.removeAttribute('hidden');
+    metaEl.classList.add('is-visible');
+  } else {
+    metaEl.setAttribute('hidden', '');
+    metaEl.classList.remove('is-visible');
+  }
+  editor._autosizeBody?.();
+}
+
+function bindInlineReplyReveal(editor, metaEl) {
+  const refresh = () => syncReplyMetaVisibility(editor, metaEl);
   const prevOnChange = editor.onChange;
-  editor.onChange = len => {
-    prevOnChange?.(len);
+  editor.onChange = () => {
+    prevOnChange?.(editor.getPlainLength());
     refresh();
   };
+  if (editor.body) {
+    editor.body.addEventListener('input', refresh);
+    editor.body.addEventListener('keyup', refresh);
+    editor.body.addEventListener('paste', () => setTimeout(refresh, 0));
+    editor.body.addEventListener('compositionend', refresh);
+  }
   refresh();
 }
 
@@ -799,19 +821,21 @@ function mountInlineReply(slot, ctx) {
   panel.innerHTML = `
     <div class="cb-inline-reply-head">回复 ${escapeHtml(replyNick)}</div>
     <div class="cb-inline-reply-editor"></div>
-    <div class="cb-inline-reply-meta cb-compose-meta" hidden>
-      <label class="cb-field">
-        <span>昵称</span>
-        <input type="text" name="nick" maxlength="40" placeholder="${escapeHtml(placeholderNick)}（可选）" autocomplete="nickname">
-      </label>
-      <label class="cb-field">
-        <span>邮箱</span>
-        <input type="email" name="email" maxlength="120" placeholder="可选，用于接收回复通知" autocomplete="email">
-      </label>
-    </div>
     <div class="cb-inline-reply-actions">
-      <button type="button" class="cb-link-btn" data-cancel-reply>取消</button>
-      <button type="button" class="cb-submit cb-submit--sm" data-submit-reply>发送</button>
+      <div class="cb-inline-reply-meta cb-compose-meta" hidden>
+        <label class="cb-field">
+          <span>昵称</span>
+          <input type="text" name="nick" maxlength="40" placeholder="${escapeHtml(placeholderNick)}（可选）" autocomplete="nickname">
+        </label>
+        <label class="cb-field">
+          <span>邮箱</span>
+          <input type="email" name="email" maxlength="120" placeholder="可选，用于接收回复通知" autocomplete="email">
+        </label>
+      </div>
+      <div class="cb-inline-reply-buttons">
+        <button type="button" class="cb-link-btn" data-cancel-reply>取消</button>
+        <button type="button" class="cb-submit cb-submit--sm" data-submit-reply>发送</button>
+      </div>
     </div>
     <span class="cb-inline-reply-status" aria-live="polite"></span>
   `;
