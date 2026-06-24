@@ -56,6 +56,9 @@ const state = {
   editorMode: 'markdown',  // markdown | rich
   selectedTags: [],
   availableTags: [],
+  selectedSeries: '',
+  seriesOrder: '',
+  availableSeries: [],
   counter: { img: '', dashboard: '' }, // 文章独立 saobby 计数器
   docList: [],
   docSearch: '',
@@ -118,6 +121,7 @@ async function loadPost(slug) {
     $('#draftToggle').checked = !!data.draft;
     $('#pinnedToggle').checked = !!data.pinned;
     $('#carouselToggle').checked = !!data.carousel;
+    setEditorSeries(data.series || '', data.seriesOrder);
     setEditorCounter(data.counter || { img: '', dashboard: '' });
     setContent(content);
     document.title = `编辑：${data.title || slug}`;
@@ -219,10 +223,22 @@ function renderDocList(filter = '') {
            href="./editor.html?slug=${encodeURIComponent(p.slug)}"
            title="${escapeHtml(p.title || p.slug)}">
           <span class="studio-doc-title">${escapeHtml(p.title || p.slug)}</span>
+          ${p.series ? `<span class="studio-doc-badge studio-doc-series">${escapeHtml(p.series)}</span>` : ''}
           ${p.draft ? '<span class="studio-doc-badge">草稿</span>' : ''}
         </a>
       `).join('')
     : '<p class="studio-nav-empty">没有匹配的文章</p>';
+
+  refreshSeriesFromDocList();
+}
+
+function refreshSeriesFromDocList() {
+  const names = state.docList.map(p => normalizeSeriesName(p.series)).filter(Boolean);
+  if (state.selectedSeries) names.push(state.selectedSeries);
+  state.availableSeries = [...new Set([...state.availableSeries, ...names])]
+    .sort((a, b) => a.localeCompare(b, 'zh-CN'));
+  renderSeriesPicker();
+  renderSeriesDatalist();
 }
 
 function toCommaList(s) {
@@ -406,6 +422,160 @@ function bindTagPicker() {
   });
 }
 
+function normalizeSeriesName(name) {
+  return String(name || '').trim();
+}
+
+function suggestSeriesOrder(seriesName) {
+  const name = normalizeSeriesName(seriesName);
+  if (!name) return '';
+  const inSeries = state.docList.filter(p => normalizeSeriesName(p.series) === name && p.slug !== state.loadedSlug);
+  const max = inSeries.reduce((m, p) => Math.max(m, Number(p.seriesOrder) || 0), 0);
+  return String(max + 1);
+}
+
+function setEditorSeries(series, order) {
+  state.selectedSeries = normalizeSeriesName(series);
+  const orderEl = $('#seriesOrder');
+  const orderWrap = $('#seriesOrderWrap');
+  const input = $('#seriesInput');
+  if (input) input.value = state.selectedSeries;
+  if (orderEl) {
+    const n = order == null || order === '' ? '' : String(order);
+    state.seriesOrder = n;
+    orderEl.value = n;
+  }
+  if (orderWrap) orderWrap.hidden = !state.selectedSeries;
+  renderSeriesPicker();
+  renderSeriesDatalist();
+}
+
+function renderSeriesDatalist() {
+  const list = $('#seriesNameList');
+  if (!list) return;
+  list.innerHTML = state.availableSeries
+    .map(s => `<option value="${escapeHtml(s)}"></option>`)
+    .join('');
+}
+
+function renderSeriesPicker() {
+  const selected = $('#selectedSeries');
+  const suggestions = $('#seriesSuggestions');
+  const orderWrap = $('#seriesOrderWrap');
+  if (!selected || !suggestions) return;
+
+  selected.innerHTML = state.selectedSeries
+    ? `<button class="editor-tag-chip selected" type="button" data-remove-series title="点击移除专栏">
+        ${escapeHtml(state.selectedSeries)}<span>×</span>
+      </button>`
+    : '<span class="editor-tag-empty">尚未加入专栏</span>';
+
+  if (orderWrap) orderWrap.hidden = !state.selectedSeries;
+
+  const q = ($('#seriesInput') && $('#seriesInput').value.trim().toLowerCase()) || '';
+  const names = state.availableSeries
+    .filter(s => s !== state.selectedSeries)
+    .filter(s => !q || s.toLowerCase().includes(q))
+    .slice(0, 24);
+
+  suggestions.innerHTML = names.length
+    ? names.map(s => `<button class="editor-tag-chip" type="button" data-add-series="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join('')
+    : '<span class="editor-tag-empty">输入新专栏名后点「加入专栏」</span>';
+}
+
+function addEditorSeries(raw) {
+  const name = normalizeSeriesName(raw);
+  if (!name) {
+    showToast('请输入专栏名称', 'error');
+    return;
+  }
+  state.selectedSeries = name;
+  if (!state.availableSeries.includes(name)) {
+    state.availableSeries.push(name);
+    state.availableSeries.sort((a, b) => a.localeCompare(b, 'zh-CN'));
+  }
+  const input = $('#seriesInput');
+  if (input) input.value = name;
+  const orderEl = $('#seriesOrder');
+  if (orderEl && !orderEl.value.trim()) {
+    const suggested = suggestSeriesOrder(name);
+    orderEl.value = suggested;
+    state.seriesOrder = suggested;
+  }
+  renderSeriesPicker();
+  renderSeriesDatalist();
+  showToast(`已加入专栏「${name}」`);
+}
+
+function removeEditorSeries() {
+  state.selectedSeries = '';
+  state.seriesOrder = '';
+  const input = $('#seriesInput');
+  const orderEl = $('#seriesOrder');
+  if (input) input.value = '';
+  if (orderEl) orderEl.value = '';
+  renderSeriesPicker();
+}
+
+function bindSeriesPicker() {
+  const input = $('#seriesInput');
+  const addBtn = $('#addSeriesBtn');
+  const selected = $('#selectedSeries');
+  const suggestions = $('#seriesSuggestions');
+  const orderEl = $('#seriesOrder');
+  if (!input || !addBtn || !selected || !suggestions) return;
+
+  addBtn.addEventListener('click', () => addEditorSeries(input.value));
+  input.addEventListener('input', renderSeriesPicker);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addEditorSeries(input.value);
+    }
+  });
+  suggestions.addEventListener('click', e => {
+    const btn = e.target.closest('[data-add-series]');
+    if (btn) addEditorSeries(btn.dataset.addSeries);
+  });
+  selected.addEventListener('click', e => {
+    if (e.target.closest('[data-remove-series]')) removeEditorSeries();
+  });
+  if (orderEl) {
+    orderEl.addEventListener('input', () => {
+      state.seriesOrder = orderEl.value.trim();
+    });
+  }
+}
+
+async function loadAvailableSeries() {
+  try {
+    const idx = await readIndex();
+    const names = [];
+    for (const p of ((idx && idx.data && idx.data.posts) || [])) {
+      const s = normalizeSeriesName(p.series);
+      if (s) names.push(s);
+    }
+    if (state.selectedSeries) names.push(state.selectedSeries);
+    state.availableSeries = [...new Set(names)].sort((a, b) => a.localeCompare(b, 'zh-CN'));
+    renderSeriesPicker();
+    renderSeriesDatalist();
+  } catch (e) {
+    console.warn('专栏列表加载失败', e);
+  }
+}
+
+function focusSeriesPanel() {
+  const meta = $('#editorMeta');
+  const shell = $('#studioShell');
+  if (meta) meta.classList.remove('is-collapsed');
+  if (shell && window.matchMedia('(max-width: 960px)').matches) {
+    shell.classList.add('is-mobile-nav-open');
+  }
+  const field = $('#seriesField');
+  if (field) field.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  $('#seriesInput')?.focus();
+}
+
 function validateBeforePublish({ title, slug, content, tags, summary, allPosts, isUpdate }) {
   const errs = [];
   if (!title.trim()) errs.push('标题不能为空');
@@ -432,6 +602,8 @@ async function publish() {
   const pinned = $('#pinnedToggle').checked;
   const carousel = $('#carouselToggle').checked;
   const summary = state.data.summary || extractSummary(content, 80);
+  const series = normalizeSeriesName(state.selectedSeries || ($('#seriesInput') && $('#seriesInput').value));
+  const seriesOrderRaw = ($('#seriesOrder') && $('#seriesOrder').value.trim()) || state.seriesOrder || '';
   if (carousel && !cover) {
     if (!confirm('当前文章没有封面图，无法进入首页轮播。\n\n继续发布会取消「轮播」勾选。是否继续？')) return;
   }
@@ -466,6 +638,13 @@ async function publish() {
   if (draft) data.draft = true;
   if (pinned) data.pinned = true;
   if (carousel && cover) data.carousel = true;
+  if (series) {
+    data.series = series;
+    if (seriesOrderRaw !== '') {
+      const n = Number(seriesOrderRaw);
+      if (!Number.isNaN(n) && n > 0) data.seriesOrder = n;
+    }
+  }
   const counter = state.counter || {};
   if (counter.img || counter.dashboard) {
     data.counter = {
@@ -533,6 +712,8 @@ async function publish() {
       draft,
       pinned,
       carousel: carousel && !!cover,
+      series: data.series,
+      seriesOrder: data.seriesOrder,
       counter: data.counter,
       path: state.loadedPath,
       removeSlug: isRename ? state.loadedSlug : null,
@@ -564,7 +745,7 @@ async function publish() {
   }
 }
 
-async function updateIndex({ slug, title, date, updated, author, summary, tags, cover, draft, pinned, carousel, counter, path, removeSlug }) {
+async function updateIndex({ slug, title, date, updated, author, summary, tags, cover, draft, pinned, carousel, series, seriesOrder, counter, path, removeSlug }) {
   const idx = await readIndex();
   const data = idx ? idx.data : { posts: [] };
   if (!Array.isArray(data.posts)) data.posts = [];
@@ -579,6 +760,8 @@ async function updateIndex({ slug, title, date, updated, author, summary, tags, 
   if (draft) entry.draft = true;
   if (pinned) entry.pinned = true;
   if (carousel && cover) entry.carousel = true;
+  if (series) entry.series = series;
+  if (seriesOrder != null && !Number.isNaN(Number(seriesOrder))) entry.seriesOrder = Number(seriesOrder);
   if (counter && (counter.img || counter.dashboard)) {
     entry.counter = {
       img: String(counter.img || ''),
@@ -1039,6 +1222,11 @@ function bindStudioChrome() {
     });
   }
 
+  const footAddSeries = $('#footAddSeries');
+  if (footAddSeries) {
+    footAddSeries.addEventListener('click', focusSeriesPanel);
+  }
+
   if (btnGenSummary) {
     btnGenSummary.addEventListener('click', () => {
       const content = getContent();
@@ -1188,9 +1376,11 @@ function setupEasyMDE() {
   bindEditorModeSwitch();
   setupDragAndPaste();
   bindTagPicker();
+  bindSeriesPicker();
   bindCounterPanel();
   renderEditorCounter();
   loadAvailableTags();
+  loadAvailableSeries();
   loadDocList();
 
   ['title'].forEach(id => {
@@ -1233,6 +1423,7 @@ function setupEasyMDE() {
         $('#title').value = d.title || '';
         setContent(d.content || '');
         setEditorTags(toCommaList(d.tags || ''));
+        setEditorSeries(d.series || '', d.seriesOrder);
         $('#cover').value = d.cover || '';
         $('#slug').value = d.slug || '';
       } else {
@@ -1246,6 +1437,8 @@ function setupEasyMDE() {
       title: $('#title').value,
       content: getContent(),
       tags: $('#tags').value,
+      series: state.selectedSeries,
+      seriesOrder: ($('#seriesOrder') && $('#seriesOrder').value) || state.seriesOrder,
       cover: $('#cover').value,
       slug: $('#slug').value,
       savedAt: new Date().toISOString(),

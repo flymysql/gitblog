@@ -1278,6 +1278,15 @@ html[data-mode="dark"] .editor-vditor-host .vditor-toolbar__item .vditor-tooltip
   color: var(--text-tertiary);
   border: 1px solid var(--border);
 }
+.studio-doc-badge.studio-doc-series {
+  max-width: 92px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 25%, var(--border));
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-elev));
+}
 .studio-nav-empty {
   padding: 16px 14px;
   font-size: 12px;
@@ -1325,12 +1334,19 @@ html[data-mode="dark"] .editor-vditor-host .vditor-toolbar__item .vditor-tooltip
   outline: none;
   border-color: var(--primary);
 }
-.studio-summary-text {
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--text-tertiary);
-  word-break: break-word;
+.editor-series-field {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+.studio-series-order {
+  margin-top: 2px;
+}
+.studio-series-order input {
+  max-width: 120px;
 }
 
 .studio-main {
