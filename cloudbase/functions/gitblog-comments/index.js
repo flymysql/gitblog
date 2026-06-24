@@ -31,7 +31,11 @@ function hashIp(ip) {
   return crypto.createHash('sha256').update(String(ip || '') + (process.env.COMMENT_SALT || 'gitblog')).digest('hex').slice(0, 24);
 }
 
-const TEMP_URL_MAX_AGE = 86400 * 7;
+const IMAGE_PROXY_CACHE_MAX_AGE = 604800;
+
+function getCommentEnvId() {
+  return String(process.env.TCB_ENV || process.env.SCF_NAMESPACE || '').trim();
+}
 
 function parseCloudPathFromFileId(fileId) {
   const m = String(fileId || '').match(/^cloud:\/\/[^/]+\/(.+)$/);
@@ -43,6 +47,40 @@ function pickHtmlAttr(attrs, name) {
   return m ? (m[2] || m[3] || '') : '';
 }
 
+function isAllowedCommentImageFileId(fileId) {
+  const cloudPath = parseCloudPathFromFileId(fileId);
+  if (!cloudPath.startsWith('comments/')) return false;
+  return /\.(jpe?g|png|gif|webp)$/i.test(cloudPath);
+}
+
+function mimeFromCloudPath(cloudPath) {
+  const ext = String(cloudPath || '').split('.').pop().toLowerCase();
+  if (ext === 'png') return 'image/png';
+  if (ext === 'gif') return 'image/gif';
+  if (ext === 'webp') return 'image/webp';
+  return 'image/jpeg';
+}
+
+function getImageProxyBaseUrl() {
+  const custom = String(process.env.COMMENT_IMAGE_BASE_URL || process.env.COMMENT_HTTP_URL || '').trim().replace(/\/+$/, '');
+  if (custom) return custom;
+  const envId = getCommentEnvId();
+  const region = String(process.env.TCB_REGION || process.env.SCF_REGION || 'ap-shanghai').trim() || 'ap-shanghai';
+  const fn = String(process.env.COMMENT_FUNCTION_NAME || 'gitblog-comments').trim() || 'gitblog-comments';
+  if (!envId) return '';
+  return `https://${envId}.${region}.app.tcloudbase.com/${fn}`;
+}
+
+function buildCommentImageProxyUrl(fileId) {
+  if (!isAllowedCommentImageFileId(fileId)) return '';
+  const base = getImageProxyBaseUrl();
+  if (!base) return '';
+  const url = new URL(base);
+  url.searchParams.set('action', 'IMAGE');
+  url.searchParams.set('fileId', fileId);
+  return url.toString();
+}
+
 function guessFileIdFromImageSrc(src, fileIdAttr = '') {
   const fid = String(fileIdAttr || '').trim();
   if (fid.startsWith('cloud://')) return fid;
@@ -50,30 +88,25 @@ function guessFileIdFromImageSrc(src, fileIdAttr = '') {
   if (raw.startsWith('cloud://')) return raw;
   try {
     const u = new URL(raw);
+    const proxyFileId = u.searchParams.get('fileId');
+    if (String(u.searchParams.get('action') || '').toUpperCase() === 'IMAGE' && proxyFileId?.startsWith('cloud://')) {
+      return proxyFileId;
+    }
     if (/\.tcb\.qcloud\.la$/i.test(u.hostname) && u.pathname.includes('/comments/')) {
-      const cloudPath = u.pathname.replace(/^\//, '');
-      const envId = String(process.env.TCB_ENV || process.env.SCF_NAMESPACE || u.hostname.split('.')[0]).trim();
+      const cloudPath = decodeURIComponent(u.pathname.replace(/^\//, ''));
+      const envId = getCommentEnvId();
       if (envId && cloudPath) return `cloud://${envId}/${cloudPath}`;
     }
   } catch { /* ignore */ }
   return '';
 }
 
-async function resolveTempUrls(fileIds) {
-  const unique = [...new Set((fileIds || []).filter(id => String(id).startsWith('cloud://')))];
+function resolveImageProxyUrls(fileIds) {
   const urlMap = new Map();
-  if (!unique.length) return urlMap;
-  for (let i = 0; i < unique.length; i += 50) {
-    const chunk = unique.slice(i, i + 50);
-    const res = await app.getTempFileURL({
-      fileList: chunk.map(fileID => ({ fileID, maxAge: TEMP_URL_MAX_AGE })),
-    });
-    (res.fileList || []).forEach(item => {
-      if (item.code === 'SUCCESS' && item.tempFileURL) {
-        urlMap.set(item.fileID, item.tempFileURL);
-      }
-    });
-  }
+  [...new Set((fileIds || []).filter(id => String(id).startsWith('cloud://')))].forEach(fileId => {
+    const url = buildCommentImageProxyUrl(fileId);
+    if (url) urlMap.set(fileId, url);
+  });
   return urlMap;
 }
 
@@ -101,7 +134,7 @@ async function resolveCommentImageUrls(html) {
     pickHtmlAttr(t.attrs, 'src'),
     pickHtmlAttr(t.attrs, 'data-cb-fileid'),
   )).filter(Boolean);
-  const urlMap = await resolveTempUrls(fileIds);
+  const urlMap = resolveImageProxyUrls(fileIds);
 
   let result = raw;
   tags.forEach(tag => {
@@ -417,13 +450,36 @@ async function handleUpload(event, context) {
     fileContent: buf,
   });
   const fileId = uploadRes.fileID;
-  const tempRes = await app.getTempFileURL({
-    fileList: [{ fileID: fileId, maxAge: TEMP_URL_MAX_AGE }],
-  });
-  const url = tempRes.fileList?.[0]?.tempFileURL || '';
+  const url = buildCommentImageProxyUrl(fileId);
   if (!url) return jsonErr('获取图片链接失败');
 
   return jsonOk({ url, fileId });
+}
+
+async function handleImageHttp(params, origin) {
+  const fileId = decodeURIComponent(String(params.fileId || '').trim());
+  if (!isAllowedCommentImageFileId(fileId)) {
+    return httpResponse(403, jsonErr('无权访问该图片', 403), origin);
+  }
+  try {
+    const res = await app.downloadFile({ fileID: fileId });
+    const buf = res.fileContent;
+    if (!buf || !buf.length) return httpResponse(404, jsonErr('图片不存在', 404), origin);
+    const cloudPath = parseCloudPathFromFileId(fileId);
+    return {
+      statusCode: 200,
+      headers: {
+        ...corsHeaders(origin),
+        'Content-Type': mimeFromCloudPath(cloudPath),
+        'Cache-Control': `public, max-age=${IMAGE_PROXY_CACHE_MAX_AGE}, immutable`,
+      },
+      body: buf.toString('base64'),
+      isBase64Encoded: true,
+    };
+  } catch (err) {
+    console.error('image proxy failed', err);
+    return httpResponse(404, jsonErr('图片读取失败', 404), origin);
+  }
 }
 
 async function dispatch(event, context) {
@@ -456,7 +512,7 @@ function pickOrigin(requestOrigin) {
 function corsHeaders(origin) {
   return {
     'Access-Control-Allow-Origin': pickOrigin(origin),
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Max-Age': '86400',
   };
@@ -502,6 +558,13 @@ exports.main = async (event, context) => {
       const method = String(event.httpMethod || event.method || '').toUpperCase();
       if (method === 'OPTIONS') {
         return httpResponse(204, '', origin);
+      }
+      if (method === 'GET') {
+        const qs = event.queryStringParameters || {};
+        if (String(qs.action || '').toUpperCase() === 'IMAGE') {
+          return await handleImageHttp(qs, origin);
+        }
+        return httpResponse(400, jsonErr('未知 GET 请求'), origin);
       }
       let payload = event;
       if (event.body != null && event.body !== '') {
