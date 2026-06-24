@@ -2,7 +2,7 @@ import { initToolPage, mountToolComments, $, escapeHtml, copyText } from './tool
 import { CONFIG } from './config.js';
 import { INTEREST_OPTIONS, SKILL_DIMS, DISCIPLINE_META, SUBJECTS, getMajorById, majorReferenceLinks, describeMajorTraits } from './tool-major-data.js';
 import { scoreMajors, formatResultText } from './tool-major-engine.js';
-import { PROVINCES, DATA_YEAR } from './tool-admission-data.js';
+import { PROVINCES } from './tool-admission-data.js';
 import { recommendSchools, formatSchoolRecsText } from './tool-admission-engine.js';
 import { drawMajorResultShareImage, drawMajorDetailShareImage, showShareImagePreview, toolPageUrl } from './tool-share-image.js';
 
@@ -416,6 +416,7 @@ function renderSchoolCard(item) {
   const gapText = item.scoreGap >= 0 ? `高 ${item.scoreGap} 分` : `低 ${Math.abs(item.scoreGap)} 分`;
   const rankText = item.rankGap >= 0 ? `位次领先约 ${item.rankGap.toLocaleString()}` : `位次落后约 ${Math.abs(item.rankGap).toLocaleString()}`;
   const matchText = item.majorMatch ? ` · 专业匹配 ${item.majorMatch}%` : '';
+  const lineTag = item.lineType === 'major' ? '专业投档线' : item.lineType === 'school' ? '院校投档线' : '参考估算';
   return `
     <article class="major-school-card">
       <div class="major-school-card-head">
@@ -423,7 +424,7 @@ function renderSchoolCard(item) {
         <p class="major-school-major">${escapeHtml(item.majorName)}${matchText}</p>
       </div>
       <p class="major-school-meta">
-        ${item.year} 年参考：约 ${item.minScore} 分 / 位次 ${item.minRank.toLocaleString()}；
+        ${item.year} 年${lineTag}：约 ${item.minScore} 分 / 位次 ${item.minRank.toLocaleString()}；
         你的成绩较参考线${gapText}，${rankText}
       </p>
     </article>
@@ -475,8 +476,9 @@ function renderSchoolRecs(rec) {
     <p class="major-school-recs-head">
       ${escapeHtml(rec.province.name)} · ${escapeHtml(rec.trackLabel)} ·
       你的成绩 <strong>${rec.score}</strong> 分 / 省排名 <strong>${rec.rank.toLocaleString()}</strong>
-      （${DATA_YEAR} 年录取数据参考）
+      （${rec.dataInfo?.mode === 'csv' ? `${rec.year} 年真实录取 CSV` : `${rec.year} 年参考估算`}）
     </p>
+    ${rec.dataInfo?.note ? `<p class="major-school-recs-note">${escapeHtml(rec.dataInfo.note)}</p>` : ''}
     ${renderSchoolTier('冲', 'is-reach', '录取有难度，可作为冲刺志愿', rec.grouped.reach)}
     ${renderSchoolTier('稳', 'is-match', '分数位次较接近，较有希望', rec.grouped.match)}
     ${renderSchoolTier('保', 'is-safety', '相对稳妥，建议作保底', rec.grouped.safety)}
@@ -486,20 +488,40 @@ function renderSchoolRecs(rec) {
 function runSchoolRecommendation() {
   if (!lastPayload) return;
   readAdmissionForm();
+  const err = $('majorAdmissionError');
+  const btn = $('majorAdmissionSubmit');
   const score = Number(admissionInput.score);
   const rank = Number(admissionInput.rank);
   const majorScores = new Map(lastPayload.results.map(r => [r.major.id, r.score]));
-  const rec = recommendSchools({
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '加载数据…';
+  }
+  if (err) err.hidden = true;
+
+  recommendSchools({
     score,
     rank,
     province: admissionInput.province,
     answers: getAnswers(),
     majorIds: lastPayload.results.map(r => r.major.id),
     majorScores,
+  }).then(rec => {
+    saveSchoolRecs(rec);
+    renderSchoolRecs(rec);
+    updateResultCopyText();
+  }).catch(e => {
+    if (err) {
+      err.textContent = `推荐失败：${e.message}`;
+      err.hidden = false;
+    }
+  }).finally(() => {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '查看院校推荐';
+    }
   });
-  saveSchoolRecs(rec);
-  renderSchoolRecs(rec);
-  updateResultCopyText();
 }
 
 function updateResultCopyText() {
@@ -699,16 +721,7 @@ $('majorRetry').addEventListener('click', resetQuiz);
 
 $('majorAdmissionForm')?.addEventListener('submit', (e) => {
   e.preventDefault();
-  const btn = $('majorAdmissionSubmit');
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = '分析中…';
-  }
   runSchoolRecommendation();
-  if (btn) {
-    btn.disabled = false;
-    btn.textContent = '查看院校推荐';
-  }
 });
 
 $('majorCopy').addEventListener('click', async () => {
