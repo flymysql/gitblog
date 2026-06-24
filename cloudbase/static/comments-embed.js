@@ -27,7 +27,7 @@ const cfg = {
   maxLength: 5000,
   allowImage: true,
   pageSize: 50,
-  mobileDock: params.get('mobileDock') === '1' || window.matchMedia('(max-width: 640px)').matches,
+  mobileDock: params.get('mobileDock') === '1',
 };
 
 const mode = String(params.get('mode') || 'light').trim().toLowerCase();
@@ -36,6 +36,7 @@ document.documentElement.setAttribute('data-mode', mode === 'dark' ? 'dark' : 'l
 let _heightTimer = null;
 let _app = null;
 let _authReady = null;
+let _commentCount = null;
 
 const SDK_HINT = '评论服务连接失败：请在控制台开启「匿名登录」，并将云函数 gitblog-comments 安全规则 invoke 设为 true（见 cloudbase/README.md）';
 
@@ -146,6 +147,7 @@ function postHeight(ready = false) {
         height: h,
         composeHeight,
         composeOpen,
+        commentCount: _commentCount,
         ready,
       }, '*');
     } catch { /* ignore */ }
@@ -783,9 +785,10 @@ async function mount() {
     try {
       const res = await callApi({ action: 'GET', path: cfg.path, limit: cfg.pageSize });
       const comments = res.comments || [];
+      _commentCount = comments.length;
       listEl.innerHTML = comments.length
         ? comments.map(c => renderCommentItem(c)).join('')
-        : '<p class="cb-empty">暂无评论，来说第一句吧。</p>';
+        : '';
       loadingEl.hidden = true;
       listEl.hidden = false;
       postHeight(true);
