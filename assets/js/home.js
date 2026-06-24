@@ -887,7 +887,7 @@ function bindMobileHomeSticky() {
       listState = null;
       ul.classList.add('post-list--giscus');
       if (!isCommentsReady('notes')) {
-        ul.innerHTML = `<li class="empty">请先在后台启用评论（CloudBase 或 giscus）并填写完整配置。随笔与 <a href="notes.html">随笔页</a> 共用同一条讨论。</li>`;
+        ul.innerHTML = `<li class="empty">请先在后台启用 CloudBase 评论并填写 envId。随笔与 <a href="notes.html">随笔页</a> 共用同一条讨论。</li>`;
       } else {
         ul.innerHTML = `
           <li class="home-giscus-only">
