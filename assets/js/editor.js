@@ -127,7 +127,7 @@ async function loadPost(slug) {
     document.title = `编辑：${data.title || slug}`;
     renderSummaryPreview();
     setStatus('已加载', 'saved');
-    $('#btnDelete').style.display = '';
+    syncDeleteButtons(true);
     updatePreview();
     refreshEditorLayout();
   } catch (e) {
@@ -564,16 +564,110 @@ async function loadAvailableSeries() {
   }
 }
 
-function focusSeriesPanel() {
-  const meta = $('#editorMeta');
+const MOBILE_EDITOR_MQ = window.matchMedia('(max-width: 960px)');
+
+function isMobileEditor() {
+  return MOBILE_EDITOR_MQ.matches;
+}
+
+function updateEditorLayoutMode() {
   const shell = $('#studioShell');
-  if (meta) meta.classList.remove('is-collapsed');
-  if (shell && window.matchMedia('(max-width: 960px)').matches) {
-    shell.classList.add('is-mobile-nav-open');
+  if (!shell) return;
+  const rich = state.editorMode === 'rich' || isMobileEditor();
+  shell.classList.toggle('is-rich-mode', rich);
+  document.body.classList.toggle('is-mobile-editor', isMobileEditor());
+  refreshEditorLayout();
+}
+
+async function applyEditorViewport() {
+  updateEditorLayoutMode();
+  if (isMobileEditor() && state.editorMode !== 'rich') {
+    await switchEditorMode('rich');
   }
-  const field = $('#seriesField');
-  if (field) field.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  $('#seriesInput')?.focus();
+}
+
+function switchNavTab(tab) {
+  document.querySelectorAll('.studio-nav-tab').forEach(btn => {
+    const active = btn.dataset.navTab === tab;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  document.querySelectorAll('.studio-nav-panel').forEach(panel => {
+    panel.classList.toggle('is-active', panel.dataset.navPanel === tab);
+  });
+}
+
+function openNavDrawer(tab = 'list') {
+  switchNavTab(tab);
+  const shell = $('#studioShell');
+  const backdrop = $('#studioDrawerBackdrop');
+  if (shell) shell.classList.add('is-mobile-nav-open');
+  if (backdrop) backdrop.hidden = false;
+}
+
+function closeNavDrawer() {
+  const shell = $('#studioShell');
+  const backdrop = $('#studioDrawerBackdrop');
+  if (shell) shell.classList.remove('is-mobile-nav-open');
+  if (backdrop) backdrop.hidden = true;
+}
+
+function openMetaSettings(section) {
+  switchNavTab('settings');
+  if (isMobileEditor()) openNavDrawer('settings');
+  if (section === 'series') $('#seriesInput')?.focus();
+  else if (section === 'tags') $('#tagInput')?.focus();
+}
+
+function syncDeleteButtons(show) {
+  const vis = show ? '' : 'none';
+  const del = $('#btnDelete');
+  const delM = $('#btnDeleteMobile');
+  if (del) del.style.display = vis;
+  if (delM) delM.style.display = vis;
+}
+
+function bindNavTabs() {
+  document.querySelectorAll('.studio-nav-tab').forEach(btn => {
+    btn.addEventListener('click', () => switchNavTab(btn.dataset.navTab));
+  });
+  $('#navCloseBtn')?.addEventListener('click', closeNavDrawer);
+  $('#studioDrawerBackdrop')?.addEventListener('click', closeNavDrawer);
+}
+
+function bindMobileTogglesSync() {
+  const pairs = [
+    ['draftToggle', 'draftToggleMobile'],
+    ['pinnedToggle', 'pinnedToggleMobile'],
+    ['carouselToggle', 'carouselToggleMobile'],
+  ];
+  pairs.forEach(([desktopId, mobileId]) => {
+    const d = $('#' + desktopId);
+    const m = $('#' + mobileId);
+    if (!d || !m) return;
+    const syncFromDesktop = () => { m.checked = d.checked; };
+    const syncFromMobile = () => { d.checked = m.checked; };
+    d.addEventListener('change', syncFromDesktop);
+    m.addEventListener('change', syncFromMobile);
+    syncFromDesktop();
+  });
+}
+
+function bindMobileChrome() {
+  $('#btnMobileList')?.addEventListener('click', () => openNavDrawer('list'));
+  $('#btnMobileSettings')?.addEventListener('click', () => openNavDrawer('settings'));
+  $('#btnPublishMobile')?.addEventListener('click', () => $('#btnPublish')?.click());
+  $('#btnDeleteMobile')?.addEventListener('click', () => $('#btnDelete')?.click());
+  $('#btnGenSummaryMeta')?.addEventListener('click', () => $('#btnGenSummary')?.click());
+  MOBILE_EDITOR_MQ.addEventListener('change', () => applyEditorViewport());
+}
+
+function focusSeriesPanel() {
+  openMetaSettings('series');
+}
+
+function focusTagPanel() {
+  openMetaSettings('tags');
 }
 
 function validateBeforePublish({ title, slug, content, tags, summary, allPosts, isUpdate }) {
@@ -725,6 +819,7 @@ async function publish() {
     showToast(draft ? '草稿已保存' : '发布成功，几十秒后线上生效');
     loadDocList();
     renderSummaryPreview();
+    closeNavDrawer();
 
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.set('slug', slug);
@@ -1002,6 +1097,10 @@ async function setupVditor(initialMd) {
 
 async function switchEditorMode(target) {
   if (!target || target === state.editorMode) return;
+  if (target === 'markdown' && isMobileEditor()) {
+    showToast('移动端仅支持富文本编辑');
+    return;
+  }
   const buttons = document.querySelectorAll('.editor-mode-btn');
 
   if (target === 'rich') {
@@ -1037,7 +1136,6 @@ async function switchEditorMode(target) {
     state.editorMode = 'rich';
     const sourcePanel = document.querySelector('.studio-panel-source') || document.querySelector('.editor-pane');
     if (sourcePanel) sourcePanel.classList.add('is-rich');
-    refreshEditorLayout();
   } else {
     // 富文本 → Markdown：取 Vditor markdown 灌回 EasyMDE
     if (state.vditor && state.vditorReady) {
@@ -1051,7 +1149,6 @@ async function switchEditorMode(target) {
     if (sourcePanel) sourcePanel.classList.remove('is-rich');
     setStatus('已切换到 Markdown', 'saved');
     if (state.mde && state.mde.codemirror) state.mde.codemirror.refresh();
-    refreshEditorLayout();
   }
 
   buttons.forEach(b => {
@@ -1060,6 +1157,7 @@ async function switchEditorMode(target) {
     b.setAttribute('aria-selected', active ? 'true' : 'false');
   });
   updatePreview();
+  updateEditorLayoutMode();
 }
 
 function bindEditorModeSwitch() {
@@ -1138,35 +1236,12 @@ function bindEditorLayoutRefresh() {
   setTimeout(run, 800);
 }
 
-function bindMetaCollapse() {
-  const meta = $('#editorMeta');
-  const btn = $('#metaCollapseBtn');
-  if (!meta || !btn) return;
-
-  const key = 'editor_meta_collapsed';
-  const collapsed = localStorage.getItem(key) === '1';
-  meta.classList.toggle('is-collapsed', collapsed);
-  btn.textContent = collapsed ? '展开' : '收起';
-  btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-
-  btn.addEventListener('click', () => {
-    const next = !meta.classList.contains('is-collapsed');
-    meta.classList.toggle('is-collapsed', next);
-    btn.textContent = next ? '展开' : '收起';
-    btn.setAttribute('aria-expanded', next ? 'false' : 'true');
-    localStorage.setItem(key, next ? '1' : '0');
-    refreshEditorLayout();
-  });
-}
-
 function bindStudioChrome() {
   const shell = $('#studioShell');
   const workspace = $('#studioWorkspace');
   const splitter = $('#studioSplitter');
   const navBtn = $('#navCollapseBtn');
   const outlineBtn = $('#outlineCollapseBtn');
-  const mobileNavBtn = $('#btnToggleNav');
-  const mobileOutlineBtn = $('#btnToggleOutline');
   const docSearch = $('#docSearch');
   const footAddTag = $('#footAddTag');
   const btnGenSummary = $('#btnGenSummary');
@@ -1189,19 +1264,6 @@ function bindStudioChrome() {
     if (localStorage.getItem('studio_outline_collapsed') === '1') shell.classList.add('is-outline-collapsed');
   }
 
-  if (mobileNavBtn && shell) {
-    mobileNavBtn.addEventListener('click', () => {
-      shell.classList.toggle('is-mobile-nav-open');
-      shell.classList.remove('is-mobile-outline-open');
-    });
-  }
-  if (mobileOutlineBtn && shell) {
-    mobileOutlineBtn.addEventListener('click', () => {
-      shell.classList.toggle('is-mobile-outline-open');
-      shell.classList.remove('is-mobile-nav-open');
-    });
-  }
-
   if (docSearch) {
     docSearch.addEventListener('input', () => {
       state.docSearch = docSearch.value;
@@ -1209,23 +1271,10 @@ function bindStudioChrome() {
     });
   }
 
-  if (footAddTag) {
-    footAddTag.addEventListener('click', () => {
-      const meta = $('#editorMeta');
-      if (meta) meta.classList.remove('is-collapsed');
-      const nav = $('#studioNav');
-      if (nav) nav.scrollTop = nav.scrollHeight;
-      $('#tagInput')?.focus();
-      if (window.matchMedia('(max-width: 960px)').matches && shell) {
-        shell.classList.add('is-mobile-nav-open');
-      }
-    });
-  }
+  if (footAddTag) footAddTag.addEventListener('click', focusTagPanel);
 
   const footAddSeries = $('#footAddSeries');
-  if (footAddSeries) {
-    footAddSeries.addEventListener('click', focusSeriesPanel);
-  }
+  if (footAddSeries) footAddSeries.addEventListener('click', focusSeriesPanel);
 
   if (btnGenSummary) {
     btnGenSummary.addEventListener('click', () => {
@@ -1371,8 +1420,10 @@ function setupEasyMDE() {
 
   setupEasyMDE();
   bindEditorLayoutRefresh();
-  bindMetaCollapse();
+  bindNavTabs();
   bindStudioChrome();
+  bindMobileChrome();
+  bindMobileTogglesSync();
   bindEditorModeSwitch();
   setupDragAndPaste();
   bindTagPicker();
@@ -1396,22 +1447,6 @@ function setupEasyMDE() {
 
   $('#btnPublish').addEventListener('click', publish);
   $('#btnDelete').addEventListener('click', deletePost);
-  $('#btnPreview').addEventListener('click', () => {
-    const shell = $('#studioShell');
-    if (shell) {
-      if (shell.classList.contains('is-preview-only')) {
-        shell.classList.remove('is-preview-only');
-        shell.classList.add('is-edit-only');
-      } else if (shell.classList.contains('is-edit-only')) {
-        shell.classList.remove('is-edit-only');
-      } else {
-        shell.classList.add('is-preview-only');
-      }
-      refreshEditorLayout();
-      return;
-    }
-    document.querySelectorAll('.editor-pane').forEach(el => el.classList.toggle('preview-mode'));
-  });
 
   // 自动草稿到 localStorage
   const draftKey = 'editor_draft_' + (initialSlug || 'new');
@@ -1459,4 +1494,5 @@ function setupEasyMDE() {
   } else {
     updatePreview();
   }
+  await applyEditorViewport();
 })();
