@@ -674,8 +674,12 @@ function settingsContentHtml() {
               <option value="sdk">Web SDK callFunction（须升级套餐并配置安全域名）</option>
             </select>
           </label>
-          <label class="span-2">嵌入页完整 URL（可选，留空用默认托管域）
-            <input name="cloudbase.embedUrl" placeholder="https://gitbolg-xxx.tcloudbaseapp.com/comments-embed.html">
+          <label class="span-2">托管域名 embedBaseUrl（embed 模式必填）
+            <input name="cloudbase.embedBaseUrl" placeholder="https://gitbolg-xxx-1256429518.tcloudbaseapp.com">
+            <span class="settings-hint">复制 <code>tcb hosting deploy</code> 输出的完整域名（含 <code>-数字</code> 后缀），不要漏掉。</span>
+          </label>
+          <label class="span-2">嵌入页完整 URL（可选，留空则用 embedBaseUrl + embedPage）
+            <input name="cloudbase.embedUrl" placeholder="https://gitbolg-xxx-1256429518.tcloudbaseapp.com/comments-embed.html">
           </label>
           <label class="span-2">HTTP 地址（accessMode=http 时，可选）
             <input name="cloudbase.httpUrl" placeholder="https://gitbolg-xxx.ap-shanghai.app.tcloudbase.com/gitblog-comments">

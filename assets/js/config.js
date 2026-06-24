@@ -66,6 +66,7 @@ export const CONFIG = {
     functionName: "gitblog-comments",
     accessMode: "embed",
     httpUrl: "",
+    embedBaseUrl: "https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com",
     embedPage: "comments-embed.html",
     placeholderNick: "访客",
     moderation: false,
