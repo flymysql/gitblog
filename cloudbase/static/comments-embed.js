@@ -1,7 +1,9 @@
 /**
  * CloudBase 评论嵌入页（托管于 {envId}-{appId}.tcloudbaseapp.com）
- * 通过 HTTP 调云函数，无需 Web SDK 匿名登录，避免 PERMISSION_DENIED。
+ * 优先用 Web SDK callFunction（同环境托管域，移动端/微信更稳定）；
+ * HTTP 仅作桌面端兜底。
  */
+const SDK_URL = 'https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js';
 const PROFILE_KEY = 'gitblog-comment-profile-v1';
 
 const EMOJI_GROUPS = [
@@ -30,8 +32,42 @@ const mode = String(params.get('mode') || 'light').trim().toLowerCase();
 document.documentElement.setAttribute('data-mode', mode === 'dark' ? 'dark' : 'light');
 
 let _heightTimer = null;
+let _app = null;
+let _authReady = null;
 
-const HTTP_HINT = '请确认：① 云函数 gitblog-comments 已部署；② 控制台已开启 HTTP 访问；③ 重新部署云函数（含 CORS）。详见 cloudbase/README.md';
+const SDK_HINT = '评论服务连接失败：请在控制台开启「匿名登录」，并将云函数 gitblog-comments 安全规则 invoke 设为 true（见 cloudbase/README.md）';
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) {
+      resolve();
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('CloudBase SDK 加载失败'));
+    document.head.appendChild(s);
+  });
+}
+
+async function getApp() {
+  if (_app) return _app;
+  if (!cfg.envId) throw new Error('缺少 env 参数');
+  await loadScript(SDK_URL);
+  // eslint-disable-next-line no-undef
+  _app = cloudbase.init({ env: cfg.envId, region: cfg.region });
+  if (!_authReady) {
+    _authReady = (async () => {
+      const auth = _app.auth();
+      const state = await auth.getLoginState();
+      if (!state) await auth.signInAnonymously();
+    })();
+  }
+  await _authReady;
+  return _app;
+}
 
 function resolveHttpUrl() {
   if (cfg.httpUrl) return cfg.httpUrl;
@@ -39,39 +75,55 @@ function resolveHttpUrl() {
   return `https://${cfg.envId}.${cfg.region}.app.tcloudbase.com/${cfg.functionName}`;
 }
 
-function escapeHtml(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
-  );
+function parseApiResult(result, httpStatus) {
+  if (result?.code === 'OPERATION_FAIL' || /PERMISSION_DENIED/i.test(String(result?.msg || result?.message || ''))) {
+    throw new Error('云函数权限不足：请开启匿名登录，并将安全规则 invoke 设为 true（见 cloudbase/README.md）');
+  }
+  if (!result || result.ok === false) {
+    throw new Error(result?.message || result?.msg || `评论服务请求失败${httpStatus ? `（HTTP ${httpStatus}）` : ''}`);
+  }
+  return result;
 }
 
-async function callApi(payload) {
+async function callApiViaSdk(payload) {
+  const app = await getApp();
+  const res = await app.callFunction({ name: cfg.functionName, data: payload });
+  return parseApiResult(res?.result);
+}
+
+async function callApiViaHttp(payload) {
   const url = resolveHttpUrl();
-  let res;
-  try {
-    res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-  } catch {
-    throw new Error(HTTP_HINT);
-  }
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
   let result;
   try {
     result = await res.json();
   } catch {
     throw new Error(`评论服务响应异常（HTTP ${res.status}）`);
   }
-  if (result?.code === 'OPERATION_FAIL' || /PERMISSION_DENIED/i.test(String(result?.msg || result?.message || ''))) {
-    throw new Error('云函数权限不足：请在控制台 → 云函数 → gitblog-comments → 开启 HTTP 访问，并将安全规则 invoke 设为 true（见 cloudbase/README.md）');
-  }
-  if (!result || result.ok === false) {
-    throw new Error(result?.message || result?.msg || `评论服务请求失败（HTTP ${res.status}）`);
-  }
-  return result;
+  return parseApiResult(result, res.status);
 }
 
+async function callApi(payload) {
+  try {
+    return await callApiViaSdk(payload);
+  } catch (sdkErr) {
+    try {
+      return await callApiViaHttp(payload);
+    } catch {
+      throw new Error(sdkErr?.message || SDK_HINT);
+    }
+  }
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+  );
+}
 function postHeight(ready = false) {
   clearTimeout(_heightTimer);
   _heightTimer = setTimeout(() => {
