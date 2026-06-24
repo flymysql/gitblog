@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260615200000';
+export const VERSION = '20260615210000';
 
 export const CONFIG = {
   repo: {
@@ -64,6 +64,8 @@ export const CONFIG = {
     envId: "gitbolg-d7gmnsrw46e011706",
     region: "ap-shanghai",
     functionName: "gitblog-comments",
+    accessMode: "http",
+    httpUrl: "",
     placeholderNick: "访客",
     moderation: false,
     maxLength: 5000,
