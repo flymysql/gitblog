@@ -36,7 +36,12 @@ export function mountToolComments(term, hint, hostId = 'toolGiscus') {
     return;
   }
   host.innerHTML = '<p class="tool-comments-loading" aria-live="polite">评论加载中…</p>';
-  mountComments(host, term, { loading: 'eager', pageTitle: document.title, pageUrl: location.href });
+  mountComments(host, term, {
+    loading: 'eager',
+    pageTitle: document.title,
+    pageUrl: location.href,
+    context: 'tool',
+  });
 }
 
 export function $(id) { return document.getElementById(id); }
