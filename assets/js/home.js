@@ -167,17 +167,30 @@ function hydratePrerenderHeroStats() {
 /** 签名单行：在可用宽度内通过缩小字号展示全文（无省略号）；再按 .hero-info 总高度设头像正方形 */
 let heroAvatarResizeObserver = null;
 let heroAvatarResizeFallbackBound = false;
+let heroAvatarApplyRaf = 0;
+let heroAvatarApplying = false;
+let heroSubtitleFitWidth = 0;
+let heroSubtitleFitFont = '';
 
-function fitHeroSubtitleFont() {
-  const sub = document.querySelector('#hero .hero-subtitle');
+function fitHeroSubtitleFont(sub, containerWidth) {
   if (!sub) return;
-  sub.style.fontSize = '';
-  const cw = sub.clientWidth;
+  const cw = containerWidth ?? sub.clientWidth;
   if (cw < 4) return;
+
+  if (heroSubtitleFitWidth > 0 && Math.abs(cw - heroSubtitleFitWidth) < 2 && heroSubtitleFitFont) {
+    sub.style.fontSize = heroSubtitleFitFont;
+    return;
+  }
+
+  sub.style.fontSize = '';
   const base = parseFloat(getComputedStyle(sub).fontSize);
   if (!Number.isFinite(base) || base < 1) return;
   const minPx = 6;
-  if (sub.scrollWidth <= cw) return;
+  if (sub.scrollWidth <= cw) {
+    heroSubtitleFitWidth = cw;
+    heroSubtitleFitFont = '';
+    return;
+  }
 
   let lo = minPx;
   let hi = base;
@@ -187,43 +200,66 @@ function fitHeroSubtitleFont() {
     if (sub.scrollWidth <= cw) lo = mid;
     else hi = mid;
   }
-  sub.style.fontSize = `${lo}px`;
+  heroSubtitleFitWidth = cw;
+  heroSubtitleFitFont = `${lo}px`;
+  sub.style.fontSize = heroSubtitleFitFont;
 }
 
-function bindHeroAvatarSizeSync() {
-  const link = document.querySelector('#hero .hero-link');
-  if (!link) return;
+function syncHeroAvatarLayout(link) {
   const info = link.querySelector('.hero-info');
   const wrap = link.querySelector('.hero-avatar-wrap');
-  if (!info || !wrap) return;
+  const sub = info?.querySelector('.hero-subtitle');
+  if (!info || !wrap || !sub) return;
 
-  const apply = () => {
-    fitHeroSubtitleFont();
+  heroAvatarResizeObserver?.disconnect();
+
+  // 最多两轮：先按当前头像占位算字号，再按最终高度对齐头像，避免 ResizeObserver 循环抖动
+  for (let pass = 0; pass < 2; pass += 1) {
+    fitHeroSubtitleFont(sub);
     const h = Math.ceil(info.getBoundingClientRect().height);
     const side = Math.min(160, Math.max(48, h || 72));
     wrap.style.width = `${side}px`;
     wrap.style.minWidth = `${side}px`;
     wrap.style.height = `${side}px`;
     wrap.style.boxSizing = 'border-box';
+  }
+
+  heroAvatarResizeObserver?.observe(link);
+}
+
+function bindHeroAvatarSizeSync() {
+  const link = document.querySelector('#hero .hero-link');
+  if (!link) return;
+
+  const schedule = () => {
+    if (heroAvatarApplyRaf) cancelAnimationFrame(heroAvatarApplyRaf);
+    heroAvatarApplyRaf = requestAnimationFrame(() => {
+      heroAvatarApplyRaf = 0;
+      if (heroAvatarApplying) return;
+      heroAvatarApplying = true;
+      try {
+        syncHeroAvatarLayout(link);
+      } finally {
+        heroAvatarApplying = false;
+      }
+    });
   };
 
-  apply();
+  schedule();
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => apply());
+    document.fonts.ready.then(() => schedule());
   }
 
   if (typeof ResizeObserver === 'undefined') {
     if (!heroAvatarResizeFallbackBound) {
       heroAvatarResizeFallbackBound = true;
-      window.addEventListener('resize', apply, { passive: true });
+      window.addEventListener('resize', schedule, { passive: true });
     }
     return;
   }
   if (heroAvatarResizeObserver) heroAvatarResizeObserver.disconnect();
-  heroAvatarResizeObserver = new ResizeObserver(() => apply());
-  heroAvatarResizeObserver.observe(info);
-  const sub = info.querySelector('.hero-subtitle');
-  if (sub) heroAvatarResizeObserver.observe(sub);
+  heroAvatarResizeObserver = new ResizeObserver(() => schedule());
+  heroAvatarResizeObserver.observe(link);
 }
 
 function renderCarousel(posts) {
