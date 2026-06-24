@@ -448,7 +448,7 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
       <iframe
         class="cb-embed-frame"
         title="评论区"
-        loading="lazy"
+        loading="eager"
         referrerpolicy="strict-origin-when-cross-origin"
         src="${escapeHtml(src)}"
       ></iframe>
