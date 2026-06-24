@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260615180000';
+export const VERSION = '20260624125045';
 
 export const CONFIG = {
   repo: {
@@ -79,8 +79,8 @@ export const CONFIG = {
     provider: "giscus"
   },
   cloudbase: {
-    enabled: false,
-    envId: "",
+    enabled: true,
+    envId: "gitbolg-d7gmnsrw46e011706",
     region: "ap-shanghai",
     functionName: "gitblog-comments",
     placeholderNick: "访客",
