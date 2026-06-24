@@ -174,7 +174,12 @@ export function sanitizeCommentHtml(raw) {
         const n = attr.name.toLowerCase();
         if (tag === 'A' && (n === 'href' || n === 'title' || n === 'target' || n === 'rel')) return;
         if (tag === 'IMG' && (n === 'src' || n === 'alt' || n === 'title' || n === 'loading')) return;
-        if (tag === 'SPAN' && n === 'class') return;
+        if (tag === 'SPAN' && n === 'class') {
+          const cls = child.getAttribute('class') || '';
+          if (cls === 'cb-mention' || cls === 'cb-uploading') return;
+          child.removeAttribute(attr.name);
+          return;
+        }
         child.removeAttribute(attr.name);
       });
       if (tag === 'A') {
@@ -380,33 +385,165 @@ class CommentRichEditor {
     this._syncCount();
   }
 
+  setMentionPrefix(nick) {
+    const name = String(nick || '访客').trim() || '访客';
+    this.body.innerHTML = `<span class="cb-mention">@${escapeHtml(name)}</span>&nbsp;`;
+    this._syncCount();
+  }
+
   isValid() {
     const len = this.getPlainLength();
     return len > 0 && len <= this.maxLength;
   }
 }
 
-function renderCommentItem(c, { onReply }) {
+function renderCommentItem(c) {
   const nick = escapeHtml(c.nick || '访客');
+  const nickRaw = escapeHtml(c.nick || '访客');
+  const replyTo = c.replyToNick ? escapeHtml(c.replyToNick) : '';
   const hue = avatarColor(c.nick);
   const content = sanitizeCommentHtml(c.contentHtml || '');
-  const replies = (c.replies || []).map(r => renderCommentItem(r, { onReply })).join('');
+  const replies = (c.replies || []).map(r => renderCommentItem(r)).join('');
   return `
     <article class="cb-comment${c.parentId ? ' is-reply' : ''}" data-id="${escapeHtml(c._id)}">
       <div class="cb-comment-avatar" style="--cb-avatar-hue:${hue}" aria-hidden="true">${nick.slice(0, 1).toUpperCase()}</div>
       <div class="cb-comment-main">
         <header class="cb-comment-head">
+          ${replyTo ? `<span class="cb-comment-reply-badge">回复 <span class="cb-mention">@${replyTo}</span></span>` : ''}
           <strong class="cb-comment-nick">${nick}</strong>
           <time class="cb-comment-time" datetime="${escapeHtml(c.createdAtIso || '')}">${escapeHtml(formatTime(c.createdAt))}</time>
         </header>
         <div class="cb-comment-body">${content || '<p></p>'}</div>
         <footer class="cb-comment-actions">
-          <button type="button" class="cb-link-btn" data-reply="${escapeHtml(c._id)}">回复</button>
+          <button type="button" class="cb-link-btn" data-reply="${escapeHtml(c._id)}" data-reply-nick="${nickRaw}">回复</button>
         </footer>
+        <div class="cb-inline-reply-slot"></div>
         ${replies ? `<div class="cb-replies">${replies}</div>` : ''}
       </div>
     </article>
   `;
+}
+
+function closeAllInlineReplies(root) {
+  if (!root) return;
+  root.querySelectorAll('.cb-inline-reply').forEach(el => el.remove());
+  root.querySelectorAll('[data-reply].is-active').forEach(btn => btn.classList.remove('is-active'));
+}
+
+function mountInlineReply(slot, ctx) {
+  const { parentId, replyNick, path, cfg, callApi, onSuccess, opts = {} } = ctx;
+  const commentsRoot = slot.closest('.cb-comments');
+  closeAllInlineReplies(commentsRoot);
+
+  const panel = document.createElement('div');
+  panel.className = 'cb-inline-reply';
+  panel.innerHTML = `
+    <div class="cb-inline-reply-head">回复 <span class="cb-mention">@${escapeHtml(replyNick)}</span></div>
+    <div class="cb-inline-reply-editor"></div>
+    <div class="cb-inline-reply-actions">
+      <button type="button" class="cb-link-btn" data-cancel-reply>取消</button>
+      <button type="button" class="cb-submit cb-submit--sm" data-submit-reply>发送</button>
+    </div>
+    <span class="cb-inline-reply-status" aria-live="polite"></span>
+  `;
+  slot.appendChild(panel);
+
+  const editorHost = panel.querySelector('.cb-inline-reply-editor');
+  const statusEl = panel.querySelector('.cb-inline-reply-status');
+  const maxLength = Number(cfg.maxLength) || 5000;
+  const allowImage = cfg.allowImage !== false;
+  const editor = new CommentRichEditor(editorHost, {
+    allowImage,
+    maxLength,
+    onUpload: async file => {
+      const base64 = await fileToBase64(file);
+      const res = await callApi({
+        action: 'UPLOAD',
+        path,
+        fileName: file.name,
+        mime: file.type,
+        base64,
+      });
+      return res.url;
+    },
+  });
+  editor.setMentionPrefix(replyNick);
+
+  const replyBtn = commentsRoot?.querySelector(`[data-reply="${CSS.escape(parentId)}"]`);
+  replyBtn?.classList.add('is-active');
+
+  panel.querySelector('[data-cancel-reply]').addEventListener('click', () => {
+    panel.remove();
+    replyBtn?.classList.remove('is-active');
+  });
+
+  const submitBtn = panel.querySelector('[data-submit-reply]');
+  const doSubmit = async () => {
+    statusEl.textContent = '';
+    if (!editor.isValid()) {
+      statusEl.textContent = editor.getPlainLength() > maxLength ? '内容过长' : '请输入回复内容';
+      statusEl.classList.add('is-error');
+      return;
+    }
+    const profile = readProfile();
+    submitBtn.disabled = true;
+    statusEl.classList.remove('is-error');
+    statusEl.textContent = '发送中…';
+    try {
+      await callApi({
+        action: 'POST',
+        path,
+        nick: profile.nick || '',
+        email: profile.email || '',
+        contentHtml: editor.getHtml(),
+        parentId,
+        pageTitle: opts.pageTitle || document.title,
+        pageUrl: opts.pageUrl || location.href,
+      });
+      saveProfile({ nick: profile.nick, email: profile.email });
+      closeAllInlineReplies(commentsRoot);
+      await onSuccess();
+    } catch (err) {
+      statusEl.textContent = err.message || '发送失败';
+      statusEl.classList.add('is-error');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  };
+
+  submitBtn.addEventListener('click', doSubmit);
+  editorHost.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      doSubmit();
+    }
+  });
+
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  editor.body.focus();
+  try {
+    const range = document.createRange();
+    range.selectNodeContents(editor.body);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+  } catch { /* ignore */ }
+}
+
+function bindCommentListInteractions(listEl, ctx) {
+  listEl.addEventListener('click', e => {
+    const btn = e.target.closest('[data-reply]');
+    if (!btn || e.target.closest('.cb-inline-reply')) return;
+    e.preventDefault();
+    const slot = btn.closest('.cb-comment-main')?.querySelector('.cb-inline-reply-slot');
+    if (!slot) return;
+    mountInlineReply(slot, {
+      ...ctx,
+      parentId: btn.dataset.reply || '',
+      replyNick: btn.dataset.replyNick || '访客',
+    });
+  });
 }
 
 function resolveEmbedPageUrl(cfg, path, opts = {}) {
@@ -501,12 +638,11 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
           </label>
         </div>
         <div class="cb-compose-editor"></div>
-        <p class="cb-compose-hint">支持表情与图片；Ctrl/⌘ + Enter 提交</p>
+        <p class="cb-compose-hint">发表新评论；点「回复」可在对应楼层下回复并自动 @ 对方。留邮箱可在被回复时收到通知。</p>
         <div class="cb-compose-actions">
           <span class="cb-compose-status" aria-live="polite"></span>
           <button type="submit" class="cb-submit">发表评论</button>
         </div>
-        <input type="hidden" name="parentId" value="">
       </form>
     </div>
   `;
@@ -516,7 +652,6 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
   const loadingEl = root.querySelector('.cb-comments-loading');
   const form = root.querySelector('.cb-compose');
   const statusEl = root.querySelector('.cb-compose-status');
-  const parentInput = form.querySelector('[name="parentId"]');
   const nickInput = form.querySelector('[name="nick"]');
   const emailInput = form.querySelector('[name="email"]');
   const editorHost = root.querySelector('.cb-compose-editor');
@@ -550,7 +685,7 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
       const res = await callCommentApi({ action: 'GET', path, limit: Number(cfg.pageSize) || 50 });
       comments = res.comments || [];
       listEl.innerHTML = comments.length
-        ? comments.map(c => renderCommentItem(c, {})).join('')
+        ? comments.map(c => renderCommentItem(c)).join('')
         : '<p class="cb-empty">暂无评论，来说第一句吧。</p>';
       loadingEl.hidden = true;
       listEl.hidden = false;
@@ -559,13 +694,12 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
     }
   }
 
-  listEl.addEventListener('click', e => {
-    const btn = e.target.closest('[data-reply]');
-    if (!btn) return;
-    parentInput.value = btn.dataset.reply || '';
-    statusEl.textContent = '正在回复一条评论…';
-    form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    editor.body.focus();
+  bindCommentListInteractions(listEl, {
+    path,
+    cfg,
+    callApi: callCommentApi,
+    onSuccess: loadList,
+    opts,
   });
 
   form.addEventListener('keydown', e => {
@@ -596,13 +730,12 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
         nick,
         email,
         contentHtml: editor.getHtml(),
-        parentId: parentInput.value.trim() || null,
+        parentId: null,
         pageTitle: opts.pageTitle || document.title,
         pageUrl: opts.pageUrl || location.href,
       });
       saveProfile({ nick, email });
       editor.clear();
-      parentInput.value = '';
       statusEl.textContent = cfg.moderation ? '已提交，待审核通过后显示' : '发表成功';
       await loadList();
     } catch (err) {
