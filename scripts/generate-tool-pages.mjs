@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 /** 生成 9 个独立工具页 HTML（输出到 tools/ 目录） */
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { basename } from 'node:path';
 import { toolPageHtml } from './tool-page-shell.mjs';
 import { generateFarmCrops } from './generate-farm-crops.mjs';
 
 generateFarmCrops();
+
+const cfgRaw = readFileSync('assets/js/config.js', 'utf8');
+const SITE_URL = (cfgRaw.match(/url:\s*['"]([^'"]+)['"]/) || [])[1]?.replace(/\/$/, '') || '';
 
 const V = '20260622190000';
 const TOOLS_DIR = 'tools';
@@ -312,6 +315,7 @@ const PAGES = [
     h1: '大学专业倾向测评',
     lead: '回答几个关于兴趣、能力与规划的问题，获取适合你的本科专业推荐。结果仅供参考，请结合分数与招生章程填报。',
     script: 'tool-major.js',
+    ogSlug: 'tool-major',
     commentsHint: '你测出来适合什么专业？来聊聊你的志愿想法～',
     hideGlobalComments: true,
     hideToolActions: true,
@@ -357,7 +361,12 @@ const PAGES = [
 ];
 
 for (const p of PAGES) {
-  writeFileSync(p.file, toolPageHtml({ ...p, description: p.description }).replace(/v=20260622140000/g, `v=${V}`));
+  writeFileSync(p.file, toolPageHtml({
+    ...p,
+    description: p.description,
+    siteUrl: SITE_URL,
+    pagePath: p.file,
+  }).replace(/v=20260622140000/g, `v=${V}`));
   console.log('wrote', p.file);
   const oldName = basename(p.file);
   writeRedirect(oldName, `${TOOLS_DIR}/${oldName}`);
