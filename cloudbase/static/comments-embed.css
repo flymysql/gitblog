@@ -497,14 +497,20 @@ body { padding: 0 2px 8px; }
   .cb-comments--mobile-dock .cb-compose.is-sheet-open {
     position: relative;
     display: block !important;
-    max-height: 85vh;
-    overflow: auto;
+    max-height: none;
+    overflow: visible;
     margin: 0;
     padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
     border: none;
     border-radius: 0;
     background: var(--bg-elev);
     box-shadow: none;
+  }
+
+  .cb-compose.is-sheet-open .cb-editor-body {
+    max-height: none;
+    overflow: hidden;
+    min-height: 48px;
   }
 
   @keyframes cb-sheet-up {
@@ -527,5 +533,5 @@ body { padding: 0 2px 8px; }
     padding: 0 8px;
     font-size: 13px;
   }
-  .cb-editor-body { min-height: 100px; }
+  .cb-compose.is-sheet-open .cb-editor-body { min-height: 48px; }
 }

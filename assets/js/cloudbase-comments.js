@@ -330,6 +330,7 @@ class CommentRichEditor {
   _toggleEmoji(open) {
     this._emojiOpen = open ?? this.emojiPanel.hidden;
     this.emojiPanel.hidden = !this._emojiOpen;
+    this._autosizeBody();
   }
 
   _insertText(text) {
@@ -381,6 +382,27 @@ class CommentRichEditor {
     this._syncCount();
   }
 
+  _autosizeBody() {
+    const el = this.body;
+    if (!el) return;
+    const inSheet = el.closest('.cb-compose.is-sheet-open');
+    if (!inSheet) {
+      el.style.height = '';
+      el.style.overflowY = '';
+      return;
+    }
+    el.style.height = 'auto';
+    const cap = Math.round(window.innerHeight * 0.5);
+    const needed = el.scrollHeight;
+    if (needed > cap) {
+      el.style.height = `${cap}px`;
+      el.style.overflowY = 'auto';
+    } else {
+      el.style.height = `${Math.max(needed, 48)}px`;
+      el.style.overflowY = 'hidden';
+    }
+  }
+
   _syncCount() {
     const text = this.body.innerText || '';
     const len = text.length;
@@ -389,6 +411,7 @@ class CommentRichEditor {
     this.countEl.hidden = !has;
     this.countEl.classList.toggle('is-over', len > this.maxLength);
     this.editorEl.classList.toggle('has-content', has);
+    this._autosizeBody();
     this.onChange?.(len);
   }
 
@@ -449,6 +472,7 @@ function bindComposeReveal(form, editor, { metaEl, actionsEl }) {
     if (metaEl) metaEl.hidden = !showExtra;
     if (actionsEl) actionsEl.hidden = !showExtra;
     form.classList.toggle('cb-compose--active', showExtra);
+    editor._autosizeBody?.();
   };
   const prevOnChange = editor.onChange;
   editor.onChange = len => {
@@ -504,7 +528,11 @@ function bindMobileComposeSheet(form, editor, { onClose, onOpen } = {}) {
     if (listEl) listEl.hidden = true;
     if (loadingEl) loadingEl.hidden = true;
     onOpen?.();
-    setTimeout(() => editor.body.focus(), 120);
+    editor._autosizeBody?.();
+    setTimeout(() => {
+      editor._autosizeBody?.();
+      editor.body.focus();
+    }, 120);
   };
 
   form.querySelector('.cb-mobile-sheet-close')?.addEventListener('click', close);
