@@ -360,7 +360,7 @@ const PAGES = [
           </form>
           <p class="major-admission-error tool-kit-error" id="majorAdmissionError" hidden></p>
           <div class="major-school-recs" id="majorSchoolRecs" hidden></div>
-          <p class="tool-kit-hint major-admission-note">院校分数线为根据 2024 年各省投档数据整理的参考值，实际录取受招生计划、大小年等因素影响，请以当年招生章程与官方系统为准。</p>
+          <p class="tool-kit-hint major-admission-note">院校线来自开源历年录取 CSV（2016–2020，labolado/gaokao_2016-2020）；可在 data/admission/major-lines.csv 补充专业投档线。浙江、上海暂无开源数据时将使用估算参考。</p>
         </section>
         <div class="major-quiz-actions tool-kit-toolbar">
           <button type="button" class="tool-kit-btn is-ghost" id="majorShare">生成分享图</button>
