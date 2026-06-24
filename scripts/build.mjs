@@ -396,6 +396,7 @@ const TOOL_SITEMAP_PAGES = [
   'tools/tool-network.html',
   'tools/tool-air-conditioner.html',
   'tools/tool-farm-seed.html',
+  'tools/tool-major.html',
 ];
 
 const urls = [
