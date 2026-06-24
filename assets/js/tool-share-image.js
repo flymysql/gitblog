@@ -274,7 +274,7 @@ export async function drawAgeShareImage({ birthLabel, ageLine, livedDays, livedH
   return canvas;
 }
 
-/** 高考专业测评 · 结果总览分享图 */
+/** 大学专业倾向测评 · 结果总览分享图 */
 export async function drawMajorResultShareImage({ profile, results, pageUrl }) {
   const W = 750;
   const H = 1200;
@@ -292,7 +292,7 @@ export async function drawMajorResultShareImage({ profile, results, pageUrl }) {
 
   ctx.fillStyle = '#ea6f5a';
   ctx.font = `bold 34px ${FONT}`;
-  ctx.fillText('高考专业倾向测评', 48, 68);
+  ctx.fillText('大学专业倾向测评', 48, 68);
 
   ctx.fillStyle = '#888';
   ctx.font = `20px ${FONT}`;
@@ -336,7 +336,7 @@ export async function drawMajorResultShareImage({ profile, results, pageUrl }) {
   return canvas;
 }
 
-/** 高考专业测评 · 单专业分享图 */
+/** 大学专业倾向测评 · 单专业分享图 */
 export async function drawMajorDetailShareImage({ major, score, pageUrl }) {
   const W = 750;
   const H = 1000;
