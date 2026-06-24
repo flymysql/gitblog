@@ -126,12 +126,17 @@ function escapeHtml(s) {
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
   );
 }
+function measureComposeHeight(form) {
+  if (!form) return 0;
+  return Math.ceil(Math.max(form.offsetHeight, form.scrollHeight, form.getBoundingClientRect().height));
+}
+
 function postHeight(ready = false) {
   clearTimeout(_heightTimer);
   _heightTimer = setTimeout(() => {
     const form = document.querySelector('.cb-compose.is-sheet-open');
     const composeOpen = !!form;
-    const composeHeight = form ? Math.ceil(form.getBoundingClientRect().height) : 0;
+    const composeHeight = composeOpen ? measureComposeHeight(form) : 0;
     const h = composeOpen
       ? composeHeight
       : Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
@@ -152,6 +157,10 @@ function observeHeight() {
   if (typeof ResizeObserver !== 'undefined') {
     const ro = new ResizeObserver(() => postHeight(true));
     ro.observe(document.body);
+    const form = document.querySelector('.cb-compose');
+    if (form) ro.observe(form);
+    const editorBody = document.querySelector('.cb-compose .cb-editor-body');
+    if (editorBody) ro.observe(editorBody);
   } else {
     window.addEventListener('load', () => postHeight(true));
     setInterval(() => postHeight(true), 1500);
@@ -349,6 +358,7 @@ class CommentRichEditor {
   _toggleEmoji(open) {
     this._emojiOpen = open ?? this.emojiPanel.hidden;
     this.emojiPanel.hidden = !this._emojiOpen;
+    this._autosizeBody();
   }
 
   _insertText(text) {
@@ -400,6 +410,27 @@ class CommentRichEditor {
     this._syncCount();
   }
 
+  _autosizeBody() {
+    const el = this.body;
+    if (!el) return;
+    const inSheet = el.closest('.cb-compose.is-sheet-open');
+    if (!inSheet) {
+      el.style.height = '';
+      el.style.overflowY = '';
+      return;
+    }
+    el.style.height = 'auto';
+    const cap = Math.round(window.innerHeight * 0.5);
+    const needed = el.scrollHeight;
+    if (needed > cap) {
+      el.style.height = `${cap}px`;
+      el.style.overflowY = 'auto';
+    } else {
+      el.style.height = `${Math.max(needed, 48)}px`;
+      el.style.overflowY = 'hidden';
+    }
+  }
+
   _syncCount() {
     const text = this.body.innerText || '';
     const len = text.length;
@@ -408,6 +439,7 @@ class CommentRichEditor {
     this.countEl.hidden = !has;
     this.countEl.classList.toggle('is-over', len > this.maxLength);
     this.editorEl.classList.toggle('has-content', has);
+    this._autosizeBody();
     this.onChange?.(len);
   }
 
@@ -468,6 +500,7 @@ function bindComposeReveal(form, editor, { metaEl, actionsEl }) {
     if (metaEl) metaEl.hidden = !showExtra;
     if (actionsEl) actionsEl.hidden = !showExtra;
     form.classList.toggle('cb-compose--active', showExtra);
+    editor._autosizeBody?.();
     postHeight(true);
   };
   const prevOnChange = editor.onChange;
@@ -522,7 +555,11 @@ function bindMobileComposeSheet(form, editor) {
     if (listEl) listEl.hidden = true;
     if (loadingEl) loadingEl.hidden = true;
     postHeight(true);
-    setTimeout(() => editor.body.focus(), 120);
+    setTimeout(() => {
+      editor._autosizeBody?.();
+      postHeight(true);
+      editor.body.focus();
+    }, 120);
   };
 
   form.querySelector('.cb-mobile-sheet-close')?.addEventListener('click', close);
