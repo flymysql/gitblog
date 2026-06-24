@@ -490,6 +490,12 @@ function isMobileCommentDock() {
   return typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
 }
 
+/** 仅文章页在移动端使用底部悬浮评论栏；工具页、随笔等保持桌面布局 */
+function shouldUseMobileCommentDock(opts = {}) {
+  const ctx = String(opts.context || 'post').trim().toLowerCase();
+  return ctx === 'post' && isMobileCommentDock();
+}
+
 const COMMENTS_END_HINT_MORE = '没有更多评论了~';
 const COMMENTS_END_HINT_EMPTY = '暂无评论，来留下一条评论吧~';
 
@@ -904,7 +910,7 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
   if (httpUrl) url.searchParams.set('httpUrl', httpUrl);
   const assetVer = String(cfg.embedAssetVersion || '').trim();
   if (assetVer) url.searchParams.set('v', assetVer);
-  if (typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches) {
+  if (shouldUseMobileCommentDock(opts)) {
     url.searchParams.set('mobileDock', '1');
   }
   return url.toString();
@@ -954,7 +960,9 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
     }
   };
   window.addEventListener('message', onMessage);
-  bindMobileEmbedDock(embedWrap, iframe);
+  if (shouldUseMobileCommentDock(opts)) {
+    bindMobileEmbedDock(embedWrap, iframe);
+  }
   return true;
 }
 
@@ -1032,7 +1040,9 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
 
   bindComposeReveal(form, editor, { metaEl, actionsEl });
 
-  const mobileDock = bindMobileDirectDock(root, form, editor);
+  const mobileDock = shouldUseMobileCommentDock(opts)
+    ? bindMobileDirectDock(root, form, editor)
+    : null;
 
   let comments = [];
 
