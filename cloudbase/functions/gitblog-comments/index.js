@@ -147,12 +147,18 @@ function nestComments(rows) {
   return roots;
 }
 
+function stripMentionHtml(html) {
+  return String(html || '')
+    .replace(/<span class="cb-mention">@[^<]*<\/span>\s*/gi, '')
+    .trim();
+}
+
 function publicComment(row) {
   return {
     _id: row._id,
     path: row.path,
     nick: row.nick || '访客',
-    contentHtml: row.contentHtml,
+    contentHtml: stripMentionHtml(row.contentHtml),
     parentId: row.parentId || null,
     replyToNick: row.replyToNick || null,
     createdAt: row.createdAt,
@@ -162,17 +168,6 @@ function publicComment(row) {
 
 function isValidEmail(s) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || '').trim());
-}
-
-function ensureMentionHtml(html, nick) {
-  const name = String(nick || '访客').trim() || '访客';
-  const plain = stripPlain(html);
-  const mention = `@${name}`;
-  if (plain.startsWith(mention)) return html;
-  const safe = name.replace(/[&<>"']/g, c =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
-  );
-  return `<span class="cb-mention">@${safe}</span> ${html}`.trim();
 }
 
 function isReplyNotifyEnabled() {
@@ -269,7 +264,6 @@ async function handlePost(event, context) {
     if (!parentDoc || parentDoc.path !== path) return jsonErr('回复目标不存在');
     if ((parentDoc.status || 'visible') !== 'visible') return jsonErr('无法回复该评论');
     replyToNick = String(parentDoc.nick || '访客').trim() || '访客';
-    contentHtml = ensureMentionHtml(contentHtml, replyToNick);
     if (parentDoc.parentId) {
       parentId = String(parentDoc.parentId).trim();
     }
