@@ -1,5 +1,0 @@
-year,province_id,track,school_name,major_id,major_name,min_score,min_rank,source
-# 专业投档线补充表：与 school-lines.csv 院校线配合使用；有专业线时优先展示专业线
-# track 填 physics（物理/理科）或 history（历史/文科）
-# 示例（请替换为当年省考试院/阳光高考公开数据）：
-# 2020,gd,physics,浙江大学,cs,计算机科学与技术,665,1200,广东省教育考试院

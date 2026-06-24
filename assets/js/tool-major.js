@@ -2,8 +2,6 @@ import { initToolPage, mountToolComments, $, escapeHtml, copyText } from './tool
 import { CONFIG } from './config.js';
 import { INTEREST_OPTIONS, SKILL_DIMS, DISCIPLINE_META, SUBJECTS, getMajorById, majorReferenceLinks, describeMajorTraits } from './tool-major-data.js';
 import { scoreMajors, formatResultText } from './tool-major-engine.js';
-import { PROVINCES } from './tool-admission-data.js';
-import { recommendSchools, formatSchoolRecsText } from './tool-admission-engine.js';
 import { drawMajorResultShareImage, drawMajorDetailShareImage, showShareImagePreview, toolPageUrl } from './tool-share-image.js';
 
 const COMMENTS_HINT = '你测出来适合什么专业？来聊聊你的志愿想法～';
@@ -19,7 +17,6 @@ initToolPage({
 
 const STORAGE_KEY = 'gitblog-major-quiz-v1';
 const RESULT_KEY = 'gitblog-major-last-result';
-const ADMISSION_KEY = 'gitblog-major-admission-v1';
 const TOTAL_STEPS = 5;
 
 const state = {
@@ -42,11 +39,8 @@ const state = {
 
 let view = 'quiz';
 let lastPayload = null;
-let lastSchoolRecs = null;
-let admissionInput = { province: '', score: '', rank: '' };
 let detailMajorId = '';
 let commentsMounted = false;
-let provinceSelectReady = false;
 
 function loadState() {
   try {
@@ -74,37 +68,6 @@ function loadLastResult() {
 function saveLastResult(payload) {
   try {
     sessionStorage.setItem(RESULT_KEY, JSON.stringify(payload));
-  } catch { /* ignore */ }
-}
-
-function loadAdmissionInput() {
-  try {
-    const raw = sessionStorage.getItem(ADMISSION_KEY);
-    if (!raw) return;
-    admissionInput = { ...admissionInput, ...JSON.parse(raw) };
-  } catch { /* ignore */ }
-}
-
-function saveAdmissionInput() {
-  try {
-    sessionStorage.setItem(ADMISSION_KEY, JSON.stringify(admissionInput));
-  } catch { /* ignore */ }
-}
-
-function loadSchoolRecs() {
-  try {
-    const raw = sessionStorage.getItem(`${ADMISSION_KEY}-recs`);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveSchoolRecs(rec) {
-  lastSchoolRecs = rec;
-  try {
-    if (rec) sessionStorage.setItem(`${ADMISSION_KEY}-recs`, JSON.stringify(rec));
-    else sessionStorage.removeItem(`${ADMISSION_KEY}-recs`);
   } catch { /* ignore */ }
 }
 
@@ -384,155 +347,6 @@ function getScoreForMajor(majorId) {
   return hit?.score || null;
 }
 
-function ensureProvinceSelect() {
-  const sel = $('majorAdmissionProvince');
-  if (!sel || provinceSelectReady) return;
-  sel.innerHTML = `<option value="">请选择省份</option>${PROVINCES.map(p =>
-    `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`
-  ).join('')}`;
-  provinceSelectReady = true;
-}
-
-function syncAdmissionForm() {
-  ensureProvinceSelect();
-  const prov = $('majorAdmissionProvince');
-  const score = $('majorAdmissionScore');
-  const rank = $('majorAdmissionRank');
-  if (prov) prov.value = admissionInput.province || '';
-  if (score) score.value = admissionInput.score ?? '';
-  if (rank) rank.value = admissionInput.rank ?? '';
-}
-
-function readAdmissionForm() {
-  admissionInput = {
-    province: $('majorAdmissionProvince')?.value || '',
-    score: $('majorAdmissionScore')?.value || '',
-    rank: $('majorAdmissionRank')?.value || '',
-  };
-  saveAdmissionInput();
-}
-
-function renderSchoolCard(item) {
-  const gapText = item.scoreGap >= 0 ? `高 ${item.scoreGap} 分` : `低 ${Math.abs(item.scoreGap)} 分`;
-  const rankText = item.rankGap >= 0 ? `位次领先约 ${item.rankGap.toLocaleString()}` : `位次落后约 ${Math.abs(item.rankGap).toLocaleString()}`;
-  const matchText = item.majorMatch ? ` · 专业匹配 ${item.majorMatch}%` : '';
-  const lineTag = item.lineType === 'major' ? '专业投档线' : item.lineType === 'school' ? '院校投档线' : '参考估算';
-  return `
-    <article class="major-school-card">
-      <div class="major-school-card-head">
-        <h4 class="major-school-name">${escapeHtml(item.schoolName)} <span class="major-school-tier-hint">${escapeHtml(item.schoolTier)} · ${escapeHtml(item.city)}</span></h4>
-        <p class="major-school-major">${escapeHtml(item.majorName)}${matchText}</p>
-      </div>
-      <p class="major-school-meta">
-        ${item.year} 年${lineTag}：约 ${item.minScore} 分 / 位次 ${item.minRank.toLocaleString()}；
-        你的成绩较参考线${gapText}，${rankText}
-      </p>
-    </article>
-  `;
-}
-
-function renderSchoolTier(title, badgeClass, hint, items) {
-  if (!items.length) return '';
-  return `
-    <section class="major-school-tier">
-      <h3 class="major-school-tier-title">
-        <span class="major-school-tier-badge ${badgeClass}">${escapeHtml(title)}</span>
-        <span class="major-school-tier-hint">${escapeHtml(hint)}</span>
-      </h3>
-      <div class="major-school-list">${items.map(renderSchoolCard).join('')}</div>
-    </section>
-  `;
-}
-
-function renderSchoolRecs(rec) {
-  const host = $('majorSchoolRecs');
-  const err = $('majorAdmissionError');
-  if (!host) return;
-
-  if (!rec) {
-    host.hidden = true;
-    host.innerHTML = '';
-    return;
-  }
-
-  if (!rec.ok) {
-    host.hidden = true;
-    if (err) {
-      err.textContent = rec.error || '查询失败';
-      err.hidden = false;
-    }
-    return;
-  }
-
-  if (err) err.hidden = true;
-  host.hidden = false;
-
-  if (rec.empty) {
-    host.innerHTML = `<p class="major-school-empty">${escapeHtml(rec.message)}</p>`;
-    return;
-  }
-
-  host.innerHTML = `
-    <p class="major-school-recs-head">
-      ${escapeHtml(rec.province.name)} · ${escapeHtml(rec.trackLabel)} ·
-      你的成绩 <strong>${rec.score}</strong> 分 / 省排名 <strong>${rec.rank.toLocaleString()}</strong>
-      （${rec.dataInfo?.mode === 'csv' ? `${rec.year} 年真实录取 CSV` : `${rec.year} 年参考估算`}）
-    </p>
-    ${rec.dataInfo?.note ? `<p class="major-school-recs-note">${escapeHtml(rec.dataInfo.note)}</p>` : ''}
-    ${renderSchoolTier('冲', 'is-reach', '录取有难度，可作为冲刺志愿', rec.grouped.reach)}
-    ${renderSchoolTier('稳', 'is-match', '分数位次较接近，较有希望', rec.grouped.match)}
-    ${renderSchoolTier('保', 'is-safety', '相对稳妥，建议作保底', rec.grouped.safety)}
-  `;
-}
-
-function runSchoolRecommendation() {
-  if (!lastPayload) return;
-  readAdmissionForm();
-  const err = $('majorAdmissionError');
-  const btn = $('majorAdmissionSubmit');
-  const score = Number(admissionInput.score);
-  const rank = Number(admissionInput.rank);
-  const majorScores = new Map(lastPayload.results.map(r => [r.major.id, r.score]));
-
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = '加载数据…';
-  }
-  if (err) err.hidden = true;
-
-  recommendSchools({
-    score,
-    rank,
-    province: admissionInput.province,
-    answers: getAnswers(),
-    majorIds: lastPayload.results.map(r => r.major.id),
-    majorScores,
-  }).then(rec => {
-    saveSchoolRecs(rec);
-    renderSchoolRecs(rec);
-    updateResultCopyText();
-  }).catch(e => {
-    if (err) {
-      err.textContent = `推荐失败：${e.message}`;
-      err.hidden = false;
-    }
-  }).finally(() => {
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = '查看院校推荐';
-    }
-  });
-}
-
-function updateResultCopyText() {
-  if (!$('majorResult') || !lastPayload) return;
-  let text = formatResultText(lastPayload);
-  if (lastSchoolRecs?.ok && !lastSchoolRecs.empty) {
-    text += `\n\n${formatSchoolRecsText(lastSchoolRecs)}`;
-  }
-  $('majorResult').dataset.text = text;
-}
-
 function renderResults(payload) {
   lastPayload = payload;
   saveLastResult(payload);
@@ -566,14 +380,7 @@ function renderResults(payload) {
     `;
   }).join('');
 
-  syncAdmissionForm();
-  lastSchoolRecs = loadSchoolRecs();
-  if (lastSchoolRecs?.ok && admissionInput.province && admissionInput.score && admissionInput.rank) {
-    renderSchoolRecs(lastSchoolRecs);
-  } else {
-    renderSchoolRecs(null);
-  }
-  updateResultCopyText();
+  $('majorResult').dataset.text = formatResultText(payload);
   ensureResultComments();
 }
 
@@ -589,10 +396,6 @@ function renderDetail(majorId) {
   const score = getScoreForMajor(majorId);
   const traits = describeMajorTraits(major);
   const links = majorReferenceLinks(major);
-  const schoolForMajor = lastSchoolRecs?.ok && !lastSchoolRecs.empty
-    ? [...(lastSchoolRecs.grouped.reach || []), ...(lastSchoolRecs.grouped.match || []), ...(lastSchoolRecs.grouped.safety || [])]
-      .filter(item => item.majorId === majorId)
-    : [];
 
   $('majorDetailBody').innerHTML = `
     <header class="major-detail-header">
@@ -621,12 +424,6 @@ function renderDetail(majorId) {
       <h3>填报提醒</h3>
       <p class="major-detail-caution">${escapeHtml(major.cautions)}</p>
     </section>
-    ${schoolForMajor.length ? `
-    <section class="major-detail-block">
-      <h3>分数段院校参考</h3>
-      <p class="major-detail-caution">基于你输入的 ${lastSchoolRecs.score} 分 / 省排名 ${lastSchoolRecs.rank.toLocaleString()}（${escapeHtml(lastSchoolRecs.province.name)}）</p>
-      <div class="major-school-list">${schoolForMajor.map(renderSchoolCard).join('')}</div>
-    </section>` : ''}
     <section class="major-detail-block">
       <h3>延伸阅读</h3>
       <div class="major-detail-links">
@@ -669,11 +466,7 @@ function resetQuiz() {
   });
   sessionStorage.removeItem(STORAGE_KEY);
   sessionStorage.removeItem(RESULT_KEY);
-  sessionStorage.removeItem(ADMISSION_KEY);
-  sessionStorage.removeItem(`${ADMISSION_KEY}-recs`);
   lastPayload = null;
-  lastSchoolRecs = null;
-  admissionInput = { province: '', score: '', rank: '' };
   detailMajorId = '';
   showQuiz();
   renderStep();
@@ -683,7 +476,6 @@ function routeFromUrl() {
   const majorId = new URLSearchParams(location.search).get('major');
   if (majorId) {
     lastPayload = loadLastResult();
-    lastSchoolRecs = loadSchoolRecs();
     renderDetail(majorId);
     return true;
   }
@@ -691,7 +483,6 @@ function routeFromUrl() {
 }
 
 loadState();
-loadAdmissionInput();
 if (!routeFromUrl()) {
   renderStep();
 }
@@ -719,11 +510,6 @@ $('majorNext').addEventListener('click', () => {
 
 $('majorRetry').addEventListener('click', resetQuiz);
 
-$('majorAdmissionForm')?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  runSchoolRecommendation();
-});
-
 $('majorCopy').addEventListener('click', async () => {
   const text = $('majorResult').dataset.text || '';
   if (!text) return;
@@ -740,8 +526,6 @@ $('majorDetailBack').addEventListener('click', () => {
   if (lastPayload) {
     setView('result');
     history.replaceState(null, '', toolPageUrl('tools/tool-major.html'));
-    syncAdmissionForm();
-    if (lastSchoolRecs) renderSchoolRecs(lastSchoolRecs);
     ensureResultComments();
     return;
   }
