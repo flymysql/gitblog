@@ -338,30 +338,6 @@ const PAGES = [
         <p class="major-result-profile" id="majorProfile"></p>
         <p class="major-result-filter-note" id="majorFilterNote"></p>
         <div class="major-result-cards" id="majorCards"></div>
-        <section class="major-admission-panel" id="majorAdmission">
-          <h2 class="major-admission-heading">分数定位院校</h2>
-          <p class="major-admission-desc">输入今年高考分数与省内排名（位次），结合上方专业倾向，参考往年录取分数线为你推荐院校专业（冲 / 稳 / 保）。</p>
-          <form class="major-admission-form" id="majorAdmissionForm">
-            <label class="major-admission-field">
-              <span class="major-quiz-label">所在省份</span>
-              <select class="major-admission-input" id="majorAdmissionProvince" required>
-                <option value="">请选择省份</option>
-              </select>
-            </label>
-            <label class="major-admission-field">
-              <span class="major-quiz-label">高考分数</span>
-              <input class="major-admission-input" id="majorAdmissionScore" type="number" inputmode="numeric" min="200" max="900" placeholder="如 625" required>
-            </label>
-            <label class="major-admission-field">
-              <span class="major-quiz-label">省排名（位次）</span>
-              <input class="major-admission-input" id="majorAdmissionRank" type="number" inputmode="numeric" min="1" placeholder="如 8500" required>
-            </label>
-            <button type="submit" class="tool-kit-btn" id="majorAdmissionSubmit">查看院校推荐</button>
-          </form>
-          <p class="major-admission-error tool-kit-error" id="majorAdmissionError" hidden></p>
-          <div class="major-school-recs" id="majorSchoolRecs" hidden></div>
-          <p class="tool-kit-hint major-admission-note">院校线来自开源历年录取 CSV（2016–2020，labolado/gaokao_2016-2020）；可在 data/admission/major-lines.csv 补充专业投档线。浙江、上海暂无开源数据时将使用估算参考。</p>
-        </section>
         <div class="major-quiz-actions tool-kit-toolbar">
           <button type="button" class="tool-kit-btn is-ghost" id="majorShare">生成分享图</button>
           <button type="button" class="tool-kit-btn is-ghost" id="majorCopy">复制结果</button>

@@ -27,7 +27,6 @@ import {
   pushBaiduUrls,
   collectPublicUrls,
 } from './seo-build.mjs';
-import { importAdmissionData } from './import-admission-data.mjs';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
 const cfgRaw = readFileSync('assets/js/config.js', 'utf8');
@@ -70,14 +69,6 @@ const INDEX_FILE = 'data/posts.json';
 const OG_DIR = 'assets/og';
 
 console.log('Site URL:', SITE_URL);
-
-try {
-  const hasShards = existsSync(join('data/admission/provinces/gd-physics.json'));
-  const admMeta = await importAdmissionData({ download: !hasShards });
-  console.log(`录取 CSV 已就绪：${admMeta.schoolLineCount} 条院校线，${admMeta.shards.length} 个分省 JSON`);
-} catch (e) {
-  console.warn('[admission] 导入跳过:', e.message);
-}
 
 function sitePathPrefixFromBuild() {
   if (!SITE_URL) return '';

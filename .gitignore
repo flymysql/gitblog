@@ -2,9 +2,6 @@ node_modules/
 .DS_Store
 *.log
 
-# 录取原始包（构建时自动下载）；CSV 与分省 JSON 纳入版本库
-data/admission/admissions.json.gz
-
 .idea/
 .vscode/
 .env
