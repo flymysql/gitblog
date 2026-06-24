@@ -129,9 +129,20 @@ function escapeHtml(s) {
 function postHeight(ready = false) {
   clearTimeout(_heightTimer);
   _heightTimer = setTimeout(() => {
-    const h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    const form = document.querySelector('.cb-compose.is-sheet-open');
+    const composeOpen = !!form;
+    const composeHeight = form ? Math.ceil(form.getBoundingClientRect().height) : 0;
+    const h = composeOpen
+      ? composeHeight
+      : Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
     try {
-      window.parent.postMessage({ type: 'gitblog-comments-height', height: h, ready }, '*');
+      window.parent.postMessage({
+        type: 'gitblog-comments-height',
+        height: h,
+        composeHeight,
+        composeOpen,
+        ready,
+      }, '*');
     } catch { /* ignore */ }
   }, 80);
 }
@@ -491,7 +502,11 @@ function bindMobileComposeSheet(form, editor) {
 
   const close = () => {
     form.classList.remove('is-sheet-open');
-    document.documentElement.classList.remove('cb-compose-sheet-open');
+    root?.classList.remove('cb-comments--compose-only');
+    const listEl = root?.querySelector('.cb-comments-list');
+    const loadingEl = root?.querySelector('.cb-comments-loading');
+    if (listEl?.innerHTML) listEl.hidden = false;
+    if (loadingEl) loadingEl.hidden = true;
     editor.body.blur();
     postHeight(true);
     try {
@@ -501,7 +516,11 @@ function bindMobileComposeSheet(form, editor) {
 
   const open = () => {
     form.classList.add('is-sheet-open');
-    document.documentElement.classList.add('cb-compose-sheet-open');
+    root?.classList.add('cb-comments--compose-only');
+    const listEl = root?.querySelector('.cb-comments-list');
+    const loadingEl = root?.querySelector('.cb-comments-loading');
+    if (listEl) listEl.hidden = true;
+    if (loadingEl) loadingEl.hidden = true;
     postHeight(true);
     setTimeout(() => editor.body.focus(), 120);
   };

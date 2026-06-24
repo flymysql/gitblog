@@ -493,44 +493,34 @@
   cursor: pointer;
 }
 
-.cb-mobile-compose-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 998;
-  background: rgba(0, 0, 0, 0.45);
-}
-
-.cb-mobile-compose-backdrop[hidden] { display: none !important; }
-
 body.cb-has-mobile-dock {
   scroll-padding-bottom: calc(56px + env(safe-area-inset-bottom));
 }
 
-body.cb-mobile-compose-open {
-  overflow: hidden;
-}
-
-body.cb-mobile-compose-open .cb-embed-wrap--sheet {
-  position: fixed;
-  inset: 0;
-  z-index: 999;
+/* embed：输入时 iframe 固定底栏，页面仍可滚动 */
+.cb-embed-wrap--compose-pinned {
+  height: 0;
+  min-height: 0;
   margin: 0;
-  padding: 0;
-  background: var(--bg-elev);
-  display: flex;
-  flex-direction: column;
+  overflow: visible;
 }
 
-body.cb-mobile-compose-open .cb-embed-wrap--sheet .cb-embed-frame {
-  flex: 1;
+.cb-embed-wrap--compose-pinned .cb-embed-frame {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 900;
   width: 100% !important;
-  height: 100% !important;
   min-height: 0 !important;
-  max-height: none !important;
-  border-radius: 0;
+  max-height: 85vh !important;
+  border: none;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+  background: var(--bg-elev);
 }
 
-body.cb-mobile-compose-open .cb-embed-wrap--sheet .cb-embed-hint {
+.cb-embed-wrap--compose-pinned .cb-embed-hint {
   display: none !important;
 }
 
@@ -538,13 +528,13 @@ body.cb-mobile-compose-open .cb-embed-wrap--sheet .cb-embed-hint {
   display: none;
 }
 
-.cb-comments--sheet-host {
-  position: relative;
-  z-index: 999;
-}
-
 @media (max-width: 640px) {
   .cb-comments--mobile-dock .cb-compose:not(.is-sheet-open) {
+    display: none !important;
+  }
+
+  .cb-comments--mobile-dock.cb-comments--compose-only .cb-comments-list,
+  .cb-comments--mobile-dock.cb-comments--compose-only .cb-comments-loading {
     display: none !important;
   }
 
@@ -571,13 +561,13 @@ body.cb-mobile-compose-open .cb-embed-wrap--sheet .cb-embed-hint {
     cursor: pointer;
   }
 
-  .cb-comments--mobile-dock .cb-compose.is-sheet-open,
-  .cb-comments--sheet-host .cb-compose.is-sheet-open {
+  /* 直连模式：表单固定底栏，页面可继续滚动 */
+  .cb-comments--compose-pinned .cb-compose.is-sheet-open {
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 1000;
+    z-index: 900;
     display: block !important;
     max-height: min(85vh, 640px);
     overflow: auto;
