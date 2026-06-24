@@ -102,11 +102,12 @@ function renderCommentsSection(meta, slug) {
   wrap.innerHTML = `
     <div class="comments-title">评论</div>
     <div id="commentsRoot"></div>
-    <p class="comments-end-hint" aria-hidden="true">没有更多评论了~</p>
+    <p class="comments-end-hint" hidden aria-hidden="true"></p>
   `;
   mountComments($('#commentsRoot'), term, {
     pageTitle: meta?.title || document.title,
     pageUrl: location.href,
+    context: 'post',
   });
 }
 
