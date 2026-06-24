@@ -200,7 +200,7 @@ function sanitizeCommentHtml(raw) {
       [...child.attributes].forEach(attr => {
         const n = attr.name.toLowerCase();
         if (tag === 'A' && (n === 'href' || n === 'title' || n === 'target' || n === 'rel')) return;
-        if (tag === 'IMG' && (n === 'src' || n === 'alt' || n === 'title' || n === 'loading')) return;
+        if (tag === 'IMG' && (n === 'src' || n === 'alt' || n === 'title' || n === 'loading' || n === 'data-cb-fileid')) return;
         if (tag === 'SPAN' && n === 'class') {
           const cls = child.getAttribute('class') || '';
           if (cls === 'cb-uploading') return;
@@ -397,8 +397,12 @@ class CommentRichEditor {
     this.body.focus();
     document.execCommand('insertHTML', false, placeholder.outerHTML);
     try {
-      const url = await this.onUpload(file);
-      const html = `<img src="${escapeHtml(url)}" alt="评论图片" loading="lazy">`;
+      const result = await this.onUpload(file);
+      const url = typeof result === 'string' ? result : result?.url;
+      const fileId = typeof result === 'object' ? result?.fileId : '';
+      if (!url) throw new Error('图片上传失败');
+      const fileIdAttr = fileId ? ` data-cb-fileid="${escapeHtml(fileId)}"` : '';
+      const html = `<img src="${escapeHtml(url)}" alt="评论图片" loading="lazy"${fileIdAttr}>`;
       this.root.querySelector('.cb-uploading')?.replaceWith(
         ...(() => {
           const t = document.createElement('template');
@@ -631,7 +635,7 @@ function mountInlineReply(slot, ctx) {
         mime: file.type,
         base64,
       });
-      return res.url;
+      return { url: res.url, fileId: res.fileId };
     },
   });
   // 不再自动插入 @ 前缀
@@ -772,7 +776,7 @@ async function mount() {
         mime: file.type,
         base64,
       });
-      return res.url;
+      return { url: res.url, fileId: res.fileId };
     },
   });
 
