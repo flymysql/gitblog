@@ -318,15 +318,18 @@ function writeGuestNickCookie(nick) {
   document.cookie = `${GUEST_NICK_COOKIE}=${safe}; path=/; max-age=${maxAge}; SameSite=Lax`;
 }
 
+function sanitizeCustomNick(raw) {
+  return String(raw || '').replace(/\d/g, '').trim().slice(0, 40);
+}
+
 function randomGuestNick() {
   const adj = GUEST_NICK_ADJS[Math.floor(Math.random() * GUEST_NICK_ADJS.length)];
   const noun = GUEST_NICK_NOUNS[Math.floor(Math.random() * GUEST_NICK_NOUNS.length)];
-  const num = String(Math.floor(100 + Math.random() * 900));
-  return `${adj}${noun}${num}`;
+  return `${adj}${noun}`;
 }
 
 function getOrCreateGuestNick() {
-  const cached = readGuestNickCookie();
+  const cached = sanitizeCustomNick(readGuestNickCookie());
   if (cached) return cached;
   const nick = randomGuestNick();
   writeGuestNickCookie(nick);
@@ -336,8 +339,12 @@ function getOrCreateGuestNick() {
 function resolveCommentNick(inputNick) {
   const trimmed = String(inputNick || '').trim();
   if (trimmed) {
-    writeGuestNickCookie(trimmed);
-    return trimmed.slice(0, 40);
+    const nick = sanitizeCustomNick(trimmed);
+    if (nick) {
+      writeGuestNickCookie(nick);
+      return nick;
+    }
+    return getOrCreateGuestNick();
   }
   return getOrCreateGuestNick();
 }
@@ -346,11 +353,10 @@ function prefillCommentNick(inputEl) {
   if (!inputEl || inputEl.value.trim()) return;
   const profile = readProfile();
   if (profile.nick) {
-    inputEl.value = profile.nick;
+    inputEl.value = sanitizeCustomNick(profile.nick) || getOrCreateGuestNick();
     return;
   }
-  const cached = readGuestNickCookie();
-  inputEl.value = cached || getOrCreateGuestNick();
+  inputEl.value = getOrCreateGuestNick();
 }
 
 function formatTime(ts) {
@@ -381,11 +387,12 @@ function fileToBase64(file) {
 }
 
 class CommentRichEditor {
-  constructor(root, { allowImage = true, maxLength = 5000, onUpload, onChange, alwaysShowBar = false } = {}) {
+  constructor(root, { allowImage = true, maxLength = 5000, onUpload, onDiscardUpload, onChange, alwaysShowBar = false } = {}) {
     this.root = root;
     this.allowImage = allowImage;
     this.maxLength = maxLength;
     this.onUpload = onUpload;
+    this.onDiscardUpload = onDiscardUpload;
     this.onChange = onChange;
     this.alwaysShowBar = alwaysShowBar;
     this.attachments = [];
@@ -527,6 +534,9 @@ class CommentRichEditor {
   _removeAttachment(id) {
     const att = this.attachments.find(a => a.id === id);
     if (att?.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(att.previewUrl);
+    if (att?.fileId) {
+      this.onDiscardUpload?.(att.fileId).catch(() => null);
+    }
     this.attachments = this.attachments.filter(a => a.id !== id);
     this._syncAttachmentsBar();
     this._syncCount();
@@ -863,6 +873,7 @@ function mountInlineReply(slot, ctx) {
     allowImage: cfg.allowImage,
     maxLength: cfg.maxLength,
     alwaysShowBar: true,
+    onDiscardUpload: fileId => callApi({ action: 'DISCARD_UPLOAD', fileId }).catch(() => null),
     onUpload: async file => {
       const base64 = await fileToBase64(file);
       const res = await callApi({
@@ -1011,6 +1022,7 @@ async function mount() {
   const editor = new CommentRichEditor(editorHost, {
     allowImage: cfg.allowImage,
     maxLength: cfg.maxLength,
+    onDiscardUpload: fileId => callApi({ action: 'DISCARD_UPLOAD', fileId }).catch(() => null),
     onUpload: async file => {
       const base64 = await fileToBase64(file);
       const res = await callApi({
