@@ -368,12 +368,16 @@ async function handleGet(event) {
   return jsonOk({ comments: nestComments(comments) });
 }
 
+function hasStoredCommentImages(html) {
+  return /<img\b[^>]*\bdata-cb-fileid\s*=\s*["']cloud:\/\//i.test(String(html || ''));
+}
+
 async function handlePost(event, context) {
   const path = String(event.path || '').trim();
   let contentHtml = await resolveCommentImageUrls(sanitizeHtml(event.contentHtml));
   const plain = stripPlain(contentHtml);
   if (!path) return jsonErr('缺少 path');
-  if (!plain) return jsonErr('评论内容不能为空');
+  if (!plain && !hasStoredCommentImages(contentHtml)) return jsonErr('评论内容不能为空');
   if (plain.length > MAX_PLAIN_HINT) return jsonErr('评论内容过长');
 
   const ip = context?.requestContext?.sourceIp || context?.CLIENTIP || '';
