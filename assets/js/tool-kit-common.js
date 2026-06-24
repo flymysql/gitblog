@@ -5,10 +5,10 @@ import { isCommentsReady, mountComments, getCommentsProvider } from './comments-
 
 export const TOOLS_INDEX = 'tools/';
 
-export function initToolPage({ title, description, path, giscusTerm, commentsHint, deferComments = false }) {
+export function initToolPage({ title, description, path, giscusTerm, commentsHint, deferComments = false, image }) {
   initSite({ active: TOOLS_INDEX });
-  setMeta({ title, description, type: 'website' });
   const base = CONFIG.site.url || location.origin;
+  setMeta({ title, description, type: 'website', url: `${base}/${path}`, image });
   setJsonLd({
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
