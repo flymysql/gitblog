@@ -49,11 +49,23 @@ cd cloudbase
 tcb hosting deploy ./static -e gitbolg-d7gmnsrw46e011706
 ```
 
-部署后访问（示例）：
+部署后 CLI 会输出实际访问地址，形如：
 
-`https://gitbolg-d7gmnsrw46e011706.tcloudbaseapp.com/comments-embed.html?path=test&env=gitbolg-d7gmnsrw46e011706`
+`https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com`
 
-博客页会以 iframe 加载该地址，嵌入页与 CloudBase API 同域，**不触发跨域**。
+**注意：** 托管域名是 `{envId}-{应用ID}.tcloudbaseapp.com`，**不是** `{envId}.tcloudbaseapp.com`。若填错，博客页 iframe 会 404。
+
+将该域名填入 `config.js` 的 `embedBaseUrl`（或后台设置的「托管域名」）：
+
+```js
+embedBaseUrl: 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com',
+```
+
+验证：浏览器打开
+
+`https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com/comments-embed.html?path=test&env=gitbolg-d7gmnsrw46e011706`
+
+应能看到评论加载界面。
 
 ### 静态目录文件
 
@@ -102,6 +114,7 @@ cloudbase: {
   region: 'ap-shanghai',
   functionName: 'gitblog-comments',
   accessMode: 'embed',           // 免费版推荐
+  embedBaseUrl: 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com', // hosting deploy 输出的域名
   embedPage: 'comments-embed.html',
   placeholderNick: '访客',
   moderation: false,
