@@ -534,6 +534,7 @@ function bindMobileComposeSheet(form, editor) {
   }
 
   const close = () => {
+    if (!form.classList.contains('is-sheet-open')) return;
     form.classList.remove('is-sheet-open');
     root?.classList.remove('cb-comments--compose-only');
     const listEl = root?.querySelector('.cb-comments-list');
@@ -548,18 +549,21 @@ function bindMobileComposeSheet(form, editor) {
   };
 
   const open = () => {
-    form.classList.add('is-sheet-open');
-    root?.classList.add('cb-comments--compose-only');
-    const listEl = root?.querySelector('.cb-comments-list');
-    const loadingEl = root?.querySelector('.cb-comments-loading');
-    if (listEl) listEl.hidden = true;
-    if (loadingEl) loadingEl.hidden = true;
-    postHeight(true);
+    const wasOpen = form.classList.contains('is-sheet-open');
+    if (!wasOpen) {
+      form.classList.add('is-sheet-open');
+      root?.classList.add('cb-comments--compose-only');
+      const listEl = root?.querySelector('.cb-comments-list');
+      const loadingEl = root?.querySelector('.cb-comments-loading');
+      if (listEl) listEl.hidden = true;
+      if (loadingEl) loadingEl.hidden = true;
+      postHeight(true);
+    }
     setTimeout(() => {
       editor._autosizeBody?.();
       postHeight(true);
       editor.body.focus();
-    }, 120);
+    }, wasOpen ? 0 : 120);
   };
 
   form.querySelector('.cb-mobile-sheet-close')?.addEventListener('click', close);
