@@ -4,9 +4,9 @@
 // ============================================================================
 import esbuild from 'esbuild';
 import {
-  readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, statSync,
+  readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, statSync, unlinkSync,
 } from 'node:fs';
-import { join } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 
 const DIST = 'assets/dist';
 
@@ -128,6 +128,18 @@ function syncSwPrecache(version) {
   writeFileSync('sw.js', sw);
 }
 
+function inlineCssImports(entryPath, seen = new Set()) {
+  const abs = resolve(entryPath);
+  if (seen.has(abs)) return '';
+  seen.add(abs);
+  let css = readFileSync(abs, 'utf8');
+  css = css.replace(/@import\s+['"]([^'"]+)['"]\s*;/g, (_, rel) => {
+    const imported = resolve(dirname(abs), rel);
+    return inlineCssImports(imported, seen);
+  });
+  return css;
+}
+
 export async function bundleAssets() {
   mkdirSync(DIST, { recursive: true });
   const version = readVersion();
@@ -146,12 +158,16 @@ export async function bundleAssets() {
   }
 
   for (const [out, src] of Object.entries(CSS_ENTRIES)) {
+    const inlined = inlineCssImports(src);
+    const tmp = join(DIST, `.tmp-${out}`);
+    writeFileSync(tmp, inlined);
     await esbuild.build({
-      entryPoints: [src],
+      entryPoints: [tmp],
       outfile: join(DIST, out),
       minify: true,
       logLevel: 'warning',
     });
+    try { unlinkSync(tmp); } catch { /* ignore */ }
   }
 
   const htmlFiles = [
