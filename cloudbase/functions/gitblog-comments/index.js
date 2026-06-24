@@ -115,9 +115,10 @@ function nestComments(rows) {
       roots.push(c);
     }
   });
-  const sortFn = (a, b) => (a.createdAt || 0) - (b.createdAt || 0);
-  roots.sort(sortFn);
-  map.forEach(c => c.replies.sort(sortFn));
+  const sortNewest = (a, b) => (b.createdAt || 0) - (a.createdAt || 0);
+  const sortOldest = (a, b) => (a.createdAt || 0) - (b.createdAt || 0);
+  roots.sort(sortNewest);
+  map.forEach(c => c.replies.sort(sortOldest));
   return roots;
 }
 
@@ -139,7 +140,7 @@ async function handleGet(event) {
   const limit = Math.min(Math.max(Number(event.limit) || 50, 1), 200);
   const res = await db.collection(COLLECTION)
     .where({ path })
-    .orderBy('createdAt', 'asc')
+    .orderBy('createdAt', 'desc')
     .limit(limit)
     .get();
   const rows = (res.data || []).filter(r => {
