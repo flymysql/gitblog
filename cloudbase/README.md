@@ -145,9 +145,39 @@ embedBaseUrl: 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com',
 
 ### 回复邮件通知（可选）
 
-当被回复的评论**留有邮箱**时，云函数会异步发送通知邮件。默认关闭，配置 SMTP 后设 `REPLY_NOTIFY_ENABLED=1` 即可。
+当被回复的评论**留有邮箱**时，云函数会异步发送通知邮件。
 
-QQ 邮箱示例：在 QQ 邮箱设置中开启 SMTP，使用授权码作为 `SMTP_PASS`。
+#### 方式 A：自动部署（推荐，授权码不进 Git）
+
+1. 在 QQ 邮箱 → 设置 → 账户 → 开启 **SMTP** → 生成 **授权码**
+2. 在 `cloudbase/` 目录：
+
+```bash
+cp secrets.env.example secrets.env
+# 编辑 secrets.env，把 SMTP_PASS 改成你的授权码
+node deploy-comments-fn.mjs -e gitbolg-d7gmnsrw46e011706
+```
+
+`secrets.env` 已加入 `.gitignore`，部署脚本会临时注入环境变量，**部署后自动从 cloudbaserc.json 清除授权码**。
+
+当前默认发件邮箱：`237199972@qq.com`（可在 `secrets.env` 修改）。
+
+#### 方式 B：控制台手动配置
+
+云函数 `gitblog-comments` → 环境变量：
+
+| 变量 | 值 |
+|------|-----|
+| `REPLY_NOTIFY_ENABLED` | `1` |
+| `SMTP_HOST` | `smtp.qq.com` |
+| `SMTP_PORT` | `465` |
+| `SMTP_USER` | `237199972@qq.com` |
+| `SMTP_PASS` | QQ 邮箱授权码 |
+| `SMTP_FROM` | `237199972@qq.com` |
+
+保存后重新部署云函数。
+
+> 授权码只填在 `secrets.env` 或控制台，**不要**提交到 Git 仓库。
 
 ## 8. 前端配置
 
