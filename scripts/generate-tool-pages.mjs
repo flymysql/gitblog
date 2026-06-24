@@ -279,7 +279,7 @@ const PAGES = [
         <p class="farm-data-note" id="farmDataNote"></p>
         <div class="farm-goals" id="farmGoals" role="group" aria-label="种植目标"></div>
         <div class="farm-controls">
-          <label>我的等级 <input type="number" id="farmLevel" min="0" max="99" value="10"></label>
+          <label>我的等级 <input type="number" id="farmLevel" min="0" max="100" value="10"></label>
           <label>最长间隔（小时） <input type="number" id="farmInterval" min="1" max="72" step="0.5" value="8"></label>
           <label>土地类型
             <select id="farmLand">
@@ -288,6 +288,7 @@ const PAGES = [
               <option value="red">红土地</option>
               <option value="black">黑土地</option>
               <option value="gold">金土地</option>
+              <option value="purple">紫晶土地</option>
             </select>
           </label>
           <label class="farm-check"><input type="checkbox" id="farmLevelOnly" checked> 只显示当前等级能种的</label>
