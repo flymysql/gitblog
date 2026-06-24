@@ -462,6 +462,209 @@ function bindComposeReveal(form, editor, { metaEl, actionsEl }) {
   refresh();
 }
 
+function isMobileCommentDock() {
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
+}
+
+/** 移动端：评论表单底部抽屉（直连模式） */
+function bindMobileComposeSheet(form, editor, { onClose, onOpen } = {}) {
+  if (!isMobileCommentDock()) {
+    return { open: () => {}, close: () => {}, notifySubmitted: () => {} };
+  }
+
+  const root = form.closest('.cb-comments');
+  root?.classList.add('cb-comments--mobile-dock');
+
+  if (!form.querySelector('.cb-mobile-sheet-header')) {
+    const header = document.createElement('div');
+    header.className = 'cb-mobile-sheet-header';
+    header.innerHTML = `
+      <span class="cb-mobile-sheet-title">发表评论</span>
+      <button type="button" class="cb-mobile-sheet-close" aria-label="关闭">取消</button>
+    `;
+    form.prepend(header);
+  }
+
+  const close = () => {
+    form.classList.remove('is-sheet-open');
+    document.documentElement.classList.remove('cb-compose-sheet-open');
+    editor.body.blur();
+    onClose?.();
+  };
+
+  const open = () => {
+    form.classList.add('is-sheet-open');
+    document.documentElement.classList.add('cb-compose-sheet-open');
+    onOpen?.();
+    setTimeout(() => editor.body.focus(), 120);
+  };
+
+  form.querySelector('.cb-mobile-sheet-close')?.addEventListener('click', close);
+
+  window.addEventListener('message', e => {
+    if (e.data?.type === 'gitblog-comments-compose-open') open();
+    if (e.data?.type === 'gitblog-comments-compose-close') close();
+  });
+
+  return {
+    open,
+    close,
+    notifySubmitted: () => {
+      close();
+      try {
+        window.parent.postMessage({ type: 'gitblog-comments-compose-submitted' }, '*');
+      } catch { /* ignore */ }
+    },
+  };
+}
+
+function createMobileDockChrome() {
+  const dock = document.createElement('div');
+  dock.className = 'cb-mobile-dock';
+  dock.hidden = true;
+  dock.innerHTML = `
+    <div class="cb-mobile-dock-bar">
+      <button type="button" class="cb-mobile-dock-trigger" aria-label="写评论">说点什么…</button>
+    </div>
+  `;
+  document.body.appendChild(dock);
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'cb-mobile-compose-backdrop';
+  backdrop.hidden = true;
+  document.body.appendChild(backdrop);
+
+  return { dock, backdrop };
+}
+
+/** 移动端：父页底部吸附条 + iframe 全屏抽屉（embed 模式） */
+function bindMobileEmbedDock(embedWrap, iframe) {
+  if (!isMobileCommentDock()) return () => {};
+
+  const { dock, backdrop } = createMobileDockChrome();
+  let composeOpen = false;
+  let sectionVisible = false;
+
+  const postDockState = visible => {
+    try {
+      iframe.contentWindow?.postMessage({ type: 'gitblog-comments-dock', visible }, '*');
+    } catch { /* ignore */ }
+  };
+
+  const syncDock = () => {
+    const show = sectionVisible && !composeOpen;
+    dock.hidden = !show;
+    document.body.classList.toggle('cb-has-mobile-dock', show);
+    postDockState(show);
+  };
+
+  const io = new IntersectionObserver(entries => {
+    sectionVisible = entries.some(e => e.isIntersecting);
+    syncDock();
+  }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
+  io.observe(embedWrap);
+
+  const openCompose = () => {
+    composeOpen = true;
+    syncDock();
+    document.body.classList.add('cb-mobile-compose-open');
+    backdrop.hidden = false;
+    embedWrap.classList.add('cb-embed-wrap--sheet');
+    iframe.contentWindow?.postMessage({ type: 'gitblog-comments-compose-open' }, '*');
+  };
+
+  const closeCompose = () => {
+    composeOpen = false;
+    document.body.classList.remove('cb-mobile-compose-open');
+    backdrop.hidden = true;
+    embedWrap.classList.remove('cb-embed-wrap--sheet');
+    syncDock();
+    iframe.contentWindow?.postMessage({ type: 'gitblog-comments-compose-close' }, '*');
+  };
+
+  dock.querySelector('.cb-mobile-dock-trigger')?.addEventListener('click', openCompose);
+  backdrop.addEventListener('click', closeCompose);
+
+  const onMessage = e => {
+    if (e.source !== iframe?.contentWindow) return;
+    if (e.data?.type === 'gitblog-comments-compose-close') closeCompose();
+    if (e.data?.type === 'gitblog-comments-compose-submitted') closeCompose();
+  };
+  window.addEventListener('message', onMessage);
+
+  return () => {
+    io.disconnect();
+    dock.remove();
+    backdrop.remove();
+    window.removeEventListener('message', onMessage);
+    document.body.classList.remove('cb-has-mobile-dock', 'cb-mobile-compose-open');
+  };
+}
+
+/** 移动端：父页底部吸附条 + 本地表单抽屉（直连模式） */
+function bindMobileDirectDock(observeEl, form, editor) {
+  if (!isMobileCommentDock()) return null;
+
+  const { dock, backdrop } = createMobileDockChrome();
+  let composeOpen = false;
+  let sectionVisible = false;
+
+  const syncDock = () => {
+    const show = sectionVisible && !composeOpen;
+    dock.hidden = !show;
+    document.body.classList.toggle('cb-has-mobile-dock', show);
+  };
+
+  const sheet = bindMobileComposeSheet(form, editor, {
+    onOpen: () => {
+      document.body.classList.add('cb-mobile-compose-open');
+      backdrop.hidden = false;
+      observeEl.classList.add('cb-comments--sheet-host');
+    },
+    onClose: () => {
+      composeOpen = false;
+      document.body.classList.remove('cb-mobile-compose-open');
+      backdrop.hidden = true;
+      observeEl.classList.remove('cb-comments--sheet-host');
+      syncDock();
+    },
+  });
+
+  const io = new IntersectionObserver(entries => {
+    sectionVisible = entries.some(e => e.isIntersecting);
+    syncDock();
+  }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
+  io.observe(observeEl);
+
+  const openCompose = () => {
+    composeOpen = true;
+    syncDock();
+    sheet.open();
+  };
+
+  const closeCompose = () => {
+    composeOpen = false;
+    sheet.close();
+  };
+
+  dock.querySelector('.cb-mobile-dock-trigger')?.addEventListener('click', openCompose);
+  backdrop.addEventListener('click', closeCompose);
+
+  return {
+    cleanup: () => {
+      io.disconnect();
+      dock.remove();
+      backdrop.remove();
+      document.body.classList.remove('cb-has-mobile-dock', 'cb-mobile-compose-open');
+    },
+    notifySubmitted: () => {
+      composeOpen = false;
+      sheet.notifySubmitted();
+      syncDock();
+    },
+  };
+}
+
 function closeAllInlineReplies(root) {
   if (!root) return;
   root.querySelectorAll('.cb-inline-reply').forEach(el => el.remove());
@@ -611,6 +814,9 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
   if (httpUrl) url.searchParams.set('httpUrl', httpUrl);
   const assetVer = String(cfg.embedAssetVersion || '').trim();
   if (assetVer) url.searchParams.set('v', assetVer);
+  if (typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches) {
+    url.searchParams.set('mobileDock', '1');
+  }
   return url.toString();
 }
 
@@ -635,6 +841,7 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
       <p class="cb-embed-hint comments-hint">评论由 CloudBase 提供；若空白或 404，请核对 <code>embedBaseUrl</code> 是否与 <code>tcb hosting deploy</code> 输出一致（见 cloudbase/README.md）。</p>
     </div>
   `;
+  const embedWrap = targetEl.querySelector('.cb-embed-wrap');
   const iframe = targetEl.querySelector('.cb-embed-frame');
   const hint = targetEl.querySelector('.cb-embed-hint');
   const onMessage = e => {
@@ -645,6 +852,7 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
     if (hint && e.data.ready) hint.hidden = true;
   };
   window.addEventListener('message', onMessage);
+  bindMobileEmbedDock(embedWrap, iframe);
   return true;
 }
 
@@ -722,6 +930,8 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
 
   bindComposeReveal(form, editor, { metaEl, actionsEl });
 
+  const mobileDock = bindMobileDirectDock(root, form, editor);
+
   let comments = [];
 
   async function loadList() {
@@ -783,6 +993,7 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
       saveProfile({ nick, email });
       editor.clear();
       statusEl.textContent = cfg.moderation ? '已提交，待审核通过后显示' : '发表成功';
+      mobileDock?.notifySubmitted?.();
       await loadList();
     } catch (err) {
       statusEl.textContent = err.message || '发表失败';

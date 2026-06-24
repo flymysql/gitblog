@@ -27,6 +27,7 @@ const cfg = {
   maxLength: 5000,
   allowImage: true,
   pageSize: 50,
+  mobileDock: params.get('mobileDock') === '1' || window.matchMedia('(max-width: 640px)').matches,
 };
 
 const mode = String(params.get('mode') || 'light').trim().toLowerCase();
@@ -470,6 +471,64 @@ function bindComposeReveal(form, editor, { metaEl, actionsEl }) {
   refresh();
 }
 
+function bindMobileComposeSheet(form, editor) {
+  if (!cfg.mobileDock) {
+    return { open: () => {}, close: () => {}, notifySubmitted: () => {} };
+  }
+
+  const root = form.closest('.cb-comments');
+  root?.classList.add('cb-comments--mobile-dock');
+
+  if (!form.querySelector('.cb-mobile-sheet-header')) {
+    const header = document.createElement('div');
+    header.className = 'cb-mobile-sheet-header';
+    header.innerHTML = `
+      <span class="cb-mobile-sheet-title">发表评论</span>
+      <button type="button" class="cb-mobile-sheet-close" aria-label="关闭">取消</button>
+    `;
+    form.prepend(header);
+  }
+
+  const close = () => {
+    form.classList.remove('is-sheet-open');
+    document.documentElement.classList.remove('cb-compose-sheet-open');
+    editor.body.blur();
+    postHeight(true);
+    try {
+      window.parent.postMessage({ type: 'gitblog-comments-compose-close' }, '*');
+    } catch { /* ignore */ }
+  };
+
+  const open = () => {
+    form.classList.add('is-sheet-open');
+    document.documentElement.classList.add('cb-compose-sheet-open');
+    postHeight(true);
+    setTimeout(() => editor.body.focus(), 120);
+  };
+
+  form.querySelector('.cb-mobile-sheet-close')?.addEventListener('click', close);
+
+  window.addEventListener('message', e => {
+    if (e.data?.type === 'gitblog-comments-compose-open') open();
+    if (e.data?.type === 'gitblog-comments-compose-close') close();
+    if (e.data?.type === 'gitblog-comments-dock' && root) {
+      root.style.paddingBottom = e.data.visible ? 'calc(56px + env(safe-area-inset-bottom))' : '';
+      postHeight(true);
+    }
+  });
+
+  return {
+    open,
+    close,
+    notifySubmitted: () => {
+      close();
+      try {
+        window.parent.postMessage({ type: 'gitblog-comments-compose-submitted' }, '*');
+      } catch { /* ignore */ }
+    },
+  };
+}
+
 function closeAllInlineReplies(root) {
   if (!root) return;
   root.querySelectorAll('.cb-inline-reply').forEach(el => el.remove());
@@ -656,6 +715,8 @@ async function mount() {
 
   bindComposeReveal(form, editor, { metaEl, actionsEl });
 
+  const mobileSheet = bindMobileComposeSheet(form, editor);
+
   async function loadList() {
     loadingEl.hidden = false;
     listEl.hidden = true;
@@ -711,6 +772,7 @@ async function mount() {
       saveProfile({ nick, email });
       editor.clear();
       statusEl.textContent = cfg.moderation ? '已提交，待审核通过后显示' : '发表成功';
+      mobileSheet.notifySubmitted();
       await loadList();
     } catch (err) {
       statusEl.textContent = err.message || '发表失败';

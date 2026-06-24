@@ -113,6 +113,12 @@ node deploy-static-embed.mjs
 
 同时递增 `config.js` 中的 `embedAssetVersion`，并同步 `comments-embed.html` 里 CSS/JS 的 `?v=` 参数，避免 CDN/浏览器缓存旧版 JS。
 
+### 移动端底部吸附评论栏
+
+文章页在 **≤640px** 宽度下，滚动到评论区附近时，底部会出现「说点什么…」吸附条（类似小红书）。点击后从底部弹出评论编辑抽屉；embed 模式下吸附条在博客页，编辑抽屉在 iframe 内。
+
+更新后需重新部署 `cloudbase/static/`（见上文）并 rebuild 博客。
+
 ### 编辑框样式没变化？
 
 博客使用 **embed 模式**时，评论区在 CloudBase 托管域名下的 iframe 里加载，与博客 `npm run build` 无关。
