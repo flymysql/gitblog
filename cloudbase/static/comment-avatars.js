@@ -86,20 +86,31 @@ function escapeHtml(s) {
   );
 }
 
-/** 在 compose-meta 内挂载头像选择器，返回 getSelected */
+/** 在 compose-meta 内挂载头像：默认只显示当前头像，点击后展开选择网格 */
 export function mountAvatarPicker(hostEl, { selected, onChange } = {}) {
-  if (!hostEl || hostEl.querySelector('[data-cb-avatar-picker]')) {
+  if (!hostEl || hostEl.querySelector('[data-cb-avatar-picker-wrap]')) {
     return {
       getSelected: () => resolveCommentAvatar(selected, ''),
+      close: () => {},
     };
   }
 
-  const current = resolveCommentAvatar(selected, '');
+  let current = resolveCommentAvatar(selected, '');
   const wrap = document.createElement('div');
   wrap.className = 'cb-field cb-field--avatar';
+  wrap.setAttribute('data-cb-avatar-picker-wrap', '');
+
+  const renderCurrentImg = () => {
+    const img = wrap.querySelector('.cb-avatar-current img');
+    if (img) img.src = commentAvatarUrl(current);
+  };
+
   wrap.innerHTML = `
     <span class="cb-avatar-picker-label">头像</span>
-    <div class="cb-avatar-picker" data-cb-avatar-picker role="listbox" aria-label="选择头像">
+    <button type="button" class="cb-avatar-current" aria-label="点击更换头像" aria-expanded="false">
+      <img src="${escapeHtml(commentAvatarUrl(current))}" alt="" loading="lazy" width="40" height="40">
+    </button>
+    <div class="cb-avatar-picker" data-cb-avatar-picker hidden role="listbox" aria-label="选择头像">
       ${COMMENT_AVATAR_FILES.map(file => `
         <button type="button" class="cb-avatar-option${file === current ? ' is-selected' : ''}"
           data-avatar="${escapeHtml(file)}"
@@ -113,21 +124,42 @@ export function mountAvatarPicker(hostEl, { selected, onChange } = {}) {
   hostEl.prepend(wrap);
 
   const picker = wrap.querySelector('[data-cb-avatar-picker]');
+  const currentBtn = wrap.querySelector('.cb-avatar-current');
+
+  const closePicker = () => {
+    picker.hidden = true;
+    currentBtn?.setAttribute('aria-expanded', 'false');
+  };
+
+  const openPicker = () => {
+    picker.hidden = false;
+    currentBtn?.setAttribute('aria-expanded', 'true');
+  };
+
+  currentBtn?.addEventListener('click', e => {
+    e.preventDefault();
+    if (picker.hidden) openPicker();
+    else closePicker();
+  });
+
   picker.addEventListener('click', e => {
     const btn = e.target.closest('[data-avatar]');
     if (!btn) return;
     e.preventDefault();
+    current = btn.dataset.avatar || current;
     picker.querySelectorAll('.cb-avatar-option').forEach(b => {
-      b.classList.remove('is-selected');
-      b.setAttribute('aria-selected', 'false');
+      const on = b.dataset.avatar === current;
+      b.classList.toggle('is-selected', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
     });
-    btn.classList.add('is-selected');
-    btn.setAttribute('aria-selected', 'true');
-    onChange?.(btn.dataset.avatar || '');
+    renderCurrentImg();
+    closePicker();
+    onChange?.(current);
   });
 
   return {
-    getSelected: () => picker.querySelector('.cb-avatar-option.is-selected')?.dataset.avatar || current,
+    getSelected: () => current,
+    close: closePicker,
   };
 }
 

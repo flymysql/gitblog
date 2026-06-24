@@ -753,10 +753,149 @@ function isMobileCommentDock() {
   return typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
 }
 
-/** 仅文章页在移动端使用底部悬浮评论栏；工具页、随笔等保持桌面布局 */
+/** 移动端统一使用底部悬浮评论抽屉 */
 function shouldUseMobileCommentDock(opts = {}) {
-  const ctx = String(opts.context || 'post').trim().toLowerCase();
-  return ctx === 'post' && isMobileCommentDock();
+  return isMobileCommentDock();
+}
+
+function isEmbedIframe() {
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+}
+
+function syncMobileTeaser(root, sheetOpen) {
+  const teaser = root?.querySelector('.cb-mobile-compose-teaser');
+  if (!teaser) return;
+  const dockVisible = document.body.classList.contains('cb-has-mobile-dock');
+  teaser.hidden = !!sheetOpen || dockVisible;
+}
+
+function bindInFrameMobileTeaser(root, mobileCtrl, { hideWhenParentDock = false } = {}) {
+  if (!isMobileCommentDock() || hideWhenParentDock || !root || !mobileCtrl) return;
+  let teaser = root.querySelector('.cb-mobile-compose-teaser');
+  if (!teaser) {
+    teaser = document.createElement('button');
+    teaser.type = 'button';
+    teaser.className = 'cb-mobile-compose-teaser';
+    teaser.textContent = '说点什么…';
+    root.appendChild(teaser);
+    teaser.addEventListener('click', () => {
+      mobileCtrl.clearReply();
+      mobileCtrl.open();
+    });
+    const anchor = root.querySelector('.cb-comments-loading') || root.querySelector('.cb-comments-list');
+    if (anchor) root.insertBefore(teaser, anchor);
+    else root.appendChild(teaser);
+  }
+  syncMobileTeaser(root, root.querySelector('.cb-compose')?.classList.contains('is-sheet-open'));
+}
+
+function createMobileComposeController(root, form, editor, { onSheetOpen, onSheetClose } = {}) {
+  const state = {
+    mode: 'new',
+    parentId: null,
+    replyNick: null,
+    replyBtn: null,
+  };
+
+  const updateSheetTitle = () => {
+    const title = form.querySelector('.cb-mobile-sheet-title');
+    if (!title) return;
+    title.textContent = state.mode === 'reply' && state.replyNick
+      ? `回复 ${state.replyNick}`
+      : '发表评论';
+  };
+
+  const clearReply = () => {
+    state.replyBtn?.classList.remove('is-active');
+    state.mode = 'new';
+    state.parentId = null;
+    state.replyNick = null;
+    state.replyBtn = null;
+    updateSheetTitle();
+  };
+
+  const setReply = ({ parentId, replyNick, replyBtn }) => {
+    closeAllInlineReplies(root);
+    clearReply();
+    state.mode = 'reply';
+    state.parentId = parentId;
+    state.replyNick = replyNick;
+    state.replyBtn = replyBtn;
+    replyBtn?.classList.add('is-active');
+    updateSheetTitle();
+  };
+
+  const sheet = bindMobileComposeSheet(form, editor, {
+    onOpen: () => {
+      syncMobileTeaser(root, true);
+      onSheetOpen?.();
+    },
+    onClose: () => {
+      clearReply();
+      syncMobileTeaser(root, false);
+      onSheetClose?.();
+    },
+  });
+
+  const onMessage = e => {
+    if (e.data?.type === 'gitblog-comments-compose-open') {
+      if (e.data.parentId) {
+        setReply({
+          parentId: e.data.parentId,
+          replyNick: e.data.replyNick || '访客',
+          replyBtn: null,
+        });
+      } else {
+        clearReply();
+      }
+      sheet.open();
+      return;
+    }
+    if (e.data?.type === 'gitblog-comments-compose-close') sheet.close();
+  };
+  window.addEventListener('message', onMessage);
+
+  return {
+    sheet,
+    setReply,
+    clearReply,
+    getParentId: () => (state.mode === 'reply' ? state.parentId : null),
+    open: replyCtx => {
+      if (replyCtx?.parentId) setReply(replyCtx);
+      else clearReply();
+      sheet.open();
+    },
+    close: () => sheet.close(),
+    notifySubmitted: () => sheet.notifySubmitted(),
+    cleanup: () => window.removeEventListener('message', onMessage),
+  };
+}
+
+/** 文章页按阅读进度；工具/随笔页按评论区是否进入视口 */
+function bindMobileDockVisibility(anchorEl, onReachChange) {
+  if (document.getElementById('article')) {
+    return bindMobileDockScrollTrigger(anchorEl, onReachChange);
+  }
+  const target = anchorEl.closest('.comments') || anchorEl;
+  let visible = false;
+  const update = () => {
+    const rect = target.getBoundingClientRect();
+    const inView = rect.top < window.innerHeight && rect.bottom > 0;
+    if (inView === visible) return;
+    visible = inView;
+    onReachChange(visible);
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+  return () => {
+    window.removeEventListener('scroll', update);
+    window.removeEventListener('resize', update);
+  };
 }
 
 const COMMENTS_END_HINT_MORE = '没有更多评论了~';
@@ -773,9 +912,6 @@ function syncCommentsEndHint(targetEl, commentCount) {
 function resolveEmbedFrameMinHeight(data, opts = {}) {
   const mobile = isMobileCommentDock();
   if (data.composeOpen) return 160;
-  if (mobile && !shouldUseMobileCommentDock(opts)) {
-    return 120;
-  }
   if (mobile && Number(data.commentCount) === 0) return 48;
   return mobile ? 160 : 320;
 }
@@ -830,11 +966,6 @@ function bindMobileComposeSheet(form, editor, { onClose, onOpen } = {}) {
   };
 
   form.querySelector('.cb-mobile-sheet-close')?.addEventListener('click', close);
-
-  window.addEventListener('message', e => {
-    if (e.data?.type === 'gitblog-comments-compose-open') open();
-    if (e.data?.type === 'gitblog-comments-compose-close') close();
-  });
 
   return {
     open,
@@ -924,7 +1055,7 @@ function bindMobileEmbedDock(embedWrap, iframe) {
     postDockState(show);
   };
 
-  const io = bindMobileDockScrollTrigger(embedWrap, visible => {
+  const io = bindMobileDockVisibility(embedWrap, visible => {
     sectionVisible = visible;
     syncDock();
   });
@@ -934,7 +1065,7 @@ function bindMobileEmbedDock(embedWrap, iframe) {
     openGuardUntil = Date.now() + 300;
     syncDock();
     embedWrap.classList.add('cb-embed-wrap--compose-pinned');
-    iframe.contentWindow?.postMessage({ type: 'gitblog-comments-compose-open' }, '*');
+    iframe.contentWindow?.postMessage({ type: 'gitblog-comments-compose-open', mode: 'new' }, '*');
   };
 
   const closeCompose = () => {
@@ -971,7 +1102,7 @@ function bindMobileEmbedDock(embedWrap, iframe) {
 }
 
 /** 移动端：父页底部吸附条 + 本地表单抽屉（直连模式） */
-function bindMobileDirectDock(observeEl, form, editor) {
+function bindMobileDirectDock(root, form, editor) {
   if (!isMobileCommentDock()) return null;
 
   const { dock } = createMobileDockChrome();
@@ -982,46 +1113,46 @@ function bindMobileDirectDock(observeEl, form, editor) {
     const show = sectionVisible && !composeOpen;
     dock.hidden = !show;
     document.body.classList.toggle('cb-has-mobile-dock', show);
+    syncMobileTeaser(root, composeOpen);
   };
 
-  const sheet = bindMobileComposeSheet(form, editor, {
-    onOpen: () => {
-      observeEl.classList.add('cb-comments--compose-pinned');
+  const mobileCtrl = createMobileComposeController(root, form, editor, {
+    onSheetOpen: () => {
+      composeOpen = true;
+      root.classList.add('cb-comments--compose-pinned');
+      syncDock();
     },
-    onClose: () => {
+    onSheetClose: () => {
       composeOpen = false;
-      observeEl.classList.remove('cb-comments--compose-pinned');
+      root.classList.remove('cb-comments--compose-pinned');
       syncDock();
     },
   });
 
-  const io = bindMobileDockScrollTrigger(observeEl, visible => {
+  bindInFrameMobileTeaser(root, mobileCtrl);
+
+  const io = bindMobileDockVisibility(root, visible => {
     sectionVisible = visible;
     syncDock();
   });
 
-  const openCompose = () => {
-    composeOpen = true;
-    syncDock();
-    sheet.open();
-  };
-
-  const closeCompose = () => {
-    composeOpen = false;
-    sheet.close();
-  };
-
-  dock.querySelector('.cb-mobile-dock-trigger')?.addEventListener('click', openCompose);
+  dock.querySelector('.cb-mobile-dock-trigger')?.addEventListener('click', () => {
+    mobileCtrl.clearReply();
+    mobileCtrl.open();
+  });
 
   return {
+    mobileCtrl,
     cleanup: () => {
+      mobileCtrl.cleanup?.();
       io();
       dock.remove();
+      root.querySelector('.cb-mobile-compose-teaser')?.remove();
       document.body.classList.remove('cb-has-mobile-dock');
     },
     notifySubmitted: () => {
       composeOpen = false;
-      sheet.notifySubmitted();
+      mobileCtrl.notifySubmitted();
       syncDock();
     },
   };
@@ -1165,6 +1296,14 @@ function bindCommentListInteractions(listEl, ctx) {
     const btn = e.target.closest('[data-reply]');
     if (!btn || e.target.closest('.cb-inline-reply')) return;
     e.preventDefault();
+    if (isMobileCommentDock() && ctx.mobileCtrl) {
+      ctx.mobileCtrl.open({
+        parentId: btn.dataset.reply || '',
+        replyNick: btn.dataset.replyNick || '访客',
+        replyBtn: btn,
+      });
+      return;
+    }
     const slot = btn.closest('.cb-comment-main')?.querySelector('.cb-inline-reply-slot');
     if (!slot) return;
     mountInlineReply(slot, {
@@ -1336,6 +1475,7 @@ function mountCloudBaseDirect(targetEl, path, opts = {}) {
   const mobileDock = shouldUseMobileCommentDock(opts)
     ? bindMobileDirectDock(root, form, editor)
     : null;
+  const mobileCtrl = mobileDock?.mobileCtrl ?? null;
 
   let comments = [];
 
@@ -1363,6 +1503,7 @@ function mountCloudBaseDirect(targetEl, path, opts = {}) {
     callApi: callCommentApi,
     onSuccess: loadList,
     opts,
+    mobileCtrl,
   });
 
   form.addEventListener('keydown', e => {
@@ -1395,7 +1536,7 @@ function mountCloudBaseDirect(targetEl, path, opts = {}) {
         email,
         avatar,
         contentHtml: editor.getHtml(),
-        parentId: null,
+        parentId: mobileCtrl?.getParentId() ?? null,
         pageTitle: opts.pageTitle || document.title,
         pageUrl: opts.pageUrl || location.href,
       });
