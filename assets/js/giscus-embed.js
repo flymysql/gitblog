@@ -3,7 +3,18 @@
 // ============================================================================
 
 import { CONFIG } from './config.js';
-import { isPostPublicPathKey } from './site.js';
+import {
+  notesFeedTerm,
+  notesCommentCategory,
+  commentPathForPost,
+  giscusTermForPost,
+} from './comment-term.js';
+
+export {
+  notesFeedTerm,
+  commentPathForPost,
+  giscusTermForPost,
+};
 
 /** 是否已配置完整，可在页面上挂载评论框 */
 export function isGiscusReady() {
@@ -11,35 +22,15 @@ export function isGiscusReady() {
   return !!(g && g.enabled && g.repoId && g.categoryId);
 }
 
-/** 首页「随笔」与 notes.html 共用的 giscus data-term（mapping 须为 specific） */
-export function notesFeedTerm() {
-  const t = String((CONFIG.giscus && CONFIG.giscus.notesTerm) || '').trim();
-  return t || 'gitblog-notes-feed';
-}
 
-/** 随笔讨论串所在分类（历史数据在 Announcements，与文章页 General 可分开配置） */
 export function notesGiscusCategory() {
-  const g = CONFIG.giscus || {};
-  return {
-    category: String(g.notesCategory || 'Announcements').trim() || 'Announcements',
-    categoryId: String(g.notesCategoryId || 'DIC_kwDOSZ6GIc4C8wdV').trim() || 'DIC_kwDOSZ6GIc4C8wdV',
-  };
+  return notesCommentCategory();
 }
 
 export function isNotesGiscusReady() {
   const g = CONFIG.giscus;
   const notes = notesGiscusCategory();
   return !!(g && g.enabled && g.repoId && notes.categoryId);
-}
-
-/**
- * 文章页 giscus term：优先 urlKey（如 20260616、welcome），否则退回 slug。
- * urlKey 为稳定 ASCII，避免中文 slug 过长；welcome 等已有讨论可继续匹配。
- */
-export function giscusTermForPost({ slug, urlKey } = {}) {
-  const k = String(urlKey || '').trim();
-  if (k && isPostPublicPathKey(k)) return k;
-  return String(slug || '').trim();
 }
 
 /**

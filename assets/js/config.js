@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260624140000';
+export const VERSION = '20260615180000';
 
 export const CONFIG = {
   repo: {
@@ -74,6 +74,21 @@ export const CONFIG = {
     notesTerm: "gitblog-notes-feed",
     notesCategory: "Announcements",
     notesCategoryId: "DIC_kwDOSZ6GIc4C8wdV"
+  },
+  comments: {
+    provider: "giscus"
+  },
+  cloudbase: {
+    enabled: false,
+    envId: "",
+    region: "ap-shanghai",
+    functionName: "gitblog-comments",
+    placeholderNick: "访客",
+    moderation: false,
+    maxLength: 5000,
+    allowImage: true,
+    pageSize: 50,
+    notesTerm: "gitblog-notes-feed"
   },
   analytics: {
     enabled: false,

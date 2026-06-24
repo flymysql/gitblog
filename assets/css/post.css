@@ -2,6 +2,8 @@
    文章阅读页样式 + TOC + 评论
    ============================================================================ */
 
+@import './cloudbase-comments.css';
+
 .article-layout {
   max-width: 1100px;
   margin: 0 auto;
