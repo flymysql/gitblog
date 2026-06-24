@@ -1,0 +1,22 @@
+[
+  {
+    "seedId": 21542,
+    "goodsId": 0,
+    "plantId": 1021542,
+    "name": "新春红包",
+    "requiredLevel": 30,
+    "price": 1,
+    "unlocked": false,
+    "limitCount": 0,
+    "boughtNum": 0,
+    "exp": 688,
+    "expPerCycle": 689,
+    "growTimeSec": 28800,
+    "growTimeStr": "8小时",
+    "expPerHour": 86,
+    "expPerGold": 0,
+    "seasons": 1,
+    "fruitId": 41542,
+    "fruitCount": 20
+  }
+]
