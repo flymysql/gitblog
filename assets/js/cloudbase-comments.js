@@ -507,10 +507,13 @@ function syncCommentsEndHint(targetEl, commentCount) {
   hint.hidden = false;
 }
 
-function resolveEmbedFrameMinHeight({ composeOpen, commentCount } = {}) {
+function resolveEmbedFrameMinHeight(data, opts = {}) {
   const mobile = isMobileCommentDock();
-  if (composeOpen) return 160;
-  if (mobile && Number(commentCount) === 0) return 48;
+  if (data.composeOpen) return 160;
+  if (mobile && !shouldUseMobileCommentDock(opts)) {
+    return 120;
+  }
+  if (mobile && Number(data.commentCount) === 0) return 48;
   return mobile ? 160 : 320;
 }
 
@@ -912,6 +915,8 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
   if (assetVer) url.searchParams.set('v', assetVer);
   if (shouldUseMobileCommentDock(opts)) {
     url.searchParams.set('mobileDock', '1');
+  } else {
+    url.searchParams.set('mobileDock', '0');
   }
   return url.toString();
 }
@@ -949,7 +954,7 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
           const ch = Number(e.data.composeHeight) || h;
           iframe.style.height = `${Math.min(Math.max(ch, 160), Math.round(window.innerHeight * 0.85))}px`;
         } else {
-          const minH = resolveEmbedFrameMinHeight(e.data);
+          const minH = resolveEmbedFrameMinHeight(e.data, opts);
           iframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
         }
       }
@@ -967,18 +972,10 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
 }
 
 /**
- * 挂载 CloudBase 评论区
- * @param {HTMLElement} targetEl
- * @param {string} path 页面标识（urlKey / notesTerm / tool path）
+ * 挂载 CloudBase 评论区（直连模式，表单在页面内）
  */
-export function mountCloudBaseComments(targetEl, path, opts = {}) {
-  if (!targetEl || !path) return false;
+function mountCloudBaseDirect(targetEl, path, opts = {}) {
   const cfg = cloudbaseCfg();
-  const mode = String(cfg.accessMode || 'embed').trim().toLowerCase();
-  if (mode === 'embed') {
-    return mountCloudBaseEmbed(targetEl, path, opts);
-  }
-
   const maxLength = Number(cfg.maxLength) || 5000;
   const allowImage = cfg.allowImage !== false;
   const placeholderNick = String(cfg.placeholderNick || '访客').trim() || '访客';
@@ -1118,6 +1115,21 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
 
   loadList();
   return true;
+}
+
+/**
+ * 挂载 CloudBase 评论区
+ * @param {HTMLElement} targetEl
+ * @param {string} path 页面标识（urlKey / notesTerm / tool path）
+ */
+export function mountCloudBaseComments(targetEl, path, opts = {}) {
+  if (!targetEl || !path) return false;
+  const cfg = cloudbaseCfg();
+  const mode = String(cfg.accessMode || 'embed').trim().toLowerCase();
+  if (mode === 'embed' && shouldUseMobileCommentDock(opts)) {
+    return mountCloudBaseEmbed(targetEl, path, opts);
+  }
+  return mountCloudBaseDirect(targetEl, path, opts);
 }
 
 function fileToBase64(file) {
