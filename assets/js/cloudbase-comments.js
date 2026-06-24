@@ -922,6 +922,8 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
   } else {
     url.searchParams.set('mobileDock', '0');
   }
+  const ctx = String(opts.context || 'post').trim().toLowerCase();
+  if (ctx) url.searchParams.set('context', ctx);
   return url.toString();
 }
 
@@ -975,6 +977,10 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
   return true;
 }
 
+function commentsFlatClass(opts = {}) {
+  return String(opts.context || 'post').trim().toLowerCase() === 'tool' ? ' cb-comments--flat' : '';
+}
+
 /**
  * 挂载 CloudBase 评论区（直连模式，表单在页面内）
  */
@@ -985,7 +991,7 @@ function mountCloudBaseDirect(targetEl, path, opts = {}) {
   const placeholderNick = String(cfg.placeholderNick || '访客').trim() || '访客';
 
   targetEl.innerHTML = `
-    <div class="cb-comments" data-path="${escapeHtml(path)}">
+    <div class="cb-comments${commentsFlatClass(opts)}" data-path="${escapeHtml(path)}">
       <form class="cb-compose cb-compose--minimal" novalidate>
         <div class="cb-compose-editor"></div>
         <div class="cb-compose-meta" hidden>
