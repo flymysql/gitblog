@@ -756,16 +756,23 @@ function setupMobileComposeChrome(form, metaEl, actionsEl) {
     footer.hidden = true;
     form.appendChild(footer);
   }
-  const avatarWrap = metaEl?.querySelector('[data-cb-avatar-picker-wrap]');
+  let avatarWrap = footer.querySelector('[data-cb-avatar-picker-wrap]')
+    || metaEl?.querySelector('[data-cb-avatar-picker-wrap]')
+    || form.querySelector('[data-cb-avatar-picker-wrap]');
   if (avatarWrap && !footer.contains(avatarWrap)) {
     avatarWrap.classList.add('cb-compose-footer-avatar');
     avatarWrap.querySelector('.cb-avatar-picker-label')?.setAttribute('hidden', '');
-    footer.appendChild(avatarWrap);
+    footer.insertBefore(avatarWrap, footer.firstChild);
   }
-  const status = actionsEl?.querySelector('.cb-compose-status');
-  const submit = actionsEl?.querySelector('.cb-submit');
+  const status = actionsEl?.querySelector('.cb-compose-status')
+    || form.querySelector('.cb-compose-status');
+  const submit = actionsEl?.querySelector('.cb-submit')
+    || form.querySelector('.cb-submit');
   if (status && !footer.contains(status)) footer.appendChild(status);
-  if (submit && !footer.contains(submit)) footer.appendChild(submit);
+  if (submit && !footer.contains(submit)) {
+    submit.textContent = '发送';
+    footer.appendChild(submit);
+  }
 }
 
 function bindMobileComposeTrigger(root, mobileCtrl) {
@@ -775,7 +782,8 @@ function bindMobileComposeTrigger(root, mobileCtrl) {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'cb-mobile-compose-trigger';
-  btn.textContent = '写评论';
+  btn.textContent = '说点什么…';
+  btn.setAttribute('aria-label', '写评论');
   btn.addEventListener('click', () => {
     mobileCtrl.clearReply();
     mobileCtrl.open();
@@ -1000,6 +1008,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
       onOpen?.();
       postHeight(true);
     }
+    setupMobileComposeChrome(form, form.querySelector('.cb-compose-meta'), form.querySelector('.cb-compose-actions'));
     notifyParentComposePin(true);
     form.dispatchEvent(new CustomEvent('cb-compose-sheet-change', { bubbles: true }));
     setTimeout(() => {
