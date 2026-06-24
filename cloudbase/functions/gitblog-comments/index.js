@@ -110,18 +110,40 @@ async function checkRate(ipHash) {
 function nestComments(rows) {
   const map = new Map();
   rows.forEach(r => map.set(r._id, { ...r, replies: [] }));
+
+  function findRootId(row) {
+    let id = row.parentId;
+    const seen = new Set();
+    while (id && map.has(id) && !seen.has(id)) {
+      seen.add(id);
+      const p = map.get(id);
+      if (!p?.parentId) return id;
+      id = p.parentId;
+    }
+    return row.parentId;
+  }
+
   const roots = [];
   map.forEach(c => {
-    if (c.parentId && map.has(c.parentId)) {
-      map.get(c.parentId).replies.push(c);
+    if (!c.parentId) {
+      roots.push(c);
+      return;
+    }
+    const rootId = findRootId(c);
+    const root = rootId ? map.get(rootId) : null;
+    if (root && root._id !== c._id) {
+      root.replies.push(c);
     } else {
       roots.push(c);
     }
   });
+
   const sortNewest = (a, b) => (b.createdAt || 0) - (a.createdAt || 0);
   const sortOldest = (a, b) => (a.createdAt || 0) - (b.createdAt || 0);
   roots.sort(sortNewest);
-  map.forEach(c => c.replies.sort(sortOldest));
+  map.forEach(c => {
+    if (c.replies?.length) c.replies.sort(sortOldest);
+  });
   return roots;
 }
 
@@ -159,7 +181,23 @@ function isReplyNotifyEnabled() {
     && String(process.env.SMTP_USER || '').trim();
 }
 
-async function sendReplyNotifyEmail({ to, parentNick, replyNick, excerpt, pageTitle, pageUrl }) {
+function escapeHtmlText(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function resolveNotifyPageUrl(pageUrl, path) {
+  const u = String(pageUrl || '').trim();
+  if (/^https?:\/\//i.test(u)) return u;
+  const base = String(process.env.SITE_URL || 'https://gitpull.cn').replace(/\/+$/, '');
+  const p = String(path || '').trim();
+  if (!p) return base;
+  if (/^https?:\/\//i.test(p)) return p;
+  if (p.startsWith('/')) return `${base}${p}`;
+  if (p.includes('/')) return `${base}/${p}`;
+  return `${base}/post/${p}/`;
+}
+
+async function sendReplyNotifyEmail({ to, parentNick, replyNick, excerpt, pageTitle, pageUrl, path }) {
   if (!isValidEmail(to) || !isReplyNotifyEnabled()) return;
   const nodemailer = require('nodemailer');
   const port = Number(process.env.SMTP_PORT) || 465;
@@ -172,15 +210,24 @@ async function sendReplyNotifyEmail({ to, parentNick, replyNick, excerpt, pageTi
       pass: process.env.SMTP_PASS || '',
     },
   });
-  const title = String(pageTitle || '博客').slice(0, 80);
-  const url = String(pageUrl || '').slice(0, 500);
+  const title = escapeHtmlText(String(pageTitle || '博客').slice(0, 80));
+  const link = resolveNotifyPageUrl(pageUrl, path);
+  const safeLink = escapeHtmlText(link);
+  const safeReply = escapeHtmlText(replyNick);
+  const safeParent = escapeHtmlText(parentNick);
+  const safeExcerpt = escapeHtmlText(excerpt);
   const from = String(process.env.SMTP_FROM || process.env.SMTP_USER).trim();
   await transporter.sendMail({
     from,
     to,
-    subject: `【${title}】${replyNick} 回复了你的评论`,
-    text: `${replyNick} 在《${title}》回复了 @${parentNick}：\n\n${excerpt}\n\n查看原文：${url}`,
-    html: `<p><strong>${replyNick}</strong> 在《${title}》回复了 <strong>@${parentNick}</strong>：</p><blockquote>${excerpt.replace(/</g, '&lt;')}</blockquote><p><a href="${url}">查看原文</a></p>`,
+    subject: `【${String(pageTitle || '博客').slice(0, 80)}】${replyNick} 回复了你的评论`,
+    text: `${replyNick} 在《${pageTitle || '博客'}》回复了 @${parentNick}：\n\n${excerpt}\n\n查看原文：${link}`,
+    html: `<div style="font-family:sans-serif;font-size:14px;line-height:1.6;color:#333;">
+<p><strong>${safeReply}</strong> 在《${title}》回复了 <strong>@${safeParent}</strong>：</p>
+<blockquote style="margin:12px 0;padding:8px 12px;border-left:3px solid #ea6c5c;background:#f7f7f7;">${safeExcerpt}</blockquote>
+<p><a href="${safeLink}" style="color:#ea6c5c;text-decoration:underline;" target="_blank" rel="noopener">查看原文</a></p>
+<p style="font-size:12px;color:#999;">${safeLink}</p>
+</div>`,
   });
 }
 
@@ -212,7 +259,8 @@ async function handlePost(event, context) {
   const ipHash = hashIp(ip);
   if (!(await checkRate(ipHash))) return jsonErr('操作过于频繁，请稍后再试', 429);
 
-  const parentId = event.parentId ? String(event.parentId).trim() : null;
+  const parentIdRaw = event.parentId ? String(event.parentId).trim() : null;
+  let parentId = parentIdRaw;
   let parentDoc = null;
   let replyToNick = null;
   if (parentId) {
@@ -222,6 +270,9 @@ async function handlePost(event, context) {
     if ((parentDoc.status || 'visible') !== 'visible') return jsonErr('无法回复该评论');
     replyToNick = String(parentDoc.nick || '访客').trim() || '访客';
     contentHtml = ensureMentionHtml(contentHtml, replyToNick);
+    if (parentDoc.parentId) {
+      parentId = String(parentDoc.parentId).trim();
+    }
   }
 
   const moderation = String(process.env.COMMENT_MODERATION || '0') === '1';
@@ -256,6 +307,7 @@ async function handlePost(event, context) {
       excerpt,
       pageTitle,
       pageUrl,
+      path,
     }).catch(err => console.error('reply notify failed', err));
   }
 

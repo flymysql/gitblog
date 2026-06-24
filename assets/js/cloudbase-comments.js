@@ -236,11 +236,13 @@ function avatarColor(name) {
 }
 
 class CommentRichEditor {
-  constructor(root, { allowImage = true, maxLength = 5000, onUpload } = {}) {
+  constructor(root, { allowImage = true, maxLength = 5000, onUpload, onChange, alwaysShowBar = false } = {}) {
     this.root = root;
     this.allowImage = allowImage;
     this.maxLength = maxLength;
     this.onUpload = onUpload;
+    this.onChange = onChange;
+    this.alwaysShowBar = alwaysShowBar;
     this._emojiOpen = false;
     this._render();
     this._bind();
@@ -248,24 +250,26 @@ class CommentRichEditor {
 
   _render() {
     this.root.innerHTML = `
-      <div class="cb-editor">
-        <div class="cb-editor-toolbar cb-editor-toolbar--simple" role="toolbar" aria-label="评论工具">
-          <button type="button" class="cb-tb" data-action="emoji" title="表情">😊</button>
-          ${this.allowImage ? '<button type="button" class="cb-tb" data-action="image" title="插入图片">🖼</button>' : ''}
-        </div>
+      <div class="cb-editor cb-editor--minimal">
+        <div class="cb-editor-body" contenteditable="true" data-placeholder="写下你的想法…" role="textbox" aria-multiline="true"></div>
         <div class="cb-editor-emoji" hidden></div>
-        <div class="cb-editor-body" contenteditable="true" data-placeholder="写下你的想法…支持表情与粘贴图片" role="textbox" aria-multiline="true"></div>
-        <div class="cb-editor-foot">
-          <span class="cb-editor-count">0 / ${this.maxLength}</span>
+        <div class="cb-editor-bar">
+          <div class="cb-editor-tools" role="toolbar" aria-label="评论工具">
+            <button type="button" class="cb-tb" data-action="emoji" title="表情">😊</button>
+            ${this.allowImage ? '<button type="button" class="cb-tb" data-action="image" title="图片">🖼</button>' : ''}
+          </div>
+          <span class="cb-editor-count" hidden>0 / ${this.maxLength}</span>
         </div>
         <input type="file" accept="image/*" class="cb-editor-file" hidden>
       </div>
     `;
-    this.toolbar = this.root.querySelector('.cb-editor-toolbar');
+    this.editorEl = this.root.querySelector('.cb-editor');
+    this.tools = this.root.querySelector('.cb-editor-tools');
     this.body = this.root.querySelector('.cb-editor-body');
     this.emojiPanel = this.root.querySelector('.cb-editor-emoji');
     this.countEl = this.root.querySelector('.cb-editor-count');
     this.fileInput = this.root.querySelector('.cb-editor-file');
+    if (this.alwaysShowBar) this.editorEl.classList.add('is-focused');
     this._renderEmoji();
   }
 
@@ -278,7 +282,7 @@ class CommentRichEditor {
   }
 
   _bind() {
-    this.toolbar.addEventListener('click', e => {
+    this.tools.addEventListener('click', e => {
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
       e.preventDefault();
@@ -303,6 +307,14 @@ class CommentRichEditor {
     this.body.addEventListener('input', () => this._syncCount());
     this.body.addEventListener('paste', e => this._onPaste(e));
     this.fileInput.addEventListener('change', () => this._onPickImage());
+    this.body.addEventListener('focus', () => this.editorEl.classList.add('is-focused'));
+    this.body.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (!this.root.contains(document.activeElement)) {
+          this.editorEl.classList.remove('is-focused');
+        }
+      }, 0);
+    });
 
     document.addEventListener('click', e => {
       if (!this._emojiOpen) return;
@@ -368,8 +380,12 @@ class CommentRichEditor {
   _syncCount() {
     const text = this.body.innerText || '';
     const len = text.length;
+    const has = len > 0;
     this.countEl.textContent = `${len} / ${this.maxLength}`;
+    this.countEl.hidden = !has;
     this.countEl.classList.toggle('is-over', len > this.maxLength);
+    this.editorEl.classList.toggle('has-content', has);
+    this.onChange?.(len);
   }
 
   getHtml() {
@@ -397,13 +413,15 @@ class CommentRichEditor {
   }
 }
 
-function renderCommentItem(c) {
+function renderCommentItem(c, { nested = true } = {}) {
   const nick = escapeHtml(c.nick || '访客');
   const nickRaw = escapeHtml(c.nick || '访客');
   const replyTo = c.replyToNick ? escapeHtml(c.replyToNick) : '';
   const hue = avatarColor(c.nick);
   const content = sanitizeCommentHtml(c.contentHtml || '');
-  const replies = (c.replies || []).map(r => renderCommentItem(r)).join('');
+  const replies = nested && (c.replies || []).length
+    ? `<div class="cb-replies">${(c.replies || []).map(r => renderCommentItem(r, { nested: false })).join('')}</div>`
+    : '';
   return `
     <article class="cb-comment${c.parentId ? ' is-reply' : ''}" data-id="${escapeHtml(c._id)}">
       <div class="cb-comment-avatar" style="--cb-avatar-hue:${hue}" aria-hidden="true">${nick.slice(0, 1).toUpperCase()}</div>
@@ -418,10 +436,30 @@ function renderCommentItem(c) {
           <button type="button" class="cb-link-btn" data-reply="${escapeHtml(c._id)}" data-reply-nick="${nickRaw}">回复</button>
         </footer>
         <div class="cb-inline-reply-slot"></div>
-        ${replies ? `<div class="cb-replies">${replies}</div>` : ''}
+        ${replies}
       </div>
     </article>
   `;
+}
+
+function bindComposeReveal(form, editor, { metaEl, actionsEl }) {
+  const refresh = () => {
+    const len = editor.getPlainLength();
+    const showExtra = len > 0;
+    if (metaEl) metaEl.hidden = !showExtra;
+    if (actionsEl) actionsEl.hidden = !showExtra;
+    form.classList.toggle('cb-compose--active', showExtra);
+  };
+  const prevOnChange = editor.onChange;
+  editor.onChange = len => {
+    prevOnChange?.(len);
+    refresh();
+  };
+  form.addEventListener('focusin', () => form.classList.add('cb-compose--focused'));
+  form.addEventListener('focusout', e => {
+    if (!form.contains(e.relatedTarget)) form.classList.remove('cb-compose--focused');
+  });
+  refresh();
 }
 
 function closeAllInlineReplies(root) {
@@ -455,6 +493,7 @@ function mountInlineReply(slot, ctx) {
   const editor = new CommentRichEditor(editorHost, {
     allowImage,
     maxLength,
+    alwaysShowBar: true,
     onUpload: async file => {
       const base64 = await fileToBase64(file);
       const res = await callApi({
@@ -566,6 +605,8 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
   const mode = document.documentElement.getAttribute('data-mode') || 'light';
   url.searchParams.set('mode', mode);
   if (opts.pageTitle) url.searchParams.set('title', String(opts.pageTitle).slice(0, 120));
+  const pageUrl = String(opts.pageUrl || (typeof location !== 'undefined' ? location.href : '')).trim();
+  if (pageUrl) url.searchParams.set('pageUrl', pageUrl.slice(0, 500));
   const httpUrl = String(cfg.httpUrl || '').trim();
   if (httpUrl) url.searchParams.set('httpUrl', httpUrl);
   return url.toString();
@@ -626,22 +667,21 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
     <div class="cb-comments" data-path="${escapeHtml(path)}">
       <div class="cb-comments-loading" aria-live="polite">评论加载中…</div>
       <div class="cb-comments-list" hidden></div>
-      <form class="cb-compose" novalidate>
-        <div class="cb-compose-meta">
+      <form class="cb-compose cb-compose--minimal" novalidate>
+        <div class="cb-compose-editor"></div>
+        <div class="cb-compose-meta" hidden>
           <label class="cb-field">
             <span>昵称</span>
             <input type="text" name="nick" maxlength="40" placeholder="${escapeHtml(placeholderNick)}（可选）" autocomplete="nickname">
           </label>
           <label class="cb-field">
             <span>邮箱</span>
-            <input type="email" name="email" maxlength="120" placeholder="可选，不会公开显示" autocomplete="email">
+            <input type="email" name="email" maxlength="120" placeholder="可选，用于接收回复通知" autocomplete="email">
           </label>
         </div>
-        <div class="cb-compose-editor"></div>
-        <p class="cb-compose-hint">发表新评论；点「回复」可在对应楼层下回复并自动 @ 对方。留邮箱可在被回复时收到通知。</p>
-        <div class="cb-compose-actions">
+        <div class="cb-compose-actions" hidden>
           <span class="cb-compose-status" aria-live="polite"></span>
-          <button type="submit" class="cb-submit">发表评论</button>
+          <button type="submit" class="cb-submit">发表</button>
         </div>
       </form>
     </div>
@@ -652,6 +692,8 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
   const loadingEl = root.querySelector('.cb-comments-loading');
   const form = root.querySelector('.cb-compose');
   const statusEl = root.querySelector('.cb-compose-status');
+  const metaEl = form.querySelector('.cb-compose-meta');
+  const actionsEl = form.querySelector('.cb-compose-actions');
   const nickInput = form.querySelector('[name="nick"]');
   const emailInput = form.querySelector('[name="email"]');
   const editorHost = root.querySelector('.cb-compose-editor');
@@ -675,6 +717,8 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
       return res.url;
     },
   });
+
+  bindComposeReveal(form, editor, { metaEl, actionsEl });
 
   let comments = [];
 
