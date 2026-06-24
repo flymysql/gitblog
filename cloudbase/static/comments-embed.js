@@ -723,7 +723,8 @@ function isMobileDock() {
 }
 
 function isMobileComposeActive() {
-  return window.matchMedia('(max-width: 640px)').matches;
+  // 与 isMobileDock 一致：父页 mobileDock=1 时 iframe 内 viewport 可能仍 >640px
+  return isMobileDock();
 }
 
 function shouldShowPersistentMobileDock() {
@@ -1036,6 +1037,14 @@ function closeAllInlineReplies(root) {
 }
 
 function mountInlineReply(slot, ctx) {
+  if (isMobileComposeActive()) {
+    ctx.mobileCtrl?.open({
+      parentId: ctx.parentId || '',
+      replyNick: ctx.replyNick || '访客',
+      replyBtn: null,
+    });
+    return;
+  }
   const { parentId, replyNick, path, callApi, onSuccess } = ctx;
   const commentsRoot = slot.closest('.cb-comments');
   closeAllInlineReplies(commentsRoot);

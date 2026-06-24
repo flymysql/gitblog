@@ -41,7 +41,8 @@ try {
     cwd: __dir,
     stdio: 'inherit',
   });
-  console.log('\n部署成功。请在浏览器无痕窗口打开嵌入页验证编辑框是否为新版（仅表情+图片，输入后才显示昵称/提交）。');
+  console.log('\n部署成功。请在浏览器无痕窗口打开嵌入页验证。');
+  console.log('comments-embed.html 会从 URL 参数 ?v= 加载 JS/CSS，请确保站点 config 中 embedAssetVersion 已更新并重新 build。');
   console.log('若博客页仍显示旧 UI，请重新 build 站点并硬刷新（Ctrl+Shift+R）。');
 } catch (err) {
   console.error('\n部署失败，请确认已安装并登录 CloudBase CLI：npm i -g @cloudbase/cli && tcb login');
