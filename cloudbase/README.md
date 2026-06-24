@@ -1,12 +1,22 @@
 # CloudBase 评论后端部署
 
-GitBlog 的 CloudBase 评论由云函数 `gitblog-comments` 提供 API，前端通过 `@cloudbase/js-sdk` 调用。
+GitBlog 的 CloudBase 评论由云函数 `gitblog-comments` 提供 API。博客页默认通过 **iframe 嵌入**（`accessMode: 'embed'`）加载托管在 CloudBase 静态网站上的评论页，**免费版无需配置安全域名**。
+
+## 免费版 vs 付费版
+
+| 能力 | 免费/体验版 | 个人版及以上 |
+|------|-------------|--------------|
+| 添加 `gitpull.cn` 安全域名 | ❌ `CreateAuthDomain` 报错 | ✅ |
+| iframe 嵌入（推荐） | ✅ | ✅ |
+| HTTP / SDK 直连博客域 | ❌ 会 CORS | ✅ |
+
+若执行 `tcb cors add gitpull.cn` 出现 **「当前套餐无法执行此操作」**，这是套餐限制，不是域名格式问题。请使用下文 **iframe 方案**，或升级 CloudBase 个人版。
 
 ## 1. 创建环境
 
 1. 打开 [腾讯云 CloudBase 控制台](https://console.cloud.tencent.com/tcb)
-2. 新建环境（建议选上海 `ap-shanghai` 或广州 `ap-guangzhou`）
-3. 记录 **环境 ID**（`env-xxxxx`）
+2. 新建环境（建议选上海 `ap-shanghai`）
+3. 记录 **环境 ID**（如 `gitbolg-d7gmnsrw46e011706`）
 
 ## 2. 部署云函数
 
@@ -21,13 +31,41 @@ tcb login
 
 ```bash
 cd cloudbase
-# 编辑 cloudbaserc.json，填入 envId
-tcb fn deploy gitblog-comments
+tcb fn deploy gitblog-comments -e gitbolg-d7gmnsrw46e011706
 ```
 
-或在控制台 → 云函数 → 新建 → 上传 `functions/gitblog-comments` 文件夹。
+## 3. 开启匿名登录（embed / sdk 模式需要）
 
-## 3. 数据库与安全
+控制台 → **登录授权** → 开启 **匿名登录**。
+
+云函数 → **权限控制**：允许未登录用户调用 `gitblog-comments`。
+
+## 4. 部署评论嵌入页（免费版必做）
+
+将 `cloudbase/static/` 部署到 CloudBase 静态网站托管：
+
+```bash
+cd cloudbase
+tcb hosting deploy ./static -e gitbolg-d7gmnsrw46e011706
+```
+
+部署后访问（示例）：
+
+`https://gitbolg-d7gmnsrw46e011706.tcloudbaseapp.com/comments-embed.html?path=test&env=gitbolg-d7gmnsrw46e011706`
+
+博客页会以 iframe 加载该地址，嵌入页与 CloudBase API 同域，**不触发跨域**。
+
+### 静态目录文件
+
+| 文件 | 说明 |
+|------|------|
+| `static/comments-embed.html` | 嵌入页入口 |
+| `static/comments-embed.js` | 评论 UI + SDK 调用 |
+| `static/comments-embed.css` | 样式（支持 light/dark） |
+
+更新评论 UI 后需重新执行 `tcb hosting deploy ./static`。
+
+## 5. 数据库与安全
 
 云函数首次运行会自动创建集合：
 
@@ -39,74 +77,23 @@ tcb fn deploy gitblog-comments
 - `gitblog_comments`：**所有用户不可读写**（仅云函数可写）
 - `gitblog_comment_rates`：**不可读写**
 
-评论读写全部走云函数，前端不直连数据库。
+## 6. 云存储
 
-## 3.1 安全来源 / 跨域（必做，否则浏览器报 CORS）
+评论图片上传到 `comments/{path}/...`。
 
-博客域名 `https://gitpull.cn` 不在白名单时，会出现：
+控制台 → 云存储 → 权限：允许**所有用户可读**，**仅云函数可写**。
 
-`blocked by CORS policy ... tcb-api.tencentcloudapi.com`
-
-**控制台操作**（环境 `gitbolg-d7gmnsrw46e011706`）：
-
-1. 打开 [CloudBase 控制台](https://console.cloud.tencent.com/tcb) → 你的环境 → **环境配置** → **安全来源**（或「安全配置 → Web 安全域名」）
-2. 添加（**不要**带 `https://`）：
-   - `gitpull.cn`
-   - `www.gitpull.cn`
-3. 等待 **1～2 分钟** 生效
-
-**命令行**（可选）：
-
-```bash
-tcb cors add gitpull.cn,www.gitpull.cn -e gitbolg-d7gmnsrw46e011706
-```
-
-## 3.2 开启云函数 HTTP 访问（推荐，默认走 HTTP 不调 SDK）
-
-前端默认 `accessMode: 'http'`，直接请求：
-
-`https://gitbolg-d7gmnsrw46e011706.ap-shanghai.app.tcloudbase.com/gitblog-comments`
-
-控制台步骤：
-
-1. **云函数** → `gitblog-comments` → **HTTP 访问** / **HTTP 访问服务** → **开启**
-2. **重新部署**云函数（本仓库 `cloudbase/functions/gitblog-comments` 已支持 `OPTIONS` 与 CORS 响应头）
-3. 若默认域名不可用，在 `config.js` 的 `cloudbase.httpUrl` 填入控制台显示的完整 HTTP 地址
-
-云函数环境变量（可选）：
+## 7. 云函数环境变量
 
 | 变量 | 说明 |
 |------|------|
-| `ALLOWED_ORIGINS` | 允许跨域来源，默认 `https://gitpull.cn,https://www.gitpull.cn` |
-
-## 3.3 匿名登录（仅 accessMode 为 sdk 时需要）
-
-若改回 Web SDK 模式（`accessMode: 'sdk'`），还需：
-
-控制台 → **登录授权** → 开启 **匿名登录**。
-
-前端会在 `callFunction` 前自动 `signInAnonymously()`。
-
-云函数 → **权限控制**：允许未登录用户调用。
-
-## 4. 云存储
-
-云函数会将评论图片上传到云存储路径 `comments/{path}/...`。
-
-在控制台 → 云存储 → 权限：允许**所有用户可读**，**仅管理员/云函数可写**（或保持私有，依赖 `getTempFileURL` 临时链接）。
-
-## 5. 环境变量
-
-在云函数配置中设置：
-
-| 变量 | 说明 |
-|------|------|
-| `COMMENT_MODERATION` | `1` 开启人工审核（pending），`0` 直接显示 |
+| `COMMENT_MODERATION` | `1` 开启审核，`0` 直接显示 |
 | `COMMENT_SALT` | 随机字符串，用于 IP hash |
+| `ALLOWED_ORIGINS` | HTTP 模式跨域来源（embed 模式可忽略） |
 
-## 6. 前端配置
+## 8. 前端配置
 
-在 [后台设置](/admin/settings.html) 或 `assets/js/config.js`：
+`assets/js/config.js` 或 [后台设置](/admin/settings.html)：
 
 ```js
 cloudbase: {
@@ -114,6 +101,8 @@ cloudbase: {
   envId: 'gitbolg-d7gmnsrw46e011706',
   region: 'ap-shanghai',
   functionName: 'gitblog-comments',
+  accessMode: 'embed',           // 免费版推荐
+  embedPage: 'comments-embed.html',
   placeholderNick: '访客',
   moderation: false,
   maxLength: 5000,
@@ -123,11 +112,24 @@ cloudbase: {
 },
 ```
 
-`enabled: true` 且填写 `envId` 后，文章页/工具页/随笔页将加载 CloudBase 评论区（不再使用 GitHub giscus）。
+### accessMode 说明
 
-## 7. API 说明
+| 值 | 说明 |
+|----|------|
+| `embed` | iframe 加载托管页（**免费版默认**） |
+| `http` | 博客域直连云函数 HTTP（须安全域名 + 开启 HTTP 访问） |
+| `sdk` | 博客域加载 Web SDK（须安全域名 + 匿名登录） |
 
-云函数 `event` 字段：
+## 9. 付费版：安全域名与 HTTP（可选）
+
+升级个人版后，若希望评论 UI 直接嵌在博客页（非 iframe）：
+
+1. 控制台 → **环境配置** → **安全来源**，添加 `gitpull.cn`、`www.gitpull.cn`
+2. 或 CLI：`tcb cors add gitpull.cn,www.gitpull.cn -e gitbolg-d7gmnsrw46e011706`
+3. 云函数 → `gitblog-comments` → 开启 **HTTP 访问**
+4. 将 `accessMode` 改为 `http` 或 `sdk`
+
+## 10. API 说明
 
 | action | 字段 | 说明 |
 |--------|------|------|
@@ -137,6 +139,6 @@ cloudbase: {
 
 返回 `{ ok: true, ... }` 或 `{ ok: false, message }`。
 
-## 8. 费用提示
+## 11. 费用提示
 
 CloudBase 免费体验版有每月资源点限制；个人博客评论量通常足够。详见 [CloudBase 价格文档](https://cloud.tencent.com/document/product/876/75213)。

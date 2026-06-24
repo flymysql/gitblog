@@ -1,6 +1,10 @@
 {
   "envId": "gitbolg-d7gmnsrw46e011706",
   "functionRoot": "./functions",
+  "hosting": {
+    "root": "./static",
+    "ignore": []
+  },
   "functions": [
     {
       "name": "gitblog-comments",
