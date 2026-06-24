@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
   <title>编辑文章</title>
-  <link rel="stylesheet" href="../assets/css/common.css?v=20260615120000">
-  <link rel="stylesheet" href="../assets/css/admin.css?v=20260615120000">
-  <link rel="stylesheet" href="../assets/css/post.css?v=20260615120000">
+  <link rel="stylesheet" href="../assets/css/common.css?v=20260615140000">
+  <link rel="stylesheet" href="../assets/css/admin.css?v=20260615140000">
+  <link rel="stylesheet" href="../assets/css/post.css?v=20260615140000">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
   <link rel="manifest" href="../manifest.webmanifest">
@@ -72,6 +72,20 @@
           <label class="studio-field">作者 <input id="author" placeholder="作者"></label>
           <label class="studio-field">封面 <input id="cover" placeholder="封面图 URL"></label>
           <label class="studio-field">slug <input id="slug" placeholder="自动生成"></label>
+          <div class="editor-series-field" id="seriesField">
+            <span class="editor-meta-label">专栏</span>
+            <div class="editor-selected-tags" id="selectedSeries" aria-live="polite"></div>
+            <div class="editor-tag-input-row">
+              <input id="seriesInput" placeholder="输入专栏名，或从下方选择" list="seriesNameList" autocomplete="off">
+              <datalist id="seriesNameList"></datalist>
+              <button class="btn btn-secondary" id="addSeriesBtn" type="button">加入专栏</button>
+            </div>
+            <div class="editor-tag-suggestions" id="seriesSuggestions"></div>
+            <label class="studio-field studio-series-order" id="seriesOrderWrap" hidden>
+              专栏内排序
+              <input id="seriesOrder" type="number" min="1" step="1" placeholder="如 1、2、3（越小越靠前）">
+            </label>
+          </div>
           <div class="studio-field studio-summary-field">
             <span class="editor-meta-label">摘要</span>
             <p class="studio-summary-text" id="summaryPreview">发布时自动从正文提取，也可点下方「生成摘要」</p>
@@ -114,6 +128,7 @@
           </div>
           <footer class="studio-panel-foot">
             <button type="button" class="studio-foot-btn" id="footAddTag">+ 添加标签</button>
+            <button type="button" class="studio-foot-btn" id="footAddSeries">+ 加入专栏</button>
             <button type="button" class="studio-foot-btn studio-foot-btn-ai" id="btnGenSummary">生成摘要</button>
           </footer>
         </section>
@@ -142,6 +157,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
-  <script type="module" src="../assets/js/editor.js?v=20260615120000"></script>
+  <script type="module" src="../assets/js/editor.js?v=20260615140000"></script>
 </body>
 </html>
