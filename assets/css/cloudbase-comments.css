@@ -189,6 +189,58 @@
   box-shadow: none;
 }
 
+/* 工具页等：去掉发表框灰底与多层边框 */
+.cb-comments--flat .cb-compose,
+.cb-comments--flat .cb-compose.cb-compose--active,
+.cb-comments--flat .cb-compose.cb-compose--focused {
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.cb-comments--flat .cb-editor {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  box-shadow: none;
+}
+
+.cb-comments--flat .cb-editor--minimal.is-focused,
+.cb-comments--flat .cb-editor--minimal.has-content {
+  border-bottom-color: color-mix(in srgb, var(--primary) 55%, var(--border));
+  box-shadow: none;
+}
+
+.cb-comments--flat .cb-editor-body,
+.cb-comments--flat .cb-editor-bar {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.cb-comments--flat .cb-field input {
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.cb-comments--flat .cb-field input:focus {
+  border-bottom-color: var(--primary);
+  box-shadow: none;
+}
+
+.cb-comments--flat .cb-empty {
+  background: transparent;
+  border: none;
+  padding: 12px 0;
+}
+
 .cb-compose-meta[hidden],
 .cb-compose-actions[hidden] {
   display: none !important;
