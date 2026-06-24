@@ -816,6 +816,24 @@ body.cb-has-mobile-dock {
   scroll-padding-bottom: calc(56px + env(safe-area-inset-bottom));
 }
 
+.cb-mobile-compose-trigger {
+  display: block;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 8px 0;
+  border: none;
+  background: none;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cb-comments--flat .cb-mobile-compose-trigger {
+  padding-left: 0;
+}
+
 /* embed：输入时 iframe 固定底栏，页面仍可滚动 */
 .cb-embed-wrap--compose-pinned {
   height: 0;
@@ -849,6 +867,10 @@ body.cb-has-mobile-dock {
 
 @media (max-width: 640px) {
   .cb-comments--mobile-dock > .cb-compose {
+    display: none !important;
+  }
+
+  .cb-comments--mobile-dock .cb-inline-reply {
     display: none !important;
   }
 
