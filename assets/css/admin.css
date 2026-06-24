@@ -584,9 +584,11 @@
 /* ---------- 编辑器 ---------- */
 .editor-page {
   height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--bg);
+  overflow: hidden;
 }
 
 .editor-bar {
@@ -678,20 +680,24 @@
 
 .editor-body {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  flex: 1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  flex: 1 1 0;
+  min-height: 0;
   overflow: hidden;
 }
 
 .editor-pane {
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  min-width: 0;
   overflow: hidden;
   border-right: 1px solid var(--border);
 }
 .editor-pane:last-child { border-right: none; }
 
 .editor-title {
+  flex-shrink: 0;
   padding: 24px 32px 8px;
   font-size: 28px;
   font-weight: 700;
@@ -704,6 +710,7 @@
 .editor-title::placeholder { color: var(--text-tertiary); }
 
 .editor-meta {
+  flex-shrink: 0;
   padding: 0 32px 12px;
   display: flex;
   flex-wrap: wrap;
@@ -711,7 +718,41 @@
   font-size: 12px;
   color: var(--text-secondary);
   border-bottom: 1px solid var(--border);
+  max-height: min(40vh, 340px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  transition: max-height 0.2s ease, padding 0.2s ease;
 }
+.editor-meta.is-collapsed {
+  max-height: 36px;
+  overflow: hidden;
+  padding-bottom: 8px;
+}
+.editor-meta-toolbar {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: -2px;
+}
+.editor-meta-toolbar span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.editor-meta-collapse {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  font-size: 12px;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+.editor-meta-collapse:hover { text-decoration: underline; }
 .editor-meta input {
   background: var(--bg-soft);
   padding: 5px 10px;
@@ -847,7 +888,8 @@
 }
 
 .editor-textarea {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
   padding: 18px 32px 32px;
   font-family: var(--font-mono);
   font-size: 14px;
@@ -857,11 +899,18 @@
   outline: none;
   background: var(--bg);
   color: var(--text-main);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .editor-preview {
+  flex: 1 1 0;
+  min-height: 0;
   padding: 24px 32px;
+  overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background: var(--bg-soft);
 }
 .editor-preview .article-title { font-size: 24px; margin-bottom: 16px; }
@@ -884,11 +933,10 @@
 }
 
 /* EasyMDE 集成时的样式 —— 必须形成 flex 高度链路：
-   .editor-pane(overflow:hidden) → .EasyMDEContainer(flex:1, min-height:0)
-   → .CodeMirror(flex:1, min-height:0) → .CodeMirror-scroll(overflow:auto)
-   否则 CodeMirror 会被内容撑大并被外层裁掉，滚动条消失 */
+   .editor-pane(min-height:0) → .EasyMDEContainer(flex:1) → .CodeMirror(固定高度由 JS 写入)
+   → .CodeMirror-scroll(overflow:auto)。父级用 height:auto 会导致内部无法滚动。 */
 .EasyMDEContainer {
-  flex: 1;
+  flex: 1 1 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -896,22 +944,18 @@
   overflow: hidden;
 }
 .EasyMDEContainer .CodeMirror {
-  flex: 1;
-  min-height: 0;
-  height: auto !important;       /* 抵消 EasyMDE 写入的 inline height */
+  flex: 1 1 0;
+  min-height: 120px;
   background: transparent;
   color: var(--text-main);
   border: none;
   padding: 12px 0;
 }
 .EasyMDEContainer .CodeMirror-scroll {
-  height: 100% !important;
-  max-height: none !important;
   min-height: 0;
   overflow: auto !important;
   -webkit-overflow-scrolling: touch;
 }
-.EasyMDEContainer .CodeMirror-sizer { min-height: 0 !important; }
 .EasyMDEContainer .editor-toolbar {
   flex-shrink: 0;
   border: 1px solid var(--border);
