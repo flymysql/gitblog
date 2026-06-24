@@ -1126,7 +1126,7 @@ export function mountCloudBaseComments(targetEl, path, opts = {}) {
   if (!targetEl || !path) return false;
   const cfg = cloudbaseCfg();
   const mode = String(cfg.accessMode || 'embed').trim().toLowerCase();
-  if (mode === 'embed' && shouldUseMobileCommentDock(opts)) {
+  if (mode === 'embed') {
     return mountCloudBaseEmbed(targetEl, path, opts);
   }
   return mountCloudBaseDirect(targetEl, path, opts);
