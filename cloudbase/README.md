@@ -34,54 +34,39 @@ cd cloudbase
 tcb fn deploy gitblog-comments -e gitbolg-d7gmnsrw46e011706
 ```
 
-## 3. 云函数 HTTP 访问与权限（embed 模式必做）
+## 3. 云函数权限与匿名登录（embed 模式必做）
 
-嵌入页通过 **HTTP** 调用云函数（不再走 Web SDK 匿名登录），须完成以下配置：
+嵌入页托管在 `*.tcloudbaseapp.com`，通过 **Web SDK** 调用同环境云函数（移动端/微信内置浏览器更稳定，避免跨域 HTTP 被拦截）。
 
-### 3.1 开启 HTTP 访问
+### 3.1 开启匿名登录
 
-控制台 → **云函数** → `gitblog-comments` → **HTTP 访问服务** → **开启**
+控制台 → **登录授权** → 开启 **匿名登录**
 
-记录 HTTP 地址，形如：
+### 3.2 配置云函数安全规则
 
-`https://gitbolg-d7gmnsrw46e011706.ap-shanghai.app.tcloudbase.com/gitblog-comments`
-
-### 3.2 配置云函数安全规则（解决 PERMISSION_DENIED）
-
-若页面出现：
-
-`{"code":"OPERATION_FAIL","msg":"[PERMISSION_DENIED] Permission denied"}`
-
-说明云函数默认不允许未登录调用。请按以下步骤修改：
-
-1. 控制台 → **云函数** → `gitblog-comments` → **权限控制** / **安全规则**
-2. 选择 **安全规则**，粘贴：
+控制台 → **云函数** → `gitblog-comments` → **权限控制** → **安全规则**：
 
 ```json
 {
-  "*": {
-    "invoke": true
-  },
-  "gitblog-comments": {
-    "invoke": true
-  }
+  "*": { "invoke": true },
+  "gitblog-comments": { "invoke": true }
 }
 ```
 
-3. 保存后等待约 1 分钟生效
+（参考 `cloudbase/security-rules.gitblog-comments.json`）
 
-> `invoke: true` 表示允许所有人（含未登录）调用，适合公开评论接口。
+若出现 `PERMISSION_DENIED`，通常是安全规则未放开或未开启匿名登录。
 
-### 3.3 重新部署云函数
+### 3.3 开启 HTTP 访问（可选兜底）
 
-修改 CORS 或代码后：
+SDK 失败时嵌入页会尝试 HTTP。控制台 → 云函数 → **HTTP 访问服务** → 开启。
+
+### 3.4 重新部署云函数
 
 ```bash
 cd cloudbase
 tcb fn deploy gitblog-comments -e gitbolg-d7gmnsrw46e011706
 ```
-
-云函数已自动允许 `*.tcloudbaseapp.com` 来源跨域（嵌入页托管域）。
 
 ## 4. 部署评论嵌入页（免费版必做）
 
@@ -115,7 +100,7 @@ embedBaseUrl: 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com',
 | 文件 | 说明 |
 |------|------|
 | `static/comments-embed.html` | 嵌入页入口 |
-| `static/comments-embed.js` | 评论 UI + HTTP 调用云函数 |
+| `static/comments-embed.js` | 评论 UI + SDK 调用云函数（HTTP 兜底） |
 | `static/comments-embed.css` | 样式（支持 light/dark） |
 
 更新评论 UI 后需重新执行 `tcb hosting deploy ./static`。
@@ -195,6 +180,18 @@ cloudbase: {
 
 返回 `{ ok: true, ... }` 或 `{ ok: false, message }`。
 
-## 11. 费用提示
+## 11. 故障排查
+
+### PC 正常、手机/微信报错
+
+旧版嵌入页用 HTTP 跨域请求 `app.tcloudbase.com`，微信内置浏览器和部分移动 Safari 会拦截，表现为「请确认云函数已部署…」。
+
+**处理：** 重新部署 `cloudbase/static`（新版优先走 SDK）。并确认已开启匿名登录 + 安全规则 `invoke: true`。
+
+### 嵌入页 404
+
+`embedBaseUrl` 须与 `tcb hosting deploy` 输出的完整域名一致（含 `-数字` 后缀）。
+
+## 12. 费用提示
 
 CloudBase 免费体验版有每月资源点限制；个人博客评论量通常足够。详见 [CloudBase 价格文档](https://cloud.tencent.com/document/product/876/75213)。
