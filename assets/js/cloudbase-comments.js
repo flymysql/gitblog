@@ -539,6 +539,47 @@ function createMobileDockChrome() {
   return { dock };
 }
 
+const MOBILE_DOCK_ARTICLE_RATIO = 0.5;
+
+function resolveMobileDockScrollRoot(anchorEl) {
+  const article = document.getElementById('article');
+  if (article) return article;
+  return anchorEl?.closest('.comments') || anchorEl?.closest('main') || anchorEl;
+}
+
+function isMobileDockScrollReached(scrollRoot) {
+  if (!scrollRoot) return false;
+  const rect = scrollRoot.getBoundingClientRect();
+  const top = window.scrollY + rect.top;
+  const height = scrollRoot.offsetHeight || rect.height;
+  if (height <= 0) return false;
+  const mid = top + height * MOBILE_DOCK_ARTICLE_RATIO;
+  const viewportBottom = window.scrollY + window.innerHeight;
+  return viewportBottom >= mid;
+}
+
+/** 阅读到正文约一半时触发底栏显示 */
+function bindMobileDockScrollTrigger(anchorEl, onReachChange) {
+  const scrollRoot = resolveMobileDockScrollRoot(anchorEl);
+  let reached = false;
+
+  const update = () => {
+    const next = isMobileDockScrollReached(scrollRoot);
+    if (next === reached) return;
+    reached = next;
+    onReachChange(reached);
+  };
+
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+
+  return () => {
+    window.removeEventListener('scroll', update);
+    window.removeEventListener('resize', update);
+  };
+}
+
 /** 移动端：父页底部吸附条 + iframe 底栏输入（不锁滚动） */
 function bindMobileEmbedDock(embedWrap, iframe) {
   if (!isMobileCommentDock()) return () => {};
@@ -560,11 +601,10 @@ function bindMobileEmbedDock(embedWrap, iframe) {
     postDockState(show);
   };
 
-  const io = new IntersectionObserver(entries => {
-    sectionVisible = entries.some(e => e.isIntersecting);
+  const io = bindMobileDockScrollTrigger(embedWrap, visible => {
+    sectionVisible = visible;
     syncDock();
-  }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
-  io.observe(embedWrap);
+  });
 
   const openCompose = () => {
     composeOpen = true;
@@ -590,7 +630,7 @@ function bindMobileEmbedDock(embedWrap, iframe) {
   window.addEventListener('message', onMessage);
 
   return () => {
-    io.disconnect();
+    io();
     dock.remove();
     window.removeEventListener('message', onMessage);
     document.body.classList.remove('cb-has-mobile-dock');
@@ -623,11 +663,10 @@ function bindMobileDirectDock(observeEl, form, editor) {
     },
   });
 
-  const io = new IntersectionObserver(entries => {
-    sectionVisible = entries.some(e => e.isIntersecting);
+  const io = bindMobileDockScrollTrigger(observeEl, visible => {
+    sectionVisible = visible;
     syncDock();
-  }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
-  io.observe(observeEl);
+  });
 
   const openCompose = () => {
     composeOpen = true;
@@ -644,7 +683,7 @@ function bindMobileDirectDock(observeEl, form, editor) {
 
   return {
     cleanup: () => {
-      io.disconnect();
+      io();
       dock.remove();
       document.body.classList.remove('cb-has-mobile-dock');
     },
