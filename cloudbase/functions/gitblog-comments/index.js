@@ -8,11 +8,14 @@ const db = app.database();
 
 const COLLECTION = 'gitblog_comments';
 const RATE_COLLECTION = 'gitblog_comment_rates';
+const UPLOAD_COLLECTION = 'gitblog_comment_uploads';
 const MAX_HTML_LEN = 12000;
 const MAX_PLAIN_HINT = 8000;
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 const RATE_MAX = 8;
 const UPLOAD_MAX_BYTES = 2 * 1024 * 1024;
+const ORPHAN_IMAGE_MIN_AGE_MS = Number(process.env.COMMENT_ORPHAN_IMAGE_MIN_AGE_MS) || 24 * 60 * 60 * 1000;
+const CLEANUP_BATCH = Math.min(Math.max(Number(process.env.COMMENT_CLEANUP_BATCH) || 40, 1), 100);
 
 const ALLOWED_TAGS = new Set([
   'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'del', 'code', 'pre',
@@ -29,6 +32,22 @@ function jsonErr(message, code = 400) {
 
 function hashIp(ip) {
   return crypto.createHash('sha256').update(String(ip || '') + (process.env.COMMENT_SALT || 'gitblog')).digest('hex').slice(0, 24);
+}
+
+function sanitizeNick(raw) {
+  const nick = String(raw || '').replace(/\d/g, '').trim().slice(0, 40);
+  return nick || '访客';
+}
+
+function extractFileIdsFromHtml(html) {
+  const ids = new Set();
+  const raw = String(html || '');
+  raw.replace(/data-cb-fileid\s*=\s*(?:"([^"]*)"|'([^']*)')/gi, (full, d1, d2) => {
+    const v = String(d1 || d2 || '').trim();
+    if (v.startsWith('cloud://')) ids.add(v);
+    return full;
+  });
+  return [...ids];
 }
 
 const IMAGE_PROXY_CACHE_MAX_AGE = 604800;
@@ -211,6 +230,31 @@ async function ensureCollections() {
   try {
     await db.createCollection(RATE_COLLECTION);
   } catch (_) { /* exists */ }
+  try {
+    await db.createCollection(UPLOAD_COLLECTION);
+  } catch (_) { /* exists */ }
+}
+
+async function trackCommentUpload(fileId, cloudPath) {
+  try {
+    await db.collection(UPLOAD_COLLECTION).add({
+      fileId,
+      cloudPath,
+      used: false,
+      createdAt: Date.now(),
+    });
+  } catch (err) {
+    console.error('track upload failed', err);
+  }
+}
+
+async function markUploadsUsed(fileIds) {
+  const ids = [...new Set((fileIds || []).filter(id => String(id).startsWith('cloud://')))];
+  if (!ids.length) return;
+  const now = Date.now();
+  await Promise.all(ids.map(fileId =>
+    db.collection(UPLOAD_COLLECTION).where({ fileId }).update({ used: true, usedAt: now }).catch(() => null)
+  ));
 }
 
 async function checkRate(ipHash) {
@@ -403,7 +447,7 @@ async function handlePost(event, context) {
   const now = Date.now();
   const pageTitle = String(event.pageTitle || '').slice(0, 200);
   const pageUrl = String(event.pageUrl || '').slice(0, 500);
-  const nick = String(event.nick || '').trim().slice(0, 40) || '访客';
+  const nick = sanitizeNick(event.nick);
   const doc = {
     path,
     nick,
@@ -421,6 +465,8 @@ async function handlePost(event, context) {
   };
 
   const addRes = await db.collection(COLLECTION).add(doc);
+
+  await markUploadsUsed(extractFileIdsFromHtml(contentHtml));
 
   if (parentDoc && isValidEmail(parentDoc.email) && !moderation) {
     const excerpt = stripPlain(contentHtml).slice(0, 200);
@@ -459,7 +505,60 @@ async function handleUpload(event, context) {
   const fileId = uploadRes.fileID;
   if (!isAllowedCommentImageFileId(fileId)) return jsonErr('图片上传失败');
 
+  await trackCommentUpload(fileId, cloudPath);
+
   return jsonOk({ url: COMMENT_IMG_PLACEHOLDER, fileId });
+}
+
+async function handleDiscardUpload(event, context) {
+  const fileId = String(event.fileId || '').trim();
+  if (!isAllowedCommentImageFileId(fileId)) return jsonErr('无效图片', 400);
+  const ip = context?.requestContext?.sourceIp || context?.CLIENTIP || '';
+  if (!(await checkRate(hashIp(ip)))) return jsonErr('操作过于频繁', 429);
+
+  const got = await db.collection(UPLOAD_COLLECTION).where({ fileId, used: false }).limit(1).get();
+  const row = got?.data?.[0];
+  if (!row) return jsonOk({ discarded: false });
+
+  try {
+    await app.deleteFile({ fileList: [fileId] });
+    await db.collection(UPLOAD_COLLECTION).doc(row._id).remove();
+    return jsonOk({ discarded: true });
+  } catch (err) {
+    console.error('discard upload failed', err);
+    return jsonErr('删除失败', 500);
+  }
+}
+
+async function handleCleanupOrphans() {
+  const _ = db.command;
+  const cutoff = Date.now() - ORPHAN_IMAGE_MIN_AGE_MS;
+  const res = await db.collection(UPLOAD_COLLECTION)
+    .where({ used: false, createdAt: _.lt(cutoff) })
+    .limit(CLEANUP_BATCH)
+    .get();
+
+  const rows = res?.data || [];
+  let deleted = 0;
+  let failed = 0;
+
+  for (const row of rows) {
+    const fileId = String(row.fileId || '').trim();
+    if (!isAllowedCommentImageFileId(fileId)) {
+      await db.collection(UPLOAD_COLLECTION).doc(row._id).remove().catch(() => null);
+      continue;
+    }
+    try {
+      await app.deleteFile({ fileList: [fileId] });
+      await db.collection(UPLOAD_COLLECTION).doc(row._id).remove();
+      deleted += 1;
+    } catch (err) {
+      failed += 1;
+      console.error('orphan cleanup failed', fileId, err);
+    }
+  }
+
+  return jsonOk({ deleted, failed, scanned: rows.length });
 }
 
 async function handleImage(event) {
@@ -512,6 +611,8 @@ async function dispatch(event, context) {
   if (action === 'POST') return await handlePost(event, context);
   if (action === 'UPLOAD') return await handleUpload(event, context);
   if (action === 'IMAGE') return await handleImage(event);
+  if (action === 'DISCARD_UPLOAD') return await handleDiscardUpload(event, context);
+  if (action === 'CLEANUP') return await handleCleanupOrphans();
   return jsonErr('未知 action');
 }
 
@@ -574,9 +675,18 @@ function buildHttpContext(event, context) {
   };
 }
 
+function isTimerEvent(event) {
+  const t = String(event?.Type || event?.type || '').toLowerCase();
+  return t === 'timer' || !!(event?.TriggerName || event?.triggerName);
+}
+
 exports.main = async (event, context) => {
   try {
     await ensureCollections();
+
+    if (isTimerEvent(event)) {
+      return await handleCleanupOrphans();
+    }
 
     if (isHttpEvent(event)) {
       const origin = event.headers?.origin || event.headers?.Origin || '';
