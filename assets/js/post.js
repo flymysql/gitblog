@@ -15,6 +15,10 @@ import { commentPathForPost, mountComments, getCommentsProvider } from './commen
 
 const $ = sel => document.querySelector(sel);
 
+function isMobilePostViewport() {
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 720px)').matches;
+}
+
 function publicImageUrl(url) {
   const s = String(url || '').trim();
   if (!s) return '';
@@ -353,7 +357,9 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
   const article = $('#article');
   if (!article) return;
 
-  if (prev || next) {
+  const mobile = isMobilePostViewport();
+
+  if (!mobile && (prev || next)) {
     const nav = document.createElement('nav');
     nav.className = 'post-neighbors';
     nav.innerHTML = `
@@ -373,22 +379,52 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
 
   if (related.length) {
     const sec = document.createElement('section');
-    sec.className = 'post-related';
-    sec.innerHTML = `
-      <div class="post-related-title">相关文章</div>
-      <ul class="post-related-list">
-        ${related.map(p => `
-          <li>
-            <a href="${postPathFromPost(p)}">
-              <span class="t">${escapeHtml(p.title || '无标题')}</span>
-              <span class="meta">${fmtDate(p.date)} · ${(p.tags || []).slice(0, 3).map(t => '#' + escapeHtml(t)).join(' ')}</span>
-            </a>
-          </li>
-        `).join('')}
-      </ul>
-    `;
+    sec.className = mobile ? 'post-related post-related--cards' : 'post-related';
+    if (mobile) {
+      sec.innerHTML = `
+        <div class="post-related-title">相关文章</div>
+        <div class="post-related-cards">
+          ${related.map(p => renderRelatedCard(p)).join('')}
+        </div>
+      `;
+    } else {
+      sec.innerHTML = `
+        <div class="post-related-title">相关文章</div>
+        <ul class="post-related-list">
+          ${related.map(p => `
+            <li>
+              <a href="${postPathFromPost(p)}">
+                <span class="t">${escapeHtml(p.title || '无标题')}</span>
+                <span class="meta">${fmtDate(p.date)} · ${(p.tags || []).slice(0, 3).map(t => '#' + escapeHtml(t)).join(' ')}</span>
+              </a>
+            </li>
+          `).join('')}
+        </ul>
+      `;
+    }
     article.appendChild(sec);
   }
+}
+
+function renderRelatedCard(p) {
+  const href = postPathFromPost(p);
+  const title = escapeHtml(p.title || '无标题');
+  const date = fmtDate(p.date);
+  const tag = (p.tags || [])[0];
+  const cover = p.cover ? absolutePublicImageUrl(p.cover) : '';
+  const thumb = cover ? thumbUrlFor(cover) : '';
+  return `
+    <a class="post-related-card" href="${href}">
+      ${thumb
+        ? `<span class="post-related-card-media"><img src="${escapeHtml(thumb)}" alt="" loading="lazy" decoding="async"></span>`
+        : `<span class="post-related-card-media post-related-card-media--placeholder" aria-hidden="true"><span>文</span></span>`}
+      <span class="post-related-card-body">
+        <span class="post-related-card-title">${title}</span>
+        <span class="post-related-card-meta">${escapeHtml(date)}${tag ? ` · ${escapeHtml(tag)}` : ''}</span>
+      </span>
+      <span class="post-related-card-chevron" aria-hidden="true">›</span>
+    </a>
+  `;
 }
 
 // ---------- 系列文章目录 ----------

@@ -516,6 +516,106 @@
 .post-related-list .t { color: var(--text-main); font-weight: 600; }
 .post-related-list .meta { color: var(--text-tertiary); font-size: 12px; }
 
+/* 移动端：相关文章卡片列表 */
+.post-related--cards {
+  margin-top: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.post-related--cards .post-related-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  padding: 0 2px;
+}
+
+.post-related-cards {
+  display: grid;
+  gap: 10px;
+}
+
+.post-related-card {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 10px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-elev);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.post-related-card:hover {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.post-related-card:active {
+  transform: scale(0.99);
+}
+
+.post-related-card-media {
+  width: 72px;
+  height: 54px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-soft);
+}
+
+.post-related-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.post-related-card-media--placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--primary);
+  font-size: 18px;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--primary) 12%, var(--bg-soft));
+}
+
+.post-related-card-body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.post-related-card-title {
+  color: var(--text-main);
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.post-related-card-meta {
+  color: var(--text-tertiary);
+  font-size: 11.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.post-related-card-chevron {
+  color: var(--text-tertiary);
+  font-size: 22px;
+  line-height: 1;
+  opacity: 0.5;
+  padding-right: 2px;
+}
+
 /* ---------- 外链图标 / 脚注 / 打印 ---------- */
 .article-body a.external-link::after {
   content: "↗";
@@ -576,9 +676,14 @@
     width: 38px;
     height: 38px;
   }
+  .article-footer,
+  .post-neighbors {
+    display: none !important;
+  }
   .post-neighbors { grid-template-columns: 1fr; }
   .post-neighbor.next { text-align: left; }
-  .post-related { padding: 16px 14px; }
+  .post-related:not(.post-related--cards) { padding: 16px 14px; }
+  .post-related--cards { margin-top: 24px; }
   .lightbox { padding: 18px; }
   .lightbox-close { right: 14px; top: 14px; }
 }
