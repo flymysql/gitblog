@@ -16,6 +16,87 @@ const $ = (sel, root = document) => root.querySelector(sel);
 // 进入视口前 300px 才注入真实 src，对长文章 / 多图首页效果显著
 // ============================================================================
 export const LAZY_PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E';
+
+/** 由原图路径推导 .thumb.webp（与 scripts/thumbnail-lib.mjs 命名一致） */
+export function thumbUrlFor(src) {
+  const s = String(src || '').trim().split('?')[0].split('#')[0];
+  if (!s || /\.thumb\.webp$/i.test(s)) return '';
+  if (/^https?:\/\//i.test(s) || s.startsWith('//') || s.startsWith('data:')) return '';
+  const m = s.match(/^(.*)\.([a-z0-9]+)$/i);
+  if (!m) return '';
+  return `${m[1]}.thumb.webp`;
+}
+
+let pageRenderComplete = false;
+const _upgradeQueue = new Set();
+let _upgradeScheduled = false;
+
+function upgradeImageToFull(img) {
+  const full = img.dataset.fullSrc;
+  if (!full || img.dataset.upgraded === '1') return;
+  const thumb = img.dataset.thumb || thumbUrlFor(full);
+  if (!thumb || full === thumb) {
+    img.dataset.upgraded = '1';
+    return;
+  }
+  if (img.src === full || img.currentSrc === full) {
+    img.dataset.upgraded = '1';
+    return;
+  }
+  const probe = new Image();
+  probe.decoding = 'async';
+  probe.onload = () => {
+    img.src = full;
+    img.dataset.upgraded = '1';
+    img.classList.add('progressive-upgraded');
+  };
+  probe.onerror = () => { img.dataset.upgraded = '1'; };
+  probe.src = full;
+}
+
+function flushProgressiveUpgradeQueue() {
+  _upgradeScheduled = false;
+  for (const img of _upgradeQueue) {
+    _upgradeQueue.delete(img);
+    upgradeImageToFull(img);
+  }
+}
+
+function queueProgressiveUpgrade(img) {
+  if (!img || !img.dataset.fullSrc || img.dataset.upgraded === '1') return;
+  const full = img.dataset.fullSrc;
+  const thumb = img.dataset.thumb || thumbUrlFor(full);
+  if (!thumb || full === thumb) {
+    img.dataset.upgraded = '1';
+    return;
+  }
+  _upgradeQueue.add(img);
+  if (_upgradeScheduled) return;
+  _upgradeScheduled = true;
+  const ric = window.requestIdleCallback;
+  if (ric) ric(flushProgressiveUpgradeQueue, { timeout: 4000 });
+  else setTimeout(flushProgressiveUpgradeQueue, 800);
+}
+
+export function scheduleProgressiveUpgrade(root = document) {
+  root.querySelectorAll('img[data-full-src]').forEach(img => {
+    if (img.dataset.src) return;
+    queueProgressiveUpgrade(img);
+  });
+}
+
+function initProgressiveImages() {
+  if (typeof window === 'undefined') return;
+  const onReady = () => {
+    pageRenderComplete = true;
+    scheduleProgressiveUpgrade();
+  };
+  if (document.readyState === 'complete') onReady();
+  else window.addEventListener('load', onReady, { once: true });
+}
+
+initProgressiveImages();
+
 let _lazyObs = null;
 function getLazyObserver() {
   if (_lazyObs) return _lazyObs;
@@ -24,13 +105,14 @@ function getLazyObserver() {
     for (const e of entries) {
       if (!e.isIntersecting) continue;
       const img = e.target;
-      const real = img.dataset.src;
-      if (real) {
-        img.src = real;
+      const phase1 = img.dataset.src;
+      if (phase1) {
+        img.src = phase1;
         img.removeAttribute('data-src');
       }
       img.classList.remove('lazy-pending');
       _lazyObs.unobserve(img);
+      if (pageRenderComplete) queueProgressiveUpgrade(img);
     }
   }, { rootMargin: '300px 0px', threshold: 0.01 });
   return _lazyObs;
@@ -40,29 +122,51 @@ export function lazyImage(img, { eager = false } = {}) {
   if (!img || img.dataset.lazied) return;
   img.dataset.lazied = '1';
   img.decoding = img.decoding || 'async';
+
+  let fullSrc = img.dataset.fullSrc || '';
   const pendingSrc = img.dataset.src;
+  const rawSrc = img.getAttribute('src') || '';
+
+  if (!fullSrc && pendingSrc && !pendingSrc.startsWith('data:image/svg')) {
+    fullSrc = pendingSrc;
+  }
+  if (!fullSrc && rawSrc && rawSrc !== LAZY_PLACEHOLDER && !rawSrc.startsWith('data:image/svg')) {
+    fullSrc = rawSrc;
+  }
+  if (!fullSrc) {
+    if (rawSrc && rawSrc !== LAZY_PLACEHOLDER) img.loading = 'lazy';
+    return;
+  }
+
+  img.dataset.fullSrc = fullSrc;
+  const thumbSrc = img.dataset.thumb || thumbUrlFor(fullSrc);
+  if (thumbSrc && thumbSrc !== fullSrc) img.dataset.thumb = thumbSrc;
+  const phase1 = thumbSrc && thumbSrc !== fullSrc ? thumbSrc : fullSrc;
+  const needsUpgrade = phase1 !== fullSrc;
+
   if (eager) {
     img.loading = 'eager';
     if (!img.getAttribute('fetchpriority')) img.setAttribute('fetchpriority', 'high');
-    if (pendingSrc) {
-      img.src = pendingSrc;
-      img.removeAttribute('data-src');
-    }
+    img.src = phase1;
+    img.removeAttribute('data-src');
+    img.classList.add('progressive-img');
+    if (needsUpgrade && pageRenderComplete) queueProgressiveUpgrade(img);
     return;
   }
-  const realSrc = pendingSrc || img.getAttribute('src');
-  if (!realSrc || (realSrc.startsWith('data:') && !pendingSrc)) {
-    img.loading = 'lazy';
-    return;
-  }
-  img.dataset.src = realSrc;
+
+  img.dataset.src = phase1;
   img.setAttribute('src', LAZY_PLACEHOLDER);
   img.loading = 'lazy';
   if (!img.getAttribute('fetchpriority')) img.setAttribute('fetchpriority', 'low');
-  img.classList.add('lazy-pending');
+  img.classList.add('lazy-pending', 'progressive-img');
   const io = getLazyObserver();
   if (io) io.observe(img);
-  else { img.src = realSrc; img.removeAttribute('data-src'); img.classList.remove('lazy-pending'); }
+  else {
+    img.src = phase1;
+    img.removeAttribute('data-src');
+    img.classList.remove('lazy-pending');
+    if (needsUpgrade && pageRenderComplete) queueProgressiveUpgrade(img);
+  }
 }
 
 // 给 root 内所有 img 设置懒加载；前 eagerCount 张保持立即加载（首屏 LCP 友好）

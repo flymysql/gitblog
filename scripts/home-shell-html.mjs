@@ -1,5 +1,7 @@
 // 构建期首页首屏 HTML（与 assets/js/home.js 结构对齐，减少 FOUC / CLS）
+import { existsSync } from 'node:fs';
 import { escapeHtml } from './markdown-render.mjs';
+import { thumbPathFor, normalizeLocalImagePath } from './thumbnail-lib.mjs';
 
 const LAZY_PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E';
 
@@ -160,6 +162,21 @@ function publicImageUrl(url) {
   return String(url || '').replace(/^\.\.\/assets\//, 'assets/');
 }
 
+function progressiveImgAttrs(fullUrl, { eager = false, alt = '' } = {}) {
+  const full = publicImageUrl(fullUrl);
+  const local = normalizeLocalImagePath(fullUrl);
+  const thumbLocal = local && existsSync(thumbPathFor(local)) ? thumbPathFor(local) : null;
+  const thumb = thumbLocal ? publicImageUrl(thumbLocal) : full;
+  const hasUpgrade = thumb !== full;
+  const loading = eager ? 'eager' : 'lazy';
+  const fp = eager ? 'high' : 'low';
+  const src = eager ? (hasUpgrade ? thumb : full) : LAZY_PLACEHOLDER;
+  const dataSrc = eager || !hasUpgrade ? '' : ` data-src="${escapeHtml(thumb)}"`;
+  const thumbAttr = hasUpgrade ? ` data-thumb="${escapeHtml(thumb)}"` : '';
+  const fullAttr = ` data-full-src="${escapeHtml(full)}"`;
+  return `src="${escapeHtml(src)}"${dataSrc}${thumbAttr}${fullAttr} alt="${escapeHtml(alt)}" loading="${loading}" decoding="async" fetchpriority="${fp}" class="lazy-pending progressive-img"`;
+}
+
 export function postHrefFromEntry(p, postPublicAbsUrl) {
   try {
     return new URL(postPublicAbsUrl(p)).pathname;
@@ -187,7 +204,7 @@ export function buildHeroShell({ description, avatar, postCount, tagCount, pathP
 
 export function buildPostItemShell(p, { author, avatar, postHrefFromEntry: hrefFn }) {
   const href = hrefFn(p);
-  const cover = p.cover ? publicImageUrl(p.thumbnail || p.cover) : '';
+  const coverAttrs = p.cover ? progressiveImgAttrs(p.cover, { alt: p.title || '' }) : '';
   return `<li class="post-item" data-slug="${escapeHtml(p.slug || '')}">
       <a class="post-content" href="${escapeHtml(href)}">
         <div class="post-author-row">
@@ -203,7 +220,7 @@ export function buildPostItemShell(p, { author, avatar, postHrefFromEntry: hrefF
           ${(p.tags || []).slice(0, 3).map(t => tagHtml(t)).join('')}
         </div>
       </a>
-      ${cover ? `<a href="${escapeHtml(href)}" class="post-thumbnail"><img src="${LAZY_PLACEHOLDER}" data-src="${escapeHtml(cover)}" alt="${escapeHtml(p.title || '')}" loading="lazy" decoding="async" fetchpriority="low" class="lazy-pending"></a>` : ''}
+      ${coverAttrs ? `<a href="${escapeHtml(href)}" class="post-thumbnail"><img ${coverAttrs}></a>` : ''}
     </li>`;
 }
 
@@ -236,12 +253,7 @@ export function buildCarouselShell(items, { postHrefFromEntry: hrefFn }) {
   return `<div class="carousel-viewport">
       ${items.map((p, i) => `
         <a class="carousel-slide${i === 0 ? ' active' : ''}" href="${escapeHtml(hrefFn(p))}" aria-label="${escapeHtml(p.title || '文章')}">
-          <img
-            src="${escapeHtml(i === 0 ? publicImageUrl(p.cover) : LAZY_PLACEHOLDER)}"
-            ${i === 0 ? 'fetchpriority="high"' : `data-src="${escapeHtml(publicImageUrl(p.cover))}" fetchpriority="low"`}
-            alt="${escapeHtml(p.title || '')}"
-            loading="${i === 0 ? 'eager' : 'lazy'}"
-            decoding="async">
+          <img ${progressiveImgAttrs(p.cover, { eager: i === 0, alt: p.title || '' })}>
           <span class="carousel-shade"></span>
           <span class="carousel-content">
             ${p.pinned ? '<span class="carousel-badge">置顶推荐</span>' : '<span class="carousel-badge">精选文章</span>'}
