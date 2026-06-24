@@ -125,9 +125,11 @@
         "教程",
         "项目介绍"
       ],
-      "path": "posts/welcome.md",
       "cover": "../assets/uploads/2026/05/1778490605877-blwjij-image.webp",
-      "carousel": true
+      "carousel": true,
+      "path": "posts/welcome.md",
+      "urlKey": "welcome",
+      "thumbnail": "../assets/uploads/2026/05/1778490605877-blwjij-image.thumb.webp"
     },
     {
       "slug": "about",
