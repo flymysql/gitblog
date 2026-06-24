@@ -147,7 +147,20 @@ node deploy-static-embed.mjs
 
 控制台 → 云存储 → 权限：允许**所有用户可读**，**仅云函数可写**。
 
-评论图片通过云函数 `getTempFileURL` 获取 CDN 下载地址（公开读权限下链接长期有效）。评论 HTML 中会保存 `data-cb-fileid` 以便刷新链接；若图片无法显示，请检查云存储是否为**所有用户可读**。
+评论图片通过云函数 **HTTP 代理**输出（`?action=IMAGE&fileId=cloud://...`），由云函数以管理员权限读取云存储，避免浏览器直接访问 CDN 临时链时因**安全规则**返回 403。
+
+请确保云函数已开启 **HTTP 访问**（路径 `gitblog-comments`），与评论 API 共用同一地址。
+
+可选：若希望浏览器直连 CDN，可在控制台将云存储安全规则设为允许 `comments/` 公开读：
+
+```json
+{
+  "read": "/^comments\\//.test(resource.path)",
+  "write": "false"
+}
+```
+
+上传仍仅允许云函数写入（基础权限：所有用户可读，仅管理员可写）。
 
 ## 7. 云函数环境变量
 
@@ -156,6 +169,7 @@ node deploy-static-embed.mjs
 | `COMMENT_MODERATION` | `1` 开启审核，`0` 直接显示 |
 | `COMMENT_SALT` | 随机字符串，用于 IP hash |
 | `ALLOWED_ORIGINS` | HTTP 模式跨域来源（embed 模式可忽略） |
+| `COMMENT_IMAGE_BASE_URL` | 图片代理 HTTP 根地址（可选，默认 `{envId}.{region}.app.tcloudbase.com/gitblog-comments`） |
 | `REPLY_NOTIFY_ENABLED` | `1` 开启回复邮件通知（须配置 SMTP） |
 | `SMTP_HOST` | SMTP 服务器，如 `smtp.qq.com` |
 | `SMTP_PORT` | 端口，SSL 通常 `465`，TLS 用 `587` |
