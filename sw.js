@@ -3,7 +3,7 @@
 // 与 ?v=VERSION 的 cache-busting 协同：CACHE_NAME 用 release VERSION 区分批次
 // ============================================================================
 
-const SW_VERSION = '20260624150000';
+const SW_VERSION = '20260624180000';
 const STATIC_CACHE = `static-${SW_VERSION}`;
 const PAGE_CACHE = `pages-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
@@ -12,29 +12,29 @@ const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
 const OFFLINE_URL = 'offline.html';
 
 const PRECACHE_ASSETS = [
-  'assets/dist/common.min.css?v=20260624150000',
-  'assets/dist/home.min.css?v=20260624150000',
-  'assets/dist/post.min.css?v=20260624150000',
-  'assets/dist/tools.min.css?v=20260624150000',
-  'assets/dist/admin.min.css?v=20260624150000',
-  'assets/dist/home.min.js?v=20260624150000',
-  'assets/dist/post.min.js?v=20260624150000',
-  'assets/dist/tags.min.js?v=20260624150000',
-  'assets/dist/archives.min.js?v=20260624150000',
-  'assets/dist/series.min.js?v=20260624150000',
-  'assets/dist/notes.min.js?v=20260624150000',
-  'assets/dist/tools.min.js?v=20260624150000',
-  'assets/dist/tool-age.min.js?v=20260624150000',
-  'assets/dist/tool-fortune.min.js?v=20260624150000',
-  'assets/dist/tool-json.min.js?v=20260624150000',
-  'assets/dist/tool-codec.min.js?v=20260624150000',
-  'assets/dist/tool-timestamp.min.js?v=20260624150000',
-  'assets/dist/tool-regex.min.js?v=20260624150000',
-  'assets/dist/tool-qrcode.min.js?v=20260624150000',
-  'assets/dist/tool-image.min.js?v=20260624150000',
-  'assets/dist/tool-network.min.js?v=20260624150000',
-  'assets/dist/tool-farm-seed.min.js?v=20260624150000',
-  'assets/dist/tool-major.min.js?v=20260624150000',
+  'assets/dist/common.min.css?v=20260624180000',
+  'assets/dist/home.min.css?v=20260624180000',
+  'assets/dist/post.min.css?v=20260624180000',
+  'assets/dist/tools.min.css?v=20260624180000',
+  'assets/dist/admin.min.css?v=20260624180000',
+  'assets/dist/home.min.js?v=20260624180000',
+  'assets/dist/post.min.js?v=20260624180000',
+  'assets/dist/tags.min.js?v=20260624180000',
+  'assets/dist/archives.min.js?v=20260624180000',
+  'assets/dist/series.min.js?v=20260624180000',
+  'assets/dist/notes.min.js?v=20260624180000',
+  'assets/dist/tools.min.js?v=20260624180000',
+  'assets/dist/tool-age.min.js?v=20260624180000',
+  'assets/dist/tool-fortune.min.js?v=20260624180000',
+  'assets/dist/tool-json.min.js?v=20260624180000',
+  'assets/dist/tool-codec.min.js?v=20260624180000',
+  'assets/dist/tool-timestamp.min.js?v=20260624180000',
+  'assets/dist/tool-regex.min.js?v=20260624180000',
+  'assets/dist/tool-qrcode.min.js?v=20260624180000',
+  'assets/dist/tool-image.min.js?v=20260624180000',
+  'assets/dist/tool-network.min.js?v=20260624180000',
+  'assets/dist/tool-farm-seed.min.js?v=20260624180000',
+  'assets/dist/tool-major.min.js?v=20260624180000',
 ];
 
 // 安装阶段预缓存关键文件，确保彻底离线也能至少打开首页和 offline.html
@@ -56,6 +56,8 @@ const PRECACHE_URLS = [
   'tools/tool-image.html',
   'tools/tool-network.html',
   'tools/tool-air-conditioner.html',
+  'tools/tool-farm-seed.html',
+  'tools/tool-major.html',
   'notes.html',
   'post.html',
   'offline.html',
@@ -135,6 +137,7 @@ self.addEventListener('fetch', event => {
 async function handleHtml(request, event) {
   const url = new URL(request.url);
   const postArticle = isPostArticlePath(url.pathname);
+  const toolPage = isToolPagePath(url.pathname);
 
   const network = (event.preloadResponse || Promise.resolve(null))
     .then(preload => preload || fetch(request))
@@ -146,8 +149,8 @@ async function handleHtml(request, event) {
       return res;
     });
 
-  // 文章页已预渲染完整 HTML：network-first，避免旧版「加载中…」空壳被 stale 缓存命中
-  if (postArticle) {
+  // 文章页、工具页：network-first，避免旧版 HTML 壳被 stale 缓存命中
+  if (postArticle || toolPage) {
     try {
       const res = await network;
       if (res && res.status === 200) return res;
@@ -174,6 +177,12 @@ async function handleHtml(request, event) {
 function isPostArticlePath(pathname) {
   const p = String(pathname || '').replace(/\/+$/, '') || '/';
   return /\/post\/[^/]+(?:\/index\.html)?$/i.test(p);
+}
+
+/** 工具页迭代快，走 network-first，避免刷新仍命中旧版 HTML 壳 */
+function isToolPagePath(pathname) {
+  const p = String(pathname || '').replace(/\/+$/, '') || '/';
+  return p === '/tools' || p.startsWith('/tools/');
 }
 
 async function matchHtmlShell(request) {
