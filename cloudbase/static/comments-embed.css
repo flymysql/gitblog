@@ -82,6 +82,17 @@ body { padding: 0 2px 8px; }
 
 .cb-comments-list { margin-bottom: 20px; }
 
+/* PC：输入框在评论列表上方 */
+@media (min-width: 641px) {
+  .cb-comments > .cb-compose--minimal {
+    margin-bottom: 24px;
+  }
+
+  .cb-comments > .cb-comments-list {
+    margin-bottom: 0;
+  }
+}
+
 .cb-comment {
   display: flex;
   gap: 12px;

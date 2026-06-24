@@ -717,8 +717,6 @@ async function mount() {
 
   root.innerHTML = `
     <div class="cb-comments" data-path="${escapeHtml(cfg.path)}">
-      <div class="cb-comments-loading" aria-live="polite">评论加载中…</div>
-      <div class="cb-comments-list" hidden></div>
       <form class="cb-compose cb-compose--minimal" novalidate>
         <div class="cb-compose-editor"></div>
         <div class="cb-compose-meta" hidden>
@@ -736,6 +734,8 @@ async function mount() {
           <button type="submit" class="cb-submit">发表</button>
         </div>
       </form>
+      <div class="cb-comments-loading" aria-live="polite">评论加载中…</div>
+      <div class="cb-comments-list" hidden></div>
     </div>
   `;
 
