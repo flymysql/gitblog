@@ -162,12 +162,15 @@ node deploy-static-embed.mjs
 
 上传仍仅允许云函数写入（基础权限：所有用户可读，仅管理员可写）。
 
+**孤儿图片清理**：上传时写入集合 `gitblog_comment_uploads`；评论发表成功后标记为已使用。未使用的图片在超过 `COMMENT_ORPHAN_IMAGE_MIN_AGE_MS`（默认 24 小时）后，由定时触发器 `commentImageCleanup`（每天 04:00）批量删除。用户移除待发送缩略图时会立即调用 `DISCARD_UPLOAD` 删除。
+
 ## 7. 云函数环境变量
 
 | 变量 | 说明 |
 |------|------|
 | `COMMENT_MODERATION` | `1` 开启审核，`0` 直接显示 |
 | `COMMENT_SALT` | 随机字符串，用于 IP hash |
+| `COMMENT_ORPHAN_IMAGE_MIN_AGE_MS` | 未使用评论图片保留时长（毫秒，默认 `86400000` = 24h） |
 | `ALLOWED_ORIGINS` | HTTP 模式跨域来源（embed 模式可忽略） |
 | `COMMENT_IMAGE_BASE_URL` | 图片代理 HTTP 根地址（可选，默认 `{envId}.{region}.app.tcloudbase.com/gitblog-comments`） |
 | `REPLY_NOTIFY_ENABLED` | `1` 开启回复邮件通知（须配置 SMTP） |
