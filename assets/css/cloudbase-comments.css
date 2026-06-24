@@ -156,6 +156,32 @@
 }
 
 /* ---------- 发表框 ---------- */
+.cb-compose--minimal {
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.cb-compose-meta[hidden],
+.cb-compose-actions[hidden] {
+  display: none !important;
+}
+
+.cb-compose-meta:not([hidden]) {
+  margin-top: 12px;
+  animation: cb-fade-in 0.2s ease;
+}
+
+.cb-compose-actions:not([hidden]) {
+  margin-top: 12px;
+  animation: cb-fade-in 0.2s ease;
+}
+
+@keyframes cb-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .cb-compose {
   padding: 16px 18px;
   background: var(--bg-soft);
@@ -167,7 +193,6 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 12px;
-  margin-bottom: 14px;
 }
 
 .cb-field {
@@ -198,10 +223,71 @@
 /* ---------- 富文本编辑器 ---------- */
 .cb-editor {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   background: var(--bg-elev);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
+
+.cb-editor--minimal.is-focused,
+.cb-editor--minimal.has-content {
+  border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.cb-editor-body {
+  min-height: 52px;
+  max-height: 220px;
+  overflow: auto;
+  padding: 14px 16px 8px;
+  font-size: 14px;
+  line-height: 1.75;
+  outline: none;
+}
+
+.cb-editor--minimal .cb-editor-body {
+  min-height: 48px;
+  padding: 12px 14px 6px;
+}
+
+.cb-editor-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 8px 8px 10px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease, opacity 0.15s ease, padding 0.2s ease;
+}
+
+.cb-editor--minimal.is-focused .cb-editor-bar,
+.cb-editor--minimal.has-content .cb-editor-bar {
+  max-height: 40px;
+  opacity: 1;
+  padding: 0 8px 8px 10px;
+}
+
+.cb-editor-tools {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.cb-editor-tools .cb-tb {
+  min-width: 32px;
+  height: 30px;
+  font-size: 16px;
+  border-radius: 6px;
+}
+
+.cb-editor-count {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+.cb-editor-count.is-over { color: #e74c3c; font-weight: 600; }
 
 .cb-editor-toolbar {
   display: flex;
@@ -274,16 +360,6 @@
 }
 .cb-emoji-btn:hover { background: var(--bg-elev); }
 
-.cb-editor-body {
-  min-height: 120px;
-  max-height: 280px;
-  overflow: auto;
-  padding: 12px 14px;
-  font-size: 14px;
-  line-height: 1.75;
-  outline: none;
-}
-
 .cb-editor-body:empty::before {
   content: attr(data-placeholder);
   color: var(--text-tertiary);
@@ -301,17 +377,6 @@
   font-style: italic;
 }
 
-.cb-editor-foot {
-  display: flex;
-  justify-content: flex-end;
-  padding: 4px 10px 6px;
-  border-top: 1px solid var(--border);
-  font-size: 11.5px;
-  color: var(--text-tertiary);
-}
-
-.cb-editor-count.is-over { color: #e74c3c; font-weight: 600; }
-
 .cb-compose-hint {
   margin: 8px 0 0;
   font-size: 12px;
@@ -321,9 +386,12 @@
 .cb-compose-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
-  margin-top: 12px;
+}
+
+.cb-compose--minimal .cb-compose-actions {
+  justify-content: space-between;
 }
 
 .cb-compose-status {
@@ -335,13 +403,13 @@
 
 .cb-submit {
   flex-shrink: 0;
-  height: 36px;
-  padding: 0 18px;
+  height: 34px;
+  padding: 0 16px;
   border: none;
   border-radius: 8px;
   background: var(--primary);
   color: #fff;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
   cursor: pointer;
 }
@@ -392,8 +460,17 @@
   font-size: 13px;
 }
 
-@media (max-width: 360px) {
-  .cb-compose-meta { grid-template-columns: 1fr; }
+@media (max-width: 640px) {
+  .cb-compose-meta {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+  }
   .cb-compose { padding: 12px; }
+  .cb-field { font-size: 11px; }
+  .cb-field input {
+    height: 36px;
+    padding: 0 8px;
+    font-size: 13px;
+  }
   .cb-editor-body { min-height: 100px; }
 }
