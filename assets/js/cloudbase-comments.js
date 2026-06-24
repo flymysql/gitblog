@@ -163,6 +163,10 @@ export function sanitizeCommentHtml(raw) {
         return;
       }
       const tag = child.tagName;
+      if (tag === 'SPAN' && (child.getAttribute('class') || '') === 'cb-mention') {
+        child.remove();
+        return;
+      }
       if (!allowed.has(tag)) {
         const frag = document.createDocumentFragment();
         while (child.firstChild) frag.appendChild(child.firstChild);
@@ -176,7 +180,7 @@ export function sanitizeCommentHtml(raw) {
         if (tag === 'IMG' && (n === 'src' || n === 'alt' || n === 'title' || n === 'loading')) return;
         if (tag === 'SPAN' && n === 'class') {
           const cls = child.getAttribute('class') || '';
-          if (cls === 'cb-mention' || cls === 'cb-uploading') return;
+          if (cls === 'cb-uploading') return;
           child.removeAttribute(attr.name);
           return;
         }
@@ -401,10 +405,8 @@ class CommentRichEditor {
     this._syncCount();
   }
 
-  setMentionPrefix(nick) {
-    const name = String(nick || '访客').trim() || '访客';
-    this.body.innerHTML = `<span class="cb-mention">@${escapeHtml(name)}</span>&nbsp;`;
-    this._syncCount();
+  setMentionPrefix() {
+    /* @mention 已停用 */
   }
 
   isValid() {
@@ -416,7 +418,6 @@ class CommentRichEditor {
 function renderCommentItem(c, { nested = true } = {}) {
   const nick = escapeHtml(c.nick || '访客');
   const nickRaw = escapeHtml(c.nick || '访客');
-  const replyTo = c.replyToNick ? escapeHtml(c.replyToNick) : '';
   const hue = avatarColor(c.nick);
   const content = sanitizeCommentHtml(c.contentHtml || '');
   const replies = nested && (c.replies || []).length
@@ -427,7 +428,6 @@ function renderCommentItem(c, { nested = true } = {}) {
       <div class="cb-comment-avatar" style="--cb-avatar-hue:${hue}" aria-hidden="true">${nick.slice(0, 1).toUpperCase()}</div>
       <div class="cb-comment-main">
         <header class="cb-comment-head">
-          ${replyTo ? `<span class="cb-comment-reply-badge">回复 <span class="cb-mention">@${replyTo}</span></span>` : ''}
           <strong class="cb-comment-nick">${nick}</strong>
           <time class="cb-comment-time" datetime="${escapeHtml(c.createdAtIso || '')}">${escapeHtml(formatTime(c.createdAt))}</time>
         </header>
@@ -487,14 +487,22 @@ function bindMobileComposeSheet(form, editor, { onClose, onOpen } = {}) {
 
   const close = () => {
     form.classList.remove('is-sheet-open');
-    document.documentElement.classList.remove('cb-compose-sheet-open');
+    root?.classList.remove('cb-comments--compose-only');
+    const listEl = root?.querySelector('.cb-comments-list');
+    const loadingEl = root?.querySelector('.cb-comments-loading');
+    if (listEl?.innerHTML) listEl.hidden = false;
+    if (loadingEl) loadingEl.hidden = true;
     editor.body.blur();
     onClose?.();
   };
 
   const open = () => {
     form.classList.add('is-sheet-open');
-    document.documentElement.classList.add('cb-compose-sheet-open');
+    root?.classList.add('cb-comments--compose-only');
+    const listEl = root?.querySelector('.cb-comments-list');
+    const loadingEl = root?.querySelector('.cb-comments-loading');
+    if (listEl) listEl.hidden = true;
+    if (loadingEl) loadingEl.hidden = true;
     onOpen?.();
     setTimeout(() => editor.body.focus(), 120);
   };
@@ -528,20 +536,14 @@ function createMobileDockChrome() {
     </div>
   `;
   document.body.appendChild(dock);
-
-  const backdrop = document.createElement('div');
-  backdrop.className = 'cb-mobile-compose-backdrop';
-  backdrop.hidden = true;
-  document.body.appendChild(backdrop);
-
-  return { dock, backdrop };
+  return { dock };
 }
 
-/** 移动端：父页底部吸附条 + iframe 全屏抽屉（embed 模式） */
+/** 移动端：父页底部吸附条 + iframe 底栏输入（不锁滚动） */
 function bindMobileEmbedDock(embedWrap, iframe) {
   if (!isMobileCommentDock()) return () => {};
 
-  const { dock, backdrop } = createMobileDockChrome();
+  const { dock } = createMobileDockChrome();
   let composeOpen = false;
   let sectionVisible = false;
 
@@ -567,23 +569,18 @@ function bindMobileEmbedDock(embedWrap, iframe) {
   const openCompose = () => {
     composeOpen = true;
     syncDock();
-    document.body.classList.add('cb-mobile-compose-open');
-    backdrop.hidden = false;
-    embedWrap.classList.add('cb-embed-wrap--sheet');
+    embedWrap.classList.add('cb-embed-wrap--compose-pinned');
     iframe.contentWindow?.postMessage({ type: 'gitblog-comments-compose-open' }, '*');
   };
 
   const closeCompose = () => {
     composeOpen = false;
-    document.body.classList.remove('cb-mobile-compose-open');
-    backdrop.hidden = true;
-    embedWrap.classList.remove('cb-embed-wrap--sheet');
+    embedWrap.classList.remove('cb-embed-wrap--compose-pinned');
     syncDock();
     iframe.contentWindow?.postMessage({ type: 'gitblog-comments-compose-close' }, '*');
   };
 
   dock.querySelector('.cb-mobile-dock-trigger')?.addEventListener('click', openCompose);
-  backdrop.addEventListener('click', closeCompose);
 
   const onMessage = e => {
     if (e.source !== iframe?.contentWindow) return;
@@ -595,9 +592,9 @@ function bindMobileEmbedDock(embedWrap, iframe) {
   return () => {
     io.disconnect();
     dock.remove();
-    backdrop.remove();
     window.removeEventListener('message', onMessage);
-    document.body.classList.remove('cb-has-mobile-dock', 'cb-mobile-compose-open');
+    document.body.classList.remove('cb-has-mobile-dock');
+    embedWrap.classList.remove('cb-embed-wrap--compose-pinned');
   };
 }
 
@@ -605,7 +602,7 @@ function bindMobileEmbedDock(embedWrap, iframe) {
 function bindMobileDirectDock(observeEl, form, editor) {
   if (!isMobileCommentDock()) return null;
 
-  const { dock, backdrop } = createMobileDockChrome();
+  const { dock } = createMobileDockChrome();
   let composeOpen = false;
   let sectionVisible = false;
 
@@ -617,15 +614,11 @@ function bindMobileDirectDock(observeEl, form, editor) {
 
   const sheet = bindMobileComposeSheet(form, editor, {
     onOpen: () => {
-      document.body.classList.add('cb-mobile-compose-open');
-      backdrop.hidden = false;
-      observeEl.classList.add('cb-comments--sheet-host');
+      observeEl.classList.add('cb-comments--compose-pinned');
     },
     onClose: () => {
       composeOpen = false;
-      document.body.classList.remove('cb-mobile-compose-open');
-      backdrop.hidden = true;
-      observeEl.classList.remove('cb-comments--sheet-host');
+      observeEl.classList.remove('cb-comments--compose-pinned');
       syncDock();
     },
   });
@@ -648,14 +641,12 @@ function bindMobileDirectDock(observeEl, form, editor) {
   };
 
   dock.querySelector('.cb-mobile-dock-trigger')?.addEventListener('click', openCompose);
-  backdrop.addEventListener('click', closeCompose);
 
   return {
     cleanup: () => {
       io.disconnect();
       dock.remove();
-      backdrop.remove();
-      document.body.classList.remove('cb-has-mobile-dock', 'cb-mobile-compose-open');
+      document.body.classList.remove('cb-has-mobile-dock');
     },
     notifySubmitted: () => {
       composeOpen = false;
@@ -679,7 +670,7 @@ function mountInlineReply(slot, ctx) {
   const panel = document.createElement('div');
   panel.className = 'cb-inline-reply';
   panel.innerHTML = `
-    <div class="cb-inline-reply-head">回复 <span class="cb-mention">@${escapeHtml(replyNick)}</span></div>
+    <div class="cb-inline-reply-head">回复 ${escapeHtml(replyNick)}</div>
     <div class="cb-inline-reply-editor"></div>
     <div class="cb-inline-reply-actions">
       <button type="button" class="cb-link-btn" data-cancel-reply>取消</button>
@@ -709,7 +700,7 @@ function mountInlineReply(slot, ctx) {
       return res.url;
     },
   });
-  editor.setMentionPrefix(replyNick);
+  // 不再自动插入 @ 前缀
 
   const replyBtn = commentsRoot?.querySelector(`[data-reply="${CSS.escape(parentId)}"]`);
   replyBtn?.classList.add('is-active');
@@ -845,11 +836,19 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
   const iframe = targetEl.querySelector('.cb-embed-frame');
   const hint = targetEl.querySelector('.cb-embed-hint');
   const onMessage = e => {
-    if (!e.data || e.data.type !== 'gitblog-comments-height') return;
-    if (e.source !== iframe?.contentWindow) return;
-    const h = Number(e.data.height);
-    if (h > 0 && iframe) iframe.style.height = `${Math.min(Math.max(h, 320), 2400)}px`;
-    if (hint && e.data.ready) hint.hidden = true;
+    if (e.source !== iframe?.contentWindow || !e.data) return;
+    if (e.data.type === 'gitblog-comments-height') {
+      const h = Number(e.data.height);
+      if (h > 0 && iframe) {
+        if (e.data.composeOpen) {
+          const ch = Number(e.data.composeHeight) || h;
+          iframe.style.height = `${Math.min(Math.max(ch, 160), Math.round(window.innerHeight * 0.85))}px`;
+        } else {
+          iframe.style.height = `${Math.min(Math.max(h, 320), 2400)}px`;
+        }
+      }
+      if (hint && e.data.ready) hint.hidden = true;
+    }
   };
   window.addEventListener('message', onMessage);
   bindMobileEmbedDock(embedWrap, iframe);
