@@ -1,10 +1,10 @@
 // ============================================================================
-// 随笔页：仅嵌入 giscus（与首页「随笔」Tab 共用 notesTerm 讨论串）
+// 随笔页：嵌入评论（CloudBase 或 giscus，与首页「随笔」Tab 共用 notesTerm）
 // ============================================================================
 
 import { initSite } from './site.js';
 import { setMeta } from './seo.js';
-import { isNotesGiscusReady, mountNotesGiscusScript } from './giscus-embed.js';
+import { isCommentsReady, mountNotesComments } from './comments-embed.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -18,14 +18,14 @@ const $ = sel => document.querySelector(sel);
   const host = $('#notesGiscusHost');
   if (!host) return;
 
-  if (!isNotesGiscusReady()) {
+  if (!isCommentsReady('notes')) {
     host.innerHTML = `
       <div class="comments-hint">
-        请先在 <a href="admin/settings.html">后台 · 站点设置</a> 中启用 giscus，并填写 repo、repoId 与随笔分类（notesCategoryId）。
+        请先在 <a href="admin/settings.html">后台 · 站点设置</a> 中启用评论（CloudBase 或 giscus），并填写完整配置。
       </div>
     `;
     return;
   }
 
-  mountNotesGiscusScript(host);
+  mountNotesComments(host);
 })();

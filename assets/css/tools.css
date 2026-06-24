@@ -2,6 +2,8 @@
    工具页 + 在线小空调
    ============================================================================ */
 
+@import './cloudbase-comments.css';
+
 .tools-page,
 .ac-page {
   max-width: var(--content-max);

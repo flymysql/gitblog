@@ -1,7 +1,7 @@
 import { initSite } from './site.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { CONFIG } from './config.js';
-import { isGiscusReady, mountGiscusScript } from './giscus-embed.js';
+import { isCommentsReady, mountComments, getCommentsProvider } from './comments-embed.js';
 
 export const TOOLS_INDEX = 'tools/';
 
@@ -20,7 +20,7 @@ export function initToolPage({ title, description, path, giscusTerm, commentsHin
   mountToolComments(giscusTerm || path.replace(/\.html$/i, ''), commentsHint);
 }
 
-/** 工具页底部 giscus 评论区（每页独立 Discussion term） */
+/** 工具页底部评论区（每页独立 path） */
 export function mountToolComments(term, hint) {
   const host = document.getElementById('toolGiscus');
   if (!host) return;
@@ -29,12 +29,12 @@ export function mountToolComments(term, hint) {
     const p = section.querySelector('p');
     if (p) p.textContent = hint;
   }
-  if (!isGiscusReady()) {
-    host.innerHTML = '<div class="tool-comments-hint">留言板未启用。可在后台设置里打开 giscus。</div>';
+  if (getCommentsProvider() === 'none' || !isCommentsReady('post')) {
+    host.innerHTML = '<div class="tool-comments-hint">留言板未启用。可在后台设置里打开 CloudBase 或 giscus 评论。</div>';
     return;
   }
   host.innerHTML = '<p class="tool-comments-loading" aria-live="polite">评论加载中…</p>';
-  mountGiscusScript(host, term, { loading: 'eager' });
+  mountComments(host, term, { loading: 'eager', pageTitle: document.title, pageUrl: location.href });
 }
 
 export function $(id) { return document.getElementById(id); }

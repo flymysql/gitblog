@@ -1,0 +1,18 @@
+{
+  "envId": "",
+  "functionRoot": "./functions",
+  "functions": [
+    {
+      "name": "gitblog-comments",
+      "timeout": 15,
+      "runtime": "Nodejs18.15",
+      "memorySize": 256,
+      "handler": "index.main",
+      "installDependency": true,
+      "envVariables": {
+        "COMMENT_MODERATION": "0",
+        "COMMENT_SALT": "change-me-in-console"
+      }
+    }
+  ]
+}
