@@ -146,10 +146,10 @@
 <pre><code># 匹配从uuid为1的user点出发经过click连接doc点再经过swing边连接的doc点的所有路径
 match p=(v:user{uuid:"123"})-[e:click]-&gt;(v2)-[e2:swing]-&gt;(v3) return p
 </code></pre>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-01.webp" alt="" loading="lazy" decoding="async"></p>
-<p>甚至更直观的我们还可以看到返回的simItem里面高度重合的部分<br><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-02.webp" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-01.webp" alt="" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-01.webp" class="progressive-img"></p>
+<p>甚至更直观的我们还可以看到返回的simItem里面高度重合的部分<br><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-02.webp" alt="" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-02.webp" class="progressive-img"></p>
 <h2>服务架构</h2>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-03.png" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-03.png" alt="" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-03.png" class="progressive-img"></p>
 <p>Nebula Graph 由三种服务构成：Graph 服务、Meta 服务和 Storage 服务，是一种存储与计算分离的架构。</p>
 <h3>graph 服务</h3>
 <p>Graph 服务主要负责处理查询请求，包括解析查询语句、校验语句、生成执行计划以及按照执行计划执行四个大步骤。</p>
@@ -162,7 +162,7 @@ match p=(v:user{uuid:"123"})-[e:click]-&gt;(v2)-[e2:swing]-&gt;(v3) return p
 <p>关于四个步骤的具体事务可以看官方介绍：<a href="https://docs.nebula-graph.com.cn/2.6.1/1.introduction/3.nebula-graph-architecture/3.graph-service/">https://docs.nebula-graph.com.cn/2.6.1/1.introduction/3.nebula-graph-architecture/3.graph-service/</a></p>
 <h3>Meta服务</h3>
 <h4>META 服务架构</h4>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-04.png" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-04.png" alt="" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-04.png" class="progressive-img"></p>
 <p>在集群模式下，所有 nebula-metad 进程构成了基于 Raft 协议的集群，其中一个进程是 leader，其他进程都是 follower。leader 是由多数派选举出来，只有 leader 能够对客户端或其他组件提供服务，其他 follower 作为候补，如果 leader 出现故障，会在所有 follower 中选举出新的 leader。</p>
 <ol>
 <li><p>提供账号管理功能<br>Meta 服务中存储了用户的账号和权限信息，当客户端通过账号发送请求给 Meta 服务，Meta 服务会检查账号信息，以及该账号是否有对应的请求权限。</p>
@@ -179,7 +179,7 @@ match p=(v:user{uuid:"123"})-[e:click]-&gt;(v2)-[e2:swing]-&gt;(v3) return p
 </li>
 </ol>
 <h3>Storage 服务</h3>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-05.webp" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-05.webp" alt="" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-05.webp" class="progressive-img"></p>
 <p>和Meta一样，Storage也是用Raft协议作集群。<br><strong>storage的三个服务层次</strong></p>
 <ol>
 <li>Storage interface 层<br>Storage 服务的最上层，定义了一系列和图相关的 API。API 请求会在这一层被翻译成一组针对分片的 KV 操作。正是这一层的存在，使得 Storage 服务变成了真正的图存储，否则 Storage 服务只是一个 KV 存储服务。</li>
@@ -405,7 +405,7 @@ $ make install
 </ol>
 <pre><code>./scripts/nebula.service status all
 </code></pre>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-06.png" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-06.png" alt="" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-06.png" class="progressive-img"></p>
 <p>三个端口都正常说明启动成功，有某一个端口不正常，应该排查端口是否被占用，可以logs目录下的日志查看报错。</p>
 <ol start="5">
 <li>停止服务</li>
@@ -429,7 +429,7 @@ $ make install
 <p>使用一键部署的，在部署的时候已经装好nebula studio，直接访问对应的ip端口即可。</p>
 </blockquote>
 <p>启动成功后，在浏览器地址栏输入 <a href="http://ip">http://ip</a> address:7001。</p>
-<p>如果在浏览器窗口中能看到以下登录界面，表示已经成功部署并启动 Studio。<br><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-07.webp" alt="" loading="lazy" decoding="async"></p>
+<p>如果在浏览器窗口中能看到以下登录界面，表示已经成功部署并启动 Studio。<br><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-07.webp" alt="" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-07.webp" class="progressive-img"></p>
 <h4>客户端sdk</h4>
 <ol>
 <li>Nebula CPP ： <a href="https://github.com/vesoft-inc/nebula-cpp">https://github.com/vesoft-inc/nebula-cpp</a></li>
@@ -797,7 +797,7 @@ files:
                 index: 3
 </code></pre>
 <h4>点配置</h4>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-08.webp" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-08.webp" alt="" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-08.webp" class="progressive-img"></p>
 <h4>边配置</h4>
 <pre><code>schema:
   type: edge
@@ -817,12 +817,12 @@ files:
         type: double
         index: 3
 </code></pre>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-09.webp" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-09.webp" alt="" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-09.webp" class="progressive-img"></p>
 <h3>使用Exchange导入</h3>
-<p>Exchange可以将不同数据源的数据导入到nebula数据库，便于迁移数据。<br>支持的数据列表：<br><img src="http://image.huawei.com/tiny-lts/v1/images/3a5d9573a940364935c1abd68db6685b_242x439.png@900-0-90-f.png" alt="image.png" loading="lazy" decoding="async"></p>
+<p>Exchange可以将不同数据源的数据导入到nebula数据库，便于迁移数据。<br>支持的数据列表：<br><img src="http://image.huawei.com/tiny-lts/v1/images/3a5d9573a940364935c1abd68db6685b_242x439.png@900-0-90-f.png" alt="image.png" loading="lazy" decoding="async" data-full-src="http://image.huawei.com/tiny-lts/v1/images/3a5d9573a940364935c1abd68db6685b_242x439.png@900-0-90-f.png" class="progressive-img"></p>
 <p>详情：<a href="https://docs.nebula-graph.com.cn/2.6.1/nebula-exchange/use-exchange/ex-ug-import-from-csv/">https://docs.nebula-graph.com.cn/2.6.1/nebula-exchange/use-exchange/ex-ug-import-from-csv/</a></p>
 <h2>nebula集群</h2>
-<p>现在我们用2台机器举例做部署方案（这里只是举例，在实际的生产环境中建议5个节点以上的集群，才能发挥集群的可靠性优势）<br><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-11.png" alt="" loading="lazy" decoding="async"></p>
+<p>现在我们用2台机器举例做部署方案（这里只是举例，在实际的生产环境中建议5个节点以上的集群，才能发挥集群的可靠性优势）<br><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-11.png" alt="" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-11.png" class="progressive-img"></p>
 <p>步骤1：将nebula的安装解压到两台机器上<br>步骤2：修改每个服务器上的Nebula Graph配置文件。<br>Nebula Graph的所有配置文件均位于安装目录的etc目录内，包括nebula-graphd.conf、nebula-metad.conf和nebula-storaged.conf，用户可以只修改所需服务的配置文件。</p>
 <p>机器A配置<br>nebula-graphd.conf</p>
 <pre><code>########## networking ##########
@@ -901,7 +901,7 @@ nebula-metad.conf
 <li>先启动两台机器的meta服务。</li>
 <li>保证meta服务正常起来后，在分别启动两台机器的graph和storage服务</li>
 </ol>
-<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-12.webp" alt="" loading="lazy" decoding="async"></p>
+<p><img src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-12.webp" alt="" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/05/%E7%BD%AE%E9%A1%B6-nebula-graph-%E5%9B%BE%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E5%BA%93-15993772-12.webp" class="progressive-img"></p>
 <h2>nebula 进阶学习</h2>
 <ol>
 <li>nebula graphd服务代码走读：<br><a href="https://www.cnblogs.com/gitpull/p/15988828.html">https://www.cnblogs.com/gitpull/p/15988828.html</a></li>

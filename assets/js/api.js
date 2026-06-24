@@ -311,12 +311,63 @@ export async function uploadImage(blob, suggestedName) {
     branch: CONFIG.repo.branch,
   };
   await ghFetch(repoPath(path), { method: 'PUT', body });
+  try {
+    const thumbBlob = await generateThumbBlob(working);
+    if (thumbBlob) {
+      const thumbPath = path.replace(/\.[^.]+$/, '.thumb.webp');
+      await ghFetch(repoPath(thumbPath), {
+        method: 'PUT',
+        body: {
+          message: `upload thumb: ${thumbPath.split('/').pop()}`,
+          content: await blobToBase64(thumbBlob),
+          branch: CONFIG.repo.branch,
+        },
+      });
+    }
+  } catch (e) {
+    console.warn('[uploadImage] thumb upload failed', e);
+  }
   return {
     path,
     optimized: working !== original,
     originalSize: original.size,
     finalSize: working.size,
   };
+}
+
+// 移动端缩略图（480px WebP），上传时同步生成 .thumb.webp
+async function generateThumbBlob(blob, maxWidth = 480, quality = 0.82) {
+  if (!blob || !blob.type) return null;
+  const type = blob.type.toLowerCase();
+  if (type === 'image/gif' || type === 'image/svg+xml') return null;
+  if (!type.startsWith('image/')) return null;
+
+  let bitmap;
+  try {
+    bitmap = await createImageBitmap(blob);
+  } catch {
+    return null;
+  }
+  const sw = bitmap.width;
+  const sh = bitmap.height;
+  if (!sw || !sh) return null;
+
+  const scale = sw > maxWidth ? (maxWidth / sw) : 1;
+  const dw = Math.round(sw * scale);
+  const dh = Math.round(sh * scale);
+  if (scale === 1 && blob.size < 48 * 1024) {
+    bitmap.close && bitmap.close();
+    return null;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = dw;
+  canvas.height = dh;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(bitmap, 0, 0, dw, dh);
+  bitmap.close && bitmap.close();
+
+  return await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', quality));
 }
 
 // 静态图片（PNG / JPEG）：转 WebP + 缩放
