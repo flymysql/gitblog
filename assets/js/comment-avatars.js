@@ -110,7 +110,7 @@ export function mountAvatarPicker(hostEl, { selected, onChange } = {}) {
     <button type="button" class="cb-avatar-current" aria-label="点击更换头像" aria-expanded="false">
       <img src="${escapeHtml(commentAvatarUrl(current))}" alt="" loading="lazy" width="40" height="40">
     </button>
-    <div class="cb-avatar-picker" data-cb-avatar-picker hidden role="listbox" aria-label="选择头像">
+    <div class="cb-avatar-picker" data-cb-avatar-picker role="listbox" aria-label="选择头像">
       ${COMMENT_AVATAR_FILES.map(file => `
         <button type="button" class="cb-avatar-option${file === current ? ' is-selected' : ''}"
           data-avatar="${escapeHtml(file)}"
@@ -127,25 +127,31 @@ export function mountAvatarPicker(hostEl, { selected, onChange } = {}) {
   const currentBtn = wrap.querySelector('.cb-avatar-current');
 
   const closePicker = () => {
-    picker.hidden = true;
+    picker.classList.remove('is-open');
+    wrap.classList.remove('cb-field--avatar-open');
     currentBtn?.setAttribute('aria-expanded', 'false');
   };
 
   const openPicker = () => {
-    picker.hidden = false;
+    picker.classList.add('is-open');
+    wrap.classList.add('cb-field--avatar-open');
     currentBtn?.setAttribute('aria-expanded', 'true');
   };
 
+  const isOpen = () => picker.classList.contains('is-open');
+
   currentBtn?.addEventListener('click', e => {
     e.preventDefault();
-    if (picker.hidden) openPicker();
-    else closePicker();
+    e.stopPropagation();
+    if (isOpen()) closePicker();
+    else openPicker();
   });
 
   picker.addEventListener('click', e => {
     const btn = e.target.closest('[data-avatar]');
     if (!btn) return;
     e.preventDefault();
+    e.stopPropagation();
     current = btn.dataset.avatar || current;
     picker.querySelectorAll('.cb-avatar-option').forEach(b => {
       const on = b.dataset.avatar === current;
@@ -157,9 +163,19 @@ export function mountAvatarPicker(hostEl, { selected, onChange } = {}) {
     onChange?.(current);
   });
 
+  const onDocClick = e => {
+    if (!isOpen()) return;
+    if (wrap.contains(e.target)) return;
+    closePicker();
+  };
+  document.addEventListener('click', onDocClick);
+
   return {
     getSelected: () => current,
-    close: closePicker,
+    close: () => {
+      closePicker();
+      document.removeEventListener('click', onDocClick);
+    },
   };
 }
 
