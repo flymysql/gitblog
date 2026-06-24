@@ -648,6 +648,55 @@
   gap: 12px;
 }
 
+.cb-compose-footer {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.cb-compose-footer:not([hidden]) {
+  display: flex;
+}
+
+.cb-compose-footer-avatar {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  grid-column: auto !important;
+}
+
+.cb-compose-footer-avatar .cb-avatar-picker-label {
+  display: none !important;
+}
+
+.cb-compose-footer .cb-compose-status {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.cb-compose-footer .cb-submit {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.cb-compose-footer-avatar .cb-avatar-picker.is-open {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 2;
+  flex-basis: auto;
+  width: max-content;
+  max-width: min(100vw - 32px, 320px);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+}
+
 .cb-compose--minimal .cb-compose-actions {
   justify-content: space-between;
 }
@@ -763,30 +812,6 @@
   cursor: pointer;
 }
 
-.cb-mobile-compose-teaser {
-  display: block;
-  width: 100%;
-  margin: 0 0 12px;
-  padding: 10px 16px;
-  border: 1px solid var(--border);
-  border-radius: 22px;
-  background: var(--bg-soft);
-  color: var(--text-tertiary);
-  font-size: 14px;
-  line-height: 1.4;
-  text-align: left;
-  cursor: pointer;
-}
-
-.cb-comments--flat .cb-mobile-compose-teaser {
-  border: none;
-  border-bottom: 1px solid var(--border);
-  border-radius: 0;
-  background: transparent;
-  padding-left: 0;
-  padding-right: 0;
-}
-
 body.cb-has-mobile-dock {
   scroll-padding-bottom: calc(56px + env(safe-area-inset-bottom));
 }
@@ -823,15 +848,11 @@ body.cb-has-mobile-dock {
 }
 
 @media (max-width: 640px) {
-  .cb-comments--mobile-dock .cb-compose:not(.is-sheet-open) {
+  .cb-comments--mobile-dock > .cb-compose {
     display: none !important;
   }
 
-  .cb-comments--mobile-dock .cb-mobile-compose-teaser[hidden] {
-    display: none !important;
-  }
-
-  .cb-comments.cb-parent-dock-visible .cb-mobile-compose-teaser {
+  .cb-compose--mobile-portal:not(.is-sheet-open) {
     display: none !important;
   }
 
@@ -863,7 +884,8 @@ body.cb-has-mobile-dock {
     cursor: pointer;
   }
 
-  /* 直连模式：表单固定底栏，高度随内容撑开，页面可继续滚动 */
+  /* 移动端底部抽屉：表单挂到 body，仅打开时固定底栏 */
+  .cb-compose--mobile-portal.is-sheet-open,
   .cb-comments--compose-pinned .cb-compose.is-sheet-open {
     position: fixed;
     left: 0;
@@ -897,6 +919,11 @@ body.cb-has-mobile-dock {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 8px;
   }
+
+  .cb-compose--mobile-portal.is-sheet-open .cb-compose-footer {
+    margin-top: 8px;
+  }
+
   .cb-compose:not(.cb-compose--minimal) { padding: 12px; }
   .cb-field { font-size: 11px; }
   .cb-field input {

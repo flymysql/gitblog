@@ -718,12 +718,54 @@ function setupCommentMeta(metaEl, profile, onAvatarChange) {
   };
 }
 
-function bindComposeReveal(form, editor, { metaEl, actionsEl }) {
+function isMobileDock() {
+  return cfg.mobileDock || window.matchMedia('(max-width: 640px)').matches;
+}
+
+function initMobileComposePortal(root, form) {
+  if (!isMobileDock() || !root || !form) return;
+  root.classList.add('cb-comments--mobile-dock');
+  form.classList.add('cb-compose--mobile-portal');
+  if (form.parentElement !== document.body) {
+    document.body.appendChild(form);
+  }
+}
+
+function setupMobileComposeChrome(form, metaEl, actionsEl) {
+  if (!isMobileDock() || !form) return;
+  let footer = form.querySelector('.cb-compose-footer');
+  if (!footer) {
+    footer = document.createElement('div');
+    footer.className = 'cb-compose-footer';
+    footer.hidden = true;
+    form.appendChild(footer);
+  }
+  const avatarWrap = metaEl?.querySelector('[data-cb-avatar-picker-wrap]');
+  if (avatarWrap && !footer.contains(avatarWrap)) {
+    avatarWrap.classList.add('cb-compose-footer-avatar');
+    avatarWrap.querySelector('.cb-avatar-picker-label')?.setAttribute('hidden', '');
+    footer.appendChild(avatarWrap);
+  }
+  const status = actionsEl?.querySelector('.cb-compose-status');
+  const submit = actionsEl?.querySelector('.cb-submit');
+  if (status && !footer.contains(status)) footer.appendChild(status);
+  if (submit && !footer.contains(submit)) footer.appendChild(submit);
+}
+
+function bindComposeReveal(form, editor, { metaEl, actionsEl, mobileMode = false } = {}) {
+  const footer = form.querySelector('.cb-compose-footer');
   const refresh = () => {
     const showExtra = editorHasContent(editor);
-    if (metaEl) metaEl.hidden = !showExtra;
-    if (actionsEl) actionsEl.hidden = !showExtra;
-    form.classList.toggle('cb-compose--active', showExtra);
+    const sheetOpen = form.classList.contains('is-sheet-open');
+    if (mobileMode) {
+      if (footer) footer.hidden = !sheetOpen;
+      if (metaEl) metaEl.hidden = !sheetOpen || !showExtra;
+      if (actionsEl) actionsEl.hidden = true;
+    } else {
+      if (metaEl) metaEl.hidden = !showExtra;
+      if (actionsEl) actionsEl.hidden = !showExtra;
+    }
+    form.classList.toggle('cb-compose--active', showExtra || sheetOpen);
     editor._autosizeBody?.();
     postHeight(true);
   };
@@ -736,7 +778,9 @@ function bindComposeReveal(form, editor, { metaEl, actionsEl }) {
   form.addEventListener('focusout', e => {
     if (!form.contains(e.relatedTarget)) form.classList.remove('cb-compose--focused');
   });
+  form.addEventListener('cb-compose-sheet-change', refresh);
   refresh();
+  return refresh;
 }
 
 function editorHasContent(editor) {
@@ -796,32 +840,6 @@ function isEmbedIframe() {
   }
 }
 
-function syncMobileTeaser(root, sheetOpen) {
-  const teaser = root?.querySelector('.cb-mobile-compose-teaser');
-  if (!teaser) return;
-  const parentDock = root?.classList.contains('cb-parent-dock-visible');
-  teaser.hidden = !!sheetOpen || parentDock;
-}
-
-function bindInFrameMobileTeaser(root, mobileCtrl, { hideWhenParentDock = false } = {}) {
-  if (!cfg.mobileDock || hideWhenParentDock || !root || !mobileCtrl) return;
-  let teaser = root.querySelector('.cb-mobile-compose-teaser');
-  if (!teaser) {
-    teaser = document.createElement('button');
-    teaser.type = 'button';
-    teaser.className = 'cb-mobile-compose-teaser';
-    teaser.textContent = '说点什么…';
-    teaser.addEventListener('click', () => {
-      mobileCtrl.clearReply();
-      mobileCtrl.open();
-    });
-    const anchor = root.querySelector('.cb-comments-loading') || root.querySelector('.cb-comments-list');
-    if (anchor) root.insertBefore(teaser, anchor);
-    else root.appendChild(teaser);
-  }
-  syncMobileTeaser(root, root.querySelector('.cb-compose')?.classList.contains('is-sheet-open'));
-}
-
 function createMobileComposeController(root, form, editor) {
   const state = {
     mode: 'new',
@@ -859,13 +877,10 @@ function createMobileComposeController(root, form, editor) {
   };
 
   const sheet = bindMobileComposeSheet(form, editor, {
-    onOpen: () => {
-      syncMobileTeaser(root, true);
-      postHeight(true);
-    },
+    root,
+    onOpen: () => postHeight(true),
     onClose: () => {
       clearReply();
-      syncMobileTeaser(root, false);
       postHeight(true);
     },
   });
@@ -904,13 +919,13 @@ function createMobileComposeController(root, form, editor) {
   };
 }
 
-function bindMobileComposeSheet(form, editor, { onClose, onOpen } = {}) {
-  if (!cfg.mobileDock) {
+function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
+  if (!isMobileDock()) {
     return { open: () => {}, close: () => {}, notifySubmitted: () => {} };
   }
 
-  const root = form.closest('.cb-comments');
-  root?.classList.add('cb-comments--mobile-dock');
+  const commentsRoot = root || form.closest('.cb-comments');
+  commentsRoot?.classList.add('cb-comments--mobile-dock');
 
   if (!form.querySelector('.cb-mobile-sheet-header')) {
     const header = document.createElement('div');
@@ -925,12 +940,13 @@ function bindMobileComposeSheet(form, editor, { onClose, onOpen } = {}) {
   const close = () => {
     if (!form.classList.contains('is-sheet-open')) return;
     form.classList.remove('is-sheet-open');
-    root?.classList.remove('cb-comments--compose-only');
-    const listEl = root?.querySelector('.cb-comments-list');
-    const loadingEl = root?.querySelector('.cb-comments-loading');
+    commentsRoot?.classList.remove('cb-comments--compose-only');
+    const listEl = commentsRoot?.querySelector('.cb-comments-list');
+    const loadingEl = commentsRoot?.querySelector('.cb-comments-loading');
     if (listEl?.innerHTML) listEl.hidden = false;
     if (loadingEl) loadingEl.hidden = true;
     editor.body.blur();
+    form.dispatchEvent(new CustomEvent('cb-compose-sheet-change', { bubbles: true }));
     onClose?.();
     postHeight(true);
     try {
@@ -942,14 +958,15 @@ function bindMobileComposeSheet(form, editor, { onClose, onOpen } = {}) {
     const wasOpen = form.classList.contains('is-sheet-open');
     if (!wasOpen) {
       form.classList.add('is-sheet-open');
-      root?.classList.add('cb-comments--compose-only');
-      const listEl = root?.querySelector('.cb-comments-list');
-      const loadingEl = root?.querySelector('.cb-comments-loading');
+      commentsRoot?.classList.add('cb-comments--compose-only');
+      const listEl = commentsRoot?.querySelector('.cb-comments-list');
+      const loadingEl = commentsRoot?.querySelector('.cb-comments-loading');
       if (listEl) listEl.hidden = true;
       if (loadingEl) loadingEl.hidden = true;
       onOpen?.();
       postHeight(true);
     }
+    form.dispatchEvent(new CustomEvent('cb-compose-sheet-change', { bubbles: true }));
     setTimeout(() => {
       editor._autosizeBody?.();
       postHeight(true);
@@ -960,10 +977,8 @@ function bindMobileComposeSheet(form, editor, { onClose, onOpen } = {}) {
   form.querySelector('.cb-mobile-sheet-close')?.addEventListener('click', close);
 
   window.addEventListener('message', e => {
-    if (e.data?.type === 'gitblog-comments-dock' && root) {
-      root.style.paddingBottom = e.data.visible ? 'calc(56px + env(safe-area-inset-bottom))' : '';
-      root.classList.toggle('cb-parent-dock-visible', !!e.data.visible);
-      syncMobileTeaser(root, form.classList.contains('is-sheet-open'));
+    if (e.data?.type === 'gitblog-comments-dock' && commentsRoot) {
+      commentsRoot.style.paddingBottom = e.data.visible ? 'calc(56px + env(safe-area-inset-bottom))' : '';
       postHeight(true);
     }
   });
@@ -1116,7 +1131,7 @@ function bindCommentListInteractions(listEl, ctx) {
     const btn = e.target.closest('[data-reply]');
     if (!btn || e.target.closest('.cb-inline-reply')) return;
     e.preventDefault();
-    if (cfg.mobileDock && ctx.mobileCtrl) {
+    if (isMobileDock() && ctx.mobileCtrl) {
       ctx.mobileCtrl.open({
         parentId: btn.dataset.reply || '',
         replyNick: btn.dataset.replyNick || '访客',
@@ -1187,6 +1202,11 @@ async function mount() {
   prefillCommentNick(nickInput);
   if (profile.email) emailInput.value = profile.email;
   const metaAvatar = setupCommentMeta(metaEl, profile);
+  const mobileMode = isMobileDock();
+  if (mobileMode) {
+    initMobileComposePortal(commentsRoot, form);
+    setupMobileComposeChrome(form, metaEl, actionsEl);
+  }
 
   const editor = new CommentRichEditor(editorHost, {
     allowImage: cfg.allowImage,
@@ -1205,17 +1225,11 @@ async function mount() {
     },
   });
 
-  bindComposeReveal(form, editor, { metaEl, actionsEl });
+  bindComposeReveal(form, editor, { metaEl, actionsEl, mobileMode });
 
-  const mobileCtrl = cfg.mobileDock
+  const mobileCtrl = mobileMode
     ? createMobileComposeController(commentsRoot, form, editor)
     : null;
-
-  if (cfg.mobileDock && isEmbedIframe()) {
-    bindInFrameMobileTeaser(commentsRoot, mobileCtrl, {
-      hideWhenParentDock: cfg.context === 'post',
-    });
-  }
 
   async function loadList() {
     loadingEl.hidden = false;
