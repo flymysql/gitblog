@@ -45,17 +45,26 @@
         <p class="major-result-filter-note" id="majorFilterNote"></p>
         <div class="major-result-cards" id="majorCards"></div>
         <div class="major-quiz-actions tool-kit-toolbar">
+          <button type="button" class="tool-kit-btn is-ghost" id="majorShare">生成分享图</button>
           <button type="button" class="tool-kit-btn is-ghost" id="majorCopy">复制结果</button>
           <button type="button" class="tool-kit-btn" id="majorRetry">重新测评</button>
         </div>
         <p class="tool-kit-hint major-quiz-disclaimer">请结合高考分数、位次、院校层次与当年招生政策综合填报。祝金榜题名！</p>
+        <section class="tool-comments major-result-comments" id="majorComments">
+          <h2>评论</h2>
+          <p>你测出来适合什么专业？来聊聊你的志愿想法～</p>
+          <div id="majorGiscus"></div>
+        </section>
+      </section>
+      <section class="tool-kit-panel major-detail-wrap" id="majorDetail" hidden>
+        <div id="majorDetailBody"></div>
+        <div class="major-quiz-actions tool-kit-toolbar">
+          <button type="button" class="tool-kit-btn is-ghost" id="majorDetailShare">生成分享图</button>
+          <button type="button" class="tool-kit-btn is-ghost" id="majorDetailBack">返回结果</button>
+        </div>
       </section>
     </div>
-    <section class="tool-comments" id="toolComments">
-      <h2>评论</h2>
-      <p>你测出来适合什么专业？来聊聊你的志愿想法～</p>
-      <div id="toolGiscus"></div>
-    </section>
+    
     <section class="tool-actions">
       <a class="btn-home" href="/">返回首页</a>
       <a class="btn-ghost" href="/tools/">查看工具箱</a>

@@ -115,3 +115,33 @@ export const SUBJECTS = [
   { id: 'geography', label: '地理' },
   { id: 'technology', label: '技术' },
 ];
+
+export function getMajorById(id) {
+  return MAJORS.find(m => m.id === id) || null;
+}
+
+export function majorReferenceLinks(major) {
+  const q = encodeURIComponent(major.name);
+  const custom = major.links || [];
+  const defaults = [
+    { label: '阳光高考', url: 'https://gaokao.chsi.com.cn/', desc: '教育部阳光高考信息平台' },
+    { label: `${major.name} · 学什么`, url: `https://www.baidu.com/s?wd=${q}%20专业%20学什么%20就业`, desc: '搜索专业介绍与就业方向' },
+    { label: `${major.name} · 知乎讨论`, url: `https://www.zhihu.com/search?type=content&q=${q}%E4%B8%93%E4%B8%9A`, desc: '看看学长学姐的经验分享' },
+  ];
+  return custom.length ? [...custom, ...defaults] : defaults;
+}
+
+export function describeMajorTraits(major) {
+  const t = major.traits || {};
+  const lines = [];
+  if (t.logic >= 8 || t.math >= 8) lines.push('数理与逻辑思维要求较高，理科基础扎实更有优势。');
+  if (t.creativity >= 8) lines.push('需要较强的创意与审美能力，适合乐于表达和试错的同学。');
+  if (t.social >= 8) lines.push('人际沟通是重要能力，适合善于协作、乐于与人打交道。');
+  if (t.handsOn >= 8) lines.push('实验与动手实践较多，适合喜欢动手验证想法的同学。');
+  if (t.gradSchool >= 8) lines.push('深造比例较高，读研或考证可能是常见发展路径。');
+  if (t.income >= 8) lines.push('市场化岗位薪资弹性较大，能力与行业选择影响明显。');
+  if (t.publicService >= 8) lines.push('公共服务、体制内相关岗位占比较高。');
+  if (t.pressure >= 8) lines.push('部分方向工作节奏快、压力较大，需提前做好心理准备。');
+  if (t.abroad >= 8) lines.push('出国深造或外企就业的机会相对更多。');
+  return lines.slice(0, 4);
+}
