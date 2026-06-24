@@ -5,7 +5,7 @@ import { isCommentsReady, mountComments, getCommentsProvider } from './comments-
 
 export const TOOLS_INDEX = 'tools/';
 
-export function initToolPage({ title, description, path, giscusTerm, commentsHint }) {
+export function initToolPage({ title, description, path, giscusTerm, commentsHint, deferComments = false }) {
   initSite({ active: TOOLS_INDEX });
   setMeta({ title, description, type: 'website' });
   const base = CONFIG.site.url || location.origin;
@@ -17,12 +17,14 @@ export function initToolPage({ title, description, path, giscusTerm, commentsHin
     operatingSystem: 'Any',
     url: `${base}/${path}`,
   });
-  mountToolComments(giscusTerm || path.replace(/\.html$/i, ''), commentsHint);
+  if (!deferComments) {
+    mountToolComments(giscusTerm || path.replace(/\.html$/i, ''), commentsHint);
+  }
 }
 
 /** 工具页底部评论区（每页独立 path） */
-export function mountToolComments(term, hint) {
-  const host = document.getElementById('toolGiscus');
+export function mountToolComments(term, hint, hostId = 'toolGiscus') {
+  const host = document.getElementById(hostId);
   if (!host) return;
   const section = host.closest('.tool-comments');
   if (section && hint) {
