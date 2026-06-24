@@ -771,10 +771,32 @@ body { padding: 0 2px 8px; }
   font-size: 13px;
 }
 
+.cb-mobile-compose-trigger {
+  display: block;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 8px 0;
+  border: none;
+  background: none;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cb-comments--flat .cb-mobile-compose-trigger {
+  padding-left: 0;
+}
+
 .cb-mobile-sheet-header { display: none; }
 
 @media (max-width: 640px) {
   .cb-comments--mobile-dock > .cb-compose {
+    display: none !important;
+  }
+
+  .cb-comments--mobile-dock .cb-inline-reply {
     display: none !important;
   }
 
@@ -812,16 +834,21 @@ body { padding: 0 2px 8px; }
 
   .cb-compose--mobile-portal.is-sheet-open,
   .cb-comments--mobile-dock .cb-compose.is-sheet-open {
-    position: relative;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 900;
     display: block !important;
     max-height: none;
     overflow: visible;
     margin: 0;
     padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
     border: none;
-    border-radius: 0;
+    border-radius: 16px 16px 0 0;
     background: var(--bg-elev);
-    box-shadow: none;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
+    animation: cb-sheet-up 0.24s ease;
   }
 
   .cb-compose.is-sheet-open .cb-editor-body {

@@ -722,6 +722,21 @@ function isMobileDock() {
   return cfg.mobileDock || window.matchMedia('(max-width: 640px)').matches;
 }
 
+function isMobileComposeActive() {
+  return window.matchMedia('(max-width: 640px)').matches;
+}
+
+function shouldShowPersistentMobileDock() {
+  const ctx = String(cfg.context || 'post').trim().toLowerCase();
+  return ctx === 'post';
+}
+
+function notifyParentComposePin(open) {
+  try {
+    window.parent.postMessage({ type: 'gitblog-comments-compose-pin', open: !!open }, '*');
+  } catch { /* ignore */ }
+}
+
 function initMobileComposePortal(root, form) {
   if (!isMobileDock() || !root || !form) return;
   root.classList.add('cb-comments--mobile-dock');
@@ -750,6 +765,23 @@ function setupMobileComposeChrome(form, metaEl, actionsEl) {
   const submit = actionsEl?.querySelector('.cb-submit');
   if (status && !footer.contains(status)) footer.appendChild(status);
   if (submit && !footer.contains(submit)) footer.appendChild(submit);
+}
+
+function bindMobileComposeTrigger(root, mobileCtrl) {
+  if (!isMobileDock() || !root || !mobileCtrl) return;
+  if (shouldShowPersistentMobileDock()) return;
+  if (root.querySelector('.cb-mobile-compose-trigger')) return;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'cb-mobile-compose-trigger';
+  btn.textContent = '写评论';
+  btn.addEventListener('click', () => {
+    mobileCtrl.clearReply();
+    mobileCtrl.open();
+  });
+  const anchor = root.querySelector('.cb-comments-loading') || root.querySelector('.cb-comments-list');
+  if (anchor) root.insertBefore(btn, anchor);
+  else root.appendChild(btn);
 }
 
 function bindComposeReveal(form, editor, { metaEl, actionsEl, mobileMode = false } = {}) {
@@ -947,6 +979,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     if (loadingEl) loadingEl.hidden = true;
     editor.body.blur();
     form.dispatchEvent(new CustomEvent('cb-compose-sheet-change', { bubbles: true }));
+    notifyParentComposePin(false);
     onClose?.();
     postHeight(true);
     try {
@@ -966,6 +999,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
       onOpen?.();
       postHeight(true);
     }
+    notifyParentComposePin(true);
     form.dispatchEvent(new CustomEvent('cb-compose-sheet-change', { bubbles: true }));
     setTimeout(() => {
       editor._autosizeBody?.();
@@ -1131,7 +1165,9 @@ function bindCommentListInteractions(listEl, ctx) {
     const btn = e.target.closest('[data-reply]');
     if (!btn || e.target.closest('.cb-inline-reply')) return;
     e.preventDefault();
-    if (isMobileDock() && ctx.mobileCtrl) {
+    if (isMobileComposeActive()) {
+      closeAllInlineReplies(btn.closest('.cb-comments'));
+      if (!ctx.mobileCtrl) return;
       ctx.mobileCtrl.open({
         parentId: btn.dataset.reply || '',
         replyNick: btn.dataset.replyNick || '访客',
@@ -1230,6 +1266,8 @@ async function mount() {
   const mobileCtrl = mobileMode
     ? createMobileComposeController(commentsRoot, form, editor)
     : null;
+
+  bindMobileComposeTrigger(commentsRoot, mobileCtrl);
 
   async function loadList() {
     loadingEl.hidden = false;
