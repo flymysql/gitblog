@@ -121,6 +121,7 @@ async function loadPost(slug) {
     setStatus('已加载', 'saved');
     $('#btnDelete').style.display = '';
     updatePreview();
+    refreshEditorLayout();
   } catch (e) {
     console.error(e);
     if (e.status === 401) { logout(window.location.href); return; }
@@ -722,6 +723,7 @@ async function setupVditor(initialMd) {
         const v = state.vditorPendingValue || initialMd || '';
         if (v) state.vditor.setValue(v);
         state.vditorPendingValue = '';
+        refreshEditorLayout();
         resolve();
       },
     });
@@ -764,6 +766,7 @@ async function switchEditorMode(target) {
 
     state.editorMode = 'rich';
     document.querySelector('.editor-pane').classList.add('is-rich');
+    refreshEditorLayout();
   } else {
     // 富文本 → Markdown：取 Vditor markdown 灌回 EasyMDE
     if (state.vditor && state.vditorReady) {
@@ -776,6 +779,7 @@ async function switchEditorMode(target) {
     document.querySelector('.editor-pane').classList.remove('is-rich');
     setStatus('已切换到 Markdown', 'saved');
     if (state.mde && state.mde.codemirror) state.mde.codemirror.refresh();
+    refreshEditorLayout();
   }
 
   buttons.forEach(b => {
@@ -805,6 +809,80 @@ function bindEditorModeSwitch() {
   obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode'] });
 }
 
+function debounce(fn, ms) {
+  let timer = null;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  };
+}
+
+/** 根据左侧编辑区剩余高度，重算 CodeMirror / Vditor 尺寸，修复无法内部滚动的问题 */
+function refreshEditorLayout() {
+  if (state.editorMode === 'markdown' && state.mde && state.mde.codemirror) {
+    const container = document.querySelector('.EasyMDEContainer');
+    const cm = state.mde.codemirror;
+    if (container && cm) {
+      const toolbar = container.querySelector('.editor-toolbar');
+      const styles = getComputedStyle(container);
+      const padY = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+      const toolH = toolbar ? toolbar.offsetHeight + 8 : 0;
+      const available = container.clientHeight - toolH - padY;
+      if (available > 80) {
+        cm.setSize(null, available);
+      }
+      cm.refresh();
+    }
+  }
+  if (state.editorMode === 'rich' && state.vditor && state.vditorReady) {
+    try { state.vditor.resize(); } catch (_) { /* ignore */ }
+  }
+}
+
+let editorLayoutObserver = null;
+function bindEditorLayoutRefresh() {
+  const pane = document.querySelector('.editor-pane');
+  const run = () => requestAnimationFrame(refreshEditorLayout);
+
+  window.addEventListener('resize', debounce(run, 120));
+
+  if (typeof ResizeObserver !== 'undefined') {
+    editorLayoutObserver = new ResizeObserver(debounce(run, 80));
+    if (pane) editorLayoutObserver.observe(pane);
+    const meta = $('#editorMeta');
+    if (meta) editorLayoutObserver.observe(meta);
+    const body = document.querySelector('.editor-body');
+    if (body) editorLayoutObserver.observe(body);
+    const mdeContainer = document.querySelector('.EasyMDEContainer');
+    if (mdeContainer) editorLayoutObserver.observe(mdeContainer);
+  }
+
+  run();
+  setTimeout(run, 200);
+  setTimeout(run, 800);
+}
+
+function bindMetaCollapse() {
+  const meta = $('#editorMeta');
+  const btn = $('#metaCollapseBtn');
+  if (!meta || !btn) return;
+
+  const key = 'editor_meta_collapsed';
+  const collapsed = localStorage.getItem(key) === '1';
+  meta.classList.toggle('is-collapsed', collapsed);
+  btn.textContent = collapsed ? '展开' : '收起';
+  btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+
+  btn.addEventListener('click', () => {
+    const next = !meta.classList.contains('is-collapsed');
+    meta.classList.toggle('is-collapsed', next);
+    btn.textContent = next ? '展开' : '收起';
+    btn.setAttribute('aria-expanded', next ? 'false' : 'true');
+    localStorage.setItem(key, next ? '1' : '0');
+    refreshEditorLayout();
+  });
+}
+
 function setupEasyMDE() {
   if (typeof EasyMDE === 'undefined') {
     // 没加载到 EasyMDE 就回退到 textarea
@@ -815,7 +893,6 @@ function setupEasyMDE() {
     autoDownloadFontAwesome: true,
     spellChecker: false,
     status: false,
-    minHeight: '300px',
     placeholder: '开始用 Markdown 写作。支持拖拽 / 粘贴上传图片',
     toolbar: [
       'bold', 'italic', 'heading', '|',
@@ -843,6 +920,7 @@ function setupEasyMDE() {
     // 富文本模式下 EasyMDE 是被动同步 buffer，不要回头触发预览（以富文本 input 为准）
     if (state.editorMode === 'markdown') updatePreview();
   });
+  refreshEditorLayout();
 }
 
 (async function init() {
@@ -864,6 +942,8 @@ function setupEasyMDE() {
   $('#author').value = (getUser() && getUser().name) || CONFIG.site.author || '';
 
   setupEasyMDE();
+  bindEditorLayoutRefresh();
+  bindMetaCollapse();
   bindEditorModeSwitch();
   setupDragAndPaste();
   bindTagPicker();
