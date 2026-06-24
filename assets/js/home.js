@@ -13,6 +13,19 @@ const $ = sel => document.querySelector(sel);
 
 // 从文章页返回首页时恢复列表滚动位置（配合无限加载先铺到离开前的条数）
 const HOME_SCROLL_KEY = 'gitblog_home_scroll_v1';
+const MOBILE_HOME_MQ = '(max-width: 720px)';
+
+function isMobileHomeViewport() {
+  return window.matchMedia(MOBILE_HOME_MQ).matches;
+}
+
+function hasHomePrerenderList() {
+  return document.querySelectorAll('#postList li.post-item').length > 0;
+}
+
+function canDeferHomeIndexFetch() {
+  return isMobileHomeViewport() && hasHomePrerenderList();
+}
 
 function navEntryType() {
   const n = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
@@ -60,8 +73,10 @@ function schedulePrefetchOtherPages() {
 
   const run = () => {
     ['tags.html', 'archives.html'].forEach(p => addPrefetch(rootPath(p)));
-    const idx = CONFIG.paths && CONFIG.paths.index ? String(CONFIG.paths.index).replace(/^\//, '') : 'data/posts.json';
-    addPrefetch(rootPath(`${idx}?v=${encodeURIComponent(CONFIG.VERSION || '')}`));
+    if (!isMobileHomeViewport()) {
+      const idx = CONFIG.paths && CONFIG.paths.index ? String(CONFIG.paths.index).replace(/^\//, '') : 'data/posts.json';
+      addPrefetch(rootPath(`${idx}?v=${encodeURIComponent(CONFIG.VERSION || '')}`));
+    }
   };
 
   const ric = window.requestIdleCallback;
@@ -175,7 +190,15 @@ function bindHeroAvatarSizeSync() {
 
 function renderCarousel(posts) {
   const root = $('#homeCarousel');
-  if (!root) return;
+  if (!root || root.hidden) return;
+
+  const hasShell = root.dataset.shell === 'prerender' && root.querySelector('.carousel-viewport');
+  if (hasShell) {
+    root.hidden = false;
+    root.removeAttribute('data-shell');
+    bindCarouselInteractions(root);
+    return;
+  }
 
   // 轮播策略：
   // 1. 如果有任何文章在后台被勾选 carousel=true，只展示这些（按 pinned + date 排，最多 8 张）
@@ -197,11 +220,8 @@ function renderCarousel(posts) {
     return;
   }
 
-  let current = 0;
   root.hidden = false;
-  const hasShell = root.dataset.shell === 'prerender' && root.querySelector('.carousel-viewport');
-  if (!hasShell) {
-    root.innerHTML = `
+  root.innerHTML = `
     <div class="carousel-viewport">
       ${items.map((p, i) => `
         <a class="carousel-slide${i === 0 ? ' active' : ''}" href="${postPathFromPost(p)}" aria-label="${escapeHtml(p.title || '文章')}">
@@ -226,9 +246,12 @@ function renderCarousel(posts) {
       </div>
     </div>
   `;
-  }
   root.removeAttribute('data-shell');
+  bindCarouselInteractions(root);
+}
 
+function bindCarouselInteractions(root) {
+  let current = 0;
   const slides = [...root.querySelectorAll('.carousel-slide')];
   const dots = [...root.querySelectorAll('.carousel-dots button')];
   const setActive = index => {
@@ -494,6 +517,70 @@ function bindPrerenderedPostList(posts) {
   return true;
 }
 
+/** 移动端首屏：保留预渲染 DOM，滚动加载更多时再拉 posts.json */
+function bindPrerenderedPostListLazy(resolvePosts) {
+  const ul = $('#postList');
+  if (!ul) return false;
+  if (listState && listState.observer) listState.observer.disconnect();
+
+  const existing = ul.querySelectorAll('li.post-item');
+  if (!existing.length) return false;
+
+  const author = CONFIG.site.author;
+  const avatar = CONFIG.site.avatar;
+  bindLazyImages(ul, { eagerCount: 0 });
+
+  const state = { loaded: existing.length, observer: null, loadNext: null, loading: false };
+  const sentinel = document.getElementById('loadMoreSentinel');
+
+  async function loadNext() {
+    if (state.loading) return;
+    state.loading = true;
+    try {
+      const posts = await resolvePosts();
+      const nextChunk = posts.slice(state.loaded, state.loaded + PAGE_SIZE);
+      if (!nextChunk.length) {
+        const anchor = document.getElementById('loadMoreSentinel');
+        if (anchor && state.loaded >= posts.length) {
+          if (state.observer) state.observer.disconnect();
+          anchor.outerHTML = `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`;
+        }
+        return;
+      }
+      const frag = document.createElement('div');
+      frag.innerHTML = nextChunk.map(p => postItemHtml(p, author, avatar)).join('');
+      const inserted = [...frag.children];
+      const anchor = document.getElementById('loadMoreSentinel');
+      inserted.forEach(node => ul.insertBefore(node, anchor));
+      inserted.forEach(node => bindLazyImages(node, { eagerCount: 0 }));
+      state.loaded += nextChunk.length;
+      if (state.loaded >= posts.length && anchor) {
+        if (state.observer) state.observer.disconnect();
+        anchor.outerHTML = `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`;
+      }
+    } finally {
+      state.loading = false;
+    }
+  }
+
+  state.loadNext = loadNext;
+
+  if (sentinel && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      for (const e of entries) if (e.isIntersecting) loadNext();
+    }, { rootMargin: '300px 0px' });
+    observer.observe(sentinel);
+    state.observer = observer;
+  } else if (sentinel) {
+    sentinel.style.cursor = 'pointer';
+    sentinel.addEventListener('click', () => loadNext());
+  }
+
+  listState = state;
+  mobileHomeStickySync?.();
+  return true;
+}
+
 function renderTags(posts) {
   const cloud = $('#tagCloud');
   if (!cloud) return;
@@ -719,19 +806,42 @@ function bindMobileHomeSticky() {
   });
 
   let allPosts = [];
-  try {
-    const data = await fetchIndexPublic();
-    allPosts = (Array.isArray(data.posts) ? data.posts : []).filter(p => !p.draft && p.type !== 'note');
-  } catch (e) {
-    $('#postList').innerHTML = `<li class="error">加载文章列表失败：${escapeHtml(e.message)}</li>`;
-    return;
+  let indexFetchPromise = null;
+
+  async function ensureIndexPosts() {
+    if (allPosts.length) return allPosts;
+    if (!indexFetchPromise) {
+      indexFetchPromise = fetchIndexPublic()
+        .then(data => {
+          allPosts = (Array.isArray(data.posts) ? data.posts : []).filter(p => !p.draft && p.type !== 'note');
+          return allPosts;
+        })
+        .catch(err => {
+          indexFetchPromise = null;
+          throw err;
+        });
+    }
+    return indexFetchPromise;
   }
 
-  renderHero(allPosts);
+  const deferIndexFetch = canDeferHomeIndexFetch();
+
+  if (!deferIndexFetch) {
+    try {
+      await ensureIndexPosts();
+    } catch (e) {
+      $('#postList').innerHTML = `<li class="error">加载文章列表失败：${escapeHtml(e.message)}</li>`;
+      return;
+    }
+    renderHero(allPosts);
+    renderCarousel(allPosts);
+    renderTags(allPosts);
+    renderRecent(allPosts);
+  } else {
+    renderCarousel(allPosts);
+  }
+
   bindHeroAvatarSizeSync();
-  renderCarousel(allPosts);
-  renderTags(allPosts);
-  renderRecent(allPosts);
   // hero-stats 异步插入后高度会变，需重新对齐头像占位
   initPageviews();
   bindHeroAvatarSizeSync();
@@ -759,7 +869,7 @@ function bindMobileHomeSticky() {
     try { sessionStorage.removeItem(HOME_SCROLL_KEY); } catch {}
   }
 
-  function refresh() {
+  async function refresh() {
     const ul = $('#postList');
     if (tab === 'notes') {
       if (listState && listState.observer) listState.observer.disconnect();
@@ -778,17 +888,56 @@ function bindMobileHomeSticky() {
       }
     } else {
       ul.classList.remove('post-list--giscus');
-      const filtered = buildHomeList({ allPosts, tab, q: '', tag: activeTag });
+      if (!allPosts.length && tab !== 'latest') {
+        try {
+          await ensureIndexPosts();
+        } catch (e) {
+          ul.innerHTML = `<li class="error">加载文章列表失败：${escapeHtml(e.message)}</li>`;
+          return;
+        }
+      }
+      const filtered = allPosts.length
+        ? buildHomeList({ allPosts, tab, q: '', tag: activeTag })
+        : [];
       const canReusePrerender = tab === 'latest' && !activeTag && !homePrerenderConsumed;
-      const reused = canReusePrerender && bindPrerenderedPostList(filtered);
-      if (reused) homePrerenderConsumed = true;
-      if (!reused) renderList(filtered, tab);
+      let reused = false;
+      if (canReusePrerender) {
+        if (allPosts.length) {
+          reused = bindPrerenderedPostList(filtered);
+        } else {
+          reused = bindPrerenderedPostListLazy(async () => {
+            await ensureIndexPosts();
+            return buildHomeList({ allPosts, tab, q: '', tag: activeTag });
+          });
+        }
+        if (reused) homePrerenderConsumed = true;
+      }
+      if (!reused) {
+        if (!allPosts.length) {
+          try {
+            await ensureIndexPosts();
+          } catch (e) {
+            ul.innerHTML = `<li class="error">加载文章列表失败：${escapeHtml(e.message)}</li>`;
+            return;
+          }
+        }
+        renderList(buildHomeList({ allPosts, tab, q: '', tag: activeTag }), tab);
+      }
     }
 
     if (pendingRestore) {
       const pr = pendingRestore;
       pendingRestore = null;
       if (tab !== 'notes' && listState && typeof listState.loadNext === 'function') {
+        if (!allPosts.length) {
+          try {
+            await ensureIndexPosts();
+          } catch {
+            scheduleRestoreHomeScroll(pr.y);
+            requestAnimationFrame(() => window.dispatchEvent(new Event('scroll')));
+            return;
+          }
+        }
         const filtered = buildHomeList({ allPosts, tab, q: '', tag: activeTag });
         const targetLoaded = Math.min(
           Math.max(Number(pr.loaded) || PAGE_SIZE, PAGE_SIZE),
@@ -796,7 +945,8 @@ function bindMobileHomeSticky() {
         );
         let guard = 0;
         while (listState.loaded < targetLoaded && guard++ < 250) {
-          listState.loadNext();
+          const r = listState.loadNext();
+          if (r && typeof r.then === 'function') await r;
         }
       }
       scheduleRestoreHomeScroll(pr.y);
@@ -805,11 +955,11 @@ function bindMobileHomeSticky() {
   }
 
   document.querySelectorAll('.tab').forEach(el => {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', async () => {
       document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
       el.classList.add('active');
       tab = el.dataset.tab;
-      refresh();
+      await refresh();
     });
   });
 
@@ -828,7 +978,7 @@ function bindMobileHomeSticky() {
     } catch {}
   });
 
-  refresh();
+  await refresh();
   bindMobileHomeSticky();
   schedulePrefetchOtherPages();
 })();
