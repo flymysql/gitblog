@@ -34,11 +34,54 @@ cd cloudbase
 tcb fn deploy gitblog-comments -e gitbolg-d7gmnsrw46e011706
 ```
 
-## 3. 开启匿名登录（embed / sdk 模式需要）
+## 3. 云函数 HTTP 访问与权限（embed 模式必做）
 
-控制台 → **登录授权** → 开启 **匿名登录**。
+嵌入页通过 **HTTP** 调用云函数（不再走 Web SDK 匿名登录），须完成以下配置：
 
-云函数 → **权限控制**：允许未登录用户调用 `gitblog-comments`。
+### 3.1 开启 HTTP 访问
+
+控制台 → **云函数** → `gitblog-comments` → **HTTP 访问服务** → **开启**
+
+记录 HTTP 地址，形如：
+
+`https://gitbolg-d7gmnsrw46e011706.ap-shanghai.app.tcloudbase.com/gitblog-comments`
+
+### 3.2 配置云函数安全规则（解决 PERMISSION_DENIED）
+
+若页面出现：
+
+`{"code":"OPERATION_FAIL","msg":"[PERMISSION_DENIED] Permission denied"}`
+
+说明云函数默认不允许未登录调用。请按以下步骤修改：
+
+1. 控制台 → **云函数** → `gitblog-comments` → **权限控制** / **安全规则**
+2. 选择 **安全规则**，粘贴：
+
+```json
+{
+  "*": {
+    "invoke": true
+  },
+  "gitblog-comments": {
+    "invoke": true
+  }
+}
+```
+
+3. 保存后等待约 1 分钟生效
+
+> `invoke: true` 表示允许所有人（含未登录）调用，适合公开评论接口。
+
+### 3.3 重新部署云函数
+
+修改 CORS 或代码后：
+
+```bash
+cd cloudbase
+tcb fn deploy gitblog-comments -e gitbolg-d7gmnsrw46e011706
+```
+
+云函数已自动允许 `*.tcloudbaseapp.com` 来源跨域（嵌入页托管域）。
 
 ## 4. 部署评论嵌入页（免费版必做）
 
@@ -72,7 +115,7 @@ embedBaseUrl: 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com',
 | 文件 | 说明 |
 |------|------|
 | `static/comments-embed.html` | 嵌入页入口 |
-| `static/comments-embed.js` | 评论 UI + SDK 调用 |
+| `static/comments-embed.js` | 评论 UI + HTTP 调用云函数 |
 | `static/comments-embed.css` | 样式（支持 light/dark） |
 
 更新评论 UI 后需重新执行 `tcb hosting deploy ./static`。
