@@ -215,6 +215,23 @@ function normalizeConfig(config) {
   config.giscus.notesTerm = String(config.giscus.notesTerm || 'gitblog-notes-feed').trim() || 'gitblog-notes-feed';
   config.giscus.notesCategory = String(config.giscus.notesCategory || 'Announcements').trim() || 'Announcements';
   config.giscus.notesCategoryId = String(config.giscus.notesCategoryId || 'DIC_kwDOSZ6GIc4C8wdV').trim() || 'DIC_kwDOSZ6GIc4C8wdV';
+
+  config.comments = config.comments || {};
+  const provider = String(config.comments.provider || '').trim().toLowerCase();
+  config.comments.provider = ['giscus', 'cloudbase', 'none'].includes(provider) ? provider : 'giscus';
+
+  config.cloudbase = config.cloudbase || {};
+  config.cloudbase.enabled = !!config.cloudbase.enabled;
+  config.cloudbase.envId = String(config.cloudbase.envId || '').trim();
+  config.cloudbase.region = String(config.cloudbase.region || 'ap-shanghai').trim() || 'ap-shanghai';
+  config.cloudbase.functionName = String(config.cloudbase.functionName || 'gitblog-comments').trim() || 'gitblog-comments';
+  config.cloudbase.placeholderNick = String(config.cloudbase.placeholderNick || '访客').trim() || '访客';
+  config.cloudbase.moderation = !!config.cloudbase.moderation;
+  config.cloudbase.maxLength = Math.min(Math.max(Number(config.cloudbase.maxLength) || 5000, 500), 12000);
+  config.cloudbase.allowImage = config.cloudbase.allowImage !== false;
+  config.cloudbase.pageSize = Math.min(Math.max(Number(config.cloudbase.pageSize) || 50, 10), 200);
+  config.cloudbase.notesTerm = String(config.cloudbase.notesTerm || config.giscus.notesTerm || 'gitblog-notes-feed').trim() || 'gitblog-notes-feed';
+
   config.analytics.enabled = !!config.analytics.enabled;
   config.analytics.snippet = String(config.analytics.snippet || '').trim();
   config.pageviews.enabled = config.pageviews.enabled !== false;
@@ -642,6 +659,49 @@ function settingsContentHtml() {
           <label>百度 site 域名 <input name="seo.baiduPush.site" placeholder="gitpull.cn（留空用 site.url 域名）"></label>
           <label class="span-2">百度推送 token
             <input name="seo.baiduPush.token" placeholder="在百度搜索资源平台 → 普通收录 → API 提交 获取">
+          </label>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <h3>评论</h3>
+        <p class="settings-help">选择评论方式：<strong>CloudBase</strong> 适合国内读者（昵称/邮箱即可评、富文本）；<strong>giscus</strong> 依赖 GitHub 登录。</p>
+        <div class="settings-grid">
+          <label>评论方式
+            <select name="comments.provider">
+              <option value="giscus">giscus（GitHub Discussions）</option>
+              <option value="cloudbase">CloudBase（腾讯云）</option>
+              <option value="none">关闭评论</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="settings-card">
+        <h3>CloudBase 评论</h3>
+        <p class="settings-help">需先在仓库 <code>cloudbase/</code> 部署云函数，详见 <code>cloudbase/README.md</code>。环境 ID 为公开信息，可填在此处。</p>
+        <div class="settings-grid">
+          <label class="settings-check"><input type="checkbox" name="cloudbase.enabled"> 启用 CloudBase 评论组件</label>
+          <label class="span-2">环境 ID（envId）
+            <input name="cloudbase.envId" placeholder="例如 cloud1-xxx">
+          </label>
+          <label>地域 region
+            <input name="cloudbase.region" placeholder="ap-shanghai">
+          </label>
+          <label>云函数名
+            <input name="cloudbase.functionName" placeholder="gitblog-comments">
+          </label>
+          <label>默认昵称
+            <input name="cloudbase.placeholderNick" placeholder="访客">
+          </label>
+          <label>单条字数上限
+            <input name="cloudbase.maxLength" type="number" min="500" max="12000" placeholder="5000">
+          </label>
+          <label class="settings-check"><input type="checkbox" name="cloudbase.allowImage"> 允许评论插入图片</label>
+          <label class="settings-check"><input type="checkbox" name="cloudbase.moderation"> 前端提示「待审核」（须云函数环境变量 COMMENT_MODERATION=1）</label>
+          <label class="span-2">随笔讨论 path（notesTerm）
+            <input name="cloudbase.notesTerm" placeholder="gitblog-notes-feed">
+            <span class="settings-hint">与 giscus 的 notesTerm 含义相同：首页「随笔」与 notes.html 共用。</span>
           </label>
         </div>
       </section>
