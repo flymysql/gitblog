@@ -17,6 +17,22 @@ const UPLOAD_MAX_BYTES = 2 * 1024 * 1024;
 const ORPHAN_IMAGE_MIN_AGE_MS = Number(process.env.COMMENT_ORPHAN_IMAGE_MIN_AGE_MS) || 24 * 60 * 60 * 1000;
 const CLEANUP_BATCH = Math.min(Math.max(Number(process.env.COMMENT_CLEANUP_BATCH) || 40, 1), 100);
 
+const COMMENT_AVATAR_FILES = [
+  'badboy.webp', 'badgirl.webp', 'boundary-female.webp', 'boundary-male.webp',
+  'caveman-female.webp', 'caveman-male.webp', 'daddy.webp', 'foodie-female.webp',
+  'foodie-male.webp', 'goodman-female.webp', 'goodman-male.webp', 'hollow-female.webp',
+  'hollow-male.webp', 'kitten-female.webp', 'kitten-male.webp', 'lovebrain-female.webp',
+  'lovebrain-male.webp', 'manmom.webp', 'mom.webp', 'mute-female.webp', 'mute-male.webp',
+  'netchat-female.webp', 'netchat-male.webp', 'newbie-female.webp', 'newbie-male.webp',
+  'player-female.webp', 'player-male.webp', 'puppy-female.webp', 'puppy-male.webp',
+  'purelove-female.webp', 'purelove-male.webp', 'rush-female.webp', 'rush-male.webp',
+  'simp-female.webp', 'simp-male.webp', 'siren-female.webp', 'siren-male.webp',
+  'solo-female.webp', 'solo-male.webp', 'spender-female.webp', 'spender-male.webp',
+  'straight-female.webp', 'straight-male.webp', 'swordsman-female.webp', 'swordsman-male.webp',
+  'zen-female.webp', 'zen-male.webp',
+];
+const COMMENT_AVATAR_SET = new Set(COMMENT_AVATAR_FILES);
+
 const ALLOWED_TAGS = new Set([
   'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'del', 'code', 'pre',
   'blockquote', 'a', 'img', 'ul', 'ol', 'li', 'span',
@@ -37,6 +53,15 @@ function hashIp(ip) {
 function sanitizeNick(raw) {
   const nick = String(raw || '').replace(/\d/g, '').trim().slice(0, 40);
   return nick || '访客';
+}
+
+function sanitizeAvatar(raw, nick) {
+  const name = String(raw || '').trim();
+  if (COMMENT_AVATAR_SET.has(name)) return name;
+  let h = 0;
+  const s = String(nick || '访客');
+  for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) >>> 0;
+  return COMMENT_AVATAR_FILES[h % COMMENT_AVATAR_FILES.length];
 }
 
 function extractFileIdsFromHtml(html) {
@@ -323,10 +348,12 @@ function stripMentionHtml(html) {
 }
 
 async function publicComment(row) {
+  const nick = row.nick || '访客';
   return {
     _id: row._id,
     path: row.path,
-    nick: row.nick || '访客',
+    nick,
+    avatar: sanitizeAvatar(row.avatar, nick),
     contentHtml: await resolveCommentImageUrls(stripMentionHtml(row.contentHtml)),
     parentId: row.parentId || null,
     replyToNick: row.replyToNick || null,
@@ -448,9 +475,11 @@ async function handlePost(event, context) {
   const pageTitle = String(event.pageTitle || '').slice(0, 200);
   const pageUrl = String(event.pageUrl || '').slice(0, 500);
   const nick = sanitizeNick(event.nick);
+  const avatar = sanitizeAvatar(event.avatar, nick);
   const doc = {
     path,
     nick,
+    avatar,
     email: String(event.email || '').trim().slice(0, 120),
     contentHtml,
     parentId,

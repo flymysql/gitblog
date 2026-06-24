@@ -3,6 +3,14 @@
  * 优先用 Web SDK callFunction（同环境托管域，移动端/微信更稳定）；
  * HTTP 仅作桌面端兜底。
  */
+import {
+  mountAvatarPicker,
+  renderCommentAvatarHtml,
+  resolveCommentAvatar,
+  isValidCommentAvatar,
+  pickRandomCommentAvatar,
+} from './comment-avatars.js';
+
 const SDK_URL = 'https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js';
 const COMMENT_IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const PROFILE_KEY = 'gitblog-comment-profile-v1';
@@ -301,10 +309,24 @@ function readProfile() {
   }
 }
 
-function saveProfile({ nick, email }) {
+function saveProfile({ nick, email, avatar }) {
   try {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify({ nick: nick || '', email: email || '' }));
+    const prev = readProfile();
+    const next = {
+      nick: nick ?? prev.nick ?? '',
+      email: email ?? prev.email ?? '',
+      avatar: avatar ?? prev.avatar ?? '',
+    };
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(next));
   } catch { /* ignore */ }
+}
+
+function getOrCreateGuestAvatar() {
+  const profile = readProfile();
+  if (isValidCommentAvatar(profile.avatar)) return profile.avatar;
+  const avatar = pickRandomCommentAvatar();
+  saveProfile({ avatar });
+  return avatar;
 }
 
 function readGuestNickCookie() {
@@ -656,14 +678,14 @@ class CommentRichEditor {
 function renderCommentItem(c, { nested = true } = {}) {
   const nick = escapeHtml(c.nick || '访客');
   const nickRaw = escapeHtml(c.nick || '访客');
-  const hue = avatarColor(c.nick);
+  const avatarHtml = renderCommentAvatarHtml(c, { escape: escapeHtml });
   const content = sanitizeCommentHtml(c.contentHtml || '');
   const replies = nested && (c.replies || []).length
     ? `<div class="cb-replies">${(c.replies || []).map(r => renderCommentItem(r, { nested: false })).join('')}</div>`
     : '';
   return `
     <article class="cb-comment${c.parentId ? ' is-reply' : ''}" data-id="${escapeHtml(c._id)}">
-      <div class="cb-comment-avatar" style="--cb-avatar-hue:${hue}" aria-hidden="true">${nick.slice(0, 1).toUpperCase()}</div>
+      ${avatarHtml}
       <div class="cb-comment-main">
         <header class="cb-comment-head">
           <strong class="cb-comment-nick">${nick}</strong>
@@ -678,6 +700,22 @@ function renderCommentItem(c, { nested = true } = {}) {
       </div>
     </article>
   `;
+}
+
+function setupCommentMeta(metaEl, profile, onAvatarChange) {
+  if (!metaEl) return { getAvatar: getOrCreateGuestAvatar };
+  const initial = isValidCommentAvatar(profile.avatar) ? profile.avatar : getOrCreateGuestAvatar();
+  const picker = mountAvatarPicker(metaEl, {
+    selected: initial,
+    onChange: file => {
+      saveProfile({ avatar: file });
+      onAvatarChange?.(file);
+      postHeight(true);
+    },
+  });
+  return {
+    getAvatar: () => resolveCommentAvatar(picker.getSelected(), ''),
+  };
 }
 
 function bindComposeReveal(form, editor, { metaEl, actionsEl }) {
@@ -869,6 +907,7 @@ function mountInlineReply(slot, ctx) {
   const profile = readProfile();
   prefillCommentNick(nickInput);
   if (profile.email) emailInput.value = profile.email;
+  const metaAvatar = setupCommentMeta(metaEl, profile);
   const editor = new CommentRichEditor(editorHost, {
     allowImage: cfg.allowImage,
     maxLength: cfg.maxLength,
@@ -912,6 +951,7 @@ function mountInlineReply(slot, ctx) {
     }
     const nick = resolveCommentNick(nickInput.value);
     const email = emailInput.value.trim() || profile.email || '';
+    const avatar = resolveCommentAvatar(metaAvatar.getAvatar(), nick);
     submitBtn.disabled = true;
     statusEl.classList.remove('is-error');
     statusEl.textContent = '发送中…';
@@ -921,12 +961,13 @@ function mountInlineReply(slot, ctx) {
         path,
         nick,
         email,
+        avatar,
         contentHtml: editor.getHtml(),
         parentId,
         pageTitle: cfg.pageTitle || document.title,
         pageUrl: cfg.pageUrl || params.get('pageUrl') || '',
       });
-      saveProfile({ nick, email });
+      saveProfile({ nick, email, avatar });
       closeAllInlineReplies(commentsRoot);
       await onSuccess();
     } catch (err) {
@@ -1018,6 +1059,7 @@ async function mount() {
   const profile = readProfile();
   prefillCommentNick(nickInput);
   if (profile.email) emailInput.value = profile.email;
+  const metaAvatar = setupCommentMeta(metaEl, profile);
 
   const editor = new CommentRichEditor(editorHost, {
     allowImage: cfg.allowImage,
@@ -1079,6 +1121,7 @@ async function mount() {
     }
     const nick = resolveCommentNick(nickInput.value);
     const email = emailInput.value.trim();
+    const avatar = resolveCommentAvatar(metaAvatar.getAvatar(), nick);
     const submitBtn = form.querySelector('.cb-submit');
     submitBtn.disabled = true;
     statusEl.classList.remove('is-error');
@@ -1089,12 +1132,13 @@ async function mount() {
         path: cfg.path,
         nick,
         email,
+        avatar,
         contentHtml: editor.getHtml(),
         parentId: null,
         pageTitle: cfg.pageTitle || document.title,
         pageUrl: cfg.pageUrl || params.get('pageUrl') || '',
       });
-      saveProfile({ nick, email });
+      saveProfile({ nick, email, avatar });
       editor.clear();
       statusEl.textContent = cfg.moderation ? '已提交，待审核通过后显示' : '发表成功';
       mobileSheet.notifySubmitted();

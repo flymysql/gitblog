@@ -4,6 +4,13 @@
 // ============================================================================
 
 import { CONFIG } from './config.js';
+import {
+  mountAvatarPicker,
+  renderCommentAvatarHtml,
+  resolveCommentAvatar,
+  isValidCommentAvatar,
+  pickRandomCommentAvatar,
+} from './comment-avatars.js';
 
 const PROFILE_KEY = 'gitblog-comment-profile-v1';
 const GUEST_NICK_COOKIE = 'gitblog_guest_nick';
@@ -279,10 +286,24 @@ function readProfile() {
   }
 }
 
-function saveProfile({ nick, email }) {
+function saveProfile({ nick, email, avatar }) {
   try {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify({ nick: nick || '', email: email || '' }));
+    const prev = readProfile();
+    const next = {
+      nick: nick ?? prev.nick ?? '',
+      email: email ?? prev.email ?? '',
+      avatar: avatar ?? prev.avatar ?? '',
+    };
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(next));
   } catch { /* ignore */ }
+}
+
+function getOrCreateGuestAvatar() {
+  const profile = readProfile();
+  if (isValidCommentAvatar(profile.avatar)) return profile.avatar;
+  const avatar = pickRandomCommentAvatar();
+  saveProfile({ avatar });
+  return avatar;
 }
 
 function readGuestNickCookie() {
@@ -625,14 +646,14 @@ class CommentRichEditor {
 function renderCommentItem(c, { nested = true } = {}) {
   const nick = escapeHtml(c.nick || '访客');
   const nickRaw = escapeHtml(c.nick || '访客');
-  const hue = avatarColor(c.nick);
+  const avatarHtml = renderCommentAvatarHtml(c, { escape: escapeHtml });
   const content = sanitizeCommentHtml(c.contentHtml || '');
   const replies = nested && (c.replies || []).length
     ? `<div class="cb-replies">${(c.replies || []).map(r => renderCommentItem(r, { nested: false })).join('')}</div>`
     : '';
   return `
     <article class="cb-comment${c.parentId ? ' is-reply' : ''}" data-id="${escapeHtml(c._id)}">
-      <div class="cb-comment-avatar" style="--cb-avatar-hue:${hue}" aria-hidden="true">${nick.slice(0, 1).toUpperCase()}</div>
+      ${avatarHtml}
       <div class="cb-comment-main">
         <header class="cb-comment-head">
           <strong class="cb-comment-nick">${nick}</strong>
@@ -647,6 +668,21 @@ function renderCommentItem(c, { nested = true } = {}) {
       </div>
     </article>
   `;
+}
+
+function setupCommentMeta(metaEl, profile, onAvatarChange) {
+  if (!metaEl) return { getAvatar: getOrCreateGuestAvatar };
+  const initial = isValidCommentAvatar(profile.avatar) ? profile.avatar : getOrCreateGuestAvatar();
+  const picker = mountAvatarPicker(metaEl, {
+    selected: initial,
+    onChange: file => {
+      saveProfile({ avatar: file });
+      onAvatarChange?.(file);
+    },
+  });
+  return {
+    getAvatar: () => resolveCommentAvatar(picker.getSelected(), ''),
+  };
 }
 
 function bindComposeReveal(form, editor, { metaEl, actionsEl }) {
@@ -1036,6 +1072,7 @@ function mountInlineReply(slot, ctx) {
   const profile = readProfile();
   prefillCommentNick(nickInput);
   if (profile.email) emailInput.value = profile.email;
+  const metaAvatar = setupCommentMeta(metaEl, profile);
   const maxLength = Number(cfg.maxLength) || 5000;
   const allowImage = cfg.allowImage !== false;
   const editor = new CommentRichEditor(editorHost, {
@@ -1076,6 +1113,7 @@ function mountInlineReply(slot, ctx) {
     }
     const nick = resolveCommentNick(nickInput.value);
     const email = emailInput.value.trim() || profile.email || '';
+    const avatar = resolveCommentAvatar(metaAvatar.getAvatar(), nick);
     submitBtn.disabled = true;
     statusEl.classList.remove('is-error');
     statusEl.textContent = '发送中…';
@@ -1085,12 +1123,13 @@ function mountInlineReply(slot, ctx) {
         path,
         nick,
         email,
+        avatar,
         contentHtml: editor.getHtml(),
         parentId,
         pageTitle: opts.pageTitle || document.title,
         pageUrl: opts.pageUrl || location.href,
       });
-      saveProfile({ nick, email });
+      saveProfile({ nick, email, avatar });
       closeAllInlineReplies(commentsRoot);
       await onSuccess();
     } catch (err) {
@@ -1273,6 +1312,7 @@ function mountCloudBaseDirect(targetEl, path, opts = {}) {
   const profile = readProfile();
   prefillCommentNick(nickInput);
   if (profile.email) emailInput.value = profile.email;
+  const metaAvatar = setupCommentMeta(metaEl, profile);
 
   const editor = new CommentRichEditor(editorHost, {
     allowImage,
@@ -1342,6 +1382,7 @@ function mountCloudBaseDirect(targetEl, path, opts = {}) {
     }
     const nick = resolveCommentNick(nickInput.value);
     const email = emailInput.value.trim();
+    const avatar = resolveCommentAvatar(metaAvatar.getAvatar(), nick);
     const submitBtn = form.querySelector('.cb-submit');
     submitBtn.disabled = true;
     statusEl.classList.remove('is-error');
@@ -1352,12 +1393,13 @@ function mountCloudBaseDirect(targetEl, path, opts = {}) {
         path,
         nick,
         email,
+        avatar,
         contentHtml: editor.getHtml(),
         parentId: null,
         pageTitle: opts.pageTitle || document.title,
         pageUrl: opts.pageUrl || location.href,
       });
-      saveProfile({ nick, email });
+      saveProfile({ nick, email, avatar });
       editor.clear();
       statusEl.textContent = cfg.moderation ? '已提交，待审核通过后显示' : '发表成功';
       mobileDock?.notifySubmitted?.();
