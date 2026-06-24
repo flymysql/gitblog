@@ -147,6 +147,8 @@ node deploy-static-embed.mjs
 
 控制台 → 云存储 → 权限：允许**所有用户可读**，**仅云函数可写**。
 
+评论图片使用永久公开地址 `https://{envId}.tcb.qcloud.la/comments/...`（不再使用会过期的临时签名链）。若图片 403，请检查云存储是否为公开读；自定义 CDN 域名可设置环境变量 `STORAGE_PUBLIC_BASE`（不含末尾 `/`）。
+
 ## 7. 云函数环境变量
 
 | 变量 | 说明 |
@@ -154,6 +156,7 @@ node deploy-static-embed.mjs
 | `COMMENT_MODERATION` | `1` 开启审核，`0` 直接显示 |
 | `COMMENT_SALT` | 随机字符串，用于 IP hash |
 | `ALLOWED_ORIGINS` | HTTP 模式跨域来源（embed 模式可忽略） |
+| `STORAGE_PUBLIC_BASE` | 云存储公开访问根 URL（可选，如 `https://{envId}.tcb.qcloud.la`） |
 | `REPLY_NOTIFY_ENABLED` | `1` 开启回复邮件通知（须配置 SMTP） |
 | `SMTP_HOST` | SMTP 服务器，如 `smtp.qq.com` |
 | `SMTP_PORT` | 端口，SSL 通常 `465`，TLS 用 `587` |

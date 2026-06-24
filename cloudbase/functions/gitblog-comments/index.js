@@ -31,6 +31,51 @@ function hashIp(ip) {
   return crypto.createHash('sha256').update(String(ip || '') + (process.env.COMMENT_SALT || 'gitblog')).digest('hex').slice(0, 24);
 }
 
+function parseCloudPathFromFileId(fileId) {
+  const m = String(fileId || '').match(/^cloud:\/\/[^/]+\/(.+)$/);
+  return m ? decodeURIComponent(m[1]) : '';
+}
+
+function getEnvIdFromFileId(fileId) {
+  const m = String(fileId || '').match(/^cloud:\/\/([^/.]+)/);
+  return m ? m[1] : '';
+}
+
+/** 云存储公开读时的永久 HTTPS 地址（避免 getTempFileURL 临时链过期 403） */
+function getStoragePublicUrl(cloudPath, fileId = '') {
+  const path = String(cloudPath || parseCloudPathFromFileId(fileId)).replace(/^\/+/, '');
+  if (!path) return '';
+  const customBase = String(process.env.STORAGE_PUBLIC_BASE || '').trim().replace(/\/+$/, '');
+  if (customBase) return `${customBase}/${path}`;
+  const envId = String(process.env.TCB_ENV || process.env.SCF_NAMESPACE || getEnvIdFromFileId(fileId)).trim();
+  if (!envId) return '';
+  return `https://${envId}.tcb.qcloud.la/${path}`;
+}
+
+function resolveCommentImageSrc(src) {
+  const raw = String(src || '').trim();
+  if (!raw) return raw;
+  if (raw.startsWith('cloud://')) {
+    return getStoragePublicUrl('', raw) || raw;
+  }
+  try {
+    const u = new URL(raw);
+    if (/\.tcb\.qcloud\.la$/i.test(u.hostname) && u.pathname.includes('/comments/')) {
+      const cloudPath = u.pathname.replace(/^\//, '');
+      const publicUrl = getStoragePublicUrl(cloudPath);
+      if (publicUrl) return publicUrl;
+    }
+  } catch { /* ignore */ }
+  return raw;
+}
+
+function resolveCommentImageUrls(html) {
+  return String(html || '').replace(
+    /(<img\b[^>]*\ssrc=)(["'])([^"']+)\2/gi,
+    (full, prefix, quote, src) => `${prefix}${quote}${resolveCommentImageSrc(src).replace(/"/g, '&quot;')}${quote}`,
+  );
+}
+
 function stripPlain(html) {
   return String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 }
@@ -158,7 +203,7 @@ function publicComment(row) {
     _id: row._id,
     path: row.path,
     nick: row.nick || '访客',
-    contentHtml: stripMentionHtml(row.contentHtml),
+    contentHtml: resolveCommentImageUrls(stripMentionHtml(row.contentHtml)),
     parentId: row.parentId || null,
     replyToNick: row.replyToNick || null,
     createdAt: row.createdAt,
@@ -244,7 +289,7 @@ async function handleGet(event) {
 
 async function handlePost(event, context) {
   const path = String(event.path || '').trim();
-  let contentHtml = sanitizeHtml(event.contentHtml);
+  let contentHtml = resolveCommentImageUrls(sanitizeHtml(event.contentHtml));
   const plain = stripPlain(contentHtml);
   if (!path) return jsonErr('缺少 path');
   if (!plain) return jsonErr('评论内容不能为空');
@@ -327,11 +372,7 @@ async function handleUpload(event, context) {
     fileContent: buf,
   });
   const fileId = uploadRes.fileID;
-  let url = fileId;
-  try {
-    const temp = await app.getTempFileURL({ fileList: [fileId] });
-    url = temp?.fileList?.[0]?.tempFileURL || fileId;
-  } catch (_) { /* use fileID */ }
+  const url = getStoragePublicUrl(cloudPath, fileId) || fileId;
 
   return jsonOk({ url, fileId });
 }
