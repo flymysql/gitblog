@@ -27,7 +27,7 @@ const cfg = {
   maxLength: 5000,
   allowImage: true,
   pageSize: 50,
-  mobileDock: params.get('mobileDock') === '1' || window.matchMedia('(max-width: 640px)').matches,
+  mobileDock: params.get('mobileDock') === '1',
 };
 
 const mode = String(params.get('mode') || 'light').trim().toLowerCase();

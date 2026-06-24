@@ -107,6 +107,7 @@ function renderCommentsSection(meta, slug) {
   mountComments($('#commentsRoot'), term, {
     pageTitle: meta?.title || document.title,
     pageUrl: location.href,
+    context: 'post',
   });
 }
 
