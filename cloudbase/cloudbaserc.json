@@ -16,6 +16,7 @@
       "envVariables": {
         "COMMENT_MODERATION": "0",
         "COMMENT_SALT": "change-me-in-console",
+        "COMMENT_ORPHAN_IMAGE_MIN_AGE_MS": "86400000",
         "ALLOWED_ORIGINS": "https://gitpull.cn,https://www.gitpull.cn",
         "REPLY_NOTIFY_ENABLED": "1",
         "SMTP_HOST": "smtp.qq.com",
@@ -24,7 +25,14 @@
         "SMTP_PASS": "",
         "SMTP_FROM": "237199972@qq.com",
         "SITE_URL": "https://gitpull.cn"
-      }
+      },
+      "triggers": [
+        {
+          "name": "commentImageCleanup",
+          "type": "timer",
+          "config": "0 0 4 * * * *"
+        }
+      ]
     }
   ]
 }

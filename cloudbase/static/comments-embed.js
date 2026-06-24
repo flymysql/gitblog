@@ -3,6 +3,14 @@
  * 优先用 Web SDK callFunction（同环境托管域，移动端/微信更稳定）；
  * HTTP 仅作桌面端兜底。
  */
+import {
+  mountAvatarPicker,
+  renderCommentAvatarHtml,
+  resolveCommentAvatar,
+  isValidCommentAvatar,
+  pickRandomCommentAvatar,
+} from './comment-avatars.js';
+
 const SDK_URL = 'https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js';
 const COMMENT_IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const PROFILE_KEY = 'gitblog-comment-profile-v1';
@@ -301,10 +309,24 @@ function readProfile() {
   }
 }
 
-function saveProfile({ nick, email }) {
+function saveProfile({ nick, email, avatar }) {
   try {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify({ nick: nick || '', email: email || '' }));
+    const prev = readProfile();
+    const next = {
+      nick: nick ?? prev.nick ?? '',
+      email: email ?? prev.email ?? '',
+      avatar: avatar ?? prev.avatar ?? '',
+    };
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(next));
   } catch { /* ignore */ }
+}
+
+function getOrCreateGuestAvatar() {
+  const profile = readProfile();
+  if (isValidCommentAvatar(profile.avatar)) return profile.avatar;
+  const avatar = pickRandomCommentAvatar();
+  saveProfile({ avatar });
+  return avatar;
 }
 
 function readGuestNickCookie() {
@@ -318,15 +340,18 @@ function writeGuestNickCookie(nick) {
   document.cookie = `${GUEST_NICK_COOKIE}=${safe}; path=/; max-age=${maxAge}; SameSite=Lax`;
 }
 
+function sanitizeCustomNick(raw) {
+  return String(raw || '').replace(/\d/g, '').trim().slice(0, 40);
+}
+
 function randomGuestNick() {
   const adj = GUEST_NICK_ADJS[Math.floor(Math.random() * GUEST_NICK_ADJS.length)];
   const noun = GUEST_NICK_NOUNS[Math.floor(Math.random() * GUEST_NICK_NOUNS.length)];
-  const num = String(Math.floor(100 + Math.random() * 900));
-  return `${adj}${noun}${num}`;
+  return `${adj}${noun}`;
 }
 
 function getOrCreateGuestNick() {
-  const cached = readGuestNickCookie();
+  const cached = sanitizeCustomNick(readGuestNickCookie());
   if (cached) return cached;
   const nick = randomGuestNick();
   writeGuestNickCookie(nick);
@@ -336,8 +361,12 @@ function getOrCreateGuestNick() {
 function resolveCommentNick(inputNick) {
   const trimmed = String(inputNick || '').trim();
   if (trimmed) {
-    writeGuestNickCookie(trimmed);
-    return trimmed.slice(0, 40);
+    const nick = sanitizeCustomNick(trimmed);
+    if (nick) {
+      writeGuestNickCookie(nick);
+      return nick;
+    }
+    return getOrCreateGuestNick();
   }
   return getOrCreateGuestNick();
 }
@@ -346,11 +375,10 @@ function prefillCommentNick(inputEl) {
   if (!inputEl || inputEl.value.trim()) return;
   const profile = readProfile();
   if (profile.nick) {
-    inputEl.value = profile.nick;
+    inputEl.value = sanitizeCustomNick(profile.nick) || getOrCreateGuestNick();
     return;
   }
-  const cached = readGuestNickCookie();
-  inputEl.value = cached || getOrCreateGuestNick();
+  inputEl.value = getOrCreateGuestNick();
 }
 
 function formatTime(ts) {
@@ -381,14 +409,16 @@ function fileToBase64(file) {
 }
 
 class CommentRichEditor {
-  constructor(root, { allowImage = true, maxLength = 5000, onUpload, onChange, onHydrateImages, alwaysShowBar = false } = {}) {
+  constructor(root, { allowImage = true, maxLength = 5000, onUpload, onDiscardUpload, onChange, alwaysShowBar = false } = {}) {
     this.root = root;
     this.allowImage = allowImage;
     this.maxLength = maxLength;
     this.onUpload = onUpload;
+    this.onDiscardUpload = onDiscardUpload;
     this.onChange = onChange;
-    this.onHydrateImages = onHydrateImages;
     this.alwaysShowBar = alwaysShowBar;
+    this.attachments = [];
+    this._attachmentSeq = 0;
     this._emojiOpen = false;
     this._render();
     this._bind();
@@ -396,19 +426,24 @@ class CommentRichEditor {
 
   _render() {
     this.root.innerHTML = `
-      <div class="cb-editor cb-editor--minimal">
-        <div class="cb-editor-body" contenteditable="true" data-placeholder="写下你的想法…" role="textbox" aria-multiline="true"></div>
-        <div class="cb-editor-emoji" hidden></div>
-        <div class="cb-editor-bar">
-          <div class="cb-editor-tools" role="toolbar" aria-label="评论工具">
-            <button type="button" class="cb-tb" data-action="emoji" title="表情">😊</button>
-            ${this.allowImage ? '<button type="button" class="cb-tb" data-action="image" title="图片">🖼</button>' : ''}
+      <div class="cb-editor-wrap">
+        <div class="cb-editor-attachments" hidden></div>
+        <div class="cb-editor cb-editor--minimal">
+          <div class="cb-editor-body" contenteditable="true" data-placeholder="写下你的想法…" role="textbox" aria-multiline="true"></div>
+          <div class="cb-editor-emoji" hidden></div>
+          <div class="cb-editor-bar">
+            <div class="cb-editor-tools" role="toolbar" aria-label="评论工具">
+              <button type="button" class="cb-tb" data-action="emoji" title="表情">😊</button>
+              ${this.allowImage ? '<button type="button" class="cb-tb" data-action="image" title="图片">🖼</button>' : ''}
+            </div>
+            <span class="cb-editor-count" hidden>0 / ${this.maxLength}</span>
           </div>
-          <span class="cb-editor-count" hidden>0 / ${this.maxLength}</span>
+          <input type="file" accept="image/*" class="cb-editor-file" hidden>
         </div>
-        <input type="file" accept="image/*" class="cb-editor-file" hidden>
       </div>
     `;
+    this.wrapEl = this.root.querySelector('.cb-editor-wrap');
+    this.attachmentsEl = this.root.querySelector('.cb-editor-attachments');
     this.editorEl = this.root.querySelector('.cb-editor');
     this.tools = this.root.querySelector('.cb-editor-tools');
     this.body = this.root.querySelector('.cb-editor-body');
@@ -449,6 +484,14 @@ class CommentRichEditor {
     this.body.addEventListener('input', () => this._syncCount());
     this.body.addEventListener('paste', e => this._onPaste(e));
     this.fileInput.addEventListener('change', () => this._onPickImage());
+    this.attachmentsEl.addEventListener('click', e => {
+      const btn = e.target.closest('.cb-editor-attachment-remove');
+      if (!btn) return;
+      e.preventDefault();
+      const item = btn.closest('.cb-editor-attachment');
+      const id = Number(item?.dataset.aid);
+      if (id) this._removeAttachment(id);
+    });
     this.body.addEventListener('focus', () => this.editorEl.classList.add('is-focused'));
     this.body.addEventListener('blur', () => {
       setTimeout(() => {
@@ -484,7 +527,7 @@ class CommentRichEditor {
       if (!item.type.startsWith('image/')) continue;
       e.preventDefault();
       const file = item.getAsFile();
-      if (file) await this._uploadAndInsert(file);
+      if (file) await this._uploadAttachment(file);
       return;
     }
   }
@@ -493,35 +536,73 @@ class CommentRichEditor {
     const file = this.fileInput.files?.[0];
     this.fileInput.value = '';
     if (!file) return;
-    await this._uploadAndInsert(file);
+    await this._uploadAttachment(file);
   }
 
-  async _uploadAndInsert(file) {
+  _syncAttachmentsBar() {
+    const items = this.attachments;
+    this.attachmentsEl.hidden = !items.length;
+    this.attachmentsEl.innerHTML = items.map(a => `
+      <div class="cb-editor-attachment${a.uploading ? ' is-uploading' : ''}" data-aid="${a.id}">
+        ${a.uploading
+    ? '<span class="cb-editor-attachment-loading" aria-hidden="true"></span>'
+    : `<img src="${escapeHtml(a.previewUrl)}" alt="待发送图片" loading="lazy">`}
+        <button type="button" class="cb-editor-attachment-remove" aria-label="移除图片" ${a.uploading ? 'hidden' : ''}>×</button>
+      </div>
+    `).join('');
+    postHeight(true);
+  }
+
+  _removeAttachment(id) {
+    const att = this.attachments.find(a => a.id === id);
+    if (att?.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(att.previewUrl);
+    if (att?.fileId) {
+      this.onDiscardUpload?.(att.fileId).catch(() => null);
+    }
+    this.attachments = this.attachments.filter(a => a.id !== id);
+    this._syncAttachmentsBar();
+    this._syncCount();
+  }
+
+  async _uploadAttachment(file) {
     if (!this.onUpload) return;
-    const placeholder = document.createElement('span');
-    placeholder.className = 'cb-uploading';
-    placeholder.textContent = '图片上传中…';
-    this.body.focus();
-    document.execCommand('insertHTML', false, placeholder.outerHTML);
+    const id = ++this._attachmentSeq;
+    const previewUrl = URL.createObjectURL(file);
+    this.attachments.push({ id, fileId: '', previewUrl, uploading: true });
+    this._syncAttachmentsBar();
+    this._syncCount();
     try {
       const result = await this.onUpload(file);
       const fileId = typeof result === 'object' ? result?.fileId : '';
       if (!fileId) throw new Error('图片上传失败');
-      const fileIdAttr = ` data-cb-fileid="${escapeHtml(fileId)}"`;
-      const html = `<img src="${COMMENT_IMG_PLACEHOLDER}" alt="评论图片" loading="lazy"${fileIdAttr}>`;
-      this.root.querySelector('.cb-uploading')?.replaceWith(
-        ...(() => {
-          const t = document.createElement('template');
-          t.innerHTML = html;
-          return [...t.content.childNodes];
-        })()
-      );
-      await this.onHydrateImages?.(this.root);
+      const att = this.attachments.find(a => a.id === id);
+      if (att) {
+        att.fileId = fileId;
+        att.uploading = false;
+      }
+      this._syncAttachmentsBar();
+      this._syncCount();
     } catch {
-      this.root.querySelector('.cb-uploading')?.remove();
+      this._removeAttachment(id);
       throw new Error('图片上传失败');
     }
-    this._syncCount();
+  }
+
+  _hasReadyAttachments() {
+    return this.attachments.some(a => a.fileId && !a.uploading);
+  }
+
+  _getTextHtml() {
+    const clone = this.body.cloneNode(true);
+    clone.querySelectorAll('img, .cb-uploading').forEach(n => n.remove());
+    return sanitizeCommentHtml(clone.innerHTML);
+  }
+
+  _getAttachmentHtml() {
+    return this.attachments
+      .filter(a => a.fileId && !a.uploading)
+      .map(a => `<p class="cb-comment-img-line"><img src="${COMMENT_IMG_PLACEHOLDER}" alt="评论图片" loading="lazy" data-cb-fileid="${escapeHtml(a.fileId)}"></p>`)
+      .join('');
   }
 
   _autosizeBody() {
@@ -548,24 +629,36 @@ class CommentRichEditor {
   _syncCount() {
     const text = this.body.innerText || '';
     const len = text.length;
-    const has = len > 0;
+    const hasText = len > 0;
+    const hasContent = hasText || this._hasReadyAttachments() || this.attachments.some(a => a.uploading);
     this.countEl.textContent = `${len} / ${this.maxLength}`;
-    this.countEl.hidden = !has;
+    this.countEl.hidden = !hasText;
     this.countEl.classList.toggle('is-over', len > this.maxLength);
-    this.editorEl.classList.toggle('has-content', has);
+    this.editorEl.classList.toggle('has-content', hasContent);
+    this.wrapEl?.classList.toggle('has-attachments', this.attachments.length > 0);
     this._autosizeBody();
     this.onChange?.(len);
+    postHeight(true);
   }
 
   getHtml() {
-    return sanitizeCommentHtml(this.body.innerHTML);
+    return `${this._getTextHtml()}${this._getAttachmentHtml()}`.trim();
   }
 
   getPlainLength() {
     return (this.body.innerText || '').length;
   }
 
+  hasAttachments() {
+    return this._hasReadyAttachments();
+  }
+
   clear() {
+    this.attachments.forEach(a => {
+      if (a.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(a.previewUrl);
+    });
+    this.attachments = [];
+    this._syncAttachmentsBar();
     this.body.innerHTML = '';
     this._syncCount();
   }
@@ -576,21 +669,23 @@ class CommentRichEditor {
 
   isValid() {
     const len = this.getPlainLength();
-    return len > 0 && len <= this.maxLength;
+    if (this.attachments.some(a => a.uploading)) return false;
+    const hasContent = len > 0 || this._hasReadyAttachments();
+    return hasContent && len <= this.maxLength;
   }
 }
 
 function renderCommentItem(c, { nested = true } = {}) {
   const nick = escapeHtml(c.nick || '访客');
   const nickRaw = escapeHtml(c.nick || '访客');
-  const hue = avatarColor(c.nick);
+  const avatarHtml = renderCommentAvatarHtml(c, { escape: escapeHtml });
   const content = sanitizeCommentHtml(c.contentHtml || '');
   const replies = nested && (c.replies || []).length
     ? `<div class="cb-replies">${(c.replies || []).map(r => renderCommentItem(r, { nested: false })).join('')}</div>`
     : '';
   return `
     <article class="cb-comment${c.parentId ? ' is-reply' : ''}" data-id="${escapeHtml(c._id)}">
-      <div class="cb-comment-avatar" style="--cb-avatar-hue:${hue}" aria-hidden="true">${nick.slice(0, 1).toUpperCase()}</div>
+      ${avatarHtml}
       <div class="cb-comment-main">
         <header class="cb-comment-head">
           <strong class="cb-comment-nick">${nick}</strong>
@@ -607,10 +702,25 @@ function renderCommentItem(c, { nested = true } = {}) {
   `;
 }
 
+function setupCommentMeta(metaEl, profile, onAvatarChange) {
+  if (!metaEl) return { getAvatar: getOrCreateGuestAvatar };
+  const initial = isValidCommentAvatar(profile.avatar) ? profile.avatar : getOrCreateGuestAvatar();
+  const picker = mountAvatarPicker(metaEl, {
+    selected: initial,
+    onChange: file => {
+      saveProfile({ avatar: file });
+      onAvatarChange?.(file);
+      postHeight(true);
+    },
+  });
+  return {
+    getAvatar: () => resolveCommentAvatar(picker.getSelected(), ''),
+  };
+}
+
 function bindComposeReveal(form, editor, { metaEl, actionsEl }) {
   const refresh = () => {
-    const len = editor.getPlainLength();
-    const showExtra = len > 0;
+    const showExtra = editorHasContent(editor);
     if (metaEl) metaEl.hidden = !showExtra;
     if (actionsEl) actionsEl.hidden = !showExtra;
     form.classList.toggle('cb-compose--active', showExtra);
@@ -633,7 +743,15 @@ function editorHasContent(editor) {
   const body = editor?.body;
   if (!body) return false;
   if (String(body.innerText || '').replace(/\u200b/g, '').trim().length > 0) return true;
-  return !!body.querySelector('img, .cb-uploading');
+  if (editor.hasAttachments?.()) return true;
+  return !!(editor.attachments?.some(a => a.uploading));
+}
+
+function commentSubmitHint(editor, maxLength) {
+  if (editor.attachments?.some(a => a.uploading)) return '图片上传中，请稍候';
+  if (editor.getPlainLength() > maxLength) return '内容过长';
+  if (!editor.getPlainLength() && !editor.hasAttachments?.()) return '请输入评论内容';
+  return '请输入评论内容';
 }
 
 function syncReplyMetaVisibility(editor, metaEl) {
@@ -789,11 +907,12 @@ function mountInlineReply(slot, ctx) {
   const profile = readProfile();
   prefillCommentNick(nickInput);
   if (profile.email) emailInput.value = profile.email;
+  const metaAvatar = setupCommentMeta(metaEl, profile);
   const editor = new CommentRichEditor(editorHost, {
     allowImage: cfg.allowImage,
     maxLength: cfg.maxLength,
     alwaysShowBar: true,
-    onHydrateImages: root => hydrateCommentImages(root, callApi),
+    onDiscardUpload: fileId => callApi({ action: 'DISCARD_UPLOAD', fileId }).catch(() => null),
     onUpload: async file => {
       const base64 = await fileToBase64(file);
       const res = await callApi({
@@ -826,12 +945,13 @@ function mountInlineReply(slot, ctx) {
   const doSubmit = async () => {
     statusEl.textContent = '';
     if (!editor.isValid()) {
-      statusEl.textContent = editor.getPlainLength() > cfg.maxLength ? '内容过长' : '请输入回复内容';
+      statusEl.textContent = commentSubmitHint(editor, cfg.maxLength);
       statusEl.classList.add('is-error');
       return;
     }
     const nick = resolveCommentNick(nickInput.value);
     const email = emailInput.value.trim() || profile.email || '';
+    const avatar = resolveCommentAvatar(metaAvatar.getAvatar(), nick);
     submitBtn.disabled = true;
     statusEl.classList.remove('is-error');
     statusEl.textContent = '发送中…';
@@ -841,12 +961,13 @@ function mountInlineReply(slot, ctx) {
         path,
         nick,
         email,
+        avatar,
         contentHtml: editor.getHtml(),
         parentId,
         pageTitle: cfg.pageTitle || document.title,
         pageUrl: cfg.pageUrl || params.get('pageUrl') || '',
       });
-      saveProfile({ nick, email });
+      saveProfile({ nick, email, avatar });
       closeAllInlineReplies(commentsRoot);
       await onSuccess();
     } catch (err) {
@@ -938,11 +1059,12 @@ async function mount() {
   const profile = readProfile();
   prefillCommentNick(nickInput);
   if (profile.email) emailInput.value = profile.email;
+  const metaAvatar = setupCommentMeta(metaEl, profile);
 
   const editor = new CommentRichEditor(editorHost, {
     allowImage: cfg.allowImage,
     maxLength: cfg.maxLength,
-    onHydrateImages: root => hydrateCommentImages(root, callApi),
+    onDiscardUpload: fileId => callApi({ action: 'DISCARD_UPLOAD', fileId }).catch(() => null),
     onUpload: async file => {
       const base64 = await fileToBase64(file);
       const res = await callApi({
@@ -993,12 +1115,13 @@ async function mount() {
     e.preventDefault();
     statusEl.textContent = '';
     if (!editor.isValid()) {
-      statusEl.textContent = editor.getPlainLength() > cfg.maxLength ? '内容过长' : '请输入评论内容';
+      statusEl.textContent = commentSubmitHint(editor, cfg.maxLength);
       statusEl.classList.add('is-error');
       return;
     }
     const nick = resolveCommentNick(nickInput.value);
     const email = emailInput.value.trim();
+    const avatar = resolveCommentAvatar(metaAvatar.getAvatar(), nick);
     const submitBtn = form.querySelector('.cb-submit');
     submitBtn.disabled = true;
     statusEl.classList.remove('is-error');
@@ -1009,12 +1132,13 @@ async function mount() {
         path: cfg.path,
         nick,
         email,
+        avatar,
         contentHtml: editor.getHtml(),
         parentId: null,
         pageTitle: cfg.pageTitle || document.title,
         pageUrl: cfg.pageUrl || params.get('pageUrl') || '',
       });
-      saveProfile({ nick, email });
+      saveProfile({ nick, email, avatar });
       editor.clear();
       statusEl.textContent = cfg.moderation ? '已提交，待审核通过后显示' : '发表成功';
       mobileSheet.notifySubmitted();
