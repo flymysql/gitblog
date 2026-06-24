@@ -226,6 +226,12 @@ function getAllowedOrigins() {
 }
 
 function pickOrigin(requestOrigin) {
+  if (requestOrigin) {
+    try {
+      const host = new URL(requestOrigin).hostname.toLowerCase();
+      if (host.endsWith('.tcloudbaseapp.com')) return requestOrigin;
+    } catch (_) { /* ignore */ }
+  }
   const allowed = getAllowedOrigins();
   if (requestOrigin && allowed.includes(requestOrigin)) return requestOrigin;
   return allowed[0] || 'https://gitpull.cn';

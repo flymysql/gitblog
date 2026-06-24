@@ -471,6 +471,8 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
   const mode = document.documentElement.getAttribute('data-mode') || 'light';
   url.searchParams.set('mode', mode);
   if (opts.pageTitle) url.searchParams.set('title', String(opts.pageTitle).slice(0, 120));
+  const httpUrl = String(cfg.httpUrl || '').trim();
+  if (httpUrl) url.searchParams.set('httpUrl', httpUrl);
   return url.toString();
 }
 

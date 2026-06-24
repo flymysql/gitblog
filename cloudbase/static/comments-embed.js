@@ -1,8 +1,7 @@
 /**
- * CloudBase 评论嵌入页（托管于 {envId}.tcloudbaseapp.com）
- * 通过 URL 参数接收 path/env/region，用 Web SDK 调云函数，避免博客域跨域。
+ * CloudBase 评论嵌入页（托管于 {envId}-{appId}.tcloudbaseapp.com）
+ * 通过 HTTP 调云函数，无需 Web SDK 匿名登录，避免 PERMISSION_DENIED。
  */
-const SDK_URL = 'https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js';
 const PROFILE_KEY = 'gitblog-comment-profile-v1';
 
 const EMOJI_GROUPS = [
@@ -18,6 +17,7 @@ const cfg = {
   envId: String(params.get('env') || '').trim(),
   region: String(params.get('region') || 'ap-shanghai').trim() || 'ap-shanghai',
   functionName: String(params.get('fn') || 'gitblog-comments').trim() || 'gitblog-comments',
+  httpUrl: String(params.get('httpUrl') || '').trim(),
   pageTitle: String(params.get('title') || '').trim(),
   placeholderNick: '访客',
   moderation: false,
@@ -29,8 +29,15 @@ const cfg = {
 const mode = String(params.get('mode') || 'light').trim().toLowerCase();
 document.documentElement.setAttribute('data-mode', mode === 'dark' ? 'dark' : 'light');
 
-let _app = null;
 let _heightTimer = null;
+
+const HTTP_HINT = '请确认：① 云函数 gitblog-comments 已部署；② 控制台已开启 HTTP 访问；③ 重新部署云函数（含 CORS）。详见 cloudbase/README.md';
+
+function resolveHttpUrl() {
+  if (cfg.httpUrl) return cfg.httpUrl;
+  if (!cfg.envId) throw new Error('缺少 env 参数');
+  return `https://${cfg.envId}.${cfg.region}.app.tcloudbase.com/${cfg.functionName}`;
+}
 
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
@@ -38,19 +45,31 @@ function escapeHtml(s) {
   );
 }
 
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) {
-      resolve();
-      return;
-    }
-    const s = document.createElement('script');
-    s.src = src;
-    s.async = true;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error(`脚本加载失败: ${src}`));
-    document.head.appendChild(s);
-  });
+async function callApi(payload) {
+  const url = resolveHttpUrl();
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    throw new Error(HTTP_HINT);
+  }
+  let result;
+  try {
+    result = await res.json();
+  } catch {
+    throw new Error(`评论服务响应异常（HTTP ${res.status}）`);
+  }
+  if (result?.code === 'OPERATION_FAIL' || /PERMISSION_DENIED/i.test(String(result?.msg || result?.message || ''))) {
+    throw new Error('云函数权限不足：请在控制台 → 云函数 → gitblog-comments → 开启 HTTP 访问，并将安全规则 invoke 设为 true（见 cloudbase/README.md）');
+  }
+  if (!result || result.ok === false) {
+    throw new Error(result?.message || result?.msg || `评论服务请求失败（HTTP ${res.status}）`);
+  }
+  return result;
 }
 
 function postHeight(ready = false) {
@@ -72,28 +91,6 @@ function observeHeight() {
     window.addEventListener('load', () => postHeight(true));
     setInterval(() => postHeight(true), 1500);
   }
-}
-
-async function getApp() {
-  if (_app) return _app;
-  await loadScript(SDK_URL);
-  if (!cfg.envId) throw new Error('缺少 env 参数');
-  // eslint-disable-next-line no-undef
-  _app = cloudbase.init({ env: cfg.envId, region: cfg.region });
-  const auth = _app.auth();
-  const state = await auth.getLoginState();
-  if (!state) await auth.signInAnonymously();
-  return _app;
-}
-
-async function callApi(payload) {
-  const app = await getApp();
-  const res = await app.callFunction({ name: cfg.functionName, data: payload });
-  const result = res?.result;
-  if (!result || result.ok === false) {
-    throw new Error(result?.message || '评论服务请求失败');
-  }
-  return result;
 }
 
 function sanitizeCommentHtml(raw) {
