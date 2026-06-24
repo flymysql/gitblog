@@ -397,13 +397,15 @@ class CommentRichEditor {
   }
 }
 
-function renderCommentItem(c) {
+function renderCommentItem(c, { nested = true } = {}) {
   const nick = escapeHtml(c.nick || '访客');
   const nickRaw = escapeHtml(c.nick || '访客');
   const replyTo = c.replyToNick ? escapeHtml(c.replyToNick) : '';
   const hue = avatarColor(c.nick);
   const content = sanitizeCommentHtml(c.contentHtml || '');
-  const replies = (c.replies || []).map(r => renderCommentItem(r)).join('');
+  const replies = nested && (c.replies || []).length
+    ? `<div class="cb-replies">${(c.replies || []).map(r => renderCommentItem(r, { nested: false })).join('')}</div>`
+    : '';
   return `
     <article class="cb-comment${c.parentId ? ' is-reply' : ''}" data-id="${escapeHtml(c._id)}">
       <div class="cb-comment-avatar" style="--cb-avatar-hue:${hue}" aria-hidden="true">${nick.slice(0, 1).toUpperCase()}</div>
@@ -418,7 +420,7 @@ function renderCommentItem(c) {
           <button type="button" class="cb-link-btn" data-reply="${escapeHtml(c._id)}" data-reply-nick="${nickRaw}">回复</button>
         </footer>
         <div class="cb-inline-reply-slot"></div>
-        ${replies ? `<div class="cb-replies">${replies}</div>` : ''}
+        ${replies}
       </div>
     </article>
   `;
@@ -566,6 +568,8 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
   const mode = document.documentElement.getAttribute('data-mode') || 'light';
   url.searchParams.set('mode', mode);
   if (opts.pageTitle) url.searchParams.set('title', String(opts.pageTitle).slice(0, 120));
+  const pageUrl = String(opts.pageUrl || (typeof location !== 'undefined' ? location.href : '')).trim();
+  if (pageUrl) url.searchParams.set('pageUrl', pageUrl.slice(0, 500));
   const httpUrl = String(cfg.httpUrl || '').trim();
   if (httpUrl) url.searchParams.set('httpUrl', httpUrl);
   return url.toString();
