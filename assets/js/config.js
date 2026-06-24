@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260618160000';
+export const VERSION = '20260624100000';
 
 export const CONFIG = {
   repo: {
@@ -115,7 +115,8 @@ export const CONFIG = {
   auth: {
     githubDeviceFlow: {
       clientId: "3410e5b91d4202af507e",
-      scope: "repo read:user"
+      scope: "repo read:user",
+      proxyBase: "/api/github-device"
     }
   },
   paths: {

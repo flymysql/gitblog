@@ -155,12 +155,37 @@ function renderLogin(host) {
       await loginWithDeviceFlow({
         remember: $('#remember').checked,
         onCode: info => {
+          const isMobile = window.matchMedia('(max-width: 768px)').matches;
+          const verifyUrl = info.verification_uri_complete || info.verification_uri;
           deviceBox.hidden = false;
           deviceBox.innerHTML = `
-            <div>在新页面输入验证码：</div>
-            <strong>${escapeHtml(info.user_code)}</strong>
-            <a href="${escapeHtml(info.verification_uri)}" target="_blank" rel="noopener">打开 GitHub 授权页面 →</a>
+            <div>${isMobile ? '复制验证码，然后在 GitHub 页面输入：' : '在新页面输入验证码：'}</div>
+            <strong id="deviceUserCode">${escapeHtml(info.user_code)}</strong>
+            <button type="button" class="btn-copy-code" id="btnCopyDeviceCode">复制验证码</button>
+            <a class="btn-device-open" href="${escapeHtml(verifyUrl)}"${isMobile ? '' : ' target="_blank" rel="noopener"'}>
+              ${isMobile ? '前往 GitHub 授权' : '打开 GitHub 授权页面 →'}
+            </a>
+            <div class="device-login-hint">完成 GitHub 授权后请保持此页打开，会自动完成登录</div>
           `;
+          const copyBtn = $('#btnCopyDeviceCode');
+          if (copyBtn) {
+            copyBtn.addEventListener('click', async () => {
+              try {
+                await navigator.clipboard.writeText(info.user_code);
+                showToast('验证码已复制');
+              } catch {
+                const range = document.createRange();
+                const node = $('#deviceUserCode');
+                if (node) {
+                  range.selectNodeContents(node);
+                  const sel = window.getSelection();
+                  sel.removeAllRanges();
+                  sel.addRange(range);
+                }
+                showToast('请手动复制验证码');
+              }
+            });
+          }
         },
       });
       const back = popReturnTo();
