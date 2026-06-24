@@ -865,85 +865,88 @@ body.cb-has-mobile-dock {
   display: none;
 }
 
+/* mobile-dock 由 JS 开启，不依赖 iframe 内 matchMedia */
+.cb-comments--mobile-dock > .cb-compose {
+  display: none !important;
+}
+
+.cb-comments--mobile-dock .cb-inline-reply {
+  display: none !important;
+}
+
+.cb-compose--mobile-portal:not(.is-sheet-open) {
+  display: none !important;
+}
+
+.cb-comments--mobile-dock.cb-comments--compose-only .cb-comments-list,
+.cb-comments--mobile-dock.cb-comments--compose-only .cb-comments-loading {
+  display: none !important;
+}
+
+.cb-comments--mobile-dock .cb-mobile-sheet-header,
+.cb-compose--mobile-portal .cb-mobile-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.cb-mobile-sheet-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.cb-mobile-sheet-close {
+  border: none;
+  background: none;
+  padding: 4px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+/* 移动端底部抽屉：表单挂到 body，仅打开时固定底栏 */
+.cb-compose--mobile-portal.is-sheet-open,
+.cb-comments--mobile-dock .cb-compose.is-sheet-open,
+.cb-comments--compose-pinned .cb-compose.is-sheet-open {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 900;
+  display: block !important;
+  max-height: none;
+  overflow: visible;
+  margin: 0;
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  border: none;
+  border-radius: 16px 16px 0 0;
+  background: var(--bg-elev);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
+  animation: cb-sheet-up 0.24s ease;
+}
+
+.cb-compose.is-sheet-open .cb-editor-body {
+  max-height: none;
+  overflow: hidden;
+  min-height: 48px;
+}
+
+@keyframes cb-sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.cb-compose--mobile-portal.is-sheet-open .cb-compose-footer {
+  margin-top: 8px;
+}
+
 @media (max-width: 640px) {
-  .cb-comments--mobile-dock > .cb-compose {
-    display: none !important;
-  }
-
-  .cb-comments--mobile-dock .cb-inline-reply {
-    display: none !important;
-  }
-
-  .cb-compose--mobile-portal:not(.is-sheet-open) {
-    display: none !important;
-  }
-
-  .cb-comments--mobile-dock.cb-comments--compose-only .cb-comments-list,
-  .cb-comments--mobile-dock.cb-comments--compose-only .cb-comments-loading {
-    display: none !important;
-  }
-
-  .cb-mobile-sheet-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 10px;
-  }
-
-  .cb-mobile-sheet-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-main);
-  }
-
-  .cb-mobile-sheet-close {
-    border: none;
-    background: none;
-    padding: 4px 0;
-    font-size: 14px;
-    color: var(--text-secondary);
-    cursor: pointer;
-  }
-
-  /* 移动端底部抽屉：表单挂到 body，仅打开时固定底栏 */
-  .cb-compose--mobile-portal.is-sheet-open,
-  .cb-comments--compose-pinned .cb-compose.is-sheet-open {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 900;
-    display: block !important;
-    max-height: none;
-    overflow: visible;
-    margin: 0;
-    padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
-    border: none;
-    border-radius: 16px 16px 0 0;
-    background: var(--bg-elev);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
-    animation: cb-sheet-up 0.24s ease;
-  }
-
-  .cb-compose.is-sheet-open .cb-editor-body {
-    max-height: none;
-    overflow: hidden;
-    min-height: 48px;
-  }
-
-  @keyframes cb-sheet-up {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-  }
-
   .cb-compose-meta {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 8px;
-  }
-
-  .cb-compose--mobile-portal.is-sheet-open .cb-compose-footer {
-    margin-top: 8px;
   }
 
   .cb-compose:not(.cb-compose--minimal) { padding: 12px; }
