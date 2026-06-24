@@ -21,6 +21,7 @@ const cfg = {
   functionName: String(params.get('fn') || 'gitblog-comments').trim() || 'gitblog-comments',
   httpUrl: String(params.get('httpUrl') || '').trim(),
   pageTitle: String(params.get('title') || '').trim(),
+  pageUrl: String(params.get('pageUrl') || '').trim(),
   placeholderNick: '访客',
   moderation: false,
   maxLength: 5000,
@@ -403,13 +404,15 @@ class CommentRichEditor {
   }
 }
 
-function renderCommentItem(c) {
+function renderCommentItem(c, { nested = true } = {}) {
   const nick = escapeHtml(c.nick || '访客');
   const nickRaw = escapeHtml(c.nick || '访客');
   const replyTo = c.replyToNick ? escapeHtml(c.replyToNick) : '';
   const hue = avatarColor(c.nick);
   const content = sanitizeCommentHtml(c.contentHtml || '');
-  const replies = (c.replies || []).map(r => renderCommentItem(r)).join('');
+  const replies = nested && (c.replies || []).length
+    ? `<div class="cb-replies">${(c.replies || []).map(r => renderCommentItem(r, { nested: false })).join('')}</div>`
+    : '';
   return `
     <article class="cb-comment${c.parentId ? ' is-reply' : ''}" data-id="${escapeHtml(c._id)}">
       <div class="cb-comment-avatar" style="--cb-avatar-hue:${hue}" aria-hidden="true">${nick.slice(0, 1).toUpperCase()}</div>
@@ -424,7 +427,7 @@ function renderCommentItem(c) {
           <button type="button" class="cb-link-btn" data-reply="${escapeHtml(c._id)}" data-reply-nick="${nickRaw}">回复</button>
         </footer>
         <div class="cb-inline-reply-slot"></div>
-        ${replies ? `<div class="cb-replies">${replies}</div>` : ''}
+        ${replies}
       </div>
     </article>
   `;
@@ -503,7 +506,7 @@ function mountInlineReply(slot, ctx) {
         contentHtml: editor.getHtml(),
         parentId,
         pageTitle: cfg.pageTitle || document.title,
-        pageUrl: params.get('pageUrl') || '',
+        pageUrl: cfg.pageUrl || params.get('pageUrl') || '',
       });
       saveProfile({ nick: profile.nick, email: profile.email });
       closeAllInlineReplies(commentsRoot);
@@ -662,7 +665,7 @@ async function mount() {
         contentHtml: editor.getHtml(),
         parentId: null,
         pageTitle: cfg.pageTitle || document.title,
-        pageUrl: params.get('pageUrl') || '',
+        pageUrl: cfg.pageUrl || params.get('pageUrl') || '',
       });
       saveProfile({ nick, email });
       editor.clear();
