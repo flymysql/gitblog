@@ -136,6 +136,7 @@ embedBaseUrl: 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com',
 | `SMTP_USER` | SMTP 登录账号 |
 | `SMTP_PASS` | SMTP 授权码/密码 |
 | `SMTP_FROM` | 发件人地址（可留空，默认用 `SMTP_USER`） |
+| `SITE_URL` | 站点根 URL，邮件「查看原文」回退链接（默认 `https://gitpull.cn`） |
 
 ### 回复与 @ 提及
 

@@ -392,8 +392,17 @@
   font-size: 13px;
 }
 
-@media (max-width: 360px) {
-  .cb-compose-meta { grid-template-columns: 1fr; }
+@media (max-width: 640px) {
+  .cb-compose-meta {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+  }
   .cb-compose { padding: 12px; }
+  .cb-field { font-size: 11px; }
+  .cb-field input {
+    height: 36px;
+    padding: 0 8px;
+    font-size: 13px;
+  }
   .cb-editor-body { min-height: 100px; }
 }

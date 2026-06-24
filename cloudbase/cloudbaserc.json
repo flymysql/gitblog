@@ -22,7 +22,8 @@
         "SMTP_PORT": "465",
         "SMTP_USER": "237199972@qq.com",
         "SMTP_PASS": "",
-        "SMTP_FROM": "237199972@qq.com"
+        "SMTP_FROM": "237199972@qq.com",
+        "SITE_URL": "https://gitpull.cn"
       }
     }
   ]
