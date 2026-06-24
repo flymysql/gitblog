@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
   <title>编辑文章</title>
-  <link rel="stylesheet" href="../assets/css/common.css?v=20260615100000">
-  <link rel="stylesheet" href="../assets/css/admin.css?v=20260615100000">
-  <link rel="stylesheet" href="../assets/css/post.css?v=20260615100000">
+  <link rel="stylesheet" href="../assets/css/common.css?v=20260615120000">
+  <link rel="stylesheet" href="../assets/css/admin.css?v=20260615120000">
+  <link rel="stylesheet" href="../assets/css/post.css?v=20260615120000">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
   <link rel="manifest" href="../manifest.webmanifest">
@@ -15,77 +15,133 @@
   <link rel="apple-touch-icon" href="../assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
-<body class="editor-page">
-  <div class="editor-bar">
-    <a class="back" href="./">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      返回
-    </a>
-    <div class="editor-mode-switch" role="tablist" aria-label="编辑模式">
-      <button type="button" class="editor-mode-btn is-active" data-mode="markdown" role="tab" aria-selected="true" title="Markdown 源码模式（适合熟悉 Markdown 的写作者）">Markdown</button>
-      <button type="button" class="editor-mode-btn" data-mode="rich" role="tab" aria-selected="false" title="所见即所得富文本模式（不需要懂 Markdown 也能写）">富文本</button>
+<body class="editor-page editor-studio">
+  <header class="studio-header">
+    <div class="studio-header-left">
+      <a class="studio-back" href="./">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        后台
+      </a>
+      <a class="btn btn-primary studio-btn-new" href="./editor.html">新建</a>
+      <button type="button" class="studio-icon-btn studio-only-mobile" id="btnToggleNav" title="文章列表" aria-label="文章列表">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      </button>
     </div>
-    <span class="editor-status" id="status">未登录</span>
-    <div class="editor-toggle-row">
-      <label><input type="checkbox" id="draftToggle"> 草稿</label>
-      <label><input type="checkbox" id="pinnedToggle"> 置顶</label>
-      <label title="勾选后将出现在首页轮播图（需有封面）"><input type="checkbox" id="carouselToggle"> 轮播</label>
+    <div class="studio-header-center">
+      <span class="editor-status" id="status">未登录</span>
     </div>
-    <button id="themeToggle" class="icon-btn" title="切换主题">
-      <svg class="icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-      <svg class="icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      <svg class="icon-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
-    </button>
-    <button class="btn btn-secondary" id="btnPreview">预览</button>
-    <button class="btn btn-secondary" id="btnDelete" style="display:none">删除</button>
-    <button class="btn btn-primary" id="btnPublish">发布</button>
-  </div>
+    <div class="studio-header-right">
+      <div class="editor-mode-switch" role="tablist" aria-label="编辑模式">
+        <button type="button" class="editor-mode-btn is-active" data-mode="markdown" role="tab" aria-selected="true" title="Markdown 源码">Markdown</button>
+        <button type="button" class="editor-mode-btn" data-mode="rich" role="tab" aria-selected="false" title="富文本模式">富文本</button>
+      </div>
+      <div class="editor-toggle-row">
+        <label><input type="checkbox" id="draftToggle"> 草稿</label>
+        <label><input type="checkbox" id="pinnedToggle"> 置顶</label>
+        <label title="需有封面"><input type="checkbox" id="carouselToggle"> 轮播</label>
+      </div>
+      <button id="themeToggle" class="icon-btn" title="切换主题">
+        <svg class="icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+      </button>
+      <button class="btn btn-secondary studio-only-mobile" id="btnPreview" type="button">预览</button>
+      <button class="btn btn-secondary studio-only-mobile" id="btnToggleOutline" type="button" title="目录">目录</button>
+      <button class="btn btn-secondary" id="btnDelete" style="display:none" type="button">删除</button>
+      <button class="btn btn-primary" id="btnPublish" type="button">发布</button>
+    </div>
+  </header>
 
-  <div class="editor-body">
-    <div class="editor-pane" style="position:relative">
-      <input class="editor-title" id="title" placeholder="输入文章标题">
-      <div class="editor-meta" id="editorMeta">
+  <div class="studio-shell" id="studioShell">
+    <aside class="studio-nav" id="studioNav">
+      <div class="studio-side-head">
+        <strong>文章</strong>
+        <button type="button" class="studio-side-toggle" id="navCollapseBtn" title="收起侧栏" aria-label="收起侧栏">‹</button>
+      </div>
+      <div class="studio-nav-search">
+        <input id="docSearch" type="search" placeholder="搜索标题或 slug…" autocomplete="off">
+      </div>
+      <nav class="studio-doc-list" id="docList" aria-label="文章列表"></nav>
+
+      <div class="studio-nav-meta" id="editorMeta">
         <div class="editor-meta-toolbar">
           <span>文章信息</span>
           <button type="button" class="editor-meta-collapse" id="metaCollapseBtn" aria-expanded="true" aria-controls="editorMeta">收起</button>
         </div>
-        <label>作者 <input id="author" placeholder="作者"></label>
-        <div class="editor-tag-field">
-          <span class="editor-meta-label">标签</span>
-          <input id="tags" type="hidden">
-          <div class="editor-selected-tags" id="selectedTags" aria-live="polite"></div>
-          <div class="editor-tag-input-row">
-            <input id="tagInput" placeholder="输入新标签后回车">
-            <button class="btn btn-secondary" id="addTagBtn" type="button">添加</button>
+        <div class="studio-meta-body">
+          <label class="studio-field">作者 <input id="author" placeholder="作者"></label>
+          <label class="studio-field">封面 <input id="cover" placeholder="封面图 URL"></label>
+          <label class="studio-field">slug <input id="slug" placeholder="自动生成"></label>
+          <div class="studio-field studio-summary-field">
+            <span class="editor-meta-label">摘要</span>
+            <p class="studio-summary-text" id="summaryPreview">发布时自动从正文提取，也可点下方「生成摘要」</p>
           </div>
-          <div class="editor-tag-suggestions" id="tagSuggestions"></div>
-        </div>
-        <label>封面 <input id="cover" placeholder="封面图 URL，可选"></label>
-        <label>slug <input id="slug" placeholder="自动生成"></label>
-        <div class="editor-counter-field" id="counterField" hidden>
-          <span class="editor-meta-label">独立计数器（saobby）</span>
-          <div class="editor-counter-row">
-            <button type="button" class="btn btn-secondary" id="counterCreateBtn" title="去 saobby.com 为这篇文章创建一个独立计数器">为本文创建计数器…</button>
-            <button type="button" class="btn" id="counterPasteBtn" title="把 saobby 给的图片 URL + 控制面板 URL 粘进来">粘贴 URL…</button>
-            <button type="button" class="btn" id="counterClearBtn" hidden title="清除计数器配置">清除</button>
+          <div class="editor-tag-field">
+            <span class="editor-meta-label">标签</span>
+            <input id="tags" type="hidden">
+            <div class="editor-selected-tags" id="selectedTags" aria-live="polite"></div>
+            <div class="editor-tag-input-row">
+              <input id="tagInput" placeholder="输入标签后回车">
+              <button class="btn btn-secondary" id="addTagBtn" type="button">添加</button>
+            </div>
+            <div class="editor-tag-suggestions" id="tagSuggestions"></div>
           </div>
-          <div class="editor-counter-summary" id="counterSummary"></div>
+          <div class="editor-counter-field" id="counterField" hidden>
+            <span class="editor-meta-label">独立计数器（saobby）</span>
+            <div class="editor-counter-row">
+              <button type="button" class="btn btn-secondary" id="counterCreateBtn">创建计数器…</button>
+              <button type="button" class="btn" id="counterPasteBtn">粘贴 URL…</button>
+              <button type="button" class="btn" id="counterClearBtn" hidden>清除</button>
+            </div>
+            <div class="editor-counter-summary" id="counterSummary"></div>
+          </div>
         </div>
       </div>
-      <textarea class="editor-textarea" id="content" placeholder="开始用 Markdown 写作。支持拖拽 / 粘贴上传图片"></textarea>
-      <!-- 富文本（WYSIWYG）模式宿主：默认隐藏，首次切到「富文本」时才懒加载 Vditor -->
-      <div id="vditorHost" class="editor-vditor-host" hidden></div>
-      <div id="dropHint" class="editor-drop-hint" hidden>松开以上传图片</div>
-    </div>
-    <div class="editor-pane">
-      <div class="editor-preview">
-        <h1 class="article-title" id="previewTitle">预览</h1>
-        <div class="article-body" id="preview"></div>
+    </aside>
+
+    <main class="studio-main">
+      <div class="studio-titlebar">
+        <input class="studio-title" id="title" placeholder="无标题文章">
       </div>
-    </div>
+
+      <div class="studio-workspace" id="studioWorkspace">
+        <section class="studio-panel studio-panel-source">
+          <header class="studio-panel-head"><span>编辑</span></header>
+          <div class="studio-panel-body studio-source-body">
+            <textarea class="editor-textarea" id="content" placeholder="开始用 Markdown 写作。支持拖拽 / 粘贴上传图片"></textarea>
+            <div id="vditorHost" class="editor-vditor-host" hidden></div>
+            <div id="dropHint" class="editor-drop-hint" hidden>松开以上传图片</div>
+          </div>
+          <footer class="studio-panel-foot">
+            <button type="button" class="studio-foot-btn" id="footAddTag">+ 添加标签</button>
+            <button type="button" class="studio-foot-btn studio-foot-btn-ai" id="btnGenSummary">生成摘要</button>
+          </footer>
+        </section>
+
+        <div class="studio-splitter" id="studioSplitter" role="separator" aria-orientation="vertical" aria-label="调整编辑与预览宽度"></div>
+
+        <section class="studio-panel studio-panel-preview">
+          <header class="studio-panel-head"><span>预览</span></header>
+          <div class="studio-panel-body editor-preview" id="previewPane">
+            <h1 class="article-title" id="previewTitle">预览</h1>
+            <div class="article-body" id="preview"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <aside class="studio-outline" id="studioOutline">
+      <div class="studio-side-head">
+        <strong>目录</strong>
+        <button type="button" class="studio-side-toggle" id="outlineCollapseBtn" title="收起目录" aria-label="收起目录">›</button>
+      </div>
+      <nav class="studio-toc" id="docToc" aria-label="文档目录">
+        <p class="studio-toc-empty">正文标题将自动生成目录</p>
+      </nav>
+    </aside>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
-  <script type="module" src="../assets/js/editor.js?v=20260615100000"></script>
+  <script type="module" src="../assets/js/editor.js?v=20260615120000"></script>
 </body>
 </html>
