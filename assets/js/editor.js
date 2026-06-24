@@ -57,6 +57,9 @@ const state = {
   selectedTags: [],
   availableTags: [],
   counter: { img: '', dashboard: '' }, // 文章独立 saobby 计数器
+  docList: [],
+  docSearch: '',
+  syncScrollLock: false,
 };
 
 function getContent() {
@@ -118,6 +121,7 @@ async function loadPost(slug) {
     setEditorCounter(data.counter || { img: '', dashboard: '' });
     setContent(content);
     document.title = `编辑：${data.title || slug}`;
+    renderSummaryPreview();
     setStatus('已加载', 'saved');
     $('#btnDelete').style.display = '';
     updatePreview();
@@ -138,7 +142,87 @@ async function updatePreview() {
     const t = $('#title').value || '预览';
     $('#previewTitle').textContent = t;
     $('#preview').innerHTML = await renderMarkdown(getContent());
+    buildToc();
+    renderSummaryPreview();
+    renderDocList(state.docSearch);
   }, 200);
+}
+
+function renderSummaryPreview() {
+  const el = $('#summaryPreview');
+  if (!el) return;
+  const content = getContent();
+  const summary = state.data.summary || extractSummary(content, 120);
+  el.textContent = summary || '发布时自动从正文提取，也可点「生成摘要」';
+}
+
+function buildToc() {
+  const preview = $('#preview');
+  const toc = $('#docToc');
+  if (!preview || !toc) return;
+
+  const headings = [...preview.querySelectorAll('h2, h3, h4')];
+  if (!headings.length) {
+    toc.innerHTML = '<p class="studio-toc-empty">正文标题将自动生成目录</p>';
+    return;
+  }
+
+  headings.forEach((h, i) => {
+    if (!h.id) h.id = `studio-h-${i}`;
+  });
+
+  toc.innerHTML = headings.map(h => {
+    const level = h.tagName.toLowerCase();
+    return `<a class="studio-toc-link is-${level}" href="#${h.id}" data-target="${h.id}">${escapeHtml(h.textContent.trim())}</a>`;
+  }).join('');
+
+  toc.querySelectorAll('.studio-toc-link').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = preview.querySelector(`#${link.dataset.target}`);
+      const pane = $('#previewPane');
+      if (target && pane) {
+        const top = target.offsetTop - pane.offsetTop - 12;
+        pane.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      }
+      toc.querySelectorAll('.studio-toc-link').forEach(a => a.classList.remove('is-active'));
+      link.classList.add('is-active');
+    });
+  });
+}
+
+async function loadDocList() {
+  try {
+    const idx = await readIndex();
+    state.docList = ((idx && idx.data && idx.data.posts) || [])
+      .filter(p => !p.page)
+      .sort((a, b) => new Date(b.updated || b.date) - new Date(a.updated || a.date));
+    renderDocList(state.docSearch);
+  } catch (e) {
+    console.warn('文章列表加载失败', e);
+  }
+}
+
+function renderDocList(filter = '') {
+  const list = $('#docList');
+  if (!list) return;
+  const q = String(filter || '').trim().toLowerCase();
+  const currentSlug = state.loadedSlug || ($('#slug') && $('#slug').value) || '';
+  const items = state.docList.filter(p => {
+    if (!q) return true;
+    return (p.title || '').toLowerCase().includes(q) || (p.slug || '').toLowerCase().includes(q);
+  });
+
+  list.innerHTML = items.length
+    ? items.map(p => `
+        <a class="studio-doc-item${p.slug === currentSlug ? ' is-active' : ''}${p.draft ? ' is-draft' : ''}"
+           href="./editor.html?slug=${encodeURIComponent(p.slug)}"
+           title="${escapeHtml(p.title || p.slug)}">
+          <span class="studio-doc-title">${escapeHtml(p.title || p.slug)}</span>
+          ${p.draft ? '<span class="studio-doc-badge">草稿</span>' : ''}
+        </a>
+      `).join('')
+    : '<p class="studio-nav-empty">没有匹配的文章</p>';
 }
 
 function toCommaList(s) {
@@ -458,6 +542,8 @@ async function publish() {
     state.data = data;
     setStatus(draft ? '已保存为草稿' : '已发布', 'saved');
     showToast(draft ? '草稿已保存' : '发布成功，几十秒后线上生效');
+    loadDocList();
+    renderSummaryPreview();
 
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.set('slug', slug);
@@ -592,8 +678,9 @@ function insertAtCursor(text) {
 }
 
 function setupDragAndPaste() {
-  const pane = document.querySelector('.editor-pane');
+  const pane = document.querySelector('.studio-source-body') || document.querySelector('.editor-pane');
   const hint = $('#dropHint');
+  if (!pane) return;
 
   ['dragenter', 'dragover'].forEach(ev =>
     pane.addEventListener(ev, e => {
@@ -765,7 +852,8 @@ async function switchEditorMode(target) {
     }
 
     state.editorMode = 'rich';
-    document.querySelector('.editor-pane').classList.add('is-rich');
+    const sourcePanel = document.querySelector('.studio-panel-source') || document.querySelector('.editor-pane');
+    if (sourcePanel) sourcePanel.classList.add('is-rich');
     refreshEditorLayout();
   } else {
     // 富文本 → Markdown：取 Vditor markdown 灌回 EasyMDE
@@ -776,7 +864,8 @@ async function switchEditorMode(target) {
     }
     $('#vditorHost').hidden = true;
     state.editorMode = 'markdown';
-    document.querySelector('.editor-pane').classList.remove('is-rich');
+    const sourcePanel = document.querySelector('.studio-panel-source') || document.querySelector('.editor-pane');
+    if (sourcePanel) sourcePanel.classList.remove('is-rich');
     setStatus('已切换到 Markdown', 'saved');
     if (state.mde && state.mde.codemirror) state.mde.codemirror.refresh();
     refreshEditorLayout();
@@ -841,7 +930,9 @@ function refreshEditorLayout() {
 
 let editorLayoutObserver = null;
 function bindEditorLayoutRefresh() {
-  const pane = document.querySelector('.editor-pane');
+  const pane = document.querySelector('.studio-source-body')
+    || document.querySelector('.studio-panel-source')
+    || document.querySelector('.editor-pane');
   const run = () => requestAnimationFrame(refreshEditorLayout);
 
   window.addEventListener('resize', debounce(run, 120));
@@ -851,10 +942,12 @@ function bindEditorLayoutRefresh() {
     if (pane) editorLayoutObserver.observe(pane);
     const meta = $('#editorMeta');
     if (meta) editorLayoutObserver.observe(meta);
-    const body = document.querySelector('.editor-body');
+    const body = document.querySelector('.studio-workspace') || document.querySelector('.editor-body');
     if (body) editorLayoutObserver.observe(body);
     const mdeContainer = document.querySelector('.EasyMDEContainer');
     if (mdeContainer) editorLayoutObserver.observe(mdeContainer);
+    const main = document.querySelector('.studio-main');
+    if (main) editorLayoutObserver.observe(main);
   }
 
   run();
@@ -881,6 +974,154 @@ function bindMetaCollapse() {
     localStorage.setItem(key, next ? '1' : '0');
     refreshEditorLayout();
   });
+}
+
+function bindStudioChrome() {
+  const shell = $('#studioShell');
+  const workspace = $('#studioWorkspace');
+  const splitter = $('#studioSplitter');
+  const navBtn = $('#navCollapseBtn');
+  const outlineBtn = $('#outlineCollapseBtn');
+  const mobileNavBtn = $('#btnToggleNav');
+  const mobileOutlineBtn = $('#btnToggleOutline');
+  const docSearch = $('#docSearch');
+  const footAddTag = $('#footAddTag');
+  const btnGenSummary = $('#btnGenSummary');
+
+  if (navBtn && shell) {
+    navBtn.addEventListener('click', () => {
+      shell.classList.toggle('is-nav-collapsed');
+      localStorage.setItem('studio_nav_collapsed', shell.classList.contains('is-nav-collapsed') ? '1' : '0');
+      refreshEditorLayout();
+    });
+    if (localStorage.getItem('studio_nav_collapsed') === '1') shell.classList.add('is-nav-collapsed');
+  }
+
+  if (outlineBtn && shell) {
+    outlineBtn.addEventListener('click', () => {
+      shell.classList.toggle('is-outline-collapsed');
+      localStorage.setItem('studio_outline_collapsed', shell.classList.contains('is-outline-collapsed') ? '1' : '0');
+      refreshEditorLayout();
+    });
+    if (localStorage.getItem('studio_outline_collapsed') === '1') shell.classList.add('is-outline-collapsed');
+  }
+
+  if (mobileNavBtn && shell) {
+    mobileNavBtn.addEventListener('click', () => {
+      shell.classList.toggle('is-mobile-nav-open');
+      shell.classList.remove('is-mobile-outline-open');
+    });
+  }
+  if (mobileOutlineBtn && shell) {
+    mobileOutlineBtn.addEventListener('click', () => {
+      shell.classList.toggle('is-mobile-outline-open');
+      shell.classList.remove('is-mobile-nav-open');
+    });
+  }
+
+  if (docSearch) {
+    docSearch.addEventListener('input', () => {
+      state.docSearch = docSearch.value;
+      renderDocList(state.docSearch);
+    });
+  }
+
+  if (footAddTag) {
+    footAddTag.addEventListener('click', () => {
+      const meta = $('#editorMeta');
+      if (meta) meta.classList.remove('is-collapsed');
+      const nav = $('#studioNav');
+      if (nav) nav.scrollTop = nav.scrollHeight;
+      $('#tagInput')?.focus();
+      if (window.matchMedia('(max-width: 960px)').matches && shell) {
+        shell.classList.add('is-mobile-nav-open');
+      }
+    });
+  }
+
+  if (btnGenSummary) {
+    btnGenSummary.addEventListener('click', () => {
+      const content = getContent();
+      if (!content.trim()) {
+        showToast('正文为空，无法生成摘要', 'error');
+        return;
+      }
+      state.data.summary = extractSummary(content, 120);
+      renderSummaryPreview();
+      showToast('摘要已生成');
+    });
+  }
+
+  if (splitter && workspace) {
+    let dragging = false;
+    const onMove = e => {
+      if (!dragging) return;
+      const rect = workspace.getBoundingClientRect();
+      const pct = ((e.clientX - rect.left) / rect.width) * 100;
+      const clamped = Math.min(78, Math.max(22, pct));
+      workspace.style.gridTemplateColumns = `minmax(0, ${clamped}fr) var(--studio-splitter) minmax(0, ${100 - clamped}fr)`;
+    };
+    const onUp = () => {
+      if (!dragging) return;
+      dragging = false;
+      splitter.classList.remove('is-dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      refreshEditorLayout();
+    };
+    splitter.addEventListener('mousedown', e => {
+      dragging = true;
+      splitter.classList.add('is-dragging');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }
+
+  bindSyncScroll();
+}
+
+function bindSyncScroll() {
+  const previewPane = $('#previewPane');
+  if (!previewPane) return;
+
+  const getCmScroller = () => {
+    if (!state.mde || !state.mde.codemirror) return null;
+    return state.mde.codemirror.getScrollerElement();
+  };
+
+  previewPane.addEventListener('scroll', () => {
+    if (state.syncScrollLock || state.editorMode !== 'markdown') return;
+    const scroller = getCmScroller();
+    if (!scroller) return;
+    const maxP = previewPane.scrollHeight - previewPane.clientHeight;
+    const maxC = scroller.scrollHeight - scroller.clientHeight;
+    if (maxP <= 0 || maxC <= 0) return;
+    state.syncScrollLock = true;
+    scroller.scrollTop = (previewPane.scrollTop / maxP) * maxC;
+    requestAnimationFrame(() => { state.syncScrollLock = false; });
+  });
+
+  const bindCm = () => {
+    if (!state.mde || !state.mde.codemirror) return;
+    const scroller = getCmScroller();
+    if (!scroller || scroller.dataset.syncBound) return;
+    scroller.dataset.syncBound = '1';
+    scroller.addEventListener('scroll', () => {
+      if (state.syncScrollLock || state.editorMode !== 'markdown') return;
+      const maxC = scroller.scrollHeight - scroller.clientHeight;
+      const maxP = previewPane.scrollHeight - previewPane.clientHeight;
+      if (maxC <= 0 || maxP <= 0) return;
+      state.syncScrollLock = true;
+      previewPane.scrollTop = (scroller.scrollTop / maxC) * maxP;
+      requestAnimationFrame(() => { state.syncScrollLock = false; });
+    });
+  };
+
+  bindCm();
+  setTimeout(bindCm, 500);
 }
 
 function setupEasyMDE() {
@@ -912,7 +1153,6 @@ function setupEasyMDE() {
         title: '上传图片',
       },
       'horizontal-rule', '|',
-      'preview', 'side-by-side', 'fullscreen', '|',
       'guide',
     ],
   });
@@ -944,12 +1184,14 @@ function setupEasyMDE() {
   setupEasyMDE();
   bindEditorLayoutRefresh();
   bindMetaCollapse();
+  bindStudioChrome();
   bindEditorModeSwitch();
   setupDragAndPaste();
   bindTagPicker();
   bindCounterPanel();
   renderEditorCounter();
   loadAvailableTags();
+  loadDocList();
 
   ['title'].forEach(id => {
     $('#' + id).addEventListener('input', updatePreview);
@@ -965,6 +1207,19 @@ function setupEasyMDE() {
   $('#btnPublish').addEventListener('click', publish);
   $('#btnDelete').addEventListener('click', deletePost);
   $('#btnPreview').addEventListener('click', () => {
+    const shell = $('#studioShell');
+    if (shell) {
+      if (shell.classList.contains('is-preview-only')) {
+        shell.classList.remove('is-preview-only');
+        shell.classList.add('is-edit-only');
+      } else if (shell.classList.contains('is-edit-only')) {
+        shell.classList.remove('is-edit-only');
+      } else {
+        shell.classList.add('is-preview-only');
+      }
+      refreshEditorLayout();
+      return;
+    }
     document.querySelectorAll('.editor-pane').forEach(el => el.classList.toggle('preview-mode'));
   });
 
