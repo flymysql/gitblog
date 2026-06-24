@@ -163,6 +163,10 @@ export function sanitizeCommentHtml(raw) {
         return;
       }
       const tag = child.tagName;
+      if (tag === 'SPAN' && (child.getAttribute('class') || '') === 'cb-mention') {
+        child.remove();
+        return;
+      }
       if (!allowed.has(tag)) {
         const frag = document.createDocumentFragment();
         while (child.firstChild) frag.appendChild(child.firstChild);
@@ -176,7 +180,7 @@ export function sanitizeCommentHtml(raw) {
         if (tag === 'IMG' && (n === 'src' || n === 'alt' || n === 'title' || n === 'loading')) return;
         if (tag === 'SPAN' && n === 'class') {
           const cls = child.getAttribute('class') || '';
-          if (cls === 'cb-mention' || cls === 'cb-uploading') return;
+          if (cls === 'cb-uploading') return;
           child.removeAttribute(attr.name);
           return;
         }
@@ -401,10 +405,8 @@ class CommentRichEditor {
     this._syncCount();
   }
 
-  setMentionPrefix(nick) {
-    const name = String(nick || '访客').trim() || '访客';
-    this.body.innerHTML = `<span class="cb-mention">@${escapeHtml(name)}</span>&nbsp;`;
-    this._syncCount();
+  setMentionPrefix() {
+    /* @mention 已停用 */
   }
 
   isValid() {
@@ -416,7 +418,6 @@ class CommentRichEditor {
 function renderCommentItem(c, { nested = true } = {}) {
   const nick = escapeHtml(c.nick || '访客');
   const nickRaw = escapeHtml(c.nick || '访客');
-  const replyTo = c.replyToNick ? escapeHtml(c.replyToNick) : '';
   const hue = avatarColor(c.nick);
   const content = sanitizeCommentHtml(c.contentHtml || '');
   const replies = nested && (c.replies || []).length
@@ -427,7 +428,6 @@ function renderCommentItem(c, { nested = true } = {}) {
       <div class="cb-comment-avatar" style="--cb-avatar-hue:${hue}" aria-hidden="true">${nick.slice(0, 1).toUpperCase()}</div>
       <div class="cb-comment-main">
         <header class="cb-comment-head">
-          ${replyTo ? `<span class="cb-comment-reply-badge">回复 <span class="cb-mention">@${replyTo}</span></span>` : ''}
           <strong class="cb-comment-nick">${nick}</strong>
           <time class="cb-comment-time" datetime="${escapeHtml(c.createdAtIso || '')}">${escapeHtml(formatTime(c.createdAt))}</time>
         </header>
@@ -679,7 +679,7 @@ function mountInlineReply(slot, ctx) {
   const panel = document.createElement('div');
   panel.className = 'cb-inline-reply';
   panel.innerHTML = `
-    <div class="cb-inline-reply-head">回复 <span class="cb-mention">@${escapeHtml(replyNick)}</span></div>
+    <div class="cb-inline-reply-head">回复 ${escapeHtml(replyNick)}</div>
     <div class="cb-inline-reply-editor"></div>
     <div class="cb-inline-reply-actions">
       <button type="button" class="cb-link-btn" data-cancel-reply>取消</button>
@@ -709,7 +709,7 @@ function mountInlineReply(slot, ctx) {
       return res.url;
     },
   });
-  editor.setMentionPrefix(replyNick);
+  // 不再自动插入 @ 前缀
 
   const replyBtn = commentsRoot?.querySelector(`[data-reply="${CSS.escape(parentId)}"]`);
   replyBtn?.classList.add('is-active');
