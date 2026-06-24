@@ -313,6 +313,7 @@ const PAGES = [
     lead: '回答几个关于兴趣、能力与规划的问题，获取适合你的本科专业推荐。结果仅供参考，请结合分数与招生章程填报。',
     script: 'tool-major.js',
     commentsHint: '你测出来适合什么专业？来聊聊你的志愿想法～',
+    hideGlobalComments: true,
     body: `
       <section class="tool-kit-panel is-active major-quiz-wrap" id="majorQuiz">
         <div class="major-quiz-progress-row">
@@ -333,10 +334,23 @@ const PAGES = [
         <p class="major-result-filter-note" id="majorFilterNote"></p>
         <div class="major-result-cards" id="majorCards"></div>
         <div class="major-quiz-actions tool-kit-toolbar">
+          <button type="button" class="tool-kit-btn is-ghost" id="majorShare">生成分享图</button>
           <button type="button" class="tool-kit-btn is-ghost" id="majorCopy">复制结果</button>
           <button type="button" class="tool-kit-btn" id="majorRetry">重新测评</button>
         </div>
         <p class="tool-kit-hint major-quiz-disclaimer">请结合高考分数、位次、院校层次与当年招生政策综合填报。祝金榜题名！</p>
+        <section class="tool-comments major-result-comments" id="majorComments">
+          <h2>评论</h2>
+          <p>你测出来适合什么专业？来聊聊你的志愿想法～</p>
+          <div id="majorGiscus"></div>
+        </section>
+      </section>
+      <section class="tool-kit-panel major-detail-wrap" id="majorDetail" hidden>
+        <div id="majorDetailBody"></div>
+        <div class="major-quiz-actions tool-kit-toolbar">
+          <button type="button" class="tool-kit-btn is-ghost" id="majorDetailShare">生成分享图</button>
+          <button type="button" class="tool-kit-btn is-ghost" id="majorDetailBack">返回结果</button>
+        </div>
       </section>`,
   },
 ];
