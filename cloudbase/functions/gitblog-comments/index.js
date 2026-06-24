@@ -32,6 +32,7 @@ function hashIp(ip) {
 }
 
 const IMAGE_PROXY_CACHE_MAX_AGE = 604800;
+const COMMENT_IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
 function getCommentEnvId() {
   return String(process.env.TCB_ENV || process.env.SCF_NAMESPACE || '').trim();
@@ -101,11 +102,10 @@ function guessFileIdFromImageSrc(src, fileIdAttr = '') {
   return '';
 }
 
-function resolveImageProxyUrls(fileIds) {
+function resolveImagePlaceholderUrls(fileIds) {
   const urlMap = new Map();
   [...new Set((fileIds || []).filter(id => String(id).startsWith('cloud://')))].forEach(fileId => {
-    const url = buildCommentImageProxyUrl(fileId);
-    if (url) urlMap.set(fileId, url);
+    if (isAllowedCommentImageFileId(fileId)) urlMap.set(fileId, COMMENT_IMG_PLACEHOLDER);
   });
   return urlMap;
 }
@@ -134,7 +134,7 @@ async function resolveCommentImageUrls(html) {
     pickHtmlAttr(t.attrs, 'src'),
     pickHtmlAttr(t.attrs, 'data-cb-fileid'),
   )).filter(Boolean);
-  const urlMap = resolveImageProxyUrls(fileIds);
+  const urlMap = resolveImagePlaceholderUrls(fileIds);
 
   let result = raw;
   tags.forEach(tag => {
@@ -181,8 +181,11 @@ function sanitizeHtml(raw) {
     if (t === 'img') {
       const src = pick('src');
       const fileId = pick('data-cb-fileid');
-      if (!/^https?:\/\//i.test(src) && !src.startsWith('cloud://') && !fileId.startsWith('cloud://')) return '';
+      if (!/^https?:\/\//i.test(src) && !src.startsWith('cloud://') && !src.startsWith('data:image/') && !fileId.startsWith('cloud://')) return '';
       const alt = pick('alt').replace(/"/g, '&quot;');
+      if (fileId.startsWith('cloud://')) {
+        return `<img src="${COMMENT_IMG_PLACEHOLDER}" alt="${alt || '评论图片'}" loading="lazy" data-cb-fileid="${fileId.replace(/"/g, '&quot;')}">`;
+      }
       const fid = fileId.startsWith('cloud://')
         ? ` data-cb-fileid="${fileId.replace(/"/g, '&quot;')}"`
         : '';
@@ -450,10 +453,27 @@ async function handleUpload(event, context) {
     fileContent: buf,
   });
   const fileId = uploadRes.fileID;
-  const url = buildCommentImageProxyUrl(fileId);
-  if (!url) return jsonErr('获取图片链接失败');
+  if (!isAllowedCommentImageFileId(fileId)) return jsonErr('图片上传失败');
 
-  return jsonOk({ url, fileId });
+  return jsonOk({ url: COMMENT_IMG_PLACEHOLDER, fileId });
+}
+
+async function handleImage(event) {
+  const fileId = String(event.fileId || '').trim();
+  if (!isAllowedCommentImageFileId(fileId)) return jsonErr('无权访问该图片', 403);
+  try {
+    const res = await app.downloadFile({ fileID: fileId });
+    const buf = res.fileContent;
+    if (!buf || !buf.length) return jsonErr('图片不存在', 404);
+    const cloudPath = parseCloudPathFromFileId(fileId);
+    return jsonOk({
+      mime: mimeFromCloudPath(cloudPath),
+      base64: buf.toString('base64'),
+    });
+  } catch (err) {
+    console.error('image fetch failed', err);
+    return jsonErr('图片读取失败', 404);
+  }
 }
 
 async function handleImageHttp(params, origin) {
@@ -487,6 +507,7 @@ async function dispatch(event, context) {
   if (action === 'GET') return await handleGet(event);
   if (action === 'POST') return await handlePost(event, context);
   if (action === 'UPLOAD') return await handleUpload(event, context);
+  if (action === 'IMAGE') return await handleImage(event);
   return jsonErr('未知 action');
 }
 

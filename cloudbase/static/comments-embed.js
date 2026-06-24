@@ -4,7 +4,12 @@
  * HTTP 仅作桌面端兜底。
  */
 const SDK_URL = 'https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js';
+const COMMENT_IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const PROFILE_KEY = 'gitblog-comment-profile-v1';
+const GUEST_NICK_COOKIE = 'gitblog_guest_nick';
+const GUEST_NICK_COOKIE_MAX_AGE_DAYS = 365;
+const GUEST_NICK_ADJS = ['快乐', '热心', '佛系', '可爱', '神秘', '躺平', '元气', '沉思', '打卡', '随手'];
+const GUEST_NICK_NOUNS = ['小鸡', '访客', '码农', '旅人', '吃瓜选手', '夜猫子', '冲浪人', '书虫', '种花人', '路人甲'];
 
 const EMOJI_GROUPS = [
   ['😀', '😁', '😂', '🤣', '😊', '😇', '🙂', '😉', '😍', '🥰', '😘', '😋'],
@@ -123,6 +128,60 @@ async function callApi(payload) {
   }
 }
 
+function guessFileIdFromImgEl(img) {
+  const fid = String(img.getAttribute('data-cb-fileid') || '').trim();
+  if (fid.startsWith('cloud://')) return fid;
+  const raw = String(img.getAttribute('src') || '').trim();
+  if (raw.startsWith('cloud://')) return raw;
+  try {
+    const u = new URL(raw);
+    const proxyFileId = u.searchParams.get('fileId');
+    if (String(u.searchParams.get('action') || '').toUpperCase() === 'IMAGE' && proxyFileId?.startsWith('cloud://')) {
+      return proxyFileId;
+    }
+    if (/\.tcb\.qcloud\.la$/i.test(u.hostname) && u.pathname.includes('/comments/')) {
+      const cloudPath = decodeURIComponent(u.pathname.replace(/^\//, ''));
+      if (cfg.envId && cloudPath) return `cloud://${cfg.envId}/${cloudPath}`;
+    }
+  } catch { /* ignore */ }
+  return '';
+}
+
+function imgNeedsHydration(img) {
+  const src = String(img.getAttribute('src') || '');
+  if (!guessFileIdFromImgEl(img)) return false;
+  if (!src || src === COMMENT_IMG_PLACEHOLDER) return true;
+  if (src.startsWith('cloud://')) return true;
+  try {
+    const u = new URL(src);
+    if (String(u.searchParams.get('action') || '').toUpperCase() === 'IMAGE') return true;
+    if (/\.tcb\.qcloud\.la$/i.test(u.hostname)) return true;
+  } catch { /* ignore */ }
+  return false;
+}
+
+async function hydrateCommentImages(root, callApiFn) {
+  if (!root || !callApiFn) return;
+  const imgs = [...root.querySelectorAll('img')].filter(imgNeedsHydration);
+  if (!imgs.length) return;
+  await Promise.all(imgs.map(async img => {
+    if (img.dataset.cbHydrating === '1' || img.dataset.cbHydrated === '1') return;
+    const fileId = guessFileIdFromImgEl(img);
+    if (!fileId) return;
+    img.setAttribute('data-cb-fileid', fileId);
+    img.dataset.cbHydrating = '1';
+    try {
+      const res = await callApiFn({ action: 'IMAGE', fileId });
+      if (res?.base64 && res?.mime) {
+        img.src = `data:${res.mime};base64,${res.base64}`;
+        img.dataset.cbHydrated = '1';
+      }
+    } catch { /* keep placeholder */ } finally {
+      delete img.dataset.cbHydrating;
+    }
+  }));
+}
+
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
@@ -220,7 +279,8 @@ function sanitizeCommentHtml(raw) {
       }
       if (tag === 'IMG') {
         const src = child.getAttribute('src') || '';
-        if (!/^https?:\/\//i.test(src) && !src.startsWith('cloud://')) {
+        const fileId = child.getAttribute('data-cb-fileid') || '';
+        if (!/^https?:\/\//i.test(src) && !src.startsWith('cloud://') && !src.startsWith('data:image/') && !fileId.startsWith('cloud://')) {
           child.remove();
           return;
         }
@@ -245,6 +305,52 @@ function saveProfile({ nick, email }) {
   try {
     localStorage.setItem(PROFILE_KEY, JSON.stringify({ nick: nick || '', email: email || '' }));
   } catch { /* ignore */ }
+}
+
+function readGuestNickCookie() {
+  const m = document.cookie.match(new RegExp(`(?:^|; )${GUEST_NICK_COOKIE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}=([^;]*)`));
+  return m ? decodeURIComponent(m[1]) : '';
+}
+
+function writeGuestNickCookie(nick) {
+  const safe = encodeURIComponent(String(nick || '').slice(0, 40));
+  const maxAge = GUEST_NICK_COOKIE_MAX_AGE_DAYS * 86400;
+  document.cookie = `${GUEST_NICK_COOKIE}=${safe}; path=/; max-age=${maxAge}; SameSite=Lax`;
+}
+
+function randomGuestNick() {
+  const adj = GUEST_NICK_ADJS[Math.floor(Math.random() * GUEST_NICK_ADJS.length)];
+  const noun = GUEST_NICK_NOUNS[Math.floor(Math.random() * GUEST_NICK_NOUNS.length)];
+  const num = String(Math.floor(100 + Math.random() * 900));
+  return `${adj}${noun}${num}`;
+}
+
+function getOrCreateGuestNick() {
+  const cached = readGuestNickCookie();
+  if (cached) return cached;
+  const nick = randomGuestNick();
+  writeGuestNickCookie(nick);
+  return nick;
+}
+
+function resolveCommentNick(inputNick) {
+  const trimmed = String(inputNick || '').trim();
+  if (trimmed) {
+    writeGuestNickCookie(trimmed);
+    return trimmed.slice(0, 40);
+  }
+  return getOrCreateGuestNick();
+}
+
+function prefillCommentNick(inputEl) {
+  if (!inputEl || inputEl.value.trim()) return;
+  const profile = readProfile();
+  if (profile.nick) {
+    inputEl.value = profile.nick;
+    return;
+  }
+  const cached = readGuestNickCookie();
+  inputEl.value = cached || getOrCreateGuestNick();
 }
 
 function formatTime(ts) {
@@ -275,12 +381,13 @@ function fileToBase64(file) {
 }
 
 class CommentRichEditor {
-  constructor(root, { allowImage = true, maxLength = 5000, onUpload, onChange, alwaysShowBar = false } = {}) {
+  constructor(root, { allowImage = true, maxLength = 5000, onUpload, onChange, onHydrateImages, alwaysShowBar = false } = {}) {
     this.root = root;
     this.allowImage = allowImage;
     this.maxLength = maxLength;
     this.onUpload = onUpload;
     this.onChange = onChange;
+    this.onHydrateImages = onHydrateImages;
     this.alwaysShowBar = alwaysShowBar;
     this._emojiOpen = false;
     this._render();
@@ -398,11 +505,10 @@ class CommentRichEditor {
     document.execCommand('insertHTML', false, placeholder.outerHTML);
     try {
       const result = await this.onUpload(file);
-      const url = typeof result === 'string' ? result : result?.url;
       const fileId = typeof result === 'object' ? result?.fileId : '';
-      if (!url) throw new Error('图片上传失败');
-      const fileIdAttr = fileId ? ` data-cb-fileid="${escapeHtml(fileId)}"` : '';
-      const html = `<img src="${escapeHtml(url)}" alt="评论图片" loading="lazy"${fileIdAttr}>`;
+      if (!fileId) throw new Error('图片上传失败');
+      const fileIdAttr = ` data-cb-fileid="${escapeHtml(fileId)}"`;
+      const html = `<img src="${COMMENT_IMG_PLACEHOLDER}" alt="评论图片" loading="lazy"${fileIdAttr}>`;
       this.root.querySelector('.cb-uploading')?.replaceWith(
         ...(() => {
           const t = document.createElement('template');
@@ -410,6 +516,7 @@ class CommentRichEditor {
           return [...t.content.childNodes];
         })()
       );
+      await this.onHydrateImages?.(this.root);
     } catch {
       this.root.querySelector('.cb-uploading')?.remove();
       throw new Error('图片上传失败');
@@ -680,12 +787,13 @@ function mountInlineReply(slot, ctx) {
   const emailInput = panel.querySelector('[name="email"]');
   const statusEl = panel.querySelector('.cb-inline-reply-status');
   const profile = readProfile();
-  if (profile.nick) nickInput.value = profile.nick;
+  prefillCommentNick(nickInput);
   if (profile.email) emailInput.value = profile.email;
   const editor = new CommentRichEditor(editorHost, {
     allowImage: cfg.allowImage,
     maxLength: cfg.maxLength,
     alwaysShowBar: true,
+    onHydrateImages: root => hydrateCommentImages(root, callApi),
     onUpload: async file => {
       const base64 = await fileToBase64(file);
       const res = await callApi({
@@ -722,7 +830,7 @@ function mountInlineReply(slot, ctx) {
       statusEl.classList.add('is-error');
       return;
     }
-    const nick = nickInput.value.trim() || profile.nick || '';
+    const nick = resolveCommentNick(nickInput.value);
     const email = emailInput.value.trim() || profile.email || '';
     submitBtn.disabled = true;
     statusEl.classList.remove('is-error');
@@ -828,12 +936,13 @@ async function mount() {
   const editorHost = root.querySelector('.cb-compose-editor');
 
   const profile = readProfile();
-  if (profile.nick) nickInput.value = profile.nick;
+  prefillCommentNick(nickInput);
   if (profile.email) emailInput.value = profile.email;
 
   const editor = new CommentRichEditor(editorHost, {
     allowImage: cfg.allowImage,
     maxLength: cfg.maxLength,
+    onHydrateImages: root => hydrateCommentImages(root, callApi),
     onUpload: async file => {
       const base64 = await fileToBase64(file);
       const res = await callApi({
@@ -861,6 +970,7 @@ async function mount() {
       listEl.innerHTML = comments.length
         ? comments.map(c => renderCommentItem(c)).join('')
         : '';
+      await hydrateCommentImages(listEl, callApi);
       loadingEl.hidden = true;
       listEl.hidden = false;
       postHeight(true);
@@ -887,7 +997,7 @@ async function mount() {
       statusEl.classList.add('is-error');
       return;
     }
-    const nick = nickInput.value.trim();
+    const nick = resolveCommentNick(nickInput.value);
     const email = emailInput.value.trim();
     const submitBtn = form.querySelector('.cb-submit');
     submitBtn.disabled = true;
