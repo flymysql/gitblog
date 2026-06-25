@@ -8,10 +8,13 @@
  *
  * 环境变量：
  *   COMMENT_ADMIN_SECRET — 与云函数 COMMENT_ADMIN_SECRET 一致（见 cloudbase/secrets.env）
- *   CLOUDBASE_HTTP_URL — 可选，默认从 config.js 推导
+ *   CLOUDBASE_HTTP_URL — 可选；仅当已开启 HTTP 网关且 tcb invoke 不可用时
+ *   CLOUDBASE_INVOKE_MODE — 设为 http 可强制走 HTTP
+ *
+ * 说明：本站评论/PV 前台走 embed + SDK，HTTP 网关可能未开启；导入默认用 tcb fn invoke（需 tcb login）。
  */
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { callCloudFunction, readCloudbaseConfig } from './cloudbase-fn-invoke.mjs';
 
 const DRY = process.argv.includes('--dry');
 const DELAY_MS = 220;
@@ -21,15 +24,10 @@ function sleep(ms) {
 }
 
 function readConfig() {
+  const cb = readCloudbaseConfig();
   const raw = readFileSync('assets/js/config.js', 'utf8');
-  const pick = key => (raw.match(new RegExp(`${key}\\s*:\\s*["']([^"']+)["']`)) || [])[1] || '';
-  return {
-    siteUrl: pick('url').replace(/\/+$/, '') || 'https://gitpull.cn',
-    envId: pick('envId'),
-    region: pick('region') || 'ap-shanghai',
-    functionName: pick('functionName') || 'gitblog-comments',
-    saobbyImg: (raw.match(/img:\s*["']([^"']*saobby[^"']*)["']/) || [])[1] || '',
-  };
+  const saobbyImg = (raw.match(/img:\s*["']([^"']*saobby[^"']*)["']/) || [])[1] || '';
+  return { ...cb, saobbyImg };
 }
 
 function loadPosts() {
@@ -72,18 +70,11 @@ async function fetchVercountForUrl(url) {
 }
 
 async function callCloudImport(cfg, secret, payload) {
-  const url = process.env.CLOUDBASE_HTTP_URL
-    || `https://${cfg.envId}.${cfg.region}.app.tcloudbase.com/${cfg.functionName}`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'PV_IMPORT', adminSecret: secret, ...payload }),
+  return callCloudFunction(cfg, {
+    action: 'PV_IMPORT',
+    adminSecret: secret,
+    ...payload,
   });
-  const text = await res.text();
-  let json;
-  try { json = JSON.parse(text); } catch { throw new Error(`CloudBase 响应非 JSON: ${text.slice(0, 200)}`); }
-  if (!json?.ok) throw new Error(json?.message || `CloudBase HTTP ${res.status}`);
-  return json;
 }
 
 async function main() {
@@ -95,9 +86,11 @@ async function main() {
 
   const cfg = readConfig();
   if (!cfg.envId) {
-    console.error('config.js 缺少 cloudbase.envId');
+    console.error('缺少 cloudbase envId（cloudbase/cloudbaserc.json 或 assets/js/config.js）');
     process.exit(1);
   }
+
+  console.log(`CloudBase 环境: ${cfg.envId}（导入走 tcb fn invoke，需已 tcb login）`);
 
   console.log('读取 Saobby 站点总计…');
   let saobbyTotal = null;
@@ -155,7 +148,7 @@ async function main() {
     return;
   }
 
-  console.log('\n写入 CloudBase…');
+  console.log('\n写入 CloudBase（tcb fn invoke）…');
   const result = await callCloudImport(cfg, secret, {
     site,
     pages,
