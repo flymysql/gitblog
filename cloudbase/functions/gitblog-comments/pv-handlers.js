@@ -29,6 +29,18 @@ function dayKey(ts = Date.now()) {
   return new Date(ts).toISOString().slice(0, 10);
 }
 
+/** CloudBase doc().get() 对不存在的文档可能返回 { data: [] }，空数组不能当作已存在 */
+function pickDocRow(got) {
+  const data = got?.data;
+  if (Array.isArray(data)) return data.length > 0 ? (data[0] || null) : null;
+  if (data && typeof data === 'object') return data;
+  return null;
+}
+
+function docExists(got) {
+  return pickDocRow(got) != null;
+}
+
 function verifyAdminSecret(event, verifyAdminSecretFn) {
   return typeof verifyAdminSecretFn === 'function' && verifyAdminSecretFn(event);
 }
@@ -41,7 +53,7 @@ async function ensurePvCollections(db) {
 
 async function getSiteStats(db) {
   const got = await db.collection(SITE_COLLECTION).doc(SITE_DOC_ID).get().catch(() => null);
-  const row = got?.data?.[0] || got?.data;
+  const row = pickDocRow(got);
   return {
     pv: Number(row?.pv) || 0,
     uv: Number(row?.uv) || 0,
@@ -52,7 +64,7 @@ async function getSiteStats(db) {
 async function getPagePv(db, path) {
   const norm = normalizePvPath(path);
   const got = await db.collection(PV_COLLECTION).doc(pathDocId(norm)).get().catch(() => null);
-  const row = got?.data?.[0] || got?.data;
+  const row = pickDocRow(got);
   return {
     path: norm,
     pv: Number(row?.pv) || 0,
@@ -69,14 +81,27 @@ async function findPageBySlug(db, slug) {
   return res?.data?.[0] || null;
 }
 
+async function findPageByLegacyPath(db, slug) {
+  const s = String(slug || '').trim();
+  if (!s) return null;
+  const candidates = [`/post/${s}`, `/post/${encodeURIComponent(s)}`];
+  for (const raw of candidates) {
+    const norm = normalizePvPath(raw);
+    const got = await db.collection(PV_COLLECTION).doc(pathDocId(norm)).get().catch(() => null);
+    const row = pickDocRow(got);
+    if (row) return row;
+  }
+  return null;
+}
+
 /** 将按 slug 路径导入的历史数据迁到当前规范路径（/post/{urlKey}） */
 async function ensureCanonicalPvDoc(db, path, { slug = '', title = '' } = {}) {
   const norm = normalizePvPath(path);
   const id = pathDocId(norm);
   const got = await db.collection(PV_COLLECTION).doc(id).get().catch(() => null);
-  if (got?.data?.[0] || got?.data) return norm;
+  if (docExists(got)) return norm;
 
-  const row = await findPageBySlug(db, slug);
+  const row = await findPageBySlug(db, slug) || await findPageByLegacyPath(db, slug);
   if (!row) return norm;
 
   const now = Date.now();
@@ -103,7 +128,7 @@ async function shouldCountHit(db, ipHash, path) {
   const id = `${ipHash}_${pathDocId(path)}_${dayKey(now)}`;
   const ref = db.collection(PV_RATE_COLLECTION).doc(id);
   const got = await ref.get().catch(() => null);
-  const row = got?.data?.[0] || got?.data;
+  const row = pickDocRow(got);
   if (row?.hitAt && now - row.hitAt < PV_RATE_WINDOW_MS) return false;
   await ref.set({ hitAt: now, path, ipHash }).catch(() => null);
   return true;
@@ -116,7 +141,7 @@ async function incrementPagePv(db, path, { slug = '', title = '', countUv = fals
   const _ = db.command;
   const ref = db.collection(PV_COLLECTION).doc(id);
   const got = await ref.get().catch(() => null);
-  const exists = !!(got?.data?.[0] || got?.data);
+  const exists = docExists(got);
 
   if (exists) {
     await ref.update({
@@ -138,7 +163,7 @@ async function incrementPagePv(db, path, { slug = '', title = '', countUv = fals
 
   const siteRef = db.collection(SITE_COLLECTION).doc(SITE_DOC_ID);
   const siteGot = await siteRef.get().catch(() => null);
-  const siteExists = !!(siteGot?.data?.[0] || siteGot?.data);
+  const siteExists = docExists(siteGot);
   if (siteExists) {
     await siteRef.update({
       pv: _.inc(1),
@@ -179,7 +204,7 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
     if (ipHash) {
       const uvId = `uv_${ipHash}`;
       const uvGot = await db.collection(PV_RATE_COLLECTION).doc(uvId).get().catch(() => null);
-      const uvRow = uvGot?.data?.[0] || uvGot?.data;
+      const uvRow = pickDocRow(uvGot);
       if (!uvRow?.uvMarked) {
         countUv = true;
         await db.collection(PV_RATE_COLLECTION).doc(uvId).set({
@@ -257,7 +282,7 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
       const id = pathDocId(path);
       const ref = db.collection(PV_COLLECTION).doc(id);
       const got = await ref.get().catch(() => null);
-      const row = got?.data?.[0] || got?.data;
+      const row = pickDocRow(got);
       const nextPv = Math.max(Number(row?.pv) || 0, pv);
       const payload = {
         path,
