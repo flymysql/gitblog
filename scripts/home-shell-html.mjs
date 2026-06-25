@@ -190,6 +190,7 @@ export function buildHeroShell({
   avatar,
   postCount,
   tagCount,
+  recentDate = '',
   pathPrefix,
   showSiteStats = true,
   siteStatsLabel = '总访问',
@@ -197,6 +198,9 @@ export function buildHeroShell({
   const aboutHref = buildRootPath('post/about/', pathPrefix);
   const saobbyStat = showSiteStats
     ? `<div class="stat saobby-slot saobby-slot-stat" data-saobby-slot="site" data-saobby-prefix="${escapeHtml(siteStatsLabel)}" hidden></div>`
+    : '';
+  const recentStat = recentDate
+    ? `<div class="stat stat-recent"><span class="stat-label">最近更新</span><strong>${escapeHtml(timeAgo(recentDate))}</strong></div>`
     : '';
   return `<a class="hero-link" href="${escapeHtml(aboutHref)}" aria-label="关于本站">
       <div class="hero-avatar-wrap">
@@ -207,6 +211,7 @@ export function buildHeroShell({
         <div class="hero-stats">
           <div class="stat"><strong>${postCount}</strong>篇文章</div>
           <div class="stat"><strong>${tagCount}</strong>个标签</div>
+          ${recentStat}
           ${saobbyStat}
         </div>
       </div>
