@@ -876,32 +876,6 @@ body.cb-has-mobile-dock {
   display: none !important;
 }
 
-/* embed：输入时父页将 iframe 钉在视口内（上沿对齐评论区，下沿留出输入框高度），列表在 iframe 内滚动 */
-.cb-embed-wrap--compose-pinned {
-  position: relative;
-}
-
-.cb-embed-wrap--compose-pinned .cb-embed-frame {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: var(--cb-embed-pin-top, 0);
-  bottom: var(--cb-compose-pin-h, 280px);
-  z-index: 900;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  background: var(--bg);
-}
-
-.cb-embed-wrap--compose-pinned .cb-embed-hint {
-  display: none !important;
-}
-
 .cb-mobile-sheet-header {
   display: none;
 }
