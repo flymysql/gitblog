@@ -412,7 +412,7 @@ export async function buildPrerenderedPostHtml({
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(`${title} · ${site.title}`)}</title>`)
     .replace(
       /<article class="article" id="article">[\s\S]*?<\/article>/,
-      `<article class="article is-prerendered" id="article" data-prerendered="1" data-slug="${escapeHtml(slug)}">\n      ${articleInner}\n    </article>`
+      `<article class="article is-prerendered" id="article" data-prerendered="1" data-slug="${escapeHtml(slug)}" data-url-key="${escapeHtml(String(post.urlKey || '').trim())}">\n      ${articleInner}\n    </article>`
     );
 
   // 移除壳里的 noindex（post.html fallback 专用），预渲染产物用 buildMetaHead 的 index,follow

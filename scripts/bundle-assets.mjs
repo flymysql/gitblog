@@ -97,6 +97,17 @@ export function rewriteHtmlAssetRefs(html, version) {
     }
   }
 
+  // 预渲染页等已指向 dist 时，仅刷新 ?v= 缓存版本
+  for (const dist of [...Object.values(CSS_DIST_MAP), ...Object.values(JS_DIST_MAP)]) {
+    for (const prefix of ['', '/']) {
+      const path = `${prefix}${dist}`;
+      out = out.replace(
+        new RegExp(`${escapeRe(path)}\\?v=[^"'\\s>]+`, 'g'),
+        `${path}?v=${v}`,
+      );
+    }
+  }
+
   return out;
 }
 
