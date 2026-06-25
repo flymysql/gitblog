@@ -9,6 +9,7 @@ let _reqSeq = 0;
 let _iframe = null;
 let _ready = null;
 let _pending = new Map();
+let _replyRouterBound = false;
 
 function cloudCfg() {
   return CONFIG.cloudbase || {};
@@ -40,8 +41,24 @@ function beaconUrl() {
   return u.toString();
 }
 
+function bindReplyRouter() {
+  if (_replyRouterBound) return;
+  _replyRouterBound = true;
+  window.addEventListener('message', (e) => {
+    if (!_iframe || e.source !== _iframe.contentWindow) return;
+    const msg = e.data;
+    if (!msg || typeof msg !== 'object' || msg.type !== 'gitblog-pv-reply' || !msg.reqId) return;
+    const pending = _pending.get(msg.reqId);
+    if (!pending) return;
+    _pending.delete(msg.reqId);
+    if (msg.ok) pending.resolve(msg.data);
+    else pending.reject(new Error(msg.data?.message || 'PV 失败'));
+  });
+}
+
 function ensureBeacon() {
   if (!isCloudBasePvEnabled()) return Promise.reject(new Error('CloudBase PV 未启用'));
+  bindReplyRouter();
   if (_ready) return _ready;
   _ready = new Promise((resolve, reject) => {
     const iframe = document.createElement('iframe');
@@ -50,29 +67,23 @@ function ensureBeacon() {
     iframe.hidden = true;
     iframe.setAttribute('aria-hidden', 'true');
     iframe.style.cssText = 'position:absolute;width:0;height:0;border:0;clip:rect(0,0,0,0);';
-    const timer = setTimeout(() => reject(new Error('PV beacon 超时')), 12000);
-    const onMsg = (e) => {
+    const timer = setTimeout(() => {
+      window.removeEventListener('message', onReady);
+      reject(new Error('PV beacon 超时'));
+    }, 12000);
+    const onReady = (e) => {
       if (e.source !== iframe.contentWindow) return;
       const msg = e.data;
-      if (!msg || typeof msg !== 'object') return;
-      if (msg.type === 'gitblog-pv-ready') {
-        clearTimeout(timer);
-        window.removeEventListener('message', onMsg);
-        _iframe = iframe;
-        resolve(iframe);
-        return;
-      }
-      if (msg.type === 'gitblog-pv-reply' && msg.reqId) {
-        const pending = _pending.get(msg.reqId);
-        if (!pending) return;
-        _pending.delete(msg.reqId);
-        if (msg.ok) pending.resolve(msg.data);
-        else pending.reject(new Error(msg.data?.message || 'PV 失败'));
-      }
+      if (!msg || msg.type !== 'gitblog-pv-ready') return;
+      clearTimeout(timer);
+      window.removeEventListener('message', onReady);
+      _iframe = iframe;
+      resolve(iframe);
     };
-    window.addEventListener('message', onMsg);
+    window.addEventListener('message', onReady);
     iframe.addEventListener('error', () => {
       clearTimeout(timer);
+      window.removeEventListener('message', onReady);
       reject(new Error('PV beacon 加载失败'));
     }, { once: true });
     document.body.appendChild(iframe);
