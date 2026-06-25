@@ -766,8 +766,9 @@ function initMobileComposePortal(root, form) {
   }
 }
 
-function setupMobileComposeChrome(form, metaEl, actionsEl) {
-  if (!isMobileDock() || !form) return;
+/** 评论底栏：头像居左，发送居右（PC / 移动端共用） */
+function setupComposeFooterChrome(form, metaEl, actionsEl) {
+  if (!form) return;
   let footer = form.querySelector('.cb-compose-footer');
   if (!footer) {
     footer = document.createElement('div');
@@ -822,8 +823,9 @@ function bindComposeReveal(form, editor, { metaEl, actionsEl, mobileMode = false
       if (metaEl) metaEl.hidden = !sheetOpen || !showExtra;
       if (actionsEl) actionsEl.hidden = true;
     } else {
+      if (footer) footer.hidden = !showExtra;
       if (metaEl) metaEl.hidden = !showExtra;
-      if (actionsEl) actionsEl.hidden = !showExtra;
+      if (actionsEl) actionsEl.hidden = true;
     }
     form.classList.toggle('cb-compose--active', showExtra || sheetOpen);
     editor._autosizeBody?.();
@@ -1033,7 +1035,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
       onOpen?.();
       postHeight(true);
     }
-    setupMobileComposeChrome(form, form.querySelector('.cb-compose-meta'), form.querySelector('.cb-compose-actions'));
+    setupComposeFooterChrome(form, form.querySelector('.cb-compose-meta'), form.querySelector('.cb-compose-actions'));
     notifyParentComposePin(true);
     form.dispatchEvent(new CustomEvent('cb-compose-sheet-change', { bubbles: true }));
     setTimeout(() => {
@@ -1285,8 +1287,8 @@ async function mount() {
   const mobileMode = isMobileDock();
   if (mobileMode) {
     initMobileComposePortal(commentsRoot, form);
-    setupMobileComposeChrome(form, metaEl, actionsEl);
   }
+  setupComposeFooterChrome(form, metaEl, actionsEl);
 
   const editor = new CommentRichEditor(editorHost, {
     allowImage: cfg.allowImage,
