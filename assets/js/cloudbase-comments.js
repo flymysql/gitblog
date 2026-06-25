@@ -1571,6 +1571,8 @@ function mountCloudBaseEmbedSplit(targetEl, path, opts = {}) {
     return false;
   }
 
+  targetEl.classList.add('cb-comments-host--embed');
+
   targetEl.innerHTML = `
     <div class="cb-embed-split">
       <div class="cb-embed-wrap cb-embed-wrap--list">
@@ -1601,7 +1603,6 @@ function mountCloudBaseEmbedSplit(targetEl, path, opts = {}) {
   const composeLayer = targetEl.querySelector('.cb-embed-compose-layer');
   const composeIframe = targetEl.querySelector('.cb-embed-frame--compose');
   const hint = targetEl.querySelector('.cb-embed-hint');
-  const backdrop = composeLayer?.querySelector('.cb-embed-compose-backdrop');
 
   let composeReady = false;
   let composeOpen = false;
@@ -1713,6 +1714,7 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
     targetEl.innerHTML = `<div class="comments-hint">${EMBED_BASE_HINT}</div>`;
     return false;
   }
+  targetEl.classList.add('cb-comments-host--embed');
   targetEl.innerHTML = `
     <div class="cb-embed-wrap">
       <iframe

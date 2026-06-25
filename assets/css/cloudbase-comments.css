@@ -21,6 +21,19 @@
 /* 移动端双 iframe：列表 + 底部悬浮 compose */
 .cb-embed-split { margin: 0; }
 
+/* embed 挂载时去掉外层容器（随笔/首页广场等）多余左右 padding */
+.cb-comments-host--embed {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+.cb-embed-wrap--list {
+  margin: 0;
+}
+
 .cb-embed-compose-layer {
   position: fixed;
   left: 0;
