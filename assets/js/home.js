@@ -105,6 +105,17 @@ function progressiveImgAttrs(fullUrl, { eager = false, alt = '' } = {}) {
   return `src="${escapeHtml(src)}"${dataSrc}${thumbAttr}${fullAttr} alt="${escapeHtml(alt)}" loading="${loading}" decoding="async" fetchpriority="${fp}" class="lazy-pending progressive-img"`;
 }
 
+function recentUpdateStatHtml(date) {
+  if (!date) return '';
+  return `<div class="stat stat-recent"><span class="stat-label">最近更新</span><strong>${escapeHtml(timeAgo(date))}</strong></div>`;
+}
+
+function latestPostDate(posts) {
+  if (!posts?.length) return '';
+  const latest = [...posts].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))[0];
+  return latest?.date || '';
+}
+
 function renderHero(posts) {
   const hero = $('#hero');
   if (!hero) return;
@@ -114,7 +125,7 @@ function renderHero(posts) {
   const statsInner = `
           <div class="stat"><strong>${posts.length}</strong>篇文章</div>
           <div class="stat"><strong>${tagCount.size}</strong>个标签</div>
-          ${posts.length ? `<div class="stat">最近更新 ${timeAgo(posts[0].date)}</div>` : ''}
+          ${recentUpdateStatHtml(latestPostDate(posts))}
           ${(CONFIG.pageviews || {}).showHomeStats !== false ? bszSiteStatsHtml() : ''}`;
 
   if (hero.dataset.shell === 'prerender' && hero.querySelector('.hero-link')) {
@@ -150,17 +161,23 @@ function hydratePrerenderHeroStats() {
 
   let postCount = 0;
   let tagCount = 0;
+  let recentText = '';
   statsEl.querySelectorAll('.stat').forEach(el => {
     const text = el.textContent || '';
     const pm = text.match(/(\d+)\s*篇文章/);
     const tm = text.match(/(\d+)\s*个标签/);
     if (pm) postCount = Number(pm[1]);
     if (tm) tagCount = Number(tm[1]);
+    if (el.classList.contains('stat-recent')) {
+      const strong = el.querySelector('strong');
+      if (strong) recentText = strong.textContent.trim();
+    }
   });
 
   statsEl.innerHTML = `
     <div class="stat"><strong>${postCount}</strong>篇文章</div>
     <div class="stat"><strong>${tagCount}</strong>个标签</div>
+    ${recentText ? `<div class="stat stat-recent"><span class="stat-label">最近更新</span><strong>${escapeHtml(recentText)}</strong></div>` : ''}
     ${bszSiteStatsHtml()}`;
 }
 

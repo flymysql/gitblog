@@ -797,11 +797,13 @@ function injectHomeSeo() {
 
   const tagSet = new Set();
   visiblePosts.forEach(p => (p.tags || []).forEach(t => tagSet.add(t)));
+  const latestHomePost = sortPostsForHomeList(visiblePosts)[0];
   const heroShell = buildHeroShell({
     description: SITE_DESC || SITE_SUBTITLE,
     avatar: SITE_AVATAR,
     postCount: visiblePosts.length,
     tagCount: tagSet.size,
+    recentDate: latestHomePost?.date || '',
     pathPrefix: SITE_PATH_PREFIX,
     showSiteStats: SHOW_HOME_STATS,
     siteStatsLabel: SAOBBY_SITE_LABEL,
