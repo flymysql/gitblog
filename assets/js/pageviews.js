@@ -16,6 +16,7 @@ import {
   formatCount,
 } from './cloudbase-pv.js';
 import { isCommentsReady } from './comments-embed.js';
+import { holdLazyImages, releaseLazyImages } from './load-priority.js';
 
 const VCOUNT_DEFAULT_SRC = 'https://events.vercount.one/js';
 
@@ -27,6 +28,75 @@ const STATE = {
 
 const LIST_STATS_CACHE_KEY = 'gitblog_list_stats_v1';
 const LIST_STATS_CACHE_MS = 5 * 60 * 1000;
+const PV_IMAGE_RELEASE_TIMEOUT_MS = 8000;
+
+let _pvImageHoldActive = false;
+let _pvWorkCount = 0;
+let _pvReleaseTimer = null;
+
+function shouldPrioritizeStatsOverImages() {
+  const cfg = pvCfg();
+  if (cfg.enabled === false) return false;
+  if (useCloudBase()) return true;
+  if (saobbySiteImg()) return true;
+  if (cfg.showPostViews !== false && vercountScriptSrc()) return true;
+  return isCommentsReady();
+}
+
+function beginPvImageHold() {
+  if (!shouldPrioritizeStatsOverImages() || _pvImageHoldActive) return;
+  _pvImageHoldActive = true;
+  holdLazyImages();
+}
+
+function schedulePvImageRelease() {
+  clearTimeout(_pvReleaseTimer);
+  _pvReleaseTimer = setTimeout(() => {
+    _pvWorkCount = 0;
+    finishPvImageHold();
+  }, PV_IMAGE_RELEASE_TIMEOUT_MS);
+}
+
+function finishPvImageHold() {
+  clearTimeout(_pvReleaseTimer);
+  _pvReleaseTimer = null;
+  if (!_pvImageHoldActive) return;
+  _pvImageHoldActive = false;
+  releaseLazyImages();
+}
+
+function endPvWorkUnit() {
+  _pvWorkCount = Math.max(0, _pvWorkCount - 1);
+  if (_pvWorkCount === 0) finishPvImageHold();
+  else schedulePvImageRelease();
+}
+
+function runWithPageviewPriority(task) {
+  if (!shouldPrioritizeStatsOverImages()) {
+    return Promise.resolve(task());
+  }
+  beginPvImageHold();
+  _pvWorkCount += 1;
+  schedulePvImageRelease();
+  return Promise.resolve(task()).finally(() => endPvWorkUnit());
+}
+
+function waitForSaobbySlot(slotEl) {
+  return new Promise(resolve => {
+    const img = slotEl?.querySelector('img');
+    if (!img) {
+      resolve();
+      return;
+    }
+    if (img.complete) {
+      resolve();
+      return;
+    }
+    const done = () => resolve();
+    img.addEventListener('load', done, { once: true });
+    img.addEventListener('error', done, { once: true });
+  });
+}
 
 function pvCfg() {
   return CONFIG.pageviews || {};
@@ -105,13 +175,16 @@ function injectSaobbySiteSlots(root = document) {
   root.querySelectorAll('[data-saobby-slot="site"]').forEach(el => {
     if (!el.dataset.saobbyPrefix && !el.dataset.saobbySuffix) el.dataset.saobbyPrefix = sitePrefix;
     const override = (el.dataset.saobbyImg || '').trim();
-    fillSaobbySite(el, override || siteImg, sitePrefix);
+    runWithPageviewPriority(async () => {
+      fillSaobbySite(el, override || siteImg, sitePrefix);
+      await waitForSaobbySlot(el);
+    });
   });
 }
 
 function injectCloudBaseSiteSlots(root = document) {
   root.querySelectorAll('[data-saobby-slot="site"]').forEach(el => {
-    renderSitePvSlot(el);
+    runWithPageviewPriority(() => renderSitePvSlot(el));
   });
 }
 
@@ -146,26 +219,28 @@ function findPagePvEl(root = document) {
 }
 
 export async function trackAndRenderArticleView(meta = {}) {
-  ensureArticlePagePvPlaceholder(document);
-  if (!useCloudBase()) {
-    injectVercountScript();
-    return;
-  }
-  if (!STATE.articlePvTask) {
-    STATE.articlePvTask = (async () => {
-      const el = findPagePvEl(document);
-      if (!el) return;
-      const article = document.querySelector('#article');
-      const slug = meta.slug || article?.dataset?.slug || '';
-      const title = meta.title || article?.querySelector('h1')?.textContent?.trim() || '';
-      const urlKey = String(meta.urlKey || article?.dataset?.urlKey || '').trim();
-      const path = (urlKey && /^[a-z0-9-]+$/i.test(urlKey))
-        ? `/post/${urlKey}`
-        : (meta.path || location.pathname);
-      await renderPagePvEl(el, { ...meta, path, slug, title, hit: true });
-    })();
-  }
-  await STATE.articlePvTask;
+  return runWithPageviewPriority(async () => {
+    ensureArticlePagePvPlaceholder(document);
+    if (!useCloudBase()) {
+      injectVercountScript();
+      return;
+    }
+    if (!STATE.articlePvTask) {
+      STATE.articlePvTask = (async () => {
+        const el = findPagePvEl(document);
+        if (!el) return;
+        const article = document.querySelector('#article');
+        const slug = meta.slug || article?.dataset?.slug || '';
+        const title = meta.title || article?.querySelector('h1')?.textContent?.trim() || '';
+        const urlKey = String(meta.urlKey || article?.dataset?.urlKey || '').trim();
+        const path = (urlKey && /^[a-z0-9-]+$/i.test(urlKey))
+          ? `/post/${urlKey}`
+          : (meta.path || location.pathname);
+        await renderPagePvEl(el, { ...meta, path, slug, title, hit: true });
+      })();
+    }
+    await STATE.articlePvTask;
+  });
 }
 
 export function bszSiteStatsHtml({ compact = false } = {}) {
@@ -240,12 +315,8 @@ function applyListStatsToSlot(el, pv, comments, opts) {
   el.dataset.listStatsDone = '1';
 }
 
-function scheduleListStatsWork(fn) {
-  if (typeof requestIdleCallback === 'function') {
-    requestIdleCallback(() => fn(), { timeout: 2000 });
-  } else {
-    setTimeout(fn, 0);
-  }
+export function queueArticleListViews(root = document) {
+  runWithPageviewPriority(() => renderArticleListViews(root).catch(() => {}));
 }
 
 export async function renderArticleListViews(root = document) {
@@ -317,12 +388,6 @@ export async function renderArticleListViews(root = document) {
   } finally {
     if (STATE.listStatsTask === task) STATE.listStatsTask = null;
   }
-}
-
-export function queueArticleListViews(root = document) {
-  scheduleListStatsWork(() => {
-    renderArticleListViews(root).catch(() => {});
-  });
 }
 
 export function initPageviews() {
