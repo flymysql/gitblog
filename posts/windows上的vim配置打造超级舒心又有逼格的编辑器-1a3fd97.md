@@ -7,6 +7,7 @@ tags:
   - "教程"
   - "前端"
 summary: "之前用的是spf13的方案 不过自己也删删减减了好多 就修改成比较适合自己的 其中vim scripts是vim的一些基本插件，包括语法高亮的支持、缩进等等。 当然我也可以使用其他…"
+cover: ../assets/uploads/2026/06/covers/windows上的vim配置打造超级舒心又有逼格的编辑器-1a3fd97.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/1a3fd97.html

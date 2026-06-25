@@ -6,6 +6,7 @@ author: "兰州小红鸡"
 tags:
   - 前端
 summary: "前几天在掘金上看到一个开源项目(PyUI)在招人，一个基于vue.js的UI库，想着反正页闲着，就硬着头皮加入了（其实我都还没学vue.js) 两天速成了一下，学了点皮毛，就开始撸…"
+cover: ../assets/uploads/2026/06/covers/使用vue.js制作carousel跑马灯组件-456bc465.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/456bc465.html

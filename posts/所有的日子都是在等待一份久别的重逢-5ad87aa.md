@@ -9,6 +9,7 @@ tags:
   - "随想"
   - "邻家酒肆"
 summary: "喝完半杯红酒，差点呛得眼泪流出，赶紧倒了瓶啤酒，敬了爸妈一杯，会越来越好的，我嘴里咕诺着。 晚上爸爸发来微信，很开心地说家里的新房子外墙的瓷砖已经都贴完了，很漂亮，改天拍一张发给我…"
+cover: ../assets/uploads/2026/06/covers/所有的日子都是在等待一份久别的重逢-5ad87aa.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/5ad87aa.html
