@@ -1,0 +1,189 @@
+:root {
+  color-scheme: light dark;
+  --text: #1f2329;
+  --text-secondary: #646a73;
+  --text-tertiary: #8f959e;
+  --bg: #fff;
+  --bg-soft: #f5f6f7;
+  --border: #e5e6eb;
+  --primary: #ea6f5a;
+  --danger: #d9534f;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+html[data-mode="dark"] {
+  --text: #e8eaed;
+  --text-secondary: #9aa0a6;
+  --text-tertiary: #80868b;
+  --bg: #1a1d21;
+  --bg-soft: #24282e;
+  --border: #3c4043;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 12px 14px 20px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button, .btn {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.btn-secondary { background: var(--bg-soft); }
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+input[type="password"], .search-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+.settings-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.settings-hint code {
+  font-size: 12px;
+  background: var(--bg-soft);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.admin-empty-card {
+  max-width: 520px;
+  padding: 8px 0;
+}
+.admin-empty-card h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.admin-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-soft);
+  padding: 4px;
+  border-radius: 10px;
+}
+.admin-tabs button {
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+}
+.admin-tabs button.active {
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0,0,0,.06);
+}
+.admin-toolbar-spacer { flex: 1; }
+.search-input { max-width: 220px; width: 100%; }
+.admin-list {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg);
+}
+.admin-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr) 110px 72px 120px;
+  gap: 10px;
+  align-items: start;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.admin-row:last-child { border-bottom: none; }
+.admin-row.head {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background: var(--bg-soft);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+.admin-row .title {
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 0;
+}
+.comments-admin-excerpt {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.admin-row .meta { font-size: 12px; color: var(--text-secondary); }
+.admin-row .actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.admin-row .actions button,
+.admin-row .actions a {
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  padding: 4px 6px;
+}
+.admin-row .actions .danger { color: var(--danger); }
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  color: var(--text-secondary);
+  margin-right: 4px;
+}
+.badge.draft { background: #fff3cd; color: #856404; }
+html[data-mode="dark"] .badge.draft { background: #3d3419; color: #f0d78c; }
+.badge.carousel { background: #e8f4ff; color: #1a73e8; }
+.loading, .empty, .error {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+.error { color: var(--danger); }
+.comments-admin-more {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0 4px;
+}
+@media (max-width: 720px) {
+  .admin-row {
+    grid-template-columns: 1fr auto;
+    padding: 12px;
+  }
+  .admin-row .meta:not(:last-child) { display: none; }
+  .admin-row.head { display: none; }
+}

@@ -200,7 +200,9 @@ node deploy-static-embed.mjs
 
 ### 后台评论管理
 
-博客后台 [评论管理](/admin/comments.html) 使用 `COMMENT_ADMIN_SECRET` 鉴权（首次进入时输入，保存在本浏览器）。云函数 action：
+博客后台 [评论管理](/admin/comments.html) 通过 **CloudBase 托管 iframe** 加载（与前台评论区相同，避免免费版 `gitpull.cn` 直连 HTTP 的 CORS 限制）。须部署 `comments-admin-embed.html`（`npm run cloudbase:deploy-embed`）。
+
+管理密钥为云函数环境变量 `COMMENT_ADMIN_SECRET`（`secrets.env`），首次在嵌入页输入后保存在 CloudBase 托管域的本机存储。
 
 | action | 字段 | 说明 |
 |--------|------|------|
