@@ -10,6 +10,21 @@ let _iframe = null;
 let _ready = null;
 let _pending = new Map();
 let _replyRouterBound = false;
+let _queue = Promise.resolve();
+
+function parsePvData(raw) {
+  let data = raw;
+  if (typeof data === 'string') {
+    try { data = JSON.parse(data); } catch { /* ignore */ }
+  }
+  if (!data || typeof data !== 'object') return {};
+  return data;
+}
+
+function pvNumber(data, key) {
+  const v = Number(parsePvData(data)[key]);
+  return Number.isFinite(v) && v >= 0 ? v : 0;
+}
 
 function cloudCfg() {
   return CONFIG.cloudbase || {};
@@ -92,7 +107,7 @@ function ensureBeacon() {
 }
 
 function callBeacon(payload) {
-  return ensureBeacon().then(() => new Promise((resolve, reject) => {
+  const run = () => ensureBeacon().then(() => new Promise((resolve, reject) => {
     const reqId = `${REQ_PREFIX}${Date.now()}_${++_reqSeq}`;
     _pending.set(reqId, { resolve, reject });
     _iframe.contentWindow.postMessage({ type: 'gitblog-pv', reqId, ...payload }, '*');
@@ -100,8 +115,11 @@ function callBeacon(payload) {
       if (!_pending.has(reqId)) return;
       _pending.delete(reqId);
       reject(new Error('PV 请求超时'));
-    }, 10000);
+    }, 15000);
   }));
+  const task = _queue.then(run, run);
+  _queue = task.catch(() => {});
+  return task;
 }
 
 export function normalizeClientPath(pathOrUrl) {
@@ -138,10 +156,10 @@ function markClientDedupe(path) {
 export async function hitPageView({ path, slug, title } = {}) {
   const p = normalizeClientPath(path);
   if (shouldSkipClientDedupe(p)) {
-    return callBeacon({ action: 'get', path: p, slug, title });
+    return parsePvData(await callBeacon({ action: 'get', path: p, slug, title }));
   }
   try {
-    const data = await callBeacon({ action: 'hit', path: p, slug, title });
+    const data = parsePvData(await callBeacon({ action: 'hit', path: p, slug, title }));
     markClientDedupe(p);
     return data;
   } catch (err) {
@@ -151,7 +169,12 @@ export async function hitPageView({ path, slug, title } = {}) {
 }
 
 export async function getPageView(path, { slug, title } = {}) {
-  return callBeacon({ action: 'get', path: normalizeClientPath(path), slug, title });
+  return parsePvData(await callBeacon({
+    action: 'get',
+    path: normalizeClientPath(path),
+    slug,
+    title,
+  }));
 }
 
 export async function getSiteViewStats() {
@@ -182,9 +205,8 @@ export async function renderSitePvSlot(el) {
   if (!el) return;
   const label = String(pvCfg().siteLabel || '人来过').trim() || '人来过';
   try {
-    // 记录当前页访问（累加站点 PV）；同会话同路径由 hitPageView 去重
     const data = await hitPageView({ path: location.pathname });
-    const num = formatCount(data.sitePv);
+    const num = formatCount(pvNumber(data, 'sitePv'));
     if (el.classList.contains('saobby-slot-stat')) {
       el.innerHTML = `<strong class="saobby-num gitblog-pv-num">${num}</strong><span class="saobby-label">${escapeHtml(label)}</span>`;
     } else {
@@ -198,13 +220,20 @@ export async function renderSitePvSlot(el) {
 
 export async function renderPagePvEl(el, { path, slug, title, hit = true } = {}) {
   if (!el) return;
+  const p = normalizeClientPath(path || location.pathname);
+  const opts = { path: p, slug, title };
+  const render = async (doHit) => {
+    const data = doHit ? await hitPageView(opts) : await getPageView(p, { slug, title });
+    return formatCount(pvNumber(data, 'pv'));
+  };
   try {
-    const data = hit
-      ? await hitPageView({ path: path || location.pathname, slug, title })
-      : await getPageView(path || location.pathname);
-    el.textContent = formatCount(data.pv);
+    el.textContent = await render(hit);
   } catch {
-    el.textContent = '—';
+    try {
+      el.textContent = await render(false);
+    } catch {
+      el.textContent = '0';
+    }
   }
 }
 
