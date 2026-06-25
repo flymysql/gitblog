@@ -281,6 +281,10 @@ body { padding: 0 2px 8px; }
   font-weight: 500;
 }
 
+.cb-editor-body .cb-mention {
+  text-decoration: none;
+}
+
 .cb-comment-reply-badge {
   font-size: 12px;
   color: var(--text-tertiary);
@@ -727,9 +731,26 @@ body { padding: 0 2px 8px; }
 }
 
 .cb-inline-reply-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 8px;
   font-size: 13px;
   color: var(--text-secondary);
+}
+
+.cb-inline-reply-head-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.cb-inline-reply .cb-compose-footer:not([hidden]) {
+  margin-top: 10px;
+}
+
+.cb-inline-reply-buttons[hidden] {
+  display: none !important;
 }
 
 .cb-inline-reply-editor .cb-editor-body {
