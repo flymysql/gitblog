@@ -133,8 +133,12 @@ function ensureArticlePagePvPlaceholder(root = document) {
   meta.insertAdjacentHTML('beforeend', `<span class="dot"></span>${html}`);
 }
 
+function findPagePvEl(root = document) {
+  return root.getElementById('gitblog_page_pv') || root.getElementById('vercount_value_page_pv');
+}
+
 async function bootCloudBasePagePv(root = document) {
-  const el = root.getElementById('gitblog_page_pv');
+  const el = findPagePvEl(root);
   if (!el || STATE.cloudbaseBooted) return;
   STATE.cloudbaseBooted = true;
   const slug = root.querySelector('#article')?.dataset?.slug || '';
@@ -192,7 +196,7 @@ export async function renderArticleListViews() {}
 export async function trackAndRenderArticleView(meta = {}) {
   ensureArticlePagePvPlaceholder(document);
   if (useCloudBase()) {
-    const el = document.getElementById('gitblog_page_pv');
+    const el = findPagePvEl(document);
     if (el) await renderPagePvEl(el, { ...meta, hit: true });
     return;
   }

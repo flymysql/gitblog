@@ -615,6 +615,7 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
     renderSeriesIndex(allPosts, slug, (meta && meta.series) || '');
     renderNeighborsAndRelated(allPosts, slug, tags);
     renderCommentsSection(meta, slug);
+    trackAndRenderArticleView({ slug, title });
     return;
   }
 
