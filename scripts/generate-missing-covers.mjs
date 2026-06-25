@@ -1,28 +1,18 @@
 #!/usr/bin/env node
 /**
- * 为缺少 cover 的文章生成 WebP 封面（OG 卡片风格，默认 < 30KB）
+ * 为缺少 cover 的文章生成 WebP 主题插画封面（默认 < 30KB）
  * 用法：node scripts/generate-missing-covers.mjs [--dry]
  */
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { postCoverOgSvg, encodeCoverWebp } from './cover-og-lib.mjs';
+import { encodeCoverWebp } from './cover-og-lib.mjs';
+import { postCoverIllustrationSvg } from './cover-illustration-lib.mjs';
 import { ensureThumbnail } from './thumbnail-lib.mjs';
 
 const POSTS_DIR = 'posts';
 const COVER_DIR = 'assets/uploads/2026/06/covers';
 const MAX_BYTES = 30 * 1024;
 const DRY = process.argv.includes('--dry');
-
-const cfgRaw = readFileSync('assets/js/config.js', 'utf8');
-function getStr(key) {
-  const m = cfgRaw.match(new RegExp(`${key}\\s*:\\s*['"]([^'"]*)['"]`));
-  return m ? m[1] : '';
-}
-const SITE = {
-  siteTitle: getStr('title') || 'Blog',
-  siteDesc: getStr('description') || '',
-  siteAuthor: getStr('author') || '',
-};
 
 function splitFrontmatter(raw) {
   const m = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
@@ -93,6 +83,10 @@ async function main() {
       slug,
       title: parseTitle(fm.yaml),
       tags: parseTags(fm.yaml),
+      summary: (() => {
+        const m = fm.yaml.match(/^summary:\s*(.+)$/m);
+        return m ? m[1].trim().replace(/^["']|["']$/g, '') : '';
+      })(),
     };
     const outPath = join(COVER_DIR, `${slug}.webp`);
     const relCover = coverRelPath(slug);
@@ -107,7 +101,7 @@ async function main() {
       continue;
     }
 
-    const svg = postCoverOgSvg(post, SITE);
+    const svg = postCoverIllustrationSvg(post);
     const { buf, quality, bytes } = await encodeCoverWebp(svg, { maxBytes: MAX_BYTES });
 
     if (!DRY) {
