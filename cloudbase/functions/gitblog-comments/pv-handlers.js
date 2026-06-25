@@ -6,7 +6,7 @@ const PV_COLLECTION = 'gitblog_pageviews';
 const SITE_COLLECTION = 'gitblog_site_stats';
 const PV_RATE_COLLECTION = 'gitblog_pv_rates';
 const SITE_DOC_ID = 'site';
-const PV_RATE_WINDOW_MS = 24 * 60 * 60 * 1000;
+const PV_RATE_WINDOW_MS = 30 * 1000;
 const PV_PATH_MAX = 240;
 
 function normalizePvPath(raw) {
@@ -122,16 +122,43 @@ async function getPagePvResolved(db, path, { slug = '', title = '' } = {}) {
   return getPagePv(db, norm);
 }
 
-async function shouldCountHit(db, ipHash, path) {
-  if (!ipHash) return true;
+async function shouldCountHit(db, dedupeId, path) {
+  if (!dedupeId) return true;
   const now = Date.now();
-  const id = `${ipHash}_${pathDocId(path)}_${dayKey(now)}`;
+  const id = `${dedupeId}_${pathDocId(path)}_${dayKey(now)}`;
   const ref = db.collection(PV_RATE_COLLECTION).doc(id);
   const got = await ref.get().catch(() => null);
   const row = pickDocRow(got);
   if (row?.hitAt && now - row.hitAt < PV_RATE_WINDOW_MS) return false;
-  await ref.set({ hitAt: now, path, ipHash }).catch(() => null);
   return true;
+}
+
+async function markHitCounted(db, dedupeId, path) {
+  if (!dedupeId) return;
+  const now = Date.now();
+  const id = `${dedupeId}_${pathDocId(path)}_${dayKey(now)}`;
+  await db.collection(PV_RATE_COLLECTION).doc(id).set({
+    hitAt: now,
+    path,
+    dedupeId,
+  }).catch(() => null);
+}
+
+function resolvePvClientIp(context, event) {
+  return String(
+    context?.requestContext?.sourceIp
+    || context?.CLIENTIP
+    || event?.requestContext?.sourceIp
+    || ''
+  ).trim();
+}
+
+function resolveDedupeId(context, event, hashIpFn) {
+  const ip = resolvePvClientIp(context, event);
+  if (ip) return hashIpFn(ip);
+  const sessionId = String(event?.sessionId || '').trim();
+  if (sessionId) return hashIpFn(`sess:${sessionId}`);
+  return '';
 }
 
 async function incrementPagePv(db, path, { slug = '', title = '', countUv = false } = {}) {
@@ -185,9 +212,8 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
     if (!path) return jsonErr('缺少 path');
     const slug = event.slug;
     const title = event.title;
-    const ip = context?.requestContext?.sourceIp || '';
-    const ipHash = hashIp(ip);
-    const count = await shouldCountHit(db, ipHash, path);
+    const dedupeId = resolveDedupeId(context, event, hashIp);
+    const count = await shouldCountHit(db, dedupeId, path);
     if (!count) {
       const page = await getPagePvResolved(db, path, { slug, title });
       const site = await getSiteStats(db);
@@ -201,6 +227,8 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
       });
     }
     let countUv = false;
+    const ip = resolvePvClientIp(context, event);
+    const ipHash = ip ? hashIp(ip) : '';
     if (ipHash) {
       const uvId = `uv_${ipHash}`;
       const uvGot = await db.collection(PV_RATE_COLLECTION).doc(uvId).get().catch(() => null);
@@ -212,11 +240,13 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
         }).catch(() => null);
       }
     }
-    return jsonOk(await incrementPagePv(db, path, {
+    const result = await incrementPagePv(db, path, {
       slug,
       title,
       countUv,
-    }));
+    });
+    await markHitCounted(db, dedupeId, path);
+    return jsonOk(result);
   }
 
   async function handlePvGet(event) {
