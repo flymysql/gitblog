@@ -42,6 +42,8 @@ for (const name of [
   'comments-list-embed.html',
   'comments-compose-embed.html',
   'comments-admin-embed.html',
+  'pv-beacon.html',
+  'pv-beacon.js',
   'comments-embed.css',
   'comments-admin-embed.css',
 ]) {
