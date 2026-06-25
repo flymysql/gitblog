@@ -14,6 +14,7 @@ import {
   batchGetPageViews,
   batchGetCommentCounts,
   formatCount,
+  getCachedArticlePv,
   preloadPvBeacon,
 } from './cloudbase-pv.js';
 import { isCommentsReady } from './comments-embed.js';
@@ -303,13 +304,24 @@ function readListStatsCache() {
   return { pv: data.pv, comments: data.comments };
 }
 
+function bestCachedListPv(pvPath) {
+  const path = String(pvPath || '').trim();
+  if (!path) return null;
+  const listCache = readListStatsCacheAny();
+  const fromList = listCache?.pv?.[path];
+  const fromArticle = getCachedArticlePv(path);
+  if (fromArticle != null && (fromList == null || fromArticle > fromList)) return fromArticle;
+  if (fromList != null) return fromList;
+  return fromArticle;
+}
+
 function writeListStatsCache(pvMap, commentMap) {
   try {
-    const prev = readListStatsCache() || { pv: {}, comments: {} };
+    const prev = readListStatsCacheAny() || { pv: {}, comments: {} };
     sessionStorage.setItem(LIST_STATS_CACHE_KEY, JSON.stringify({
       ts: Date.now(),
-      pv: { ...prev.pv, ...pvMap },
-      comments: { ...prev.comments, ...commentMap },
+      pv: { ...(prev.pv || {}), ...pvMap },
+      comments: { ...(prev.comments || {}), ...commentMap },
     }));
   } catch { /* ignore */ }
 }
@@ -354,7 +366,7 @@ export function syncArticleListStatsFromCache(root = document) {
     if (el.dataset.listStatsDone === '1') return;
     const pvPath = String(el.dataset.pvPath || '').trim();
     const commentPath = String(el.dataset.commentPath || '').trim();
-    const cachedPv = showPv && pvPath && cache.pv[pvPath] != null ? cache.pv[pvPath] : null;
+    const cachedPv = showPv && pvPath ? bestCachedListPv(pvPath) : null;
     const cachedCm = showCm && commentPath && cache.comments[commentPath] != null
       ? cache.comments[commentPath]
       : null;
@@ -390,34 +402,40 @@ export async function renderArticleListViews(root = document) {
     const cache = readListStatsCache();
     const staleCache = readListStatsCacheAny();
     const forceRefresh = !!staleCache?.stale;
-    const needPv = new Set();
+    const needPv = new Map();
     const needCm = new Set();
     const slotMeta = slots.map(el => ({
       el,
+      slug: String(el.dataset.slug || '').trim(),
       pvPath: String(el.dataset.pvPath || '').trim(),
       commentPath: String(el.dataset.commentPath || '').trim(),
     }));
 
-    for (const { el, pvPath, commentPath } of slotMeta) {
-      if (!forceRefresh) {
-        const cachedPv = showPv && pvPath && cache?.pv ? cache.pv[pvPath] : undefined;
-        const cachedCm = showCm && commentPath && cache?.comments ? cache.comments[commentPath] : undefined;
-        const hasFreshPv = !showPv || cachedPv != null;
-        const hasFreshCm = !showCm || cachedCm != null;
-        if (hasFreshPv && hasFreshCm) {
-          applyListStatsToSlot(el, cachedPv ?? 0, cachedCm ?? 0, { showPv, showCm });
-          continue;
-        }
+    for (const { el, slug, pvPath, commentPath } of slotMeta) {
+      const cachedPv = showPv && pvPath ? bestCachedListPv(pvPath) : null;
+      const cachedCm = showCm && commentPath && cache?.comments ? cache.comments[commentPath] : undefined;
+      const hasFreshCm = !showCm || cachedCm != null;
+
+      if (cachedPv != null || cachedCm != null) {
+        applyListStatsToSlot(el, cachedPv ?? 0, cachedCm ?? 0, { showPv, showCm }, { finalize: false });
       }
-      if (showPv && pvPath) needPv.add(pvPath);
-      if (showCm && commentPath) needCm.add(commentPath);
+
+      if (showPv && pvPath) {
+        needPv.set(pvPath, slug);
+      } else if (!forceRefresh && hasFreshCm) {
+        applyListStatsToSlot(el, cachedPv ?? 0, cachedCm ?? 0, { showPv, showCm });
+        continue;
+      }
+
+      if (showCm && commentPath && (forceRefresh || cachedCm == null)) needCm.add(commentPath);
     }
 
     const pending = slotMeta.filter(({ el }) => el.dataset.listStatsDone !== '1');
     if (!pending.length || (!needPv.size && !needCm.size)) return;
 
+    const pvEntries = [...needPv.entries()].map(([path, slug]) => (slug ? { path, slug } : { path }));
     const [pvMap, cmMap] = await Promise.all([
-      needPv.size ? batchGetPageViews([...needPv]).catch(() => ({})) : Promise.resolve({}),
+      needPv.size ? batchGetPageViews(pvEntries).catch(() => ({})) : Promise.resolve({}),
       needCm.size ? batchGetCommentCounts([...needCm]).catch(() => ({})) : Promise.resolve({}),
     ]);
 
@@ -428,7 +446,7 @@ export async function renderArticleListViews(root = document) {
     const mergedCache = readListStatsCache();
     for (const { el, pvPath, commentPath } of pending) {
       const pv = showPv && pvPath
-        ? (mergedCache?.pv?.[pvPath] ?? pvMap[pvPath] ?? staleCache?.pv?.[pvPath] ?? 0)
+        ? (pvMap[pvPath] ?? mergedCache?.pv?.[pvPath] ?? bestCachedListPv(pvPath) ?? staleCache?.pv?.[pvPath] ?? 0)
         : 0;
       const cm = showCm && commentPath
         ? (mergedCache?.comments?.[commentPath] ?? cmMap[commentPath] ?? staleCache?.comments?.[commentPath] ?? 0)
