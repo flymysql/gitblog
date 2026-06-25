@@ -1046,6 +1046,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     form.classList.remove('is-sheet-open');
     commentsRoot?.classList.remove('cb-comments--compose-only');
     commentsRoot?.style.removeProperty('--cb-compose-sheet-h');
+    document.documentElement.classList.remove('cb-compose-sheet-active');
     editor.clear();
     editor.body.blur();
     form.dispatchEvent(new CustomEvent('cb-compose-sheet-change', { bubbles: true }));
@@ -1062,6 +1063,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     if (!wasOpen) {
       form.classList.add('is-sheet-open');
       commentsRoot?.classList.add('cb-comments--compose-only');
+      document.documentElement.classList.add('cb-compose-sheet-active');
       onOpen?.();
       postHeight(true);
     }
@@ -1087,6 +1089,12 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     if (e.data?.type === 'gitblog-comments-dock' && commentsRoot) {
       commentsRoot.style.paddingBottom = e.data.visible ? 'calc(56px + env(safe-area-inset-bottom))' : '';
       postHeight(true);
+    }
+    if (e.data?.type === 'gitblog-comments-compose-scroll-bottom') {
+      const list = commentsRoot?.querySelector('.cb-comments-list');
+      if (list) {
+        list.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+      }
     }
   });
 

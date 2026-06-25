@@ -901,6 +901,13 @@ body { padding: 0 2px 8px; }
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* 父页钉住 iframe 视口时，列表在 iframe 内滚动 */
+html.cb-compose-sheet-active,
+html.cb-compose-sheet-active body {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .cb-comments--mobile-dock .cb-compose.is-sheet-open {
   animation: cb-sheet-up 0.2s ease;
 }
