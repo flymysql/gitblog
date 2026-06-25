@@ -49,34 +49,86 @@ export function readCloudbaseConfig() {
   return { envId, region, functionName, httpUrl, siteUrl: 'https://gitpull.cn' };
 }
 
+function extractJsonText(text) {
+  const s = String(text || '').trim();
+  if (!s) return '';
+  try {
+    JSON.parse(s);
+    return s;
+  } catch { /* continue */ }
+
+  const start = s.indexOf('{');
+  if (start < 0) return s;
+  let depth = 0;
+  let inStr = false;
+  let esc = false;
+  for (let i = start; i < s.length; i++) {
+    const ch = s[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (ch === '\\') esc = true;
+      else if (ch === '"') inStr = false;
+      continue;
+    }
+    if (ch === '"') { inStr = true; continue; }
+    if (ch === '{') depth += 1;
+    if (ch === '}') {
+      depth -= 1;
+      if (depth === 0) return s.slice(start, i + 1);
+    }
+  }
+  return s.slice(start);
+}
+
+function tryParseJsonString(s) {
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
+}
+
 function parseInvokeJson(stdout) {
   const text = String(stdout || '').trim();
   if (!text) throw new Error('tcb fn invoke 无输出');
-  const candidates = text.split('\n').map(s => s.trim()).filter(s => s.startsWith('{') || s.startsWith('['));
-  const raw = candidates.length ? candidates[candidates.length - 1] : text;
-  let parsed;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    throw new Error(`tcb 输出无法解析为 JSON：${text.slice(0, 400)}`);
+
+  const raw = extractJsonText(text);
+  const parsed = tryParseJsonString(raw);
+  if (!parsed) {
+    throw new Error(`tcb 输出无法解析为 JSON：${text.slice(0, 500)}`);
   }
 
-  if (parsed && typeof parsed === 'object' && parsed.ok !== undefined) return parsed;
-  if (parsed?.result && parsed.result.ok !== undefined) return parsed.result;
+  const unwrap = (obj) => {
+    if (!obj || typeof obj !== 'object') return obj;
+    if (obj.ok !== undefined) return obj;
+    if (obj.result?.ok !== undefined) return obj.result;
 
-  const ret = parsed?.RetMsg ?? parsed?.retMsg;
-  if (typeof ret === 'string') {
-    try {
-      const inner = JSON.parse(ret);
+    const ret = obj.RetMsg ?? obj.retMsg ?? obj.data?.RetMsg ?? obj.data?.retMsg;
+    if (typeof ret === 'string' && ret.trim()) {
+      const inner = tryParseJsonString(ret);
       if (inner?.ok !== undefined) return inner;
-    } catch {
       return { ok: false, message: ret };
     }
-  }
-  if (parsed?.response?.data && parsed.response.data.ok !== undefined) return parsed.response.data;
-  if (parsed?.data && parsed.data.ok !== undefined) return parsed.data;
 
-  return parsed;
+    if (obj.response?.data?.ok !== undefined) return obj.response.data;
+    if (obj.data?.ok !== undefined) return obj.data;
+
+    const data = obj.data && typeof obj.data === 'object' ? obj.data : null;
+    if (data) {
+      const invokeResult = data.InvokeResult ?? data.invokeResult;
+      const log = String(data.Log ?? data.log ?? '').trim();
+      if (invokeResult !== undefined && invokeResult !== 0) {
+        throw new Error(log || `云函数执行失败（InvokeResult=${invokeResult}）`);
+      }
+      if (log && /error|失败|缺少依赖|Error/i.test(log)) {
+        throw new Error(log.split('\n').slice(0, 6).join('\n'));
+      }
+    }
+
+    return obj;
+  };
+
+  return unwrap(parsed);
 }
 
 export function invokeViaTcb(cfg, payload) {
