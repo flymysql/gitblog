@@ -5,7 +5,8 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
 import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPathFromPost, postPath, rootPath, thumbUrlFor } from './site.js';
-import { initPageviews, bszSiteStatsHtml } from './pageviews.js';
+import { initPageviews, bszSiteStatsHtml, queueArticleListViews } from './pageviews.js';
+import { commentPathForPost } from './comment-term.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { isCommentsReady, mountNotesComments } from './comments-embed.js';
 
@@ -452,16 +453,28 @@ function bindCarouselInteractions(root) {
 
 const PAGE_SIZE = 15;
 
+function pvPathForPost(p) {
+  const urlKey = String(p?.urlKey || '').trim();
+  if (urlKey && /^[a-z0-9-]+$/i.test(urlKey)) return `/post/${urlKey}`;
+  const slug = String(p?.slug || '').trim();
+  return slug ? `/post/${slug}` : '';
+}
+
 function postItemHtml(p, author, avatar) {
+  const commentPath = commentPathForPost({ slug: p.slug, urlKey: p.urlKey });
+  const pvPath = pvPathForPost(p);
   return `
     <li class="post-item" data-slug="${escapeHtml(p.slug)}">
       <a class="post-content" href="${postPathFromPost(p)}">
         <div class="post-author-row">
-          <div class="avatar" style="background-image:url(${escapeHtml(p.avatar || avatar || '')})"></div>
-          <span class="name">${escapeHtml(p.author || author || '')}</span>
-          <span>·</span>
-          <span>${timeAgo(p.date)}</span>
-          ${p.pinned ? '<span class="post-pin">置顶</span>' : ''}
+          <div class="post-author-main">
+            <div class="avatar" style="background-image:url(${escapeHtml(p.avatar || avatar || '')})"></div>
+            <span class="name">${escapeHtml(p.author || author || '')}</span>
+            <span>·</span>
+            <span>${timeAgo(p.date)}</span>
+            ${p.pinned ? '<span class="post-pin">置顶</span>' : ''}
+          </div>
+          <span class="post-list-stats" data-slug="${escapeHtml(p.slug)}" data-pv-path="${escapeHtml(pvPath)}" data-comment-path="${escapeHtml(commentPath)}" aria-label="阅读与评论" hidden>…</span>
         </div>
         <h3 class="post-title">${escapeHtml(p.title || '无标题')}</h3>
         <p class="post-summary">${escapeHtml(p.summary || '')}</p>
@@ -526,6 +539,7 @@ function renderList(posts, tab = 'latest') {
       if (state.observer) state.observer.disconnect();
       sentinel.outerHTML = `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`;
     }
+    queueArticleListViews();
   }
 
   state.loadNext = loadNext;
@@ -544,6 +558,7 @@ function renderList(posts, tab = 'latest') {
   state.observer = observer;
   listState = state;
   mobileHomeStickySync?.();
+  queueArticleListViews();
 }
 
 function prerenderListMatches(ul, posts) {
@@ -585,6 +600,7 @@ function bindPrerenderedPostList(posts) {
       if (state.observer) state.observer.disconnect();
       anchor.outerHTML = `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`;
     }
+    queueArticleListViews();
   }
 
   state.loadNext = loadNext;
@@ -602,6 +618,7 @@ function bindPrerenderedPostList(posts) {
 
   listState = state;
   mobileHomeStickySync?.();
+  queueArticleListViews();
   return true;
 }
 
@@ -646,6 +663,7 @@ function bindPrerenderedPostListLazy(resolvePosts) {
         if (state.observer) state.observer.disconnect();
         anchor.outerHTML = `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`;
       }
+      queueArticleListViews();
     } finally {
       state.loading = false;
     }
