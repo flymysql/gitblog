@@ -75,11 +75,68 @@ html.cb-embed-compose-only body {
 .cb-comments--compose-only-view > .cb-compose {
   display: block !important;
   margin: 0;
-  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  padding: 0 16px calc(16px + env(safe-area-inset-bottom));
   border: none;
-  border-radius: 16px 16px 0 0;
+  border-radius: 0;
   background: var(--bg-elev);
   box-shadow: none;
+}
+
+.cb-comments--compose-only-view .cb-mobile-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0 10px;
+  margin: 0;
+}
+
+.cb-comments--compose-only-view .cb-compose-editor {
+  margin: 0 0 10px;
+}
+
+.cb-comments--compose-only-view .cb-editor {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+
+.cb-comments--compose-only-view .cb-editor--minimal.is-focused,
+.cb-comments--compose-only-view .cb-editor--minimal.has-content {
+  border-color: color-mix(in srgb, var(--primary) 32%, var(--border));
+  box-shadow: none;
+}
+
+.cb-comments--compose-only-view .cb-editor-body {
+  padding: 12px 14px 6px;
+}
+
+.cb-comments--compose-only-view .cb-editor--minimal.is-focused .cb-editor-bar,
+.cb-comments--compose-only-view .cb-editor--minimal.has-content .cb-editor-bar {
+  padding: 0 10px 8px 12px;
+}
+
+.cb-comments--compose-only-view .cb-compose-meta:not([hidden]) {
+  margin-top: 0;
+  margin-bottom: 12px;
+  gap: 10px;
+}
+
+.cb-comments--compose-only-view .cb-compose-footer:not([hidden]) {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 2px;
+  margin-top: 0;
+}
+
+.cb-comments--compose-only-view .cb-compose-footer-avatar {
+  flex: 0 0 auto;
+}
+
+.cb-comments--compose-only-view .cb-compose-footer .cb-submit {
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .cb-comments--list-only > .cb-compose {
