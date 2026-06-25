@@ -124,7 +124,7 @@ function reply(reqId, ok, data) {
 window.addEventListener('message', async (e) => {
   const msg = e.data;
   if (!msg || msg.type !== 'gitblog-pv') return;
-  const { reqId, action, path, slug, title, adminSecret, limit, sessionId } = msg;
+  const { reqId, action, path, slug, title, adminSecret, limit, sessionId, paths } = msg;
   try {
     let data;
     const base = { sessionId };
@@ -132,6 +132,10 @@ window.addEventListener('message', async (e) => {
       data = await callPv({ action: 'PV_HIT', path, slug, title, ...base });
     } else if (action === 'get') {
       data = await callPv({ action: 'PV_GET', path, slug, title, ...base });
+    } else if (action === 'batch-get') {
+      data = await callPv({ action: 'PV_BATCH_GET', paths: Array.isArray(paths) ? paths : [] });
+    } else if (action === 'comment-counts') {
+      data = await callPv({ action: 'COMMENT_COUNT_BATCH', paths: Array.isArray(paths) ? paths : [] });
     } else if (action === 'site') {
       data = await callPv({ action: 'PV_SITE' });
     } else if (action === 'admin-top') {
