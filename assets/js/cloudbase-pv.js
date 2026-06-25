@@ -15,13 +15,15 @@ const _inflightHits = new Map();
 
 const ARTICLE_PV_CACHE_KEY = 'gitblog_article_pv_v1';
 const ARTICLE_PV_CACHE_MS = 5 * 60 * 1000;
+const LIST_STATS_CACHE_KEY = 'gitblog_list_stats_v1';
 
 function readArticlePvCache(path) {
   try {
     const raw = sessionStorage.getItem(ARTICLE_PV_CACHE_KEY);
     if (!raw) return null;
     const data = JSON.parse(raw);
-    const row = data?.[path];
+    const p = normalizeClientPath(path);
+    const row = data?.[p];
     if (!row || !Number.isFinite(row.ts) || Date.now() - row.ts > ARTICLE_PV_CACHE_MS) return null;
     const pv = Number(row.pv);
     return Number.isFinite(pv) && pv >= 0 ? pv : null;
@@ -30,8 +32,31 @@ function readArticlePvCache(path) {
   }
 }
 
+/** 供首页列表复用文章页已拉取的阅读数缓存 */
+export function getCachedArticlePv(path) {
+  return readArticlePvCache(path);
+}
+
+function patchListStatsPvCache(path, pv) {
+  try {
+    const p = normalizeClientPath(path);
+    const v = Number(pv);
+    if (!p || !Number.isFinite(v) || v < 0) return;
+    let data = null;
+    try {
+      const raw = sessionStorage.getItem(LIST_STATS_CACHE_KEY);
+      if (raw) data = JSON.parse(raw);
+    } catch { /* ignore */ }
+    if (!data || typeof data !== 'object') data = { ts: Date.now(), pv: {}, comments: {} };
+    data.ts = Date.now();
+    data.pv = { ...(data.pv || {}), [p]: Math.floor(v) };
+    sessionStorage.setItem(LIST_STATS_CACHE_KEY, JSON.stringify(data));
+  } catch { /* ignore */ }
+}
+
 function writeArticlePvCache(path, pv) {
   try {
+    const p = normalizeClientPath(path);
     const v = Number(pv);
     if (!Number.isFinite(v) || v < 0) return;
     let data = {};
@@ -39,8 +64,9 @@ function writeArticlePvCache(path, pv) {
       const raw = sessionStorage.getItem(ARTICLE_PV_CACHE_KEY);
       if (raw) data = JSON.parse(raw) || {};
     } catch { /* ignore */ }
-    data[path] = { pv: Math.floor(v), ts: Date.now() };
+    data[p] = { pv: Math.floor(v), ts: Date.now() };
     sessionStorage.setItem(ARTICLE_PV_CACHE_KEY, JSON.stringify(data));
+    patchListStatsPvCache(p, v);
   } catch { /* ignore */ }
 }
 
@@ -263,10 +289,28 @@ export async function getSiteViewStats() {
   return parsePvData(await callBeacon({ action: 'site' }));
 }
 
-export async function batchGetPageViews(paths = []) {
-  const list = [...new Set((Array.isArray(paths) ? paths : []).map(normalizeClientPath).filter(Boolean))];
-  if (!list.length) return {};
-  const data = parsePvData(await callBeacon({ action: 'batch-get', paths: list }));
+export async function batchGetPageViews(entries = []) {
+  const items = [];
+  const seen = new Set();
+  for (const entry of Array.isArray(entries) ? entries : []) {
+    if (typeof entry === 'string') {
+      const path = normalizeClientPath(entry);
+      if (!path || seen.has(path)) continue;
+      seen.add(path);
+      items.push({ path });
+      continue;
+    }
+    if (!entry || typeof entry !== 'object') continue;
+    const path = normalizeClientPath(entry.path || entry.url || '');
+    if (!path || seen.has(path)) continue;
+    seen.add(path);
+    items.push({
+      path,
+      slug: String(entry.slug || '').trim() || undefined,
+    });
+  }
+  if (!items.length) return {};
+  const data = parsePvData(await callBeacon({ action: 'batch-get', items }));
   return data.pages && typeof data.pages === 'object' ? data.pages : {};
 }
 

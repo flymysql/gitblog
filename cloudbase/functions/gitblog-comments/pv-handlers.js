@@ -282,16 +282,39 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
   }
 
   async function handlePvBatchGet(event) {
-    const raw = Array.isArray(event.paths) ? event.paths : [];
-    const paths = [...new Set(raw.map(normalizePvPath).filter(Boolean))].slice(0, 100);
+    const rawItems = Array.isArray(event.items) ? event.items : null;
+    const rawPaths = Array.isArray(event.paths) ? event.paths : [];
+    const seen = new Set();
+    const items = [];
+
+    const pushItem = (pathRaw, slugRaw = '') => {
+      const path = normalizePvPath(pathRaw);
+      if (!path || seen.has(path)) return;
+      seen.add(path);
+      items.push({
+        path,
+        slug: String(slugRaw || '').trim(),
+      });
+    };
+
+    if (rawItems?.length) {
+      for (const it of rawItems) {
+        if (typeof it === 'string') pushItem(it);
+        else if (it && typeof it === 'object') pushItem(it.path || it.url, it.slug);
+      }
+    } else {
+      for (const p of rawPaths) pushItem(p);
+    }
+
     const pages = {};
-    paths.forEach(p => { pages[p] = 0; });
-    if (!paths.length) return jsonOk({ pages });
+    items.slice(0, 100).forEach(({ path }) => { pages[path] = 0; });
+    if (!items.length) return jsonOk({ pages });
 
     const _ = db.command;
     const CHUNK = 10;
-    for (let i = 0; i < paths.length; i += CHUNK) {
-      const chunk = paths.slice(i, i + CHUNK);
+    const batchPaths = items.slice(0, 100).map(i => i.path);
+    for (let i = 0; i < batchPaths.length; i += CHUNK) {
+      const chunk = batchPaths.slice(i, i + CHUNK);
       const res = await db.collection(PV_COLLECTION).where({ path: _.in(chunk) }).get().catch(() => null);
       for (const row of res?.data || []) {
         const p = normalizePvPath(row.path);
@@ -300,6 +323,14 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
         }
       }
     }
+
+    // 与 PV_GET 一致：按 slug 合并历史路径（批量接口以前只查 path 字段，会漏掉旧 slug 文档）
+    await Promise.all(items.slice(0, 100).map(async ({ path, slug }) => {
+      if (pages[path] > 0 && !slug) return;
+      const page = await getPagePvResolved(db, path, { slug });
+      pages[path] = Math.max(Number(page.pv) || 0, 0);
+    }));
+
     return jsonOk({ pages });
   }
 
