@@ -92,8 +92,13 @@
   color: var(--text-secondary);
 }
 .hero-stats .stat {
+  display: inline-flex;
+  align-items: center;
   flex: 0 0 auto;
   white-space: nowrap;
+}
+.hero-stats .stat .stat-label {
+  margin-right: 4px;
 }
 .hero-stats .stat strong { font-size: 16px; color: var(--text-main); margin-right: 4px; }
 
@@ -171,6 +176,10 @@
     font-size: 12px;
     line-height: 1;
     margin-right: 3px;
+  }
+  .hero-stats .stat .stat-label {
+    margin-right: 3px;
+    line-height: 1;
   }
 }
 
