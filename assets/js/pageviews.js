@@ -17,7 +17,7 @@ const VCOUNT_DEFAULT_SRC = 'https://events.vercount.one/js';
 
 const STATE = {
   vercountInjected: false,
-  cloudbaseBooted: false,
+  articlePvTask: null,
 };
 
 function pvCfg() {
@@ -137,33 +137,23 @@ function findPagePvEl(root = document) {
   return root.getElementById('gitblog_page_pv') || root.getElementById('vercount_value_page_pv');
 }
 
-async function bootCloudBasePagePv(root = document) {
-  const el = findPagePvEl(root);
-  if (!el || STATE.cloudbaseBooted) return;
-  STATE.cloudbaseBooted = true;
-  const slug = root.querySelector('#article')?.dataset?.slug || '';
-  const title = root.querySelector('#article h1')?.textContent?.trim() || '';
-  await renderPagePvEl(el, { slug, title, hit: true });
-}
-
-export function initPageviews() {
-  const cfg = pvCfg();
-  if (!cfg.enabled) {
-    hideAllSaobby(document);
-    return;
-  }
-
-  if (useCloudBase()) {
-    injectCloudBaseSiteSlots(document);
-    ensureArticlePagePvPlaceholder(document);
-    bootCloudBasePagePv(document);
-    return;
-  }
-
-  if (saobbySiteImg()) injectSaobbySiteSlots(document);
-  else hideAllSaobby(document);
+export async function trackAndRenderArticleView(meta = {}) {
   ensureArticlePagePvPlaceholder(document);
-  injectVercountScript();
+  if (!useCloudBase()) {
+    injectVercountScript();
+    return;
+  }
+  if (!STATE.articlePvTask) {
+    STATE.articlePvTask = (async () => {
+      const el = findPagePvEl(document);
+      if (!el) return;
+      const article = document.querySelector('#article');
+      const slug = meta.slug || article?.dataset?.slug || '';
+      const title = meta.title || article?.querySelector('h1')?.textContent?.trim() || '';
+      await renderPagePvEl(el, { ...meta, slug, title, hit: true });
+    })();
+  }
+  await STATE.articlePvTask;
 }
 
 export function bszSiteStatsHtml({ compact = false } = {}) {
@@ -193,13 +183,22 @@ export function articleListPvHtml() {
 
 export async function renderArticleListViews() {}
 
-export async function trackAndRenderArticleView(meta = {}) {
-  ensureArticlePagePvPlaceholder(document);
-  if (useCloudBase()) {
-    const el = findPagePvEl(document);
-    if (el) await renderPagePvEl(el, { ...meta, hit: true });
+export function initPageviews() {
+  const cfg = pvCfg();
+  if (!cfg.enabled) {
+    hideAllSaobby(document);
     return;
   }
+
+  if (useCloudBase()) {
+    injectCloudBaseSiteSlots(document);
+    ensureArticlePagePvPlaceholder(document);
+    return;
+  }
+
+  if (saobbySiteImg()) injectSaobbySiteSlots(document);
+  else hideAllSaobby(document);
+  ensureArticlePagePvPlaceholder(document);
   injectVercountScript();
 }
 
