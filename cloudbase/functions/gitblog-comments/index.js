@@ -2,6 +2,7 @@
 
 const cloudbase = require('@cloudbase/node-sdk');
 const crypto = require('crypto');
+const { createPvHandlers } = require('./pv-handlers');
 
 const app = cloudbase.init({ env: cloudbase.SYMBOL_CURRENT_ENV });
 const db = app.database();
@@ -258,6 +259,7 @@ async function ensureCollections() {
   try {
     await db.createCollection(UPLOAD_COLLECTION);
   } catch (_) { /* exists */ }
+  await pvApi.ensurePvCollections(db);
 }
 
 async function trackCommentUpload(fileId, cloudPath) {
@@ -389,6 +391,14 @@ function verifyAdminSecret(event) {
   const got = String(event?.adminSecret || '').trim();
   return !!expected && expected === got;
 }
+
+const pvApi = createPvHandlers({
+  db,
+  hashIp,
+  jsonOk,
+  jsonErr,
+  verifyAdminSecret,
+});
 
 function escapeHtmlText(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -768,6 +778,11 @@ async function dispatch(event, context) {
   if (action === 'CLEANUP') return await handleCleanupOrphans();
   if (action === 'ADMIN_LIST') return await handleAdminList(event);
   if (action === 'ADMIN_DELETE') return await handleAdminDelete(event);
+  if (action === 'PV_HIT') return await pvApi.handlePvHit(event, context);
+  if (action === 'PV_GET') return await pvApi.handlePvGet(event);
+  if (action === 'PV_SITE') return await pvApi.handlePvSite();
+  if (action === 'PV_ADMIN_TOP') return await pvApi.handlePvAdminTop(event);
+  if (action === 'PV_IMPORT') return await pvApi.handlePvImport(event);
   return jsonErr('未知 action');
 }
 

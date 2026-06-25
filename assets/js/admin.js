@@ -8,6 +8,13 @@ import { readIndex, fetchIndexPublic, deleteFile, readFile, writeFile, writeInde
 import { mountAdminShell, escapeHtml, showToast } from './admin-shell.js';
 import { postPathFromAdminPost } from './site.js';
 import { parseFrontmatter, stringifyFrontmatter } from './markdown.js';
+import {
+  isCloudBasePvEnabled,
+  getSiteViewStats,
+  getAdminTopPages,
+  formatCount,
+} from './cloudbase-pv.js';
+import { getStoredAdminSecret } from './cloudbase-admin-secret.js';
 
 const $ = sel => document.querySelector(sel);
 
@@ -286,6 +293,7 @@ async function renderDashboardStats(posts) {
   const now = Date.now();
   const recent7 = published.filter(p => p.date && (now - new Date(p.date).getTime()) <= 7 * 86400 * 1000).length;
   const recent30 = published.filter(p => p.date && (now - new Date(p.date).getTime()) <= 30 * 86400 * 1000).length;
+  const useCb = isCloudBasePvEnabled();
 
   host.innerHTML = `
     <div class="dashboard-grid">
@@ -296,12 +304,57 @@ async function renderDashboardStats(posts) {
       <div class="dashboard-card"><div class="dashboard-num">${recent30}</div><div class="dashboard-label">近 30 天</div></div>
     </div>
     <div class="dashboard-pv" id="dashboardPv">
-      <div class="dashboard-pv-title">阅读数据</div>
+      <div class="dashboard-pv-title" id="dashboardPvTitle">阅读数据</div>
       <div class="dashboard-pv-list" id="dashboardPvList">
-        <div class="dashboard-pv-empty">文章阅读量由 <a href="https://vercount.one" target="_blank" rel="noopener">Vercount</a> 按页面 URL 统计，请到 Vercount 控制台查看；站点总访问请查看 Saobby 控制面板或「访问数据」页。</div>
+        <div class="dashboard-pv-empty">加载中…</div>
       </div>
     </div>
   `;
+
+  const pvList = document.getElementById('dashboardPvList');
+  const pvTitle = document.getElementById('dashboardPvTitle');
+  if (!pvList) return;
+
+  if (!useCb) {
+    pvList.innerHTML = '<div class="dashboard-pv-empty">文章阅读量由 <a href="https://vercount.one" target="_blank" rel="noopener">Vercount</a> 按页面 URL 统计，请到 Vercount 控制台查看；站点总访问请查看 Saobby 控制面板或「访问数据」页。</div>';
+    return;
+  }
+
+  try {
+    const site = await getSiteViewStats();
+    if (pvTitle) {
+      pvTitle.innerHTML = `阅读数据 <span class="dashboard-pv-hint">站点 ${formatCount(site.sitePv)} PV / ${formatCount(site.siteUv)} UV</span>`;
+    }
+
+    const secret = getStoredAdminSecret();
+    if (!secret) {
+      pvList.innerHTML = '<div class="dashboard-pv-empty">输入管理密钥后可查看阅读排行 → <a href="analytics.html">访问数据</a></div>';
+      return;
+    }
+
+    const { top } = await getAdminTopPages(secret, 8);
+    if (!top.length) {
+      pvList.innerHTML = '<div class="dashboard-pv-empty">暂无阅读记录。<a href="analytics.html">访问数据</a></div>';
+      return;
+    }
+
+    const base = String(CONFIG.site?.url || '').replace(/\/+$/, '');
+    pvList.innerHTML = top.map((row, i) => {
+      const href = row.path && row.path !== '/'
+        ? `${base}${row.path.startsWith('/') ? row.path : `/${row.path}`}`
+        : `${base}/`;
+      const label = row.title || row.slug || row.path || '页面';
+      return `
+        <a class="dashboard-pv-row" href="${escapeHtml(href)}" target="_blank" rel="noopener">
+          <span class="dashboard-pv-rank">${i + 1}</span>
+          <span class="dashboard-pv-row-title">${escapeHtml(label)}</span>
+          <span class="dashboard-pv-count">${escapeHtml(formatCount(row.pv))}</span>
+        </a>
+      `;
+    }).join('');
+  } catch (err) {
+    pvList.innerHTML = `<div class="dashboard-pv-empty">阅读数据加载失败：${escapeHtml(err.message)} · <a href="analytics.html">访问数据</a></div>`;
+  }
 }
 
 (async function init() {
