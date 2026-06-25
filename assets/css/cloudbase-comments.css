@@ -865,7 +865,11 @@ body.cb-has-mobile-dock {
 }
 
 .cb-comments--mobile-dock.cb-comments--compose-only {
-  padding-bottom: min(40vh, 260px);
+  padding-bottom: calc(var(--cb-compose-sheet-h, min(42vh, 300px)) + env(safe-area-inset-bottom, 0px));
+}
+
+.cb-comments--mobile-dock.cb-comments--compose-only > .cb-comments-list {
+  display: block !important;
 }
 
 .cb-comments--mobile-dock.cb-comments--compose-only > .cb-mobile-compose-trigger {
@@ -939,13 +943,12 @@ body.cb-has-mobile-dock {
 
 /* 移动端底部抽屉：表单挂到 body，仅打开时固定底栏 */
 .cb-compose--mobile-portal.is-sheet-open,
-.cb-comments--mobile-dock .cb-compose.is-sheet-open,
-.cb-comments--compose-pinned .cb-compose.is-sheet-open {
+.cb-comments--mobile-dock .cb-compose.is-sheet-open {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 900;
+  z-index: 1000;
   display: block !important;
   max-height: none;
   overflow: visible;
