@@ -101,8 +101,13 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(request.url);
   const pathname = url.pathname;
-  // 地址栏直接打开 sitemap.xml / rss.xml 时仍是 navigate，且 Accept 常带 text/html，
-  // 不能走 handleHtml，否则无缓存时会落到 offline.html。
+
+  // sw.js 本身必须 network-only，否则新版本无法下发
+  if (/\/sw\.js$/i.test(pathname)) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
   const isNonHtmlDocument = /\.xml$/i.test(pathname)
     || /\/robots\.txt$/i.test(pathname)
     || /\.txt$/i.test(pathname);
@@ -136,8 +141,6 @@ self.addEventListener('fetch', event => {
 
 async function handleHtml(request, event) {
   const url = new URL(request.url);
-  const postArticle = isPostArticlePath(url.pathname);
-  const toolPage = isToolPagePath(url.pathname);
 
   const network = (event.preloadResponse || Promise.resolve(null))
     .then(preload => preload || fetch(request))
@@ -149,29 +152,14 @@ async function handleHtml(request, event) {
       return res;
     });
 
-  // 文章页、工具页：network-first，避免旧版 HTML 壳被 stale 缓存命中
-  if (postArticle || toolPage) {
-    try {
-      const res = await network;
-      if (res && res.status === 200) return res;
-    } catch { /* 离线回退 */ }
-    const cached = await matchHtmlShell(request);
-    return cached || caches.match(OFFLINE_URL);
-  }
+  // 全部 HTML 导航 network-first，避免旧版壳缓存导致普通刷新看不到更新
+  try {
+    const res = await network;
+    if (res && res.status === 200) return res;
+  } catch { /* 离线回退 */ }
 
   const cached = await matchHtmlShell(request);
-
-  // 导航页最影响 DCL。已有缓存时立刻返回页面壳，后台静默更新，避免慢 304 卡住首屏。
-  if (cached) {
-    event.waitUntil(network.catch(() => {}));
-    return cached;
-  }
-
-  // 首次访问且没有缓存时才等网络；多等几秒避免慢网/冷启动时误落到离线页
-  return Promise.race([
-    network.catch(() => null),
-    delay(6000).then(() => null),
-  ]).then(res => res || caches.match(OFFLINE_URL));
+  return cached || caches.match(OFFLINE_URL);
 }
 
 function isPostArticlePath(pathname) {

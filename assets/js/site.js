@@ -737,8 +737,15 @@ export function initSite({ active = '', skipDuplicateSitePv = false } = {}) {
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
   if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') return;
-  // 不在 admin 后台启用 sw（避免缓存登录页 / 后台资源），让 admin 永远是最新版本
   if (location.pathname.includes('/admin/')) return;
+
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    refreshing = true;
+    window.location.reload();
+  });
+
   window.addEventListener('load', () => {
     const bp = siteBasePath();
     const scope = bp ? `${bp}/` : '/';
