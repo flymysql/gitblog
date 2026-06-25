@@ -206,9 +206,7 @@ function postHeight(ready = false) {
     const form = document.querySelector('.cb-compose.is-sheet-open');
     const composeOpen = !!form;
     const composeHeight = composeOpen ? measureComposeHeight(form) : 0;
-    const h = composeOpen
-      ? composeHeight
-      : Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    const h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
     try {
       window.parent.postMessage({
         type: 'gitblog-comments-height',
