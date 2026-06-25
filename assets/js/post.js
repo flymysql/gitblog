@@ -7,6 +7,7 @@ import { CONFIG } from './config.js';
 import { fetchIndexPublic, fetchPostMarkdownPublic } from './api.js';
 import { renderMarkdown, parseFrontmatter } from './markdown.js';
 import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages, postPath, postPathFromPost, rootPath, isPostPublicPathKey, thumbUrlFor, LAZY_PLACEHOLDER } from './site.js';
+import { preloadPvBeacon } from './cloudbase-pv.js';
 import { bszPagePvHtml, trackAndRenderArticleView, startArticlePageView } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { enhanceMath, enhanceMermaid, enhanceCodeAdvanced } from './enhancers.js';
@@ -544,8 +545,9 @@ function articlePvMetaFromPage() {
 }
 
 (async function init() {
-  initSite({ active: '', skipDuplicateSitePv: true });
+  preloadPvBeacon();
   startArticlePageView(articlePvMetaFromPage());
+  initSite({ active: '', skipDuplicateSitePv: true });
   bindReadingProgress();
   bindBackToTop();
 

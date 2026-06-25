@@ -619,7 +619,11 @@ function writeRootPostHtmlRedirect(entries) {
   html = html.replace(/\n?\s*<script data-post-slug-redirect>[\s\S]*?<\/script>/g, '');
   html = html.replace(
     /(<meta name="referrer" content="no-referrer-when-downgrade">)/,
-    `$1\n  <script data-post-slug-redirect>${body}</script>`
+    (m) => {
+      const pvHints = buildPvBeaconHeadTags();
+      const redirect = `\n  <script data-post-slug-redirect>${body}</script>`;
+      return pvHints ? `${m}\n  ${pvHints}${redirect}` : `${m}${redirect}`;
+    }
   );
   writeFileSync('post.html', html);
   console.log(`post.html 已写入 slug→urlKey 跳转（${Object.keys(map).length} 篇）`);
