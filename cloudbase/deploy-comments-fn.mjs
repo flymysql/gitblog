@@ -53,6 +53,10 @@ if (!secrets.SMTP_PASS || secrets.SMTP_PASS.includes('你的')) {
   console.error('请在 secrets.env 中填写真实的 SMTP_PASS（QQ 邮箱 SMTP 授权码）');
   process.exit(1);
 }
+if (!secrets.COMMENT_ADMIN_SECRET || secrets.COMMENT_ADMIN_SECRET.includes('请设置')) {
+  console.error('请在 secrets.env 中设置 COMMENT_ADMIN_SECRET（后台评论管理密钥）');
+  process.exit(1);
+}
 
 const fn = mergeEnv(rc, secrets);
 const envId = envArg || rc.envId;
@@ -69,7 +73,7 @@ try {
     cwd: __dir,
     stdio: 'inherit',
   });
-  console.log('\n部署成功。回复邮件通知已启用（被回复者须填写邮箱）。');
+  console.log('\n部署成功。回复邮件与新评论通知已启用（须 secrets.env 中 SMTP 与 COMMENT_ADMIN_SECRET 已配置）。');
 } catch (err) {
   console.error('\n部署失败，请确认已安装并登录 CloudBase CLI：npm i -g @cloudbase/cli && tcb login');
   process.exit(err.status || 1);

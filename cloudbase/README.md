@@ -174,6 +174,9 @@ node deploy-static-embed.mjs
 | `ALLOWED_ORIGINS` | HTTP 模式跨域来源（embed 模式可忽略） |
 | `COMMENT_IMAGE_BASE_URL` | 图片代理 HTTP 根地址（可选，默认 `{envId}.{region}.app.tcloudbase.com/gitblog-comments`） |
 | `REPLY_NOTIFY_ENABLED` | `1` 开启回复邮件通知（须配置 SMTP） |
+| `COMMENT_NOTIFY_ENABLED` | `1` 开启新评论通知（发给站长，须配置 SMTP） |
+| `COMMENT_NOTIFY_EMAIL` | 新评论通知收件人，如 `jimmycppliu@tencent.com` |
+| `COMMENT_ADMIN_SECRET` | 后台评论管理密钥（`ADMIN_LIST` / `ADMIN_DELETE` 必填） |
 | `SMTP_HOST` | SMTP 服务器，如 `smtp.qq.com` |
 | `SMTP_PORT` | 端口，SSL 通常 `465`，TLS 用 `587` |
 | `SMTP_USER` | SMTP 登录账号 |
@@ -190,6 +193,19 @@ node deploy-static-embed.mjs
 ### 回复邮件通知（可选）
 
 当被回复的评论**留有邮箱**时，云函数会异步发送通知邮件。
+
+### 新评论通知（站长）
+
+每条新评论（含回复）会异步通知 `COMMENT_NOTIFY_EMAIL`（默认 `jimmycppliu@tencent.com`）。须 `COMMENT_NOTIFY_ENABLED=1` 且 SMTP 已配置。
+
+### 后台评论管理
+
+博客后台 [评论管理](/admin/comments.html) 使用 `COMMENT_ADMIN_SECRET` 鉴权（首次进入时输入，保存在本浏览器）。云函数 action：
+
+| action | 字段 | 说明 |
+|--------|------|------|
+| `ADMIN_LIST` | `adminSecret`, `limit?`, `skip?`, `path?`, `status?` | 列出评论（不含已删除） |
+| `ADMIN_DELETE` | `adminSecret`, `id` | 软删除评论及其直接回复 |
 
 #### 方式 A：自动部署（推荐，授权码不进 Git）
 
@@ -269,6 +285,8 @@ cloudbase: {
 | `GET` | `path`, `limit?` | 拉取评论树 |
 | `POST` | `path`, `contentHtml`, `nick?`, `email?`, `parentId?` | 发表评论 |
 | `UPLOAD` | `path`, `base64`, `mime`, `fileName?` | 上传评论图片 |
+| `ADMIN_LIST` | `adminSecret`, `limit?`, `skip?`, `path?`, `status?` | 后台列出评论 |
+| `ADMIN_DELETE` | `adminSecret`, `id` | 后台删除评论 |
 
 返回 `{ ok: true, ... }` 或 `{ ok: false, message }`。
 
