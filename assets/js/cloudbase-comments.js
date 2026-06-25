@@ -635,16 +635,17 @@ class CommentRichEditor {
     const name = String(nick || '访客').trim() || '访客';
     const prefix = `@${name} `;
     this.body.innerHTML = '';
+    const textNode = document.createTextNode(prefix);
+    this.body.appendChild(textNode);
     this.body.focus();
-    const sel = window.getSelection();
-    if (sel) {
+    try {
       const range = document.createRange();
-      range.selectNodeContents(this.body);
+      range.setStart(textNode, textNode.length);
       range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-    document.execCommand('insertText', false, prefix);
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+    } catch { /* ignore */ }
     this._syncCount();
   }
 
@@ -776,9 +777,10 @@ function isMobileCommentDock() {
   return typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
 }
 
-/** 移动端统一使用底部悬浮评论抽屉 */
+/** 仅文章页移动端使用底部悬浮评论抽屉；随笔/工具页原地评论 */
 function shouldUseMobileCommentDock(opts = {}) {
-  return isMobileCommentDock();
+  if (!isMobileCommentDock()) return false;
+  return commentPageContext(opts) === 'post';
 }
 
 function commentPageContext(opts = {}) {
@@ -790,8 +792,8 @@ function shouldShowPersistentMobileDock(opts = {}) {
   return commentPageContext(opts) === 'post';
 }
 
-function isMobileComposeActive() {
-  return isMobileCommentDock();
+function isMobileComposeActive(opts = {}) {
+  return shouldUseMobileCommentDock(opts);
 }
 
 function syncEmbedComposePin(embedWrap, open) {
@@ -900,7 +902,12 @@ function createMobileComposeController(root, form, editor, { onSheetOpen, onShee
     replyBtn?.classList.add('is-active');
     updateSheetTitle();
     editor.clear();
-    editor.setReplyMention(replyNick);
+  };
+
+  const applyReplyMention = () => {
+    if (state.mode === 'reply' && state.replyNick) {
+      editor.setReplyMention(state.replyNick);
+    }
   };
 
   const sheet = bindMobileComposeSheet(form, editor, {
@@ -922,10 +929,11 @@ function createMobileComposeController(root, form, editor, { onSheetOpen, onShee
           replyNick: e.data.replyNick || '访客',
           replyBtn: null,
         });
+        sheet.open({ onReady: applyReplyMention });
       } else {
         clearReply();
+        sheet.open();
       }
-      sheet.open();
       return;
     }
     if (e.data?.type === 'gitblog-comments-compose-close') sheet.close();
@@ -938,12 +946,14 @@ function createMobileComposeController(root, form, editor, { onSheetOpen, onShee
     clearReply,
     getParentId: () => (state.mode === 'reply' ? state.parentId : null),
     open: replyCtx => {
-      if (replyCtx?.parentId) setReply(replyCtx);
-      else {
+      if (replyCtx?.parentId) {
+        setReply(replyCtx);
+        sheet.open({ onReady: applyReplyMention });
+      } else {
         clearReply();
         editor.clear();
+        sheet.open();
       }
-      sheet.open();
     },
     close: () => sheet.close(),
     notifySubmitted: () => sheet.notifySubmitted(),
@@ -1021,7 +1031,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     onClose?.();
   };
 
-  const open = () => {
+  const open = (opts = {}) => {
     const wasOpen = form.classList.contains('is-sheet-open');
     if (!wasOpen) {
       form.classList.add('is-sheet-open');
@@ -1034,6 +1044,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     setTimeout(() => {
       editor._autosizeBody?.();
       editor.body.focus();
+      opts.onReady?.();
     }, wasOpen ? 0 : 120);
   };
 
@@ -1263,7 +1274,7 @@ function closeAllInlineReplies(root) {
 }
 
 function mountInlineReply(slot, ctx) {
-  if (isMobileComposeActive()) {
+  if (isMobileComposeActive(ctx.opts)) {
     ctx.mobileCtrl?.open({
       parentId: ctx.parentId || '',
       replyNick: ctx.replyNick || '访客',
@@ -1402,7 +1413,7 @@ function bindCommentListInteractions(listEl, ctx) {
     const btn = e.target.closest('[data-reply]');
     if (!btn || e.target.closest('.cb-inline-reply')) return;
     e.preventDefault();
-    if (isMobileComposeActive()) {
+    if (isMobileComposeActive(ctx.opts)) {
       closeAllInlineReplies(btn.closest('.cb-comments'));
       if (!ctx.mobileCtrl) return;
       ctx.mobileCtrl.open({

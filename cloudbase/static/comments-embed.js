@@ -667,17 +667,19 @@ class CommentRichEditor {
     const name = String(nick || '访客').trim() || '访客';
     const prefix = `@${name} `;
     this.body.innerHTML = '';
+    const textNode = document.createTextNode(prefix);
+    this.body.appendChild(textNode);
     this.body.focus();
-    const sel = window.getSelection();
-    if (sel) {
+    try {
       const range = document.createRange();
-      range.selectNodeContents(this.body);
+      range.setStart(textNode, textNode.length);
       range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-    document.execCommand('insertText', false, prefix);
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+    } catch { /* ignore */ }
     this._syncCount();
+    postHeight(true);
   }
 
   isValid() {
@@ -731,12 +733,16 @@ function setupCommentMeta(metaEl, profile, onAvatarChange) {
   };
 }
 
+function commentPageContext() {
+  return String(cfg.context || 'post').trim().toLowerCase();
+}
+
 function isMobileDock() {
+  if (commentPageContext() !== 'post') return false;
   return cfg.mobileDock || window.matchMedia('(max-width: 640px)').matches;
 }
 
 function isMobileComposeActive() {
-  // 与 isMobileDock 一致：父页 mobileDock=1 时 iframe 内 viewport 可能仍 >640px
   return isMobileDock();
 }
 
@@ -929,7 +935,12 @@ function createMobileComposeController(root, form, editor) {
     replyBtn?.classList.add('is-active');
     updateSheetTitle();
     editor.clear();
-    editor.setReplyMention(replyNick);
+  };
+
+  const applyReplyMention = () => {
+    if (state.mode === 'reply' && state.replyNick) {
+      editor.setReplyMention(state.replyNick);
+    }
   };
 
   const sheet = bindMobileComposeSheet(form, editor, {
@@ -949,10 +960,11 @@ function createMobileComposeController(root, form, editor) {
           replyNick: e.data.replyNick || '访客',
           replyBtn: null,
         });
+        sheet.open({ onReady: applyReplyMention });
       } else {
         clearReply();
+        sheet.open();
       }
-      sheet.open();
       return;
     }
     if (e.data?.type === 'gitblog-comments-compose-close') sheet.close();
@@ -965,12 +977,14 @@ function createMobileComposeController(root, form, editor) {
     clearReply,
     getParentId: () => (state.mode === 'reply' ? state.parentId : null),
     open: replyCtx => {
-      if (replyCtx?.parentId) setReply(replyCtx);
-      else {
+      if (replyCtx?.parentId) {
+        setReply(replyCtx);
+        sheet.open({ onReady: applyReplyMention });
+      } else {
         clearReply();
         editor.clear();
+        sheet.open();
       }
-      sheet.open();
     },
     close: () => sheet.close(),
     notifySubmitted: () => sheet.notifySubmitted(),
@@ -1011,7 +1025,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     } catch { /* ignore */ }
   };
 
-  const open = () => {
+  const open = (opts = {}) => {
     const wasOpen = form.classList.contains('is-sheet-open');
     if (!wasOpen) {
       form.classList.add('is-sheet-open');
@@ -1026,6 +1040,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
       editor._autosizeBody?.();
       postHeight(true);
       editor.body.focus();
+      opts.onReady?.();
     }, wasOpen ? 0 : 120);
   };
 
