@@ -58,6 +58,34 @@ body { padding: 0 2px 8px; }
 .cb-embed-hint { margin-top: 10px; font-size: 12.5px; }
 .cb-embed-hint[hidden] { display: none; }
 
+/* 独立 compose iframe：由父页 fixed 贴底，iframe 内仅展示表单 */
+html.cb-embed-compose-only,
+html.cb-embed-compose-only body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-elev);
+  overflow: hidden;
+}
+
+.cb-comments--compose-only-view {
+  margin: 0;
+  padding: 0;
+}
+
+.cb-comments--compose-only-view > .cb-compose {
+  display: block !important;
+  margin: 0;
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  border: none;
+  border-radius: 16px 16px 0 0;
+  background: var(--bg-elev);
+  box-shadow: none;
+}
+
+.cb-comments--list-only > .cb-compose {
+  display: none !important;
+}
+
 .cb-comments {
   font-size: 14px;
   line-height: 1.65;
