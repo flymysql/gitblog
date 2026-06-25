@@ -610,6 +610,10 @@ function writeRootPostHtmlRedirect(entries) {
   const bpJson = JSON.stringify(SITE_PATH_PREFIX.replace(/\/+$/, ''));
   const body = `(function(){try{var m=${JSON.stringify(map)};var s=new URLSearchParams(location.search).get('slug');if(!s||!/post\\.html$/i.test(location.pathname))return;var k=m[s];if(!k)return;var bp=${bpJson};location.replace((bp?bp:'')+'/post/'+encodeURIComponent(k)+'/');}catch(e){}})();`;
   let html = readFileSync('post.html', 'utf8');
+  html = html.replace(
+    /assets\/dist\/[a-z0-9.-]+\.min\.(?:js|css)\?v=[^"'\s>]+/gi,
+    (m) => m.replace(/\?v=[^"'\s>]+/, `?v=${BUILD_VERSION}`),
+  );
   html = html.replace(/\n?\s*<script data-post-slug-redirect>[\s\S]*?<\/script>/g, '');
   html = html.replace(
     /(<meta name="referrer" content="no-referrer-when-downgrade">)/,

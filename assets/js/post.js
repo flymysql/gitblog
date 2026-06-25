@@ -518,7 +518,11 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
   renderNeighborsAndRelated(allPosts, slug, tags);
   renderCommentsSection(meta, slug);
 
-  trackAndRenderArticleView({ slug, title });
+  trackAndRenderArticleView({
+    slug,
+    title,
+    urlKey: (meta && meta.urlKey) || '',
+  });
 }
 
 (async function init() {
@@ -615,7 +619,11 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
     renderSeriesIndex(allPosts, slug, (meta && meta.series) || '');
     renderNeighborsAndRelated(allPosts, slug, tags);
     renderCommentsSection(meta, slug);
-    trackAndRenderArticleView({ slug, title });
+    trackAndRenderArticleView({
+      slug,
+      title,
+      urlKey: (meta && meta.urlKey) || pathSeg || '',
+    });
     return;
   }
 
