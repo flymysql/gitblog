@@ -47,6 +47,25 @@ const cfg = {
 const mode = String(params.get('mode') || 'light').trim().toLowerCase();
 document.documentElement.setAttribute('data-mode', mode === 'dark' ? 'dark' : 'light');
 
+function resolveEmbedView() {
+  const viewParam = String(params.get('view') || '').trim().toLowerCase();
+  if (viewParam === 'list' || viewParam === 'compose') return viewParam;
+  const page = (location.pathname.split('/').pop() || '').toLowerCase();
+  if (page.includes('comments-list-embed')) return 'list';
+  if (page.includes('comments-compose-embed')) return 'compose';
+  return 'full';
+}
+
+const embedView = resolveEmbedView();
+
+function isSplitListView() {
+  return embedView === 'list';
+}
+
+function isSplitComposeView() {
+  return embedView === 'compose';
+}
+
 let _heightTimer = null;
 let _app = null;
 let _authReady = null;
@@ -203,11 +222,30 @@ function measureComposeHeight(form) {
 /** compose 打开期间锁定上报高度，避免 padding-bottom 撑大 iframe */
 let _embedLockedHeight = 0;
 
+function postComposeHeight(ready = false) {
+  clearTimeout(_heightTimer);
+  _heightTimer = setTimeout(() => {
+    const form = document.querySelector('.cb-compose');
+    const h = Math.max(measureComposeHeight(form), 120);
+    try {
+      window.parent.postMessage({
+        type: 'gitblog-comments-compose-height',
+        height: h,
+        ready,
+      }, '*');
+    } catch { /* ignore */ }
+  }, 80);
+}
+
 function postHeight(ready = false) {
+  if (isSplitComposeView()) {
+    postComposeHeight(ready);
+    return;
+  }
   clearTimeout(_heightTimer);
   _heightTimer = setTimeout(() => {
     const form = document.querySelector('.cb-compose.is-sheet-open');
-    const composeOpen = !!form;
+    const composeOpen = !!form && !isSplitListView();
     const composeHeight = composeOpen ? measureComposeHeight(form) : 0;
     let h;
     if (composeOpen && _embedLockedHeight > 0) {
@@ -759,7 +797,19 @@ function isMobileDock() {
 }
 
 function isMobileComposeActive() {
+  if (isSplitListView()) return isMobileDock();
   return isMobileDock();
+}
+
+function requestParentCompose({ parentId, replyNick, replyBtn } = {}) {
+  replyBtn?.classList.add('is-active');
+  try {
+    window.parent.postMessage({
+      type: 'gitblog-comments-open-compose',
+      parentId: parentId || '',
+      replyNick: replyNick || '',
+    }, '*');
+  } catch { /* ignore */ }
 }
 
 function shouldShowPersistentMobileDock() {
@@ -819,7 +869,7 @@ function setupComposeFooterChrome(form, metaEl, actionsEl) {
 }
 
 function bindMobileComposeTrigger(root, mobileCtrl) {
-  if (!isMobileDock() || !root || !mobileCtrl) return;
+  if (!isMobileDock() || !root) return;
   if (shouldShowPersistentMobileDock()) return;
   if (root.querySelector('.cb-mobile-compose-trigger')) return;
   const btn = document.createElement('button');
@@ -828,6 +878,11 @@ function bindMobileComposeTrigger(root, mobileCtrl) {
   btn.textContent = '说点什么…';
   btn.setAttribute('aria-label', '写评论');
   btn.addEventListener('click', () => {
+    if (isSplitListView()) {
+      requestParentCompose();
+      return;
+    }
+    if (!mobileCtrl) return;
     mobileCtrl.clearReply();
     mobileCtrl.open();
   });
@@ -1131,6 +1186,15 @@ function closeAllInlineReplies(root) {
 
 function mountInlineReply(slot, ctx) {
   if (isMobileComposeActive()) {
+    if (isSplitListView()) {
+      closeAllInlineReplies(slot.closest('.cb-comments'));
+      requestParentCompose({
+        parentId: ctx.parentId || '',
+        replyNick: ctx.replyNick || '访客',
+        replyBtn: ctx.replyBtn || null,
+      });
+      return;
+    }
     ctx.mobileCtrl?.open({
       parentId: ctx.parentId || '',
       replyNick: ctx.replyNick || '访客',
@@ -1273,6 +1337,15 @@ function bindCommentListInteractions(listEl, ctx) {
     e.preventDefault();
     if (isMobileComposeActive()) {
       closeAllInlineReplies(btn.closest('.cb-comments'));
+      if (isSplitListView()) {
+        btn.closest('.cb-comment')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        requestParentCompose({
+          parentId: btn.dataset.reply || '',
+          replyNick: btn.dataset.replyNick || '访客',
+          replyBtn: btn,
+        });
+        return;
+      }
       if (!ctx.mobileCtrl) return;
       btn.closest('.cb-comment')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
       ctx.mobileCtrl.open({
@@ -1295,6 +1368,248 @@ function bindCommentListInteractions(listEl, ctx) {
 function showError(root, message) {
   root.innerHTML = `<div class="comments-hint">${escapeHtml(message)}</div>`;
   postHeight(true);
+}
+
+async function mountListOnly() {
+  const root = document.getElementById('gitblog-comments-root');
+  if (!root) return;
+
+  if (!cfg.path) {
+    showError(root, '缺少 path 参数');
+    return;
+  }
+
+  root.innerHTML = `
+    <div class="cb-comments cb-comments--list-only${cfg.context === 'tool' ? ' cb-comments--flat' : ''}" data-path="${escapeHtml(cfg.path)}">
+      <div class="cb-comments-loading" aria-live="polite">评论加载中…</div>
+      <div class="cb-comments-list" hidden></div>
+    </div>
+  `;
+
+  const commentsRoot = root.querySelector('.cb-comments') || root;
+  const listEl = commentsRoot.querySelector('.cb-comments-list');
+  const loadingEl = commentsRoot.querySelector('.cb-comments-loading');
+
+  bindMobileComposeTrigger(commentsRoot, null);
+
+  async function loadList() {
+    loadingEl.hidden = false;
+    listEl.hidden = true;
+    try {
+      const res = await callApi({ action: 'GET', path: cfg.path, limit: cfg.pageSize });
+      const comments = res.comments || [];
+      _commentCount = comments.length;
+      listEl.innerHTML = comments.length
+        ? comments.map(c => renderCommentItem(c)).join('')
+        : '';
+      await hydrateCommentImages(listEl, callApi);
+      loadingEl.hidden = true;
+      listEl.hidden = false;
+      postHeight(true);
+    } catch (err) {
+      loadingEl.innerHTML = `<div class="comments-hint">${escapeHtml(err.message || '加载失败')}</div>`;
+      postHeight(true);
+    }
+  }
+
+  bindCommentListInteractions(listEl, { path: cfg.path, callApi, onSuccess: loadList, mobileCtrl: null });
+
+  window.addEventListener('message', e => {
+    if (e.data?.type === 'gitblog-comments-reload') loadList();
+  });
+
+  observeHeight();
+
+  try {
+    await loadList();
+  } catch (err) {
+    showError(root, err.message || '初始化失败');
+  }
+}
+
+async function mountComposeOnly() {
+  const root = document.getElementById('gitblog-comments-root');
+  if (!root) return;
+
+  if (!cfg.path) {
+    showError(root, '缺少 path 参数');
+    return;
+  }
+
+  document.documentElement.classList.add('cb-embed-compose-only');
+
+  root.innerHTML = `
+    <div class="cb-comments cb-comments--compose-only-view" data-path="${escapeHtml(cfg.path)}">
+      <form class="cb-compose cb-compose--minimal is-sheet-open" novalidate>
+        <div class="cb-mobile-sheet-header">
+          <span class="cb-mobile-sheet-title">发表评论</span>
+          <button type="button" class="cb-mobile-sheet-close" aria-label="关闭">取消</button>
+        </div>
+        <div class="cb-compose-editor"></div>
+        <div class="cb-compose-meta" hidden>
+          <label class="cb-field">
+            <span>昵称</span>
+            <input type="text" name="nick" maxlength="40" placeholder="${escapeHtml(cfg.placeholderNick)}（可选）" autocomplete="nickname">
+          </label>
+          <label class="cb-field">
+            <span>邮箱</span>
+            <input type="email" name="email" maxlength="120" placeholder="可选，用于接收回复通知" autocomplete="email">
+          </label>
+        </div>
+        <div class="cb-compose-actions" hidden>
+          <span class="cb-compose-status" aria-live="polite"></span>
+          <button type="submit" class="cb-submit">发表</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  const commentsRoot = root.querySelector('.cb-comments') || root;
+  const form = commentsRoot.querySelector('.cb-compose');
+  const statusEl = commentsRoot.querySelector('.cb-compose-status');
+  const metaEl = form.querySelector('.cb-compose-meta');
+  const actionsEl = form.querySelector('.cb-compose-actions');
+  const nickInput = form.querySelector('[name="nick"]');
+  const emailInput = form.querySelector('[name="email"]');
+  const editorHost = commentsRoot.querySelector('.cb-compose-editor');
+  const titleEl = form.querySelector('.cb-mobile-sheet-title');
+
+  const replyState = { parentId: null, replyNick: null };
+
+  const updateTitle = () => {
+    if (!titleEl) return;
+    titleEl.textContent = replyState.parentId && replyState.replyNick
+      ? `回复 ${replyState.replyNick}`
+      : '发表评论';
+  };
+
+  const profile = readProfile();
+  prefillCommentNick(nickInput);
+  if (profile.email) emailInput.value = profile.email;
+  const metaAvatar = setupCommentMeta(metaEl, profile);
+  setupComposeFooterChrome(form, metaEl, actionsEl);
+
+  const editor = new CommentRichEditor(editorHost, {
+    allowImage: cfg.allowImage,
+    maxLength: cfg.maxLength,
+    onDiscardUpload: fileId => callApi({ action: 'DISCARD_UPLOAD', fileId }).catch(() => null),
+    onUpload: async file => {
+      const base64 = await fileToBase64(file);
+      const res = await callApi({
+        action: 'UPLOAD',
+        path: cfg.path,
+        fileName: file.name,
+        mime: file.type,
+        base64,
+      });
+      return { url: res.url, fileId: res.fileId };
+    },
+  });
+
+  bindComposeReveal(form, editor, { metaEl, actionsEl, mobileMode: true });
+
+  const resetReply = () => {
+    replyState.parentId = null;
+    replyState.replyNick = null;
+    updateTitle();
+  };
+
+  const notifyClose = () => {
+    try {
+      window.parent.postMessage({ type: 'gitblog-comments-compose-close' }, '*');
+    } catch { /* ignore */ }
+  };
+
+  const applyInit = data => {
+    replyState.parentId = String(data?.parentId || '').trim() || null;
+    replyState.replyNick = String(data?.replyNick || '').trim() || null;
+    updateTitle();
+    editor.clear();
+    if (replyState.parentId && replyState.replyNick) {
+      editor.setReplyMention(replyState.replyNick);
+    }
+    postComposeHeight(true);
+    setTimeout(() => editor.body?.focus(), 120);
+  };
+
+  form.querySelector('.cb-mobile-sheet-close')?.addEventListener('click', () => {
+    editor.clear();
+    editor.body?.blur();
+    resetReply();
+    notifyClose();
+  });
+
+  window.addEventListener('message', e => {
+    if (e.data?.type === 'gitblog-comments-compose-init') applyInit(e.data);
+    if (e.data?.type === 'gitblog-comments-compose-reset') {
+      editor.clear();
+      editor.body?.blur();
+      resetReply();
+    }
+  });
+
+  form.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      form.requestSubmit();
+    }
+  });
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    statusEl.textContent = '';
+    if (!editor.isValid()) {
+      statusEl.textContent = commentSubmitHint(editor, cfg.maxLength);
+      statusEl.classList.add('is-error');
+      return;
+    }
+    const nick = resolveCommentNick(nickInput.value);
+    const email = emailInput.value.trim();
+    const avatar = resolveCommentAvatar(metaAvatar.getAvatar(), nick);
+    const submitBtn = form.querySelector('.cb-submit');
+    submitBtn.disabled = true;
+    statusEl.classList.remove('is-error');
+    statusEl.textContent = '提交中…';
+    try {
+      await callApi({
+        action: 'POST',
+        path: cfg.path,
+        nick,
+        email,
+        avatar,
+        contentHtml: editor.getHtml(),
+        parentId: replyState.parentId,
+        pageTitle: cfg.pageTitle || document.title,
+        pageUrl: cfg.pageUrl || params.get('pageUrl') || '',
+      });
+      saveProfile({ nick, email, avatar });
+      editor.clear();
+      resetReply();
+      statusEl.textContent = cfg.moderation ? '已提交，待审核通过后显示' : '发表成功';
+      try {
+        window.parent.postMessage({ type: 'gitblog-comments-compose-submitted' }, '*');
+      } catch { /* ignore */ }
+    } catch (err) {
+      statusEl.textContent = err.message || '发表失败';
+      statusEl.classList.add('is-error');
+    } finally {
+      submitBtn.disabled = false;
+      postComposeHeight(true);
+    }
+  });
+
+  postComposeHeight(true);
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(() => postComposeHeight(true));
+    ro.observe(document.body);
+    ro.observe(form);
+    const editorBody = form.querySelector('.cb-editor-body');
+    if (editorBody) ro.observe(editorBody);
+  }
+
+  try {
+    window.parent.postMessage({ type: 'gitblog-comments-compose-ready' }, '*');
+  } catch { /* ignore */ }
 }
 
 async function mount() {
@@ -1455,7 +1770,13 @@ async function mount() {
   }
 }
 
-mount().catch(err => {
+async function boot() {
+  if (isSplitComposeView()) return mountComposeOnly();
+  if (isSplitListView()) return mountListOnly();
+  return mount();
+}
+
+boot().catch(err => {
   const root = document.getElementById('gitblog-comments-root');
   if (root) showError(root, err.message || '加载失败');
 });
