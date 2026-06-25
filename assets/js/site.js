@@ -7,6 +7,7 @@ import { CONFIG } from './config.js';
 import { initTheme, bindThemeToggle, themeToggleHtml } from './theme.js';
 import { fetchIndexPublic, fetchStaticJson } from './api.js';
 import { initPageviews, bszSiteStatsHtml } from './pageviews.js';
+import { isLazyImagesHeld, runWhenLazyImagesAllowed } from './load-priority.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
@@ -70,6 +71,10 @@ function queueProgressiveUpgrade(img) {
     img.dataset.upgraded = '1';
     return;
   }
+  if (isLazyImagesHeld()) {
+    runWhenLazyImagesAllowed(() => queueProgressiveUpgrade(img));
+    return;
+  }
   _upgradeQueue.add(img);
   if (_upgradeScheduled) return;
   _upgradeScheduled = true;
@@ -120,6 +125,12 @@ function getLazyObserver() {
 
 export function lazyImage(img, { eager = false } = {}) {
   if (!img || img.dataset.lazied) return;
+  if (isLazyImagesHeld()) {
+    runWhenLazyImagesAllowed(() => {
+      if (img.isConnected) lazyImage(img, { eager });
+    });
+    return;
+  }
   img.dataset.lazied = '1';
   img.decoding = img.decoding || 'async';
 
