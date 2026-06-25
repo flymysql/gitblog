@@ -54,6 +54,18 @@ function resolveHttpUrl() {
   return `https://${cfg.envId}.${cfg.region}.app.tcloudbase.com/${cfg.functionName}`;
 }
 
+function isEmbedHostedOrigin() {
+  try {
+    return /\.tcloudbaseapp\.com$/i.test(location.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function shouldTryHttpFallback() {
+  return false;
+}
+
 function parseApiResult(result, httpStatus) {
   let data = result;
   if (typeof data === 'string') {
@@ -93,6 +105,9 @@ async function callPv(payload) {
   try {
     return await callPvViaSdk(payload);
   } catch (sdkErr) {
+    if (!shouldTryHttpFallback()) {
+      throw new Error(sdkErr?.message || 'PV 请求失败');
+    }
     try {
       return await callPvViaHttp(payload);
     } catch {
