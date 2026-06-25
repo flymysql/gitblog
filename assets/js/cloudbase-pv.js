@@ -11,6 +11,20 @@ let _ready = null;
 let _pending = new Map();
 let _replyRouterBound = false;
 let _queue = Promise.resolve();
+const _inflightHits = new Map();
+
+function getPvSessionId() {
+  try {
+    let id = sessionStorage.getItem('gitblog_pv_sid');
+    if (!id) {
+      id = `pv_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+      sessionStorage.setItem('gitblog_pv_sid', id);
+    }
+    return id;
+  } catch {
+    return '';
+  }
+}
 
 function parsePvData(raw) {
   let data = raw;
@@ -110,7 +124,12 @@ function callBeacon(payload) {
   const run = () => ensureBeacon().then(() => new Promise((resolve, reject) => {
     const reqId = `${REQ_PREFIX}${Date.now()}_${++_reqSeq}`;
     _pending.set(reqId, { resolve, reject });
-    _iframe.contentWindow.postMessage({ type: 'gitblog-pv', reqId, ...payload }, '*');
+    _iframe.contentWindow.postMessage({
+      type: 'gitblog-pv',
+      reqId,
+      sessionId: getPvSessionId(),
+      ...payload,
+    }, '*');
     setTimeout(() => {
       if (!_pending.has(reqId)) return;
       _pending.delete(reqId);
@@ -134,37 +153,20 @@ export function normalizeClientPath(pathOrUrl) {
   return p || '/';
 }
 
-function dedupeKey(path) {
-  const day = new Date().toISOString().slice(0, 10);
-  return `gitblog-pv-hit:${path}:${day}`;
-}
-
-function shouldSkipClientDedupe(path) {
-  try {
-    return sessionStorage.getItem(dedupeKey(path)) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function markClientDedupe(path) {
-  try {
-    sessionStorage.setItem(dedupeKey(path), '1');
-  } catch { /* ignore */ }
-}
-
 export async function hitPageView({ path, slug, title } = {}) {
   const p = normalizeClientPath(path);
-  if (shouldSkipClientDedupe(p)) {
-    return parsePvData(await callBeacon({ action: 'get', path: p, slug, title }));
+  if (_inflightHits.has(p)) {
+    return _inflightHits.get(p);
   }
-  try {
+  const task = (async () => {
     const data = parsePvData(await callBeacon({ action: 'hit', path: p, slug, title }));
-    markClientDedupe(p);
     return data;
-  } catch (err) {
-    try { sessionStorage.removeItem(dedupeKey(p)); } catch { /* ignore */ }
-    throw err;
+  })();
+  _inflightHits.set(p, task);
+  try {
+    return await task;
+  } finally {
+    if (_inflightHits.get(p) === task) _inflightHits.delete(p);
   }
 }
 
