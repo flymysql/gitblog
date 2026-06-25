@@ -778,10 +778,9 @@ function isMobileCommentDock() {
   return typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
 }
 
-/** 仅文章页移动端使用底部悬浮评论抽屉；随笔/工具页原地评论 */
+/** 移动端所有页面使用底部悬浮评论抽屉 */
 function shouldUseMobileCommentDock(opts = {}) {
-  if (!isMobileCommentDock()) return false;
-  return commentPageContext(opts) === 'post';
+  return isMobileCommentDock();
 }
 
 function commentPageContext(opts = {}) {

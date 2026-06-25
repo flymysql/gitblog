@@ -738,8 +738,12 @@ function commentPageContext() {
 }
 
 function isMobileDock() {
-  if (commentPageContext() !== 'post') return false;
-  return cfg.mobileDock || window.matchMedia('(max-width: 640px)').matches;
+  // 以父页传入的 mobileDock 为准（父页按自身视口判断）。
+  // PC 端随笔区 iframe 较窄时，iframe 内 matchMedia 会误判为移动端，故不能依赖它。
+  const dockParam = params.get('mobileDock');
+  if (dockParam === '1') return true;
+  if (dockParam === '0') return false;
+  return window.matchMedia('(max-width: 640px)').matches;
 }
 
 function isMobileComposeActive() {
