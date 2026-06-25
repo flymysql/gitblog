@@ -62,6 +62,41 @@ async function getPagePv(db, path) {
   };
 }
 
+async function findPageBySlug(db, slug) {
+  const s = String(slug || '').trim();
+  if (!s) return null;
+  const res = await db.collection(PV_COLLECTION).where({ slug: s }).limit(1).get();
+  return res?.data?.[0] || null;
+}
+
+/** 将按 slug 路径导入的历史数据迁到当前规范路径（/post/{urlKey}） */
+async function ensureCanonicalPvDoc(db, path, { slug = '', title = '' } = {}) {
+  const norm = normalizePvPath(path);
+  const id = pathDocId(norm);
+  const got = await db.collection(PV_COLLECTION).doc(id).get().catch(() => null);
+  if (got?.data?.[0] || got?.data) return norm;
+
+  const row = await findPageBySlug(db, slug);
+  if (!row) return norm;
+
+  const now = Date.now();
+  await db.collection(PV_COLLECTION).doc(id).set({
+    path: norm,
+    slug: String(slug || row.slug || '').trim(),
+    title: String(title || row.title || '').trim(),
+    pv: Math.max(Number(row.pv) || 0, 0),
+    createdAt: Number(row.createdAt) || now,
+    lastAt: Number(row.lastAt) || now,
+    importedFrom: row.importedFrom || 'alias-migrate',
+  });
+  return norm;
+}
+
+async function getPagePvResolved(db, path, { slug = '', title = '' } = {}) {
+  const norm = await ensureCanonicalPvDoc(db, path, { slug, title });
+  return getPagePv(db, norm);
+}
+
 async function shouldCountHit(db, ipHash, path) {
   if (!ipHash) return true;
   const now = Date.now();
@@ -75,7 +110,7 @@ async function shouldCountHit(db, ipHash, path) {
 }
 
 async function incrementPagePv(db, path, { slug = '', title = '', countUv = false } = {}) {
-  const norm = normalizePvPath(path);
+  const norm = await ensureCanonicalPvDoc(db, path, { slug, title });
   const id = pathDocId(norm);
   const now = Date.now();
   const _ = db.command;
@@ -123,14 +158,16 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
   async function handlePvHit(event, context) {
     const path = normalizePvPath(event.path || event.pagePath || event.url);
     if (!path) return jsonErr('缺少 path');
+    const slug = event.slug;
+    const title = event.title;
     const ip = context?.requestContext?.sourceIp || '';
     const ipHash = hashIp(ip);
     const count = await shouldCountHit(db, ipHash, path);
     if (!count) {
-      const page = await getPagePv(db, path);
+      const page = await getPagePvResolved(db, path, { slug, title });
       const site = await getSiteStats(db);
       return jsonOk({
-        path,
+        path: page.path,
         pv: page.pv,
         sitePv: site.pv,
         siteUv: site.uv,
@@ -151,8 +188,8 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
       }
     }
     return jsonOk(await incrementPagePv(db, path, {
-      slug: event.slug,
-      title: event.title,
+      slug,
+      title,
       countUv,
     }));
   }
@@ -160,9 +197,12 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
   async function handlePvGet(event) {
     const path = normalizePvPath(event.path || event.pagePath || event.url);
     if (!path) return jsonErr('缺少 path');
-    const page = await getPagePv(db, path);
+    const page = await getPagePvResolved(db, path, {
+      slug: event.slug,
+      title: event.title,
+    });
     const site = await getSiteStats(db);
-    return jsonOk({ path, pv: page.pv, sitePv: site.pv, siteUv: site.uv });
+    return jsonOk({ path: page.path, pv: page.pv, sitePv: site.pv, siteUv: site.uv });
   }
 
   async function handlePvSite() {
