@@ -7,7 +7,7 @@ import { CONFIG } from './config.js';
 import { fetchIndexPublic, fetchPostMarkdownPublic } from './api.js';
 import { renderMarkdown, parseFrontmatter } from './markdown.js';
 import { initSite, escapeHtml, fmtDate, readingMinutes, tagHtml, bindLazyImages, postPath, postPathFromPost, rootPath, isPostPublicPathKey, thumbUrlFor, LAZY_PLACEHOLDER } from './site.js';
-import { bszPagePvHtml, trackAndRenderArticleView } from './pageviews.js';
+import { bszPagePvHtml, trackAndRenderArticleView, startArticlePageView } from './pageviews.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { enhanceMath, enhanceMermaid, enhanceCodeAdvanced } from './enhancers.js';
 import { shareCardHtml, bindShareCard } from './share.js';
@@ -525,8 +525,27 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
   });
 }
 
+function articlePvMetaFromPage() {
+  const article = document.querySelector('#article');
+  const pathMatch = window.location.pathname.match(/\/post\/([^/]+)\/?$/);
+  let pathSeg = '';
+  if (pathMatch) {
+    try { pathSeg = decodeURIComponent(pathMatch[1]).trim(); } catch { pathSeg = pathMatch[1].trim(); }
+  }
+  const slug = String(article?.dataset?.slug || '').trim();
+  const urlKey = String(article?.dataset?.urlKey || pathSeg || '').trim();
+  const title = article?.querySelector('.article-title')?.textContent?.trim()
+    || article?.querySelector('h1')?.textContent?.trim()
+    || '';
+  const path = (urlKey && /^[a-z0-9-]+$/i.test(urlKey))
+    ? `/post/${urlKey}`
+    : location.pathname;
+  return { slug, urlKey, title, path };
+}
+
 (async function init() {
   initSite({ active: '', skipDuplicateSitePv: true });
+  startArticlePageView(articlePvMetaFromPage());
   bindReadingProgress();
   bindBackToTop();
 
