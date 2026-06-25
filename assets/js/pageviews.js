@@ -227,28 +227,31 @@ function findPagePvEl(root = document) {
 }
 
 export async function trackAndRenderArticleView(meta = {}) {
-  return runWithPageviewPriority(async () => {
-    ensureArticlePagePvPlaceholder(document);
-    if (!useCloudBase()) {
-      injectVercountScript();
-      return;
-    }
-    if (!STATE.articlePvTask) {
-      STATE.articlePvTask = (async () => {
-        const el = findPagePvEl(document);
-        if (!el) return;
-        const article = document.querySelector('#article');
-        const slug = meta.slug || article?.dataset?.slug || '';
-        const title = meta.title || article?.querySelector('h1')?.textContent?.trim() || '';
-        const urlKey = String(meta.urlKey || article?.dataset?.urlKey || '').trim();
-        const path = (urlKey && /^[a-z0-9-]+$/i.test(urlKey))
-          ? `/post/${urlKey}`
-          : (meta.path || location.pathname);
-        await renderPagePvEl(el, { ...meta, path, slug, title, hit: true });
-      })();
-    }
-    await STATE.articlePvTask;
-  });
+  return startArticlePageView(meta);
+}
+
+/** 文章页尽早拉阅读数（不阻塞图片与其它增强逻辑） */
+export function startArticlePageView(meta = {}) {
+  ensureArticlePagePvPlaceholder(document);
+  if (!useCloudBase()) {
+    injectVercountScript();
+    return Promise.resolve();
+  }
+  if (!STATE.articlePvTask) {
+    STATE.articlePvTask = (async () => {
+      const el = findPagePvEl(document);
+      if (!el) return;
+      const article = document.querySelector('#article');
+      const slug = meta.slug || article?.dataset?.slug || '';
+      const title = meta.title || article?.querySelector('h1')?.textContent?.trim() || '';
+      const urlKey = String(meta.urlKey || article?.dataset?.urlKey || '').trim();
+      const path = meta.path || ((urlKey && /^[a-z0-9-]+$/i.test(urlKey))
+        ? `/post/${urlKey}`
+        : location.pathname);
+      await renderPagePvEl(el, { ...meta, path, slug, title, hit: true });
+    })();
+  }
+  return STATE.articlePvTask;
 }
 
 export function bszSiteStatsHtml({ compact = false } = {}) {
