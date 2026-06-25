@@ -808,8 +808,38 @@ function isMobileComposeActive(opts = {}) {
   return shouldUseMobileCommentDock(opts);
 }
 
-function syncEmbedComposePin(_embedWrap, _open, _composeHeight = 0) {
-  /* 浮层在 iframe 内 position:fixed 叠加；父页不改 iframe 尺寸/定位，列表保持可见可滚动 */
+function syncEmbedComposePin(embedWrap, open, composeHeight = 0) {
+  if (!embedWrap) return;
+  const iframe = embedWrap.querySelector('.cb-embed-frame');
+  if (!iframe) return;
+
+  if (open) {
+    const spacer = Number(embedWrap.dataset.cbEmbedHeight) || iframe.offsetHeight || 0;
+    if (spacer > 0) embedWrap.style.minHeight = `${spacer}px`;
+
+    const ch = Math.min(
+      Math.max(Number(composeHeight) || 280, 160),
+      Math.round(window.innerHeight * 0.85),
+    );
+    const pinTop = Math.max(0, Math.round(embedWrap.getBoundingClientRect().top));
+
+    embedWrap.style.setProperty('--cb-compose-pin-h', `${ch}px`);
+    embedWrap.style.setProperty('--cb-embed-pin-top', `${pinTop}px`);
+    embedWrap.classList.add('cb-embed-wrap--compose-pinned');
+    iframe.style.height = 'auto';
+
+    try {
+      iframe.contentWindow?.postMessage({ type: 'gitblog-comments-compose-scroll-bottom' }, '*');
+    } catch { /* ignore */ }
+  } else {
+    embedWrap.classList.remove('cb-embed-wrap--compose-pinned');
+    embedWrap.style.minHeight = '';
+    embedWrap.style.removeProperty('--cb-compose-pin-h');
+    embedWrap.style.removeProperty('--cb-embed-pin-top');
+    const h = Number(embedWrap.dataset.cbEmbedHeight);
+    if (h > 0) iframe.style.height = `${h}px`;
+    else iframe.style.height = '';
+  }
 }
 
 function isEmbedIframe() {
@@ -1527,8 +1557,10 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
       const h = Number(e.data.height);
       if (h > 0 && iframe) {
         embedWrap.dataset.cbEmbedHeight = String(h);
-        const minH = resolveEmbedFrameMinHeight(e.data, opts);
-        iframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
+        if (!embedWrap.classList.contains('cb-embed-wrap--compose-pinned')) {
+          const minH = resolveEmbedFrameMinHeight(e.data, opts);
+          iframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
+        }
       }
       if (hint && e.data.ready) hint.hidden = true;
       if (e.data.ready && Object.prototype.hasOwnProperty.call(e.data, 'commentCount')) {

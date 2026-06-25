@@ -876,7 +876,7 @@ body.cb-has-mobile-dock {
   display: none !important;
 }
 
-/* embed：输入时 iframe 固定底栏吸底，wrap 保留高度占位，列表仍可滚动 */
+/* embed：输入时父页将 iframe 钉在视口内（上沿对齐评论区，下沿留出输入框高度），列表在 iframe 内滚动 */
 .cb-embed-wrap--compose-pinned {
   position: relative;
 }
@@ -885,15 +885,17 @@ body.cb-has-mobile-dock {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  top: var(--cb-embed-pin-top, 0);
+  bottom: var(--cb-compose-pin-h, 280px);
   z-index: 900;
   width: 100% !important;
+  height: auto !important;
   min-height: 0 !important;
-  max-height: 85vh !important;
+  max-height: none !important;
   border: none;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
-  background: var(--bg-elev);
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--bg);
 }
 
 .cb-embed-wrap--compose-pinned .cb-embed-hint {
