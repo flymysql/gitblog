@@ -560,6 +560,19 @@
   margin: 16px 0 8px;
 }
 
+.comments-admin-embed-wrap {
+  min-height: 360px;
+}
+.comments-admin-embed-frame {
+  display: block;
+  width: 100%;
+  min-height: 360px;
+  height: 720px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
 @media (max-width: 720px) {
   .admin-toolbar {
     padding: 12px 14px;
