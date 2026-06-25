@@ -34,6 +34,14 @@ function loadPosts() {
   return JSON.parse(readFileSync('data/posts.json', 'utf8')).posts || [];
 }
 
+function canonicalPostPath(post) {
+  const k = String(post.urlKey || '').trim();
+  if (k && /^[a-z0-9-]+$/i.test(k)) return `/post/${k}`;
+  const slug = String(post.slug || '').trim();
+  if (slug) return `/post/${encodeURIComponent(slug)}`;
+  return '';
+}
+
 function postPublicPath(siteUrl, post) {
   const k = String(post.urlKey || '').trim();
   const slug = String(post.slug || '').trim();
@@ -120,7 +128,7 @@ async function main() {
       await sleep(DELAY_MS);
     }
     if (best.pv > 0) {
-      const path = new URL(best.url).pathname.replace(/\/+$/, '') || '/';
+      const path = canonicalPostPath(post) || new URL(best.url).pathname.replace(/\/+$/, '') || '/';
       pages.push({
         path,
         slug: post.slug,
