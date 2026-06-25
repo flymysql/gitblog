@@ -27,6 +27,7 @@
   right: 0;
   bottom: 0;
   z-index: 1000;
+  pointer-events: none;
 }
 
 .cb-embed-compose-layer[hidden] { display: none !important; }
@@ -38,8 +39,8 @@
   margin: 0;
   padding: 0;
   border: 0;
-  background: rgba(0, 0, 0, 0.35);
-  cursor: pointer;
+  background: rgba(0, 0, 0, 0.28);
+  pointer-events: none;
 }
 
 .cb-embed-frame--compose {
@@ -53,10 +54,7 @@
   background: var(--bg-elev);
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
-}
-
-body.cb-compose-layer-open {
-  overflow: hidden;
+  pointer-events: auto;
 }
 
 body.cb-compose-layer-open.cb-has-mobile-dock .cb-mobile-dock {
