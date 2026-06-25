@@ -9,6 +9,8 @@ on:
       - 'data/posts.json'
       - 'assets/js/config.js'
       - 'assets/js/post.js'
+      - 'assets/js/pageviews.js'
+      - 'assets/js/cloudbase-pv.js'
       - 'post.html'
       - 'index.html'
       - 'scripts/build.mjs'
@@ -54,8 +56,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-         git add sitemap.xml rss.xml robots.txt manifest.webmanifest data/posts.json data/search.json assets/og post post.html sw.js
-         git add index.html
+          git add sitemap.xml rss.xml robots.txt manifest.webmanifest data/posts.json data/search.json assets/og post post.html sw.js assets/dist index.html
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
