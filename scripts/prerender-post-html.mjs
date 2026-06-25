@@ -276,7 +276,11 @@ function buildShareCardHtml({ canonical, title, shareCfg, donateCfg, sitePathPre
 function buildPagePvHtml(pageviewsCfg) {
   const cfg = pageviewsCfg || {};
   if (cfg.enabled === false || cfg.showPostViews === false) return '';
-  const label = String((cfg.vercount || {}).label || '阅读').trim() || '阅读';
+  const provider = String(cfg.provider || 'third-party').trim().toLowerCase();
+  const label = String(cfg.label || (cfg.vercount || {}).label || '阅读').trim() || '阅读';
+  if (provider === 'cloudbase') {
+    return `<span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">${escapeHtml(label)} </span><span id="gitblog_page_pv">…</span><span class="gitblog-pv-suffix"> 次</span></span>`;
+  }
   return `<span class="dot"></span><span class="vercount-inline"><span class="vercount-prefix">${escapeHtml(label)} </span><span id="vercount_value_page_pv">…</span><span class="vercount-suffix"> 次</span></span>`;
 }
 

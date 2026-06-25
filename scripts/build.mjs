@@ -645,6 +645,15 @@ const DONATE_CFG = {
 const PAGEVIEWS_CFG = {
   enabled: getSectionBool('pageviews', 'enabled', true),
   showPostViews: getSectionBool('pageviews', 'showPostViews', true),
+  provider: (() => {
+    const m = cfgRaw.match(/pageviews\s*:\s*\{[\s\S]*?provider\s*:\s*"([^"]*)"/);
+    const p = m ? String(m[1]).trim().toLowerCase() : 'cloudbase';
+    return p === 'third-party' ? 'third-party' : 'cloudbase';
+  })(),
+  label: (() => {
+    const m = cfgRaw.match(/pageviews\s*:\s*\{[\s\S]*?label\s*:\s*"([^"]*)"/);
+    return m ? m[1] : (getNestedStr('vercount', 'label') || '阅读');
+  })(),
   vercount: {
     label: getNestedStr('vercount', 'label') || '阅读',
   },
