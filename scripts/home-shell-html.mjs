@@ -286,7 +286,9 @@ export function buildCriticalHomeCss() {
   return `<style id="critical-home">
 :root{--nav-height:60px;--content-max:980px;--radius:6px;--radius-lg:10px;--primary:#EA6F5A;--text-main:#2F2F2F;--text-secondary:#6B6B6B;--text-tertiary:#9C9C9C;--border:#ECECEC;--bg:#FFF;--bg-soft:#F8F8F8;--nav-bg:rgba(255,255,255,.85);--shadow:0 1px 3px rgba(0,0,0,.04)}
 :root[data-mode=dark],:root[data-theme=dark]{--text-main:#E6E6E6;--text-secondary:#A3A3A3;--border:#2A2A2D;--bg:#131316;--bg-soft:#1A1A1E;--nav-bg:rgba(19,19,22,.78)}
-html,body{margin:0;background:var(--bg);color:var(--text-main);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+html,body{margin:0;color:var(--text-main);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+html{background:var(--bg)}
+body{background:transparent}
 body{padding-top:var(--nav-height)}
 [hidden]{display:none!important}
 #site-nav{position:fixed;top:0;left:0;right:0;width:100%;z-index:100}
