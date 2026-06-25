@@ -253,6 +253,10 @@
   font-weight: 500;
 }
 
+.cb-editor-body .cb-mention {
+  text-decoration: none;
+}
+
 .cb-comment-reply-badge {
   font-size: 12px;
   color: var(--text-tertiary);
@@ -735,9 +739,26 @@
 }
 
 .cb-inline-reply-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 8px;
   font-size: 13px;
   color: var(--text-secondary);
+}
+
+.cb-inline-reply-head-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.cb-inline-reply .cb-compose-footer:not([hidden]) {
+  margin-top: 10px;
+}
+
+.cb-inline-reply-buttons[hidden] {
+  display: none !important;
 }
 
 .cb-inline-reply-editor .cb-editor-body {
@@ -851,12 +872,9 @@ body.cb-has-mobile-dock {
   display: none !important;
 }
 
-/* embed：输入时 iframe 固定底栏，页面仍可滚动 */
+/* embed：输入时 iframe 固定底栏吸底，wrap 保留高度占位，列表仍可滚动 */
 .cb-embed-wrap--compose-pinned {
-  height: 0;
-  min-height: 0;
-  margin: 0;
-  overflow: visible;
+  position: relative;
 }
 
 .cb-embed-wrap--compose-pinned .cb-embed-frame {
