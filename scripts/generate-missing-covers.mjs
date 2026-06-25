@@ -11,7 +11,7 @@ import { ensureThumbnail } from './thumbnail-lib.mjs';
 
 const POSTS_DIR = 'posts';
 const COVER_DIR = 'assets/uploads/2026/06/covers';
-const MAX_BYTES = 30 * 1024;
+const MAX_BYTES = 48 * 1024;
 const DRY = process.argv.includes('--dry');
 
 function splitFrontmatter(raw) {
