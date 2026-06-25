@@ -9,7 +9,12 @@ function resolveCommentAvatarBase() {
   return '/assets/comment-avatars';
 }
 
-export const COMMENT_AVATAR_BASE = resolveCommentAvatarBase();
+export function getCommentAvatarBase() {
+  return resolveCommentAvatarBase();
+}
+
+/** @deprecated 请用 getCommentAvatarBase()；保留导出以免旧代码引用报错 */
+export const COMMENT_AVATAR_BASE = '/assets/comment-avatars';
 
 export const COMMENT_AVATAR_FILES = [
   'badboy.webp',
@@ -70,7 +75,7 @@ export function isValidCommentAvatar(name) {
 export function commentAvatarUrl(name) {
   const file = String(name || '').trim();
   if (!isValidCommentAvatar(file)) return '';
-  return `${COMMENT_AVATAR_BASE}/${file}`;
+  return `${getCommentAvatarBase()}/${file}`;
 }
 
 export function pickRandomCommentAvatar() {
