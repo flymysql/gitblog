@@ -540,6 +540,26 @@
 .admin-row .actions a:hover { color: var(--primary); background: var(--bg-soft); }
 .admin-row .actions .danger:hover { color: #d9534f; background: var(--bg-soft); }
 
+.comments-admin-list .comments-admin-row {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr) 110px 72px 120px;
+}
+.comments-admin-excerpt {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.comments-admin-more {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0 8px;
+}
+
 @media (max-width: 720px) {
   .admin-toolbar {
     padding: 12px 14px;
