@@ -7,6 +7,7 @@ tags:
   - 微信小程序
   - 前端
 summary: "¶页面初始数据 ¶生命周期函数–监听页面加载 ¶//单词选择函数 ¶下一组单词分配函数 ¶成绩上传 ¶获取成绩 ¶//加载全球排名的数据 上面写了部分的函数功能，全部代码在这里 h…"
+cover: ../assets/uploads/2026/06/covers/微信小程序小鸡单词单词测试功能-c24a6dbf.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/c24a6dbf.html

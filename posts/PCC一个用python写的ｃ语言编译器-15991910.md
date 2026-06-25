@@ -8,6 +8,7 @@ tags:
   - "编译器"
   - python
 summary: "PCC——python实现编译器 大学的编译原理课设，实现源码到汇编代码的翻译，链接部分使用gcc的功能。目前支持数组，四则运算，赋值，判断，输出，循环语句等。 项目地址：http…"
+cover: ../assets/uploads/2026/06/covers/PCC一个用python写的ｃ语言编译器-15991910.webp
 origin:
   from: cnblogs
   url: https://www.cnblogs.com/gitpull/p/15991910.html
