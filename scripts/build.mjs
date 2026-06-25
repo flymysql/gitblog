@@ -64,6 +64,40 @@ function getSaobbySiteLabel() {
 
 const SHOW_HOME_STATS = getSectionBool('pageviews', 'showHomeStats', true);
 const SAOBBY_SITE_LABEL = getSaobbySiteLabel();
+
+function getCloudbaseEmbedBaseUrl() {
+  const m = cfgRaw.match(/embedBaseUrl\s*:\s*"([^"]*)"/);
+  return m ? String(m[1]).trim() : '';
+}
+
+function buildPvBeaconHeadTags() {
+  if (!getSectionBool('pageviews', 'enabled', true)) return '';
+  const provider = (() => {
+    const m = cfgRaw.match(/pageviews\s*:\s*\{[\s\S]*?provider\s*:\s*"([^"]*)"/);
+    const p = m ? String(m[1]).trim().toLowerCase() : 'cloudbase';
+    return p === 'third-party' ? 'third-party' : 'cloudbase';
+  })();
+  if (provider !== 'cloudbase' || !getSectionBool('cloudbase', 'enabled', true)) return '';
+  const embed = getCloudbaseEmbedBaseUrl();
+  if (!embed) return '';
+  let origin = '';
+  try { origin = new URL(embed).origin; } catch { return ''; }
+  const envId = getNestedStr('cloudbase', 'envId') || (cfgRaw.match(/envId\s*:\s*"([^"]*)"/) || [])[1] || '';
+  const region = getNestedStr('cloudbase', 'region') || 'ap-shanghai';
+  const fn = getNestedStr('cloudbase', 'functionName') || 'gitblog-comments';
+  const v = (cfgRaw.match(/embedAssetVersion\s*:\s*"([^"]*)"/) || [])[1] || '';
+  const u = new URL(`${embed.replace(/\/+$/, '')}/pv-beacon.html`);
+  if (envId) u.searchParams.set('env', envId);
+  u.searchParams.set('region', region);
+  u.searchParams.set('fn', fn);
+  if (v) u.searchParams.set('v', v);
+  return [
+    `<link rel="dns-prefetch" href="${xmlEsc(origin)}">`,
+    `<link rel="preconnect" href="${xmlEsc(origin)}" crossorigin>`,
+    `<link rel="prefetch" href="${xmlEsc(u.toString())}" as="document">`,
+  ].join('\n  ');
+}
+
 const POSTS_DIR = 'posts';
 const INDEX_FILE = 'data/posts.json';
 const OG_DIR = 'assets/og';
@@ -759,6 +793,11 @@ function injectHomeSeo() {
     logo: SITE_LOGO || SITE_AVATAR || undefined,
   });
   const jsonLd = `<script type="application/ld+json">${JSON.stringify(websiteLd)}</script>\n  <script type="application/ld+json">${JSON.stringify(orgLd)}</script>`;
+
+  html = html.replace(/<meta name="referrer" content="no-referrer-when-downgrade">/, (m) => {
+    const pvHints = buildPvBeaconHeadTags();
+    return pvHints ? `${m}\n  ${pvHints}` : m;
+  });
 
   // title / description
   html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${xmlEsc(homeTitle)}</title>`);

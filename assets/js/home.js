@@ -5,7 +5,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
 import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPathFromPost, postPath, rootPath, thumbUrlFor } from './site.js';
-import { initPageviews, bszSiteStatsHtml, queueArticleListViews } from './pageviews.js';
+import { initPageviews, bszSiteStatsHtml, queueArticleListViews, syncArticleListStatsFromCache, mountSitePvSlots } from './pageviews.js';
 import { commentPathForPost } from './comment-term.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { isCommentsReady, mountNotesComments } from './comments-embed.js';
@@ -519,6 +519,7 @@ function renderList(posts, tab = 'latest') {
            <span class="load-more-text">加载更多</span>
          </li>`
       : `<li class="load-more-end">已经到底啦 · 共 ${posts.length} 篇</li>`);
+  syncArticleListStatsFromCache(ul);
   // 列表缩略图全部走视口懒加载（首屏前几张视口可见时会立刻加载）
   bindLazyImages(ul, { eagerCount: 0 });
 
@@ -533,6 +534,7 @@ function renderList(posts, tab = 'latest') {
     const inserted = [...frag.children];
     inserted.forEach(node => ul.insertBefore(node, sentinel));
     inserted.forEach(node => bindLazyImages(node, { eagerCount: 0 }));
+    syncArticleListStatsFromCache(ul);
     state.loaded += nextChunk.length;
     if (state.loaded >= posts.length) {
       // 全部加载完，把 sentinel 替换成"到底"提示
@@ -582,6 +584,7 @@ function bindPrerenderedPostList(posts) {
   const author = CONFIG.site.author;
   const avatar = CONFIG.site.avatar;
   bindLazyImages(ul, { eagerCount: 0 });
+  syncArticleListStatsFromCache(ul);
 
   const state = { loaded: existing.length, observer: null, loadNext: null };
   const sentinel = document.getElementById('loadMoreSentinel');
@@ -595,6 +598,7 @@ function bindPrerenderedPostList(posts) {
     const anchor = document.getElementById('loadMoreSentinel');
     inserted.forEach(node => ul.insertBefore(node, anchor));
     inserted.forEach(node => bindLazyImages(node, { eagerCount: 0 }));
+    syncArticleListStatsFromCache(ul);
     state.loaded += nextChunk.length;
     if (state.loaded >= posts.length && anchor) {
       if (state.observer) state.observer.disconnect();
@@ -634,6 +638,7 @@ function bindPrerenderedPostListLazy(resolvePosts) {
   const author = CONFIG.site.author;
   const avatar = CONFIG.site.avatar;
   bindLazyImages(ul, { eagerCount: 0 });
+  syncArticleListStatsFromCache(ul);
 
   const state = { loaded: existing.length, observer: null, loadNext: null, loading: false };
   const sentinel = document.getElementById('loadMoreSentinel');
@@ -658,6 +663,7 @@ function bindPrerenderedPostListLazy(resolvePosts) {
       const anchor = document.getElementById('loadMoreSentinel');
       inserted.forEach(node => ul.insertBefore(node, anchor));
       inserted.forEach(node => bindLazyImages(node, { eagerCount: 0 }));
+      syncArticleListStatsFromCache(ul);
       state.loaded += nextChunk.length;
       if (state.loaded >= posts.length && anchor) {
         if (state.observer) state.observer.disconnect();
@@ -684,6 +690,7 @@ function bindPrerenderedPostListLazy(resolvePosts) {
 
   listState = state;
   mobileHomeStickySync?.();
+  queueArticleListViews();
   return true;
 }
 
@@ -940,6 +947,7 @@ function bindMobileHomeSticky() {
       return;
     }
     renderHero(allPosts);
+    mountSitePvSlots($('#hero'));
     renderCarousel(allPosts);
     renderTags(allPosts);
     renderRecent(allPosts);
@@ -949,8 +957,7 @@ function bindMobileHomeSticky() {
 
   bindHeroAvatarSizeSync();
   hydratePrerenderHeroStats();
-  // hero-stats 异步插入后高度会变，需重新对齐头像占位
-  initPageviews();
+  mountSitePvSlots($('#hero'));
   bindHeroAvatarSizeSync();
   requestAnimationFrame(() => bindHeroAvatarSizeSync());
   setTimeout(bindHeroAvatarSizeSync, 120);
