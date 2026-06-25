@@ -109,13 +109,14 @@ function reply(reqId, ok, data) {
 window.addEventListener('message', async (e) => {
   const msg = e.data;
   if (!msg || msg.type !== 'gitblog-pv') return;
-  const { reqId, action, path, slug, title, adminSecret, limit } = msg;
+  const { reqId, action, path, slug, title, adminSecret, limit, sessionId } = msg;
   try {
     let data;
+    const base = { sessionId };
     if (action === 'hit') {
-      data = await callPv({ action: 'PV_HIT', path, slug, title });
+      data = await callPv({ action: 'PV_HIT', path, slug, title, ...base });
     } else if (action === 'get') {
-      data = await callPv({ action: 'PV_GET', path, slug, title });
+      data = await callPv({ action: 'PV_GET', path, slug, title, ...base });
     } else if (action === 'site') {
       data = await callPv({ action: 'PV_SITE' });
     } else if (action === 'admin-top') {
