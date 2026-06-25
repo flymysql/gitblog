@@ -1,7 +1,7 @@
 /**
  * CloudBase 评论嵌入页（托管于 {envId}-{appId}.tcloudbaseapp.com）
  * 优先用 Web SDK callFunction（同环境托管域，移动端/微信更稳定）；
- * HTTP 仅作桌面端兜底。
+ * 不在 embed 托管域跨域尝试 HTTP 网关（必 CORS 失败，仅控制台噪音）。
  *
  * 部署前由 scripts/build-embed-static.mjs 将本文件与 comment-avatars.js 打成单文件，
  * 避免运行时单独请求 comment-avatars.js 命中 CDN 旧缓存。
@@ -114,6 +114,26 @@ function resolveHttpUrl() {
   return `https://${cfg.envId}.${cfg.region}.app.tcloudbase.com/${cfg.functionName}`;
 }
 
+function isEmbedHostedOrigin() {
+  try {
+    return /\.tcloudbaseapp\.com$/i.test(location.hostname);
+  } catch {
+    return false;
+  }
+}
+
+/** embed 托管域跨域调 HTTP 网关必 CORS 失败；仅显式配置 httpUrl 时才尝试 HTTP 兜底 */
+function shouldTryHttpFallback() {
+  if (!cfg.httpUrl) return false;
+  if (!isEmbedHostedOrigin()) return true;
+  try {
+    const u = new URL(cfg.httpUrl);
+    return u.origin === location.origin;
+  } catch {
+    return false;
+  }
+}
+
 function parseApiResult(result, httpStatus) {
   if (result?.code === 'OPERATION_FAIL' || /PERMISSION_DENIED/i.test(String(result?.msg || result?.message || ''))) {
     throw new Error('云函数权限不足：请开启匿名登录，并将安全规则 invoke 设为 true（见 cloudbase/README.md）');
@@ -150,6 +170,9 @@ async function callApi(payload) {
   try {
     return await callApiViaSdk(payload);
   } catch (sdkErr) {
+    if (!shouldTryHttpFallback()) {
+      throw new Error(sdkErr?.message || SDK_HINT);
+    }
     try {
       return await callApiViaHttp(payload);
     } catch {
