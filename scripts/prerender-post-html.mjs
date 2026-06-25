@@ -3,6 +3,7 @@ import { load as loadHtml } from 'cheerio';
 import { renderMarkdown, escapeHtml } from './markdown-render.mjs';
 import sharp from 'sharp';
 import { existsSync } from 'node:fs';
+import { buildPvBeaconHeadTags } from './pv-beacon-head.mjs';
 import { thumbPathFor, normalizeLocalImagePath } from './thumbnail-lib.mjs';
 
 const TAG_PALETTE = [
@@ -423,6 +424,14 @@ export async function buildPrerenderedPostHtml({
     /(<meta name="apple-mobile-web-app-capable" content="yes">)/,
     `$1\n  ${metaHead}`
   );
+
+  const pvHints = buildPvBeaconHeadTags();
+  if (pvHints) {
+    html = html.replace(
+      /(<meta name="referrer" content="no-referrer-when-downgrade">)/,
+      `$1\n  ${pvHints}`
+    );
+  }
 
   return html;
 }

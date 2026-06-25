@@ -13,6 +13,37 @@ let _replyRouterBound = false;
 let _writeQueue = Promise.resolve();
 const _inflightHits = new Map();
 
+const ARTICLE_PV_CACHE_KEY = 'gitblog_article_pv_v1';
+const ARTICLE_PV_CACHE_MS = 5 * 60 * 1000;
+
+function readArticlePvCache(path) {
+  try {
+    const raw = sessionStorage.getItem(ARTICLE_PV_CACHE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    const row = data?.[path];
+    if (!row || !Number.isFinite(row.ts) || Date.now() - row.ts > ARTICLE_PV_CACHE_MS) return null;
+    const pv = Number(row.pv);
+    return Number.isFinite(pv) && pv >= 0 ? pv : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeArticlePvCache(path, pv) {
+  try {
+    const v = Number(pv);
+    if (!Number.isFinite(v) || v < 0) return;
+    let data = {};
+    try {
+      const raw = sessionStorage.getItem(ARTICLE_PV_CACHE_KEY);
+      if (raw) data = JSON.parse(raw) || {};
+    } catch { /* ignore */ }
+    data[path] = { pv: Math.floor(v), ts: Date.now() };
+    sessionStorage.setItem(ARTICLE_PV_CACHE_KEY, JSON.stringify(data));
+  } catch { /* ignore */ }
+}
+
 function getPvSessionId() {
   try {
     let id = sessionStorage.getItem('gitblog_pv_sid');
@@ -291,21 +322,29 @@ export async function renderSitePvSlot(el) {
   trackPageView({ path: location.pathname });
 }
 
-/** 文章阅读：先 PV_GET 展示，可选后台 PV_HIT 计数 */
+/** 文章阅读：缓存先展示 → PV_GET → 后台 PV_HIT 计数 */
 export async function renderPagePvEl(el, { path, slug, title, hit = true } = {}) {
   if (!el) return;
   const p = normalizeClientPath(path || location.pathname);
-  const opts = { path: p, slug, title };
+  const cached = readArticlePvCache(p);
+  if (cached != null) {
+    el.textContent = formatCount(cached);
+  }
   try {
     const data = await getPageView(p, { slug, title });
-    el.textContent = formatCount(pvNumber(data, 'pv'));
+    const num = formatCount(pvNumber(data, 'pv'));
+    el.textContent = num;
+    writeArticlePvCache(p, pvNumber(data, 'pv'));
   } catch {
-    el.textContent = '0';
+    if (cached == null) el.textContent = '0';
   }
   if (hit) {
-    hitPageView(opts).then((data) => {
+    hitPageView({ path: p, slug, title }).then((data) => {
       const n = formatCount(pvNumber(data, 'pv'));
-      if (n !== '—') el.textContent = n;
+      if (n !== '—') {
+        el.textContent = n;
+        writeArticlePvCache(p, pvNumber(data, 'pv'));
+      }
     }).catch(() => {});
   }
 }
