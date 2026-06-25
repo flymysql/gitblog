@@ -821,7 +821,11 @@ body { padding: 0 2px 8px; }
 
 /* 打开底部抽屉时隐藏假输入框，列表保持可见并可滚动 */
 .cb-comments--mobile-dock.cb-comments--compose-only {
-  padding-bottom: min(40vh, 260px);
+  padding-bottom: calc(var(--cb-compose-sheet-h, min(42vh, 300px)) + env(safe-area-inset-bottom, 0px));
+}
+
+.cb-comments--mobile-dock.cb-comments--compose-only > .cb-comments-list {
+  display: block !important;
 }
 
 .cb-comments--mobile-dock.cb-comments--compose-only > .cb-mobile-compose-trigger {
@@ -873,7 +877,7 @@ body { padding: 0 2px 8px; }
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 900;
+  z-index: 1000;
   display: block !important;
   max-height: none;
   overflow: visible;
