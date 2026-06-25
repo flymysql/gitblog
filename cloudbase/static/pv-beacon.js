@@ -73,7 +73,7 @@ window.addEventListener('message', async (e) => {
     if (action === 'hit') {
       data = await callPv({ action: 'PV_HIT', path, slug, title });
     } else if (action === 'get') {
-      data = await callPv({ action: 'PV_GET', path });
+      data = await callPv({ action: 'PV_GET', path, slug, title });
     } else if (action === 'site') {
       data = await callPv({ action: 'PV_SITE' });
     } else if (action === 'admin-top') {
