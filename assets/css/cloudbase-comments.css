@@ -843,6 +843,10 @@ body.cb-has-mobile-dock {
   margin-right: 0;
 }
 
+.cb-comments--mobile-dock.cb-comments--compose-only {
+  padding-bottom: min(40vh, 260px);
+}
+
 .cb-comments--mobile-dock.cb-comments--compose-only > .cb-mobile-compose-trigger {
   display: none !important;
 }
@@ -888,11 +892,6 @@ body.cb-has-mobile-dock {
 }
 
 .cb-compose--mobile-portal:not(.is-sheet-open) {
-  display: none !important;
-}
-
-.cb-comments--mobile-dock.cb-comments--compose-only .cb-comments-list,
-.cb-comments--mobile-dock.cb-comments--compose-only .cb-comments-loading {
   display: none !important;
 }
 
