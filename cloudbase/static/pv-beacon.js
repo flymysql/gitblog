@@ -49,14 +49,56 @@ async function getApp() {
   return _app;
 }
 
-async function callPv(payload) {
+function resolveHttpUrl() {
+  if (!cfg.envId) throw new Error('缺少 env');
+  return `https://${cfg.envId}.${cfg.region}.app.tcloudbase.com/${cfg.functionName}`;
+}
+
+function parseApiResult(result, httpStatus) {
+  let data = result;
+  if (typeof data === 'string') {
+    try { data = JSON.parse(data); } catch { /* keep string */ }
+  }
+  if (data?.code === 'OPERATION_FAIL' || /PERMISSION_DENIED/i.test(String(data?.msg || data?.message || ''))) {
+    throw new Error('云函数权限不足：请开启匿名登录，并将安全规则 invoke 设为 true');
+  }
+  if (!data || data.ok === false) {
+    throw new Error(data?.message || data?.msg || `PV 请求失败${httpStatus ? `（HTTP ${httpStatus}）` : ''}`);
+  }
+  return data;
+}
+
+async function callPvViaSdk(payload) {
   const app = await getApp();
   const res = await app.callFunction({ name: cfg.functionName, data: payload });
-  const result = res?.result;
-  if (!result || result.ok === false) {
-    throw new Error(result?.message || 'PV 请求失败');
+  return parseApiResult(res?.result);
+}
+
+async function callPvViaHttp(payload) {
+  const res = await fetch(resolveHttpUrl(), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  let result;
+  try {
+    result = await res.json();
+  } catch {
+    throw new Error(`PV 响应异常（HTTP ${res.status}）`);
   }
-  return result;
+  return parseApiResult(result, res.status);
+}
+
+async function callPv(payload) {
+  try {
+    return await callPvViaSdk(payload);
+  } catch (sdkErr) {
+    try {
+      return await callPvViaHttp(payload);
+    } catch {
+      throw new Error(sdkErr?.message || 'PV 请求失败');
+    }
+  }
 }
 
 function reply(reqId, ok, data) {

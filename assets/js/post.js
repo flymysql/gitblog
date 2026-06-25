@@ -526,7 +526,7 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
 }
 
 (async function init() {
-  initSite({ active: '' });
+  initSite({ active: '', skipDuplicateSitePv: true });
   bindReadingProgress();
   bindBackToTop();
 
