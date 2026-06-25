@@ -7,6 +7,7 @@ tags:
   - 博客建站
   - 教程
 summary: "想总结下最近自己搭博客时遇到的一些问题 当时上网搜了好久，可把自己累坏了 1 wordpress更新或者更新主题和插件时，显示没有权限访问上机目录 可能是你的站点文件夹所有组为ro…"
+cover: ../assets/uploads/2026/06/covers/wordpress建站可能遇到一些小问题-646aecb5.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/646aecb5.html
