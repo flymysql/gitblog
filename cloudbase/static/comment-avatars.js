@@ -1,6 +1,15 @@
-// 评论头像：flymysql/cpti generated-avatars/thumbs
-export const COMMENT_AVATAR_BASE =
-  'https://cdn.jsdelivr.net/gh/flymysql/cpti@main/generated-avatars/thumbs';
+// 评论头像：源自 flymysql/cpti generated-avatars/thumbs，托管于本站
+function resolveCommentAvatarBase() {
+  try {
+    const host = String(location?.hostname || '');
+    if (/\.tcloudbaseapp\.com$/i.test(host)) {
+      return new URL('comment-avatars/', location.href).href.replace(/\/$/, '');
+    }
+  } catch { /* ignore */ }
+  return '/assets/comment-avatars';
+}
+
+export const COMMENT_AVATAR_BASE = resolveCommentAvatarBase();
 
 export const COMMENT_AVATAR_FILES = [
   'badboy.webp',
