@@ -1031,10 +1031,21 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     form.prepend(header);
   }
 
+  const syncComposeSheetPadding = () => {
+    if (!commentsRoot) return;
+    if (form.classList.contains('is-sheet-open')) {
+      const ch = Math.ceil(form.getBoundingClientRect().height) || 280;
+      commentsRoot.style.setProperty('--cb-compose-sheet-h', `${ch}px`);
+    } else {
+      commentsRoot.style.removeProperty('--cb-compose-sheet-h');
+    }
+  };
+
   const close = () => {
     if (!form.classList.contains('is-sheet-open')) return;
     form.classList.remove('is-sheet-open');
     commentsRoot?.classList.remove('cb-comments--compose-only');
+    commentsRoot?.style.removeProperty('--cb-compose-sheet-h');
     editor.clear();
     editor.body.blur();
     form.dispatchEvent(new CustomEvent('cb-compose-sheet-change', { bubbles: true }));
@@ -1059,6 +1070,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     form.dispatchEvent(new CustomEvent('cb-compose-sheet-change', { bubbles: true }));
     setTimeout(() => {
       editor._autosizeBody?.();
+      syncComposeSheetPadding();
       postHeight(true);
       editor.body.focus();
       opts.onReady?.();
@@ -1066,14 +1078,14 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
   };
 
   form.querySelector('.cb-mobile-sheet-close')?.addEventListener('click', close);
+  form.addEventListener('cb-compose-sheet-change', () => {
+    syncComposeSheetPadding();
+    postHeight(true);
+  });
 
   window.addEventListener('message', e => {
     if (e.data?.type === 'gitblog-comments-dock' && commentsRoot) {
       commentsRoot.style.paddingBottom = e.data.visible ? 'calc(56px + env(safe-area-inset-bottom))' : '';
-      postHeight(true);
-    }
-    if (e.data?.type === 'gitblog-comments-compose-scroll-bottom') {
-      window.scrollTo(0, Math.max(document.documentElement.scrollHeight, document.body.scrollHeight));
       postHeight(true);
     }
   });
