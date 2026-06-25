@@ -7,6 +7,7 @@ tags:
   - 算法
   - C++
 summary: "¶ 素数 ¶ 题目描述 令Pi表示第i个素数。现任给两个正整数M include include using namespace std; class prime { int pr…"
+cover: ../assets/uploads/2026/06/covers/pat乙级试题C算法题训练-dedc9755.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/dedc9755.html

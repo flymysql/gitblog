@@ -12,6 +12,7 @@
     "migrate:hexo": "node scripts/migrate-hexo.mjs",
     "fix:hexo-codeblocks": "node scripts/fix-hexo-codeblocks.mjs",
     "normalize": "node scripts/normalize-tags-and-covers.mjs",
+    "generate:covers": "node scripts/generate-missing-covers.mjs",
     "strip:wechat": "node scripts/strip-wechat.mjs",
     "release": "node scripts/make-release.mjs",
     "release:push": "node scripts/make-release.mjs --push",

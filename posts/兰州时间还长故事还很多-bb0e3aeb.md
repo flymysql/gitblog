@@ -9,6 +9,7 @@ tags:
   - "随想"
   - "邻家酒肆"
 summary: "我 相 信 这 么 好 看 的 你 已 经 置 顶 了 我 每 晚 睡 前 陪 你 说 个 故 事 GOODNIGHT 看这篇文章一定要先听这首歌 肆主 ：篮球场上有个女孩在独自打…"
+cover: ../assets/uploads/2026/06/covers/兰州时间还长故事还很多-bb0e3aeb.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/bb0e3aeb.html

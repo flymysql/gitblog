@@ -29,9 +29,11 @@
       "tags": [
         "杂七杂八"
       ],
+      "cover": "../assets/uploads/2026/06/covers/qq-farm-assistant-经典农场辅助.webp",
       "carousel": true,
       "path": "posts/qq-farm-assistant-经典农场辅助.md",
-      "urlKey": "20260617"
+      "urlKey": "20260617",
+      "thumbnail": "../assets/uploads/2026/06/covers/qq-farm-assistant-经典农场辅助.thumb.webp"
     },
     {
       "slug": "海门回声-一个寂静的生日夜晚",
@@ -44,10 +46,12 @@
         "海门回声",
         "随想"
       ],
+      "cover": "../assets/uploads/2026/06/covers/海门回声-一个寂静的生日夜晚.webp",
       "series": "海门回声",
       "seriesOrder": 1,
       "path": "posts/海门回声-一个寂静的生日夜晚.md",
-      "urlKey": "20260616"
+      "urlKey": "20260616",
+      "thumbnail": "../assets/uploads/2026/06/covers/海门回声-一个寂静的生日夜晚.thumb.webp"
     },
     {
       "slug": "用-ai-做好软件项目上下文工程实践指南",
@@ -256,8 +260,10 @@
         "推荐",
         "推荐算法"
       ],
+      "cover": "../assets/uploads/2026/06/covers/推荐召回-向量召回之U2I学习总结-15986952.webp",
       "path": "posts/推荐召回-向量召回之U2I学习总结-15986952.md",
-      "urlKey": "20220309"
+      "urlKey": "20220309",
+      "thumbnail": "../assets/uploads/2026/06/covers/推荐召回-向量召回之U2I学习总结-15986952.thumb.webp"
     },
     {
       "slug": "随笔杂谈-15995658",
@@ -269,8 +275,10 @@
       "tags": [
         "杂七杂八"
       ],
+      "cover": "../assets/uploads/2026/06/covers/随笔杂谈-15995658.webp",
       "path": "posts/随笔杂谈-15995658.md",
-      "urlKey": "20200101"
+      "urlKey": "20200101",
+      "thumbnail": "../assets/uploads/2026/06/covers/随笔杂谈-15995658.thumb.webp"
     },
     {
       "slug": "生如夏花般绚烂死如秋叶般静美-bcd926d2",
@@ -283,10 +291,12 @@
         "谙风",
         "随想"
       ],
+      "cover": "../assets/uploads/2026/06/covers/生如夏花般绚烂死如秋叶般静美-bcd926d2.webp",
       "series": "谙风",
       "seriesOrder": 12,
       "path": "posts/生如夏花般绚烂死如秋叶般静美-bcd926d2.md",
-      "urlKey": "20190605"
+      "urlKey": "20190605",
+      "thumbnail": "../assets/uploads/2026/06/covers/生如夏花般绚烂死如秋叶般静美-bcd926d2.thumb.webp"
     },
     {
       "slug": "记忆的种子·一-c315b081",
@@ -299,10 +309,12 @@
         "谙风",
         "随想"
       ],
+      "cover": "../assets/uploads/2026/06/covers/记忆的种子·一-c315b081.webp",
       "series": "谙风",
       "seriesOrder": 1,
       "path": "posts/记忆的种子·一-c315b081.md",
-      "urlKey": "20190605-2"
+      "urlKey": "20190605-2",
+      "thumbnail": "../assets/uploads/2026/06/covers/记忆的种子·一-c315b081.thumb.webp"
     },
     {
       "slug": "记忆的种子·二-29fe4821",
@@ -315,10 +327,12 @@
         "谙风",
         "随想"
       ],
+      "cover": "../assets/uploads/2026/06/covers/记忆的种子·二-29fe4821.webp",
       "series": "谙风",
       "seriesOrder": 2,
       "path": "posts/记忆的种子·二-29fe4821.md",
-      "urlKey": "20190605-3"
+      "urlKey": "20190605-3",
+      "thumbnail": "../assets/uploads/2026/06/covers/记忆的种子·二-29fe4821.thumb.webp"
     },
     {
       "slug": "谙风-小城中学-7712d2d6",
@@ -331,10 +345,12 @@
         "谙风",
         "随想"
       ],
+      "cover": "../assets/uploads/2026/06/covers/谙风-小城中学-7712d2d6.webp",
       "series": "谙风",
       "seriesOrder": 8,
       "path": "posts/谙风-小城中学-7712d2d6.md",
-      "urlKey": "20190605-4"
+      "urlKey": "20190605-4",
+      "thumbnail": "../assets/uploads/2026/06/covers/谙风-小城中学-7712d2d6.thumb.webp"
     },
     {
       "slug": "PCC一个用python写的ｃ语言编译器-15991910",
@@ -348,8 +364,10 @@
         "编译器",
         "python"
       ],
+      "cover": "../assets/uploads/2026/06/covers/PCC一个用python写的ｃ语言编译器-15991910.webp",
       "path": "posts/PCC一个用python写的ｃ语言编译器-15991910.md",
-      "urlKey": "20190101"
+      "urlKey": "20190101",
+      "thumbnail": "../assets/uploads/2026/06/covers/PCC一个用python写的ｃ语言编译器-15991910.thumb.webp"
     },
     {
       "slug": "桃李春风一杯酒江湖夜雨十年灯-15995716",
@@ -361,8 +379,10 @@
       "tags": [
         "杂七杂八"
       ],
+      "cover": "../assets/uploads/2026/06/covers/桃李春风一杯酒江湖夜雨十年灯-15995716.webp",
       "path": "posts/桃李春风一杯酒江湖夜雨十年灯-15995716.md",
-      "urlKey": "20190101-2"
+      "urlKey": "20190101-2",
+      "thumbnail": "../assets/uploads/2026/06/covers/桃李春风一杯酒江湖夜雨十年灯-15995716.thumb.webp"
     },
     {
       "slug": "模仿知乎的链接卡片-a714f04b",
@@ -375,8 +395,10 @@
         "教程",
         "前端"
       ],
+      "cover": "../assets/uploads/2026/06/covers/模仿知乎的链接卡片-a714f04b.webp",
       "path": "posts/模仿知乎的链接卡片-a714f04b.md",
-      "urlKey": "20181216"
+      "urlKey": "20181216",
+      "thumbnail": "../assets/uploads/2026/06/covers/模仿知乎的链接卡片-a714f04b.thumb.webp"
     },
     {
       "slug": "Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4",
@@ -419,8 +441,10 @@
         "教程",
         "微信小程序"
       ],
+      "cover": "../assets/uploads/2026/06/covers/小程序开发之接入Bmob后端云作为后端数据库-93621394.webp",
       "path": "posts/小程序开发之接入Bmob后端云作为后端数据库-93621394.md",
-      "urlKey": "20181203"
+      "urlKey": "20181203",
+      "thumbnail": "../assets/uploads/2026/06/covers/小程序开发之接入Bmob后端云作为后端数据库-93621394.thumb.webp"
     },
     {
       "slug": "使用vue.js制作carousel跑马灯组件-456bc465",
@@ -432,8 +456,10 @@
       "tags": [
         "前端"
       ],
+      "cover": "../assets/uploads/2026/06/covers/使用vue.js制作carousel跑马灯组件-456bc465.webp",
       "path": "posts/使用vue.js制作carousel跑马灯组件-456bc465.md",
-      "urlKey": "20181202"
+      "urlKey": "20181202",
+      "thumbnail": "../assets/uploads/2026/06/covers/使用vue.js制作carousel跑马灯组件-456bc465.thumb.webp"
     },
     {
       "slug": "Dijkstra单源最短路径算法-15e41f53",
@@ -493,8 +519,10 @@
       "author": "兰州小红鸡",
       "summary": "由于以前公众号发了挺多分享资源的文章，索性写个python爬虫来爬取 特点： 1.保留公众号排版样式（就是把div样式全拷下来了） 2.写成md格式，并且加了hexo渲染需要的头部…",
       "tags": [],
+      "cover": "../assets/uploads/2026/06/covers/将公众号文章爬到hexo博客-fb598031.webp",
       "path": "posts/将公众号文章爬到hexo博客-fb598031.md",
-      "urlKey": "20181111"
+      "urlKey": "20181111",
+      "thumbnail": "../assets/uploads/2026/06/covers/将公众号文章爬到hexo博客-fb598031.thumb.webp"
     },
     {
       "slug": "hexo建站笔记之彩色标签云-d6caa003",
@@ -539,8 +567,10 @@
       "tags": [
         "sql"
       ],
+      "cover": "../assets/uploads/2026/06/covers/sql学习笔记2-5f5ec841.webp",
       "path": "posts/sql学习笔记2-5f5ec841.md",
-      "urlKey": "20181030"
+      "urlKey": "20181030",
+      "thumbnail": "../assets/uploads/2026/06/covers/sql学习笔记2-5f5ec841.thumb.webp"
     },
     {
       "slug": "手动修改博客css样式打造属于自己的博客样式-e17f6e4c",
@@ -585,8 +615,10 @@
         "教程",
         "博客建站"
       ],
+      "cover": "../assets/uploads/2026/06/covers/解决来必力评论系统加载慢的问题-3453c710.webp",
       "path": "posts/解决来必力评论系统加载慢的问题-3453c710.md",
-      "urlKey": "20181013"
+      "urlKey": "20181013",
+      "thumbnail": "../assets/uploads/2026/06/covers/解决来必力评论系统加载慢的问题-3453c710.thumb.webp"
     },
     {
       "slug": "hexo博客搭建以及next美化教程-e8d13fc",
@@ -614,8 +646,10 @@
       "tags": [
         "sql"
       ],
+      "cover": "../assets/uploads/2026/06/covers/sql语言学习笔记-1406270f.webp",
       "path": "posts/sql语言学习笔记-1406270f.md",
-      "urlKey": "20181008"
+      "urlKey": "20181008",
+      "thumbnail": "../assets/uploads/2026/06/covers/sql语言学习笔记-1406270f.thumb.webp"
     },
     {
       "slug": "假期最后一天-1bde1150",
@@ -627,8 +661,10 @@
       "tags": [
         "随想"
       ],
+      "cover": "../assets/uploads/2026/06/covers/假期最后一天-1bde1150.webp",
       "path": "posts/假期最后一天-1bde1150.md",
-      "urlKey": "20181007"
+      "urlKey": "20181007",
+      "thumbnail": "../assets/uploads/2026/06/covers/假期最后一天-1bde1150.thumb.webp"
     },
     {
       "slug": "MarkDown的用法学习笔记-93e22221",
@@ -656,8 +692,10 @@
         "教程",
         "前端"
       ],
+      "cover": "../assets/uploads/2026/06/covers/windows上的vim配置打造超级舒心又有逼格的编辑器-1a3fd97.webp",
       "path": "posts/windows上的vim配置打造超级舒心又有逼格的编辑器-1a3fd97.md",
-      "urlKey": "20180621"
+      "urlKey": "20180621",
+      "thumbnail": "../assets/uploads/2026/06/covers/windows上的vim配置打造超级舒心又有逼格的编辑器-1a3fd97.thumb.webp"
     },
     {
       "slug": "挣钱要比想象的难-79ade34d",
@@ -669,8 +707,10 @@
       "tags": [
         "随想"
       ],
+      "cover": "../assets/uploads/2026/06/covers/挣钱要比想象的难-79ade34d.webp",
       "path": "posts/挣钱要比想象的难-79ade34d.md",
-      "urlKey": "20180514"
+      "urlKey": "20180514",
+      "thumbnail": "../assets/uploads/2026/06/covers/挣钱要比想象的难-79ade34d.thumb.webp"
     },
     {
       "slug": "微信小程序加载游戏排名好友全球-6d6da729",
@@ -684,8 +724,10 @@
         "前端",
         "算法"
       ],
+      "cover": "../assets/uploads/2026/06/covers/微信小程序加载游戏排名好友全球-6d6da729.webp",
       "path": "posts/微信小程序加载游戏排名好友全球-6d6da729.md",
-      "urlKey": "20180501-3"
+      "urlKey": "20180501-3",
+      "thumbnail": "../assets/uploads/2026/06/covers/微信小程序加载游戏排名好友全球-6d6da729.thumb.webp"
     },
     {
       "slug": "微信小程序小鸡单词单词书选择-7da2453f",
@@ -697,8 +739,10 @@
       "tags": [
         "微信小程序"
       ],
+      "cover": "../assets/uploads/2026/06/covers/微信小程序小鸡单词单词书选择-7da2453f.webp",
       "path": "posts/微信小程序小鸡单词单词书选择-7da2453f.md",
-      "urlKey": "20180501-2"
+      "urlKey": "20180501-2",
+      "thumbnail": "../assets/uploads/2026/06/covers/微信小程序小鸡单词单词书选择-7da2453f.thumb.webp"
     },
     {
       "slug": "微信小程序小鸡单词单词测试功能-c24a6dbf",
@@ -711,8 +755,10 @@
         "微信小程序",
         "前端"
       ],
+      "cover": "../assets/uploads/2026/06/covers/微信小程序小鸡单词单词测试功能-c24a6dbf.webp",
       "path": "posts/微信小程序小鸡单词单词测试功能-c24a6dbf.md",
-      "urlKey": "20180501"
+      "urlKey": "20180501",
+      "thumbnail": "../assets/uploads/2026/06/covers/微信小程序小鸡单词单词测试功能-c24a6dbf.thumb.webp"
     },
     {
       "slug": "微信背单词小程序小鸡单词-66cf95f7",
@@ -725,8 +771,10 @@
         "微信小程序",
         "前端"
       ],
+      "cover": "../assets/uploads/2026/06/covers/微信背单词小程序小鸡单词-66cf95f7.webp",
       "path": "posts/微信背单词小程序小鸡单词-66cf95f7.md",
-      "urlKey": "20180427"
+      "urlKey": "20180427",
+      "thumbnail": "../assets/uploads/2026/06/covers/微信背单词小程序小鸡单词-66cf95f7.thumb.webp"
     },
     {
       "slug": "2018刑侦推理题c暴力破解-83736cf7",
@@ -736,8 +784,10 @@
       "author": "兰州小红鸡",
       "summary": "最近看到很火的那个2018年刑侦推理题，很多程序员都用来编程暴力破解 感觉挺好玩，就自己也来用c++试一试 （正在学校机房上实验课的我，只能对着发白的codeblocks撸码） $…",
       "tags": [],
+      "cover": "../assets/uploads/2026/06/covers/2018刑侦推理题c暴力破解-83736cf7.webp",
       "path": "posts/2018刑侦推理题c暴力破解-83736cf7.md",
-      "urlKey": "20180426"
+      "urlKey": "20180426",
+      "thumbnail": "../assets/uploads/2026/06/covers/2018刑侦推理题c暴力破解-83736cf7.thumb.webp"
     },
     {
       "slug": "wordpress建站可能遇到一些小问题-646aecb5",
@@ -750,8 +800,10 @@
         "博客建站",
         "教程"
       ],
+      "cover": "../assets/uploads/2026/06/covers/wordpress建站可能遇到一些小问题-646aecb5.webp",
       "path": "posts/wordpress建站可能遇到一些小问题-646aecb5.md",
-      "urlKey": "20180423-2"
+      "urlKey": "20180423-2",
+      "thumbnail": "../assets/uploads/2026/06/covers/wordpress建站可能遇到一些小问题-646aecb5.thumb.webp"
     },
     {
       "slug": "pat乙级试题C算法题训练-dedc9755",
@@ -764,8 +816,10 @@
         "算法",
         "C++"
       ],
+      "cover": "../assets/uploads/2026/06/covers/pat乙级试题C算法题训练-dedc9755.webp",
       "path": "posts/pat乙级试题C算法题训练-dedc9755.md",
-      "urlKey": "20180423"
+      "urlKey": "20180423",
+      "thumbnail": "../assets/uploads/2026/06/covers/pat乙级试题C算法题训练-dedc9755.thumb.webp"
     },
     {
       "slug": "在阿里云服务器一键搭建web服务器wordprss安装-d438625",
@@ -777,8 +831,10 @@
       "tags": [
         "博客建站"
       ],
+      "cover": "../assets/uploads/2026/06/covers/在阿里云服务器一键搭建web服务器wordprss安装-d438625.webp",
       "path": "posts/在阿里云服务器一键搭建web服务器wordprss安装-d438625.md",
-      "urlKey": "20180421"
+      "urlKey": "20180421",
+      "thumbnail": "../assets/uploads/2026/06/covers/在阿里云服务器一键搭建web服务器wordprss安装-d438625.thumb.webp"
     },
     {
       "slug": "Flybook-用node.js从零开始搭一个简约而不简单的博客站点-15995676",
@@ -806,10 +862,12 @@
         "随想",
         "邻家酒肆"
       ],
+      "cover": "../assets/uploads/2026/06/covers/兰州时间还长故事还很多-bb0e3aeb.webp",
       "series": "谙风",
       "seriesOrder": 11,
       "path": "posts/兰州时间还长故事还很多-bb0e3aeb.md",
-      "urlKey": "20170705"
+      "urlKey": "20170705",
+      "thumbnail": "../assets/uploads/2026/06/covers/兰州时间还长故事还很多-bb0e3aeb.thumb.webp"
     },
     {
       "slug": "青梅不在竹马老去从此我爱上的每一个人都很像你-2ed35e3b",
@@ -822,8 +880,10 @@
         "随想",
         "邻家酒肆"
       ],
+      "cover": "../assets/uploads/2026/06/covers/青梅不在竹马老去从此我爱上的每一个人都很像你-2ed35e3b.webp",
       "path": "posts/青梅不在竹马老去从此我爱上的每一个人都很像你-2ed35e3b.md",
-      "urlKey": "20170622"
+      "urlKey": "20170622",
+      "thumbnail": "../assets/uploads/2026/06/covers/青梅不在竹马老去从此我爱上的每一个人都很像你-2ed35e3b.thumb.webp"
     },
     {
       "slug": "喜欢一个人就是想和她说好多好多话-f560a010",
@@ -836,8 +896,10 @@
         "随想",
         "邻家酒肆"
       ],
+      "cover": "../assets/uploads/2026/06/covers/喜欢一个人就是想和她说好多好多话-f560a010.webp",
       "path": "posts/喜欢一个人就是想和她说好多好多话-f560a010.md",
-      "urlKey": "20170618"
+      "urlKey": "20170618",
+      "thumbnail": "../assets/uploads/2026/06/covers/喜欢一个人就是想和她说好多好多话-f560a010.thumb.webp"
     },
     {
       "slug": "爱而不得人那么多为什么非你不可-be4966e8",
@@ -850,8 +912,10 @@
         "随想",
         "邻家酒肆"
       ],
+      "cover": "../assets/uploads/2026/06/covers/爱而不得人那么多为什么非你不可-be4966e8.webp",
       "path": "posts/爱而不得人那么多为什么非你不可-be4966e8.md",
-      "urlKey": "20170617"
+      "urlKey": "20170617",
+      "thumbnail": "../assets/uploads/2026/06/covers/爱而不得人那么多为什么非你不可-be4966e8.thumb.webp"
     },
     {
       "slug": "然而青春啊-却在最酣畅淋漓时戛然而止-f9280584",
@@ -864,10 +928,12 @@
         "随想",
         "邻家酒肆"
       ],
+      "cover": "../assets/uploads/2026/06/covers/然而青春啊-却在最酣畅淋漓时戛然而止-f9280584.webp",
       "series": "谙风",
       "seriesOrder": 10,
       "path": "posts/然而青春啊-却在最酣畅淋漓时戛然而止-f9280584.md",
-      "urlKey": "20170614"
+      "urlKey": "20170614",
+      "thumbnail": "../assets/uploads/2026/06/covers/然而青春啊-却在最酣畅淋漓时戛然而止-f9280584.thumb.webp"
     },
     {
       "slug": "写给发小一个童年的长度-66e78132",
@@ -880,10 +946,12 @@
         "随想",
         "邻家酒肆"
       ],
+      "cover": "../assets/uploads/2026/06/covers/写给发小一个童年的长度-66e78132.webp",
       "series": "谙风",
       "seriesOrder": 9,
       "path": "posts/写给发小一个童年的长度-66e78132.md",
-      "urlKey": "20170613"
+      "urlKey": "20170613",
+      "thumbnail": "../assets/uploads/2026/06/covers/写给发小一个童年的长度-66e78132.thumb.webp"
     },
     {
       "slug": "谙风-小城青旅-c54dc801",
@@ -896,10 +964,12 @@
         "随想",
         "邻家酒肆"
       ],
+      "cover": "../assets/uploads/2026/06/covers/谙风-小城青旅-c54dc801.webp",
       "series": "谙风",
       "seriesOrder": 7,
       "path": "posts/谙风-小城青旅-c54dc801.md",
-      "urlKey": "20170612"
+      "urlKey": "20170612",
+      "thumbnail": "../assets/uploads/2026/06/covers/谙风-小城青旅-c54dc801.thumb.webp"
     },
     {
       "slug": "十月不远青海湖不远-427178b3",
@@ -912,8 +982,10 @@
         "随想",
         "邻家酒肆"
       ],
+      "cover": "../assets/uploads/2026/06/covers/十月不远青海湖不远-427178b3.webp",
       "path": "posts/十月不远青海湖不远-427178b3.md",
-      "urlKey": "20170611"
+      "urlKey": "20170611",
+      "thumbnail": "../assets/uploads/2026/06/covers/十月不远青海湖不远-427178b3.thumb.webp"
     },
     {
       "slug": "大学生你凭什么创业-560c5cce",
@@ -926,8 +998,10 @@
         "随想",
         "邻家酒肆"
       ],
+      "cover": "../assets/uploads/2026/06/covers/大学生你凭什么创业-560c5cce.webp",
       "path": "posts/大学生你凭什么创业-560c5cce.md",
-      "urlKey": "20170610"
+      "urlKey": "20170610",
+      "thumbnail": "../assets/uploads/2026/06/covers/大学生你凭什么创业-560c5cce.thumb.webp"
     },
     {
       "slug": "所有的日子都是在等待一份久别的重逢-5ad87aa",
@@ -940,10 +1014,12 @@
         "随想",
         "邻家酒肆"
       ],
+      "cover": "../assets/uploads/2026/06/covers/所有的日子都是在等待一份久别的重逢-5ad87aa.webp",
       "series": "谙风",
       "seriesOrder": 6,
       "path": "posts/所有的日子都是在等待一份久别的重逢-5ad87aa.md",
-      "urlKey": "20170609"
+      "urlKey": "20170609",
+      "thumbnail": "../assets/uploads/2026/06/covers/所有的日子都是在等待一份久别的重逢-5ad87aa.thumb.webp"
     },
     {
       "slug": "未来的年月希望可以让我来温暖你们-76ea918a",
@@ -956,10 +1032,12 @@
         "随想",
         "邻家酒肆"
       ],
+      "cover": "../assets/uploads/2026/06/covers/未来的年月希望可以让我来温暖你们-76ea918a.webp",
       "series": "谙风",
       "seriesOrder": 5,
       "path": "posts/未来的年月希望可以让我来温暖你们-76ea918a.md",
-      "urlKey": "20170608"
+      "urlKey": "20170608",
+      "thumbnail": "../assets/uploads/2026/06/covers/未来的年月希望可以让我来温暖你们-76ea918a.thumb.webp"
     },
     {
       "slug": "人生在世如春梦-d95c37aa",
@@ -972,10 +1050,12 @@
         "随想",
         "邻家酒肆"
       ],
+      "cover": "../assets/uploads/2026/06/covers/人生在世如春梦-d95c37aa.webp",
       "series": "谙风",
       "seriesOrder": 4,
       "path": "posts/人生在世如春梦-d95c37aa.md",
-      "urlKey": "20170607"
+      "urlKey": "20170607",
+      "thumbnail": "../assets/uploads/2026/06/covers/人生在世如春梦-d95c37aa.thumb.webp"
     },
     {
       "slug": "那些在苦难中艰难生活的人-0aaaaa22",
@@ -985,10 +1065,12 @@
       "author": "兰州小红鸡",
       "summary": "很不幸，在别人还在享受生活的时候，他们要鼓起勇气，把生活操翻在地。 生活对于普通人真的是过分苛刻。 前几日听到一个消息久久不能释怀，家乡的一位年轻女人突然意外离去，她是很好的一个人…",
       "tags": [],
+      "cover": "../assets/uploads/2026/06/covers/那些在苦难中艰难生活的人-0aaaaa22.webp",
       "series": "谙风",
       "seriesOrder": 3,
       "path": "posts/那些在苦难中艰难生活的人-0aaaaa22.md",
-      "urlKey": "20170606"
+      "urlKey": "20170606",
+      "thumbnail": "../assets/uploads/2026/06/covers/那些在苦难中艰难生活的人-0aaaaa22.thumb.webp"
     },
     {
       "slug": "用python做一个C类编译器——语法翻译器-15995704",

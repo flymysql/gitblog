@@ -6,6 +6,7 @@ date: 2017-06-06T08:52:05+08:00
 updated: 2017-06-06T08:52:05+08:00
 author: "兰州小红鸡"
 summary: "很不幸，在别人还在享受生活的时候，他们要鼓起勇气，把生活操翻在地。 生活对于普通人真的是过分苛刻。 前几日听到一个消息久久不能释怀，家乡的一位年轻女人突然意外离去，她是很好的一个人…"
+cover: ../assets/uploads/2026/06/covers/那些在苦难中艰难生活的人-0aaaaa22.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/0aaaaa22.html

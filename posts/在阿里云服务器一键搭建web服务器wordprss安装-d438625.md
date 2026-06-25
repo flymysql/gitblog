@@ -6,6 +6,7 @@ author: "兰州小红鸡"
 tags:
   - 博客建站
 summary: "¶前期准备 1. 在校学生可以在阿里买一轻量级云服务器，大概一百多一年，玩一玩还是蛮划算的。 2. 推荐使用CentOs镜像系统。 3. 4. 然后再买一个域名（几块钱到几十块钱不…"
+cover: ../assets/uploads/2026/06/covers/在阿里云服务器一键搭建web服务器wordprss安装-d438625.webp
 origin:
   from: hexo
   url: https://flymysql.github.io/post/d438625.html
