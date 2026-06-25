@@ -16,6 +16,7 @@ import {
   formatCount,
   getCachedArticlePv,
   preloadPvBeacon,
+  waitForPvBeacon,
 } from './cloudbase-pv.js';
 import { isCommentsReady } from './comments-embed.js';
 import { holdLazyImages, releaseLazyImages } from './load-priority.js';
@@ -26,6 +27,7 @@ const STATE = {
   vercountInjected: false,
   articlePvTask: null,
   listStatsTask: null,
+  listStatsRetryTimer: null,
 };
 
 const LIST_STATS_CACHE_KEY = 'gitblog_list_stats_v1';
@@ -311,8 +313,10 @@ function bestCachedListPv(pvPath) {
   const fromList = listCache?.pv?.[path];
   const fromArticle = getCachedArticlePv(path);
   if (fromArticle != null && (fromList == null || fromArticle > fromList)) return fromArticle;
-  if (fromList != null) return fromList;
-  return fromArticle;
+  if (fromList != null && fromList > 0) return fromList;
+  if (fromList === 0 && fromArticle === 0) return 0;
+  if (fromArticle != null) return fromArticle;
+  return null;
 }
 
 function writeListStatsCache(pvMap, commentMap) {
@@ -378,7 +382,27 @@ export function syncArticleListStatsFromCache(root = document) {
 }
 
 export function queueArticleListViews(root = document) {
-  runWithPageviewPriority(() => renderArticleListViews(root).catch(() => {}));
+  if (STATE.listStatsRetryTimer) {
+    clearTimeout(STATE.listStatsRetryTimer);
+    STATE.listStatsRetryTimer = null;
+  }
+  runWithPageviewPriority(() => renderArticleListViews(root).catch(() => {
+    scheduleArticleListViewsRetry(root);
+  }));
+}
+
+function scheduleArticleListViewsRetry(root = document, attempt = 1) {
+  if (attempt > 3 || !useCloudBase()) return;
+  if (STATE.listStatsRetryTimer) clearTimeout(STATE.listStatsRetryTimer);
+  STATE.listStatsRetryTimer = setTimeout(() => {
+    STATE.listStatsRetryTimer = null;
+    root.querySelectorAll('.post-list-stats[data-list-stats-done="1"]').forEach(el => {
+      delete el.dataset.listStatsDone;
+    });
+    runWithPageviewPriority(() => renderArticleListViews(root).catch(() => {
+      scheduleArticleListViewsRetry(root, attempt + 1);
+    }));
+  }, 1200 * attempt);
 }
 
 export async function renderArticleListViews(root = document) {
@@ -433,25 +457,58 @@ export async function renderArticleListViews(root = document) {
     const pending = slotMeta.filter(({ el }) => el.dataset.listStatsDone !== '1');
     if (!pending.length || (!needPv.size && !needCm.size)) return;
 
-    const pvEntries = [...needPv.entries()].map(([path, slug]) => (slug ? { path, slug } : { path }));
-    const [pvMap, cmMap] = await Promise.all([
-      needPv.size ? batchGetPageViews(pvEntries).catch(() => ({})) : Promise.resolve({}),
-      needCm.size ? batchGetCommentCounts([...needCm]).catch(() => ({})) : Promise.resolve({}),
-    ]);
+    let pvOk = !needPv.size;
+    let cmOk = !needCm.size;
+    let pvMap = {};
+    let cmMap = {};
 
-    if (Object.keys(pvMap).length || Object.keys(cmMap).length) {
-      writeListStatsCache(pvMap, cmMap);
+    try {
+      await waitForPvBeacon();
+    } catch {
+      return;
     }
+
+    const pvEntries = [...needPv.entries()].map(([path, slug]) => (slug ? { path, slug } : { path }));
+    const fetches = [];
+    if (needPv.size) {
+      fetches.push(batchGetPageViews(pvEntries).then(data => {
+        pvMap = data || {};
+        pvOk = true;
+      }).catch(() => { pvOk = false; }));
+    }
+    if (needCm.size) {
+      fetches.push(batchGetCommentCounts([...needCm]).then(data => {
+        cmMap = data || {};
+        cmOk = true;
+      }).catch(() => { cmOk = false; }));
+    }
+    await Promise.all(fetches);
+
+    if (!pvOk && !cmOk) return;
+
+    if (pvOk && Object.keys(pvMap).length) writeListStatsCache(pvMap, {});
+    if (cmOk && Object.keys(cmMap).length) writeListStatsCache({}, cmMap);
 
     const mergedCache = readListStatsCache();
     for (const { el, pvPath, commentPath } of pending) {
+      const cachedPv = showPv && pvPath ? bestCachedListPv(pvPath) : null;
+      const cachedCm = showCm && commentPath
+        ? (mergedCache?.comments?.[commentPath] ?? readListStatsCacheAny()?.comments?.[commentPath])
+        : null;
       const pv = showPv && pvPath
-        ? (pvMap[pvPath] ?? mergedCache?.pv?.[pvPath] ?? bestCachedListPv(pvPath) ?? staleCache?.pv?.[pvPath] ?? 0)
+        ? (pvOk
+          ? (pvMap[pvPath] ?? mergedCache?.pv?.[pvPath] ?? cachedPv ?? 0)
+          : (cachedPv ?? null))
         : 0;
       const cm = showCm && commentPath
-        ? (mergedCache?.comments?.[commentPath] ?? cmMap[commentPath] ?? staleCache?.comments?.[commentPath] ?? 0)
+        ? (cmOk
+          ? (cmMap[commentPath] ?? mergedCache?.comments?.[commentPath] ?? cachedCm ?? 0)
+          : (cachedCm ?? null))
         : 0;
-      applyListStatsToSlot(el, pv, cm, { showPv, showCm });
+      if (showPv && pvPath && !pvOk && pv == null) continue;
+      if (showCm && commentPath && !cmOk && cm == null) continue;
+      const finalize = (!showPv || pvOk || pv != null) && (!showCm || cmOk || cm != null);
+      applyListStatsToSlot(el, pv ?? 0, cm ?? 0, { showPv, showCm }, { finalize });
     }
   })();
 
