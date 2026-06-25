@@ -206,9 +206,7 @@ function postHeight(ready = false) {
     const form = document.querySelector('.cb-compose.is-sheet-open');
     const composeOpen = !!form;
     const composeHeight = composeOpen ? measureComposeHeight(form) : 0;
-    const h = composeOpen
-      ? composeHeight
-      : Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    const h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
     try {
       window.parent.postMessage({
         type: 'gitblog-comments-height',
@@ -667,17 +665,19 @@ class CommentRichEditor {
     const name = String(nick || '访客').trim() || '访客';
     const prefix = `@${name} `;
     this.body.innerHTML = '';
+    const textNode = document.createTextNode(prefix);
+    this.body.appendChild(textNode);
     this.body.focus();
-    const sel = window.getSelection();
-    if (sel) {
+    try {
       const range = document.createRange();
-      range.selectNodeContents(this.body);
+      range.setStart(textNode, textNode.length);
       range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-    document.execCommand('insertText', false, prefix);
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+    } catch { /* ignore */ }
     this._syncCount();
+    postHeight(true);
   }
 
   isValid() {
@@ -731,12 +731,20 @@ function setupCommentMeta(metaEl, profile, onAvatarChange) {
   };
 }
 
+function commentPageContext() {
+  return String(cfg.context || 'post').trim().toLowerCase();
+}
+
 function isMobileDock() {
-  return cfg.mobileDock || window.matchMedia('(max-width: 640px)').matches;
+  // 以父页传入的 mobileDock 为准（父页按自身视口判断）。
+  // PC 端随笔区 iframe 较窄时，iframe 内 matchMedia 会误判为移动端，故不能依赖它。
+  const dockParam = params.get('mobileDock');
+  if (dockParam === '1') return true;
+  if (dockParam === '0') return false;
+  return window.matchMedia('(max-width: 640px)').matches;
 }
 
 function isMobileComposeActive() {
-  // 与 isMobileDock 一致：父页 mobileDock=1 时 iframe 内 viewport 可能仍 >640px
   return isMobileDock();
 }
 
@@ -760,8 +768,9 @@ function initMobileComposePortal(root, form) {
   }
 }
 
-function setupMobileComposeChrome(form, metaEl, actionsEl) {
-  if (!isMobileDock() || !form) return;
+/** 评论底栏：头像居左，发送居右（PC / 移动端共用） */
+function setupComposeFooterChrome(form, metaEl, actionsEl) {
+  if (!form) return;
   let footer = form.querySelector('.cb-compose-footer');
   if (!footer) {
     footer = document.createElement('div');
@@ -816,8 +825,9 @@ function bindComposeReveal(form, editor, { metaEl, actionsEl, mobileMode = false
       if (metaEl) metaEl.hidden = !sheetOpen || !showExtra;
       if (actionsEl) actionsEl.hidden = true;
     } else {
+      if (footer) footer.hidden = !showExtra;
       if (metaEl) metaEl.hidden = !showExtra;
-      if (actionsEl) actionsEl.hidden = !showExtra;
+      if (actionsEl) actionsEl.hidden = true;
     }
     form.classList.toggle('cb-compose--active', showExtra || sheetOpen);
     editor._autosizeBody?.();
@@ -929,7 +939,12 @@ function createMobileComposeController(root, form, editor) {
     replyBtn?.classList.add('is-active');
     updateSheetTitle();
     editor.clear();
-    editor.setReplyMention(replyNick);
+  };
+
+  const applyReplyMention = () => {
+    if (state.mode === 'reply' && state.replyNick) {
+      editor.setReplyMention(state.replyNick);
+    }
   };
 
   const sheet = bindMobileComposeSheet(form, editor, {
@@ -949,10 +964,11 @@ function createMobileComposeController(root, form, editor) {
           replyNick: e.data.replyNick || '访客',
           replyBtn: null,
         });
+        sheet.open({ onReady: applyReplyMention });
       } else {
         clearReply();
+        sheet.open();
       }
-      sheet.open();
       return;
     }
     if (e.data?.type === 'gitblog-comments-compose-close') sheet.close();
@@ -965,12 +981,14 @@ function createMobileComposeController(root, form, editor) {
     clearReply,
     getParentId: () => (state.mode === 'reply' ? state.parentId : null),
     open: replyCtx => {
-      if (replyCtx?.parentId) setReply(replyCtx);
-      else {
+      if (replyCtx?.parentId) {
+        setReply(replyCtx);
+        sheet.open({ onReady: applyReplyMention });
+      } else {
         clearReply();
         editor.clear();
+        sheet.open();
       }
-      sheet.open();
     },
     close: () => sheet.close(),
     notifySubmitted: () => sheet.notifySubmitted(),
@@ -1011,7 +1029,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     } catch { /* ignore */ }
   };
 
-  const open = () => {
+  const open = (opts = {}) => {
     const wasOpen = form.classList.contains('is-sheet-open');
     if (!wasOpen) {
       form.classList.add('is-sheet-open');
@@ -1019,13 +1037,14 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
       onOpen?.();
       postHeight(true);
     }
-    setupMobileComposeChrome(form, form.querySelector('.cb-compose-meta'), form.querySelector('.cb-compose-actions'));
+    setupComposeFooterChrome(form, form.querySelector('.cb-compose-meta'), form.querySelector('.cb-compose-actions'));
     notifyParentComposePin(true);
     form.dispatchEvent(new CustomEvent('cb-compose-sheet-change', { bubbles: true }));
     setTimeout(() => {
       editor._autosizeBody?.();
       postHeight(true);
       editor.body.focus();
+      opts.onReady?.();
     }, wasOpen ? 0 : 120);
   };
 
@@ -1270,8 +1289,8 @@ async function mount() {
   const mobileMode = isMobileDock();
   if (mobileMode) {
     initMobileComposePortal(commentsRoot, form);
-    setupMobileComposeChrome(form, metaEl, actionsEl);
   }
+  setupComposeFooterChrome(form, metaEl, actionsEl);
 
   const editor = new CommentRichEditor(editorHost, {
     allowImage: cfg.allowImage,
