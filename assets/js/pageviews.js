@@ -150,7 +150,11 @@ export async function trackAndRenderArticleView(meta = {}) {
       const article = document.querySelector('#article');
       const slug = meta.slug || article?.dataset?.slug || '';
       const title = meta.title || article?.querySelector('h1')?.textContent?.trim() || '';
-      await renderPagePvEl(el, { ...meta, slug, title, hit: true });
+      const urlKey = String(meta.urlKey || article?.dataset?.urlKey || '').trim();
+      const path = (urlKey && /^[a-z0-9-]+$/i.test(urlKey))
+        ? `/post/${urlKey}`
+        : (meta.path || location.pathname);
+      await renderPagePvEl(el, { ...meta, path, slug, title, hit: true });
     })();
   }
   await STATE.articlePvTask;
