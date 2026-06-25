@@ -27,6 +27,7 @@ import {
   pushBaiduUrls,
   collectPublicUrls,
 } from './seo-build.mjs';
+import { buildPvBeaconHeadTags } from './pv-beacon-head.mjs';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
 const cfgRaw = readFileSync('assets/js/config.js', 'utf8');
@@ -64,39 +65,6 @@ function getSaobbySiteLabel() {
 
 const SHOW_HOME_STATS = getSectionBool('pageviews', 'showHomeStats', true);
 const SAOBBY_SITE_LABEL = getSaobbySiteLabel();
-
-function getCloudbaseEmbedBaseUrl() {
-  const m = cfgRaw.match(/embedBaseUrl\s*:\s*"([^"]*)"/);
-  return m ? String(m[1]).trim() : '';
-}
-
-function buildPvBeaconHeadTags() {
-  if (!getSectionBool('pageviews', 'enabled', true)) return '';
-  const provider = (() => {
-    const m = cfgRaw.match(/pageviews\s*:\s*\{[\s\S]*?provider\s*:\s*"([^"]*)"/);
-    const p = m ? String(m[1]).trim().toLowerCase() : 'cloudbase';
-    return p === 'third-party' ? 'third-party' : 'cloudbase';
-  })();
-  if (provider !== 'cloudbase' || !getSectionBool('cloudbase', 'enabled', true)) return '';
-  const embed = getCloudbaseEmbedBaseUrl();
-  if (!embed) return '';
-  let origin = '';
-  try { origin = new URL(embed).origin; } catch { return ''; }
-  const envId = getNestedStr('cloudbase', 'envId') || (cfgRaw.match(/envId\s*:\s*"([^"]*)"/) || [])[1] || '';
-  const region = getNestedStr('cloudbase', 'region') || 'ap-shanghai';
-  const fn = getNestedStr('cloudbase', 'functionName') || 'gitblog-comments';
-  const v = (cfgRaw.match(/embedAssetVersion\s*:\s*"([^"]*)"/) || [])[1] || '';
-  const u = new URL(`${embed.replace(/\/+$/, '')}/pv-beacon.html`);
-  if (envId) u.searchParams.set('env', envId);
-  u.searchParams.set('region', region);
-  u.searchParams.set('fn', fn);
-  if (v) u.searchParams.set('v', v);
-  return [
-    `<link rel="dns-prefetch" href="${xmlEsc(origin)}">`,
-    `<link rel="preconnect" href="${xmlEsc(origin)}" crossorigin>`,
-    `<link rel="prefetch" href="${xmlEsc(u.toString())}" as="document">`,
-  ].join('\n  ');
-}
 
 const POSTS_DIR = 'posts';
 const INDEX_FILE = 'data/posts.json';
@@ -651,7 +619,11 @@ function writeRootPostHtmlRedirect(entries) {
   html = html.replace(/\n?\s*<script data-post-slug-redirect>[\s\S]*?<\/script>/g, '');
   html = html.replace(
     /(<meta name="referrer" content="no-referrer-when-downgrade">)/,
-    `$1\n  <script data-post-slug-redirect>${body}</script>`
+    (m) => {
+      const pvHints = buildPvBeaconHeadTags();
+      const redirect = `\n  <script data-post-slug-redirect>${body}</script>`;
+      return pvHints ? `${m}\n  ${pvHints}${redirect}` : `${m}${redirect}`;
+    }
   );
   writeFileSync('post.html', html);
   console.log(`post.html 已写入 slug→urlKey 跳转（${Object.keys(map).length} 篇）`);
