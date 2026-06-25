@@ -366,10 +366,28 @@ function isValidEmail(s) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || '').trim());
 }
 
+function isSmtpConfigured() {
+  return !!(String(process.env.SMTP_HOST || '').trim() && String(process.env.SMTP_USER || '').trim());
+}
+
 function isReplyNotifyEnabled() {
-  return String(process.env.REPLY_NOTIFY_ENABLED || '0') === '1'
-    && String(process.env.SMTP_HOST || '').trim()
-    && String(process.env.SMTP_USER || '').trim();
+  return String(process.env.REPLY_NOTIFY_ENABLED || '0') === '1' && isSmtpConfigured();
+}
+
+function isNewCommentNotifyEnabled() {
+  return String(process.env.COMMENT_NOTIFY_ENABLED || '0') === '1'
+    && isValidEmail(process.env.COMMENT_NOTIFY_EMAIL)
+    && isSmtpConfigured();
+}
+
+function getCommentNotifyEmail() {
+  return String(process.env.COMMENT_NOTIFY_EMAIL || '').trim();
+}
+
+function verifyAdminSecret(event) {
+  const expected = String(process.env.COMMENT_ADMIN_SECRET || '').trim();
+  const got = String(event?.adminSecret || '').trim();
+  return !!expected && expected === got;
 }
 
 function escapeHtmlText(s) {
@@ -388,11 +406,10 @@ function resolveNotifyPageUrl(pageUrl, path) {
   return `${base}/post/${p}/`;
 }
 
-async function sendReplyNotifyEmail({ to, parentNick, replyNick, excerpt, pageTitle, pageUrl, path }) {
-  if (!isValidEmail(to) || !isReplyNotifyEnabled()) return;
+function createMailTransporter() {
   const nodemailer = require('nodemailer');
   const port = Number(process.env.SMTP_PORT) || 465;
-  const transporter = nodemailer.createTransport({
+  return nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port,
     secure: port !== 587,
@@ -401,6 +418,11 @@ async function sendReplyNotifyEmail({ to, parentNick, replyNick, excerpt, pageTi
       pass: process.env.SMTP_PASS || '',
     },
   });
+}
+
+async function sendReplyNotifyEmail({ to, parentNick, replyNick, excerpt, pageTitle, pageUrl, path }) {
+  if (!isValidEmail(to) || !isReplyNotifyEnabled()) return;
+  const transporter = createMailTransporter();
   const title = escapeHtmlText(String(pageTitle || '博客').slice(0, 80));
   const link = resolveNotifyPageUrl(pageUrl, path);
   const safeLink = escapeHtmlText(link);
@@ -420,6 +442,97 @@ async function sendReplyNotifyEmail({ to, parentNick, replyNick, excerpt, pageTi
 <p style="font-size:12px;color:#999;">${safeLink}</p>
 </div>`,
   });
+}
+
+async function sendNewCommentNotifyEmail({ nick, excerpt, pageTitle, pageUrl, path, isReply, replyToNick, status }) {
+  if (!isNewCommentNotifyEnabled()) return;
+  const to = getCommentNotifyEmail();
+  const transporter = createMailTransporter();
+  const title = escapeHtmlText(String(pageTitle || '博客').slice(0, 80));
+  const link = resolveNotifyPageUrl(pageUrl, path);
+  const safeLink = escapeHtmlText(link);
+  const safeNick = escapeHtmlText(nick);
+  const safeExcerpt = escapeHtmlText(excerpt);
+  const safeReplyTo = escapeHtmlText(replyToNick || '');
+  const from = String(process.env.SMTP_FROM || process.env.SMTP_USER).trim();
+  const pending = status === 'pending';
+  const kind = isReply ? `回复 @${replyToNick || '某人'}` : '新评论';
+  const subject = `【${String(pageTitle || '博客').slice(0, 80)}】${kind} · ${nick}${pending ? '（待审核）' : ''}`;
+  const textKind = isReply ? `${nick} 回复了 @${replyToNick || '某人'}` : `${nick} 发表了新评论`;
+  await transporter.sendMail({
+    from,
+    to,
+    subject,
+    text: `${textKind}（${pending ? '待审核' : '已显示'}）\n\n${excerpt}\n\n查看原文：${link}`,
+    html: `<div style="font-family:sans-serif;font-size:14px;line-height:1.6;color:#333;">
+<p><strong>${safeNick}</strong> ${isReply ? `回复了 <strong>@${safeReplyTo}</strong>` : '发表了新评论'}${pending ? '（<span style="color:#c97a00;">待审核</span>）' : ''}：</p>
+<blockquote style="margin:12px 0;padding:8px 12px;border-left:3px solid #ea6c5c;background:#f7f7f7;">${safeExcerpt}</blockquote>
+<p><a href="${safeLink}" style="color:#ea6c5c;text-decoration:underline;" target="_blank" rel="noopener">查看原文</a></p>
+<p style="font-size:12px;color:#999;">${safeLink}</p>
+<p style="font-size:12px;color:#999;">页面：${title}</p>
+</div>`,
+  });
+}
+
+function adminComment(row) {
+  const nick = row.nick || '访客';
+  return {
+    _id: row._id,
+    path: row.path,
+    nick,
+    avatar: sanitizeAvatar(row.avatar, nick),
+    contentPlain: stripPlain(stripMentionHtml(row.contentHtml)).slice(0, 300),
+    parentId: row.parentId || null,
+    replyToNick: row.replyToNick || null,
+    pageTitle: row.pageTitle || '',
+    pageUrl: row.pageUrl || '',
+    status: row.status || 'visible',
+    createdAt: row.createdAt,
+    createdAtIso: row.createdAtIso,
+  };
+}
+
+async function handleAdminList(event) {
+  if (!verifyAdminSecret(event)) return jsonErr('管理密钥无效', 403);
+  const limit = Math.min(Math.max(Number(event.limit) || 50, 1), 200);
+  const skip = Math.max(Number(event.skip) || 0, 0);
+  const path = String(event.path || '').trim();
+  const status = String(event.status || '').trim();
+  const _ = db.command;
+  let query = db.collection(COLLECTION);
+  const where = {};
+  if (path) where.path = path;
+  if (status && status !== 'all') where.status = status;
+  else where.status = _.neq('deleted');
+  query = query.where(where);
+  const res = await query.orderBy('createdAt', 'desc').skip(skip).limit(limit).get();
+  const comments = (res.data || []).map(adminComment);
+  return jsonOk({ comments, skip, limit });
+}
+
+async function handleAdminDelete(event) {
+  if (!verifyAdminSecret(event)) return jsonErr('管理密钥无效', 403);
+  const id = String(event.id || '').trim();
+  if (!id) return jsonErr('缺少 id');
+  const got = await db.collection(COLLECTION).doc(id).get();
+  const doc = got?.data?.[0];
+  if (!doc) return jsonErr('评论不存在', 404);
+  if ((doc.status || 'visible') === 'deleted') return jsonOk({ deleted: true });
+
+  const now = Date.now();
+  const _ = db.command;
+  await db.collection(COLLECTION).doc(id).update({
+    status: 'deleted',
+    deletedAt: now,
+  });
+
+  const childRes = await db.collection(COLLECTION).where({ parentId: id, status: _.neq('deleted') }).get();
+  const children = childRes?.data || [];
+  await Promise.all(children.map(child =>
+    db.collection(COLLECTION).doc(child._id).update({ status: 'deleted', deletedAt: now }).catch(() => null)
+  ));
+
+  return jsonOk({ deleted: true, cascaded: children.length });
 }
 
 async function handleGet(event) {
@@ -497,8 +610,8 @@ async function handlePost(event, context) {
 
   await markUploadsUsed(extractFileIdsFromHtml(contentHtml));
 
+  const excerpt = stripPlain(contentHtml).slice(0, 200);
   if (parentDoc && isValidEmail(parentDoc.email) && !moderation) {
-    const excerpt = stripPlain(contentHtml).slice(0, 200);
     sendReplyNotifyEmail({
       to: parentDoc.email,
       parentNick: replyToNick,
@@ -509,6 +622,17 @@ async function handlePost(event, context) {
       path,
     }).catch(err => console.error('reply notify failed', err));
   }
+
+  sendNewCommentNotifyEmail({
+    nick,
+    excerpt,
+    pageTitle,
+    pageUrl,
+    path,
+    isReply: !!parentId,
+    replyToNick,
+    status: doc.status,
+  }).catch(err => console.error('new comment notify failed', err));
 
   return jsonOk({ id: addRes.id, status: doc.status });
 }
@@ -642,6 +766,8 @@ async function dispatch(event, context) {
   if (action === 'IMAGE') return await handleImage(event);
   if (action === 'DISCARD_UPLOAD') return await handleDiscardUpload(event, context);
   if (action === 'CLEANUP') return await handleCleanupOrphans();
+  if (action === 'ADMIN_LIST') return await handleAdminList(event);
+  if (action === 'ADMIN_DELETE') return await handleAdminDelete(event);
   return jsonErr('未知 action');
 }
 
