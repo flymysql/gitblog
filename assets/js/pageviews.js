@@ -14,6 +14,7 @@ import {
   batchGetPageViews,
   batchGetCommentCounts,
   formatCount,
+  preloadPvBeacon,
 } from './cloudbase-pv.js';
 import { isCommentsReady } from './comments-embed.js';
 import { holdLazyImages, releaseLazyImages } from './load-priority.js';
@@ -183,9 +184,16 @@ function injectSaobbySiteSlots(root = document) {
 }
 
 function injectCloudBaseSiteSlots(root = document) {
-  root.querySelectorAll('[data-saobby-slot="site"]').forEach(el => {
+  root.querySelectorAll('[data-saobby-slot="site"]:not([data-pv-site-done="1"])').forEach(el => {
     runWithPageviewPriority(() => renderSitePvSlot(el));
   });
+}
+
+/** 仅挂载指定区域内的站点统计（Hero 重绘后补挂） */
+export function mountSitePvSlots(root = document) {
+  const cfg = pvCfg();
+  if (cfg.enabled === false || !useCloudBase()) return;
+  injectCloudBaseSiteSlots(root);
 }
 
 function injectVercountScript() {
@@ -268,20 +276,28 @@ export function articleListPvHtml() {
   return '';
 }
 
-function readListStatsCache() {
+function readListStatsCacheAny() {
   try {
     const raw = sessionStorage.getItem(LIST_STATS_CACHE_KEY);
     if (!raw) return null;
     const data = JSON.parse(raw);
     if (!data || typeof data !== 'object') return null;
-    if (!Number.isFinite(data.ts) || Date.now() - data.ts > LIST_STATS_CACHE_MS) return null;
+    const age = Number.isFinite(data.ts) ? Date.now() - data.ts : Infinity;
     return {
       pv: data.pv && typeof data.pv === 'object' ? data.pv : {},
       comments: data.comments && typeof data.comments === 'object' ? data.comments : {},
+      fresh: age <= LIST_STATS_CACHE_MS,
+      stale: age > LIST_STATS_CACHE_MS,
     };
   } catch {
     return null;
   }
+}
+
+function readListStatsCache() {
+  const data = readListStatsCacheAny();
+  if (!data || data.stale) return null;
+  return { pv: data.pv, comments: data.comments };
 }
 
 function writeListStatsCache(pvMap, commentMap) {
@@ -302,17 +318,48 @@ function listStatsHtml(pv, comments, { showPv, showCm }) {
   return parts.join(' ');
 }
 
-function applyListStatsToSlot(el, pv, comments, opts) {
-  if (!el || el.dataset.listStatsDone === '1') return;
+function updateListStatsSlot(el, pv, comments, opts) {
+  if (!el) return;
   const html = listStatsHtml(pv, comments, opts);
   if (!html) {
     el.hidden = true;
-    el.dataset.listStatsDone = '1';
     return;
   }
   el.innerHTML = html;
   el.hidden = false;
-  el.dataset.listStatsDone = '1';
+}
+
+function applyListStatsToSlot(el, pv, comments, opts, { finalize = true } = {}) {
+  updateListStatsSlot(el, pv, comments, opts);
+  if (finalize) el.dataset.listStatsDone = '1';
+  else delete el.dataset.listStatsDone;
+}
+
+/** 列表渲染后立刻用缓存（含过期缓存）同步展示，不阻塞网络 */
+export function syncArticleListStatsFromCache(root = document) {
+  const list = root.querySelector ? root.querySelector('#postList') : null;
+  if (!list || list.classList.contains('post-list--giscus')) return;
+
+  const showPv = useCloudBase() && pvCfg().showPostViews !== false;
+  const showCm = isCommentsReady();
+  if (!showPv && !showCm) return;
+
+  const cache = readListStatsCacheAny();
+  if (!cache) return;
+
+  list.querySelectorAll('.post-list-stats').forEach(el => {
+    if (el.dataset.listStatsDone === '1') return;
+    const pvPath = String(el.dataset.pvPath || '').trim();
+    const commentPath = String(el.dataset.commentPath || '').trim();
+    const cachedPv = showPv && pvPath && cache.pv[pvPath] != null ? cache.pv[pvPath] : null;
+    const cachedCm = showCm && commentPath && cache.comments[commentPath] != null
+      ? cache.comments[commentPath]
+      : null;
+    const hasPv = !showPv || cachedPv != null;
+    const hasCm = !showCm || cachedCm != null;
+    if (!hasPv && !hasCm) return;
+    applyListStatsToSlot(el, cachedPv ?? 0, cachedCm ?? 0, { showPv, showCm }, { finalize: false });
+  });
 }
 
 export function queueArticleListViews(root = document) {
@@ -327,6 +374,8 @@ export async function renderArticleListViews(root = document) {
   const showCm = isCommentsReady();
   if (!showPv && !showCm) return;
 
+  syncArticleListStatsFromCache(root);
+
   const slots = [...list.querySelectorAll('.post-list-stats:not([data-list-stats-done="1"])')];
   if (!slots.length) return;
 
@@ -336,6 +385,8 @@ export async function renderArticleListViews(root = document) {
 
   const task = (async () => {
     const cache = readListStatsCache();
+    const staleCache = readListStatsCacheAny();
+    const forceRefresh = !!staleCache?.stale;
     const needPv = new Set();
     const needCm = new Set();
     const slotMeta = slots.map(el => ({
@@ -345,20 +396,22 @@ export async function renderArticleListViews(root = document) {
     }));
 
     for (const { el, pvPath, commentPath } of slotMeta) {
-      const cachedPv = showPv && pvPath && cache?.pv ? cache.pv[pvPath] : undefined;
-      const cachedCm = showCm && commentPath && cache?.comments ? cache.comments[commentPath] : undefined;
-      const hasPv = !showPv || cachedPv != null;
-      const hasCm = !showCm || cachedCm != null;
-      if (hasPv && hasCm) {
-        applyListStatsToSlot(el, cachedPv ?? 0, cachedCm ?? 0, { showPv, showCm });
-        continue;
+      if (!forceRefresh) {
+        const cachedPv = showPv && pvPath && cache?.pv ? cache.pv[pvPath] : undefined;
+        const cachedCm = showCm && commentPath && cache?.comments ? cache.comments[commentPath] : undefined;
+        const hasFreshPv = !showPv || cachedPv != null;
+        const hasFreshCm = !showCm || cachedCm != null;
+        if (hasFreshPv && hasFreshCm) {
+          applyListStatsToSlot(el, cachedPv ?? 0, cachedCm ?? 0, { showPv, showCm });
+          continue;
+        }
       }
-      if (showPv && pvPath && cachedPv == null) needPv.add(pvPath);
-      if (showCm && commentPath && cachedCm == null) needCm.add(commentPath);
+      if (showPv && pvPath) needPv.add(pvPath);
+      if (showCm && commentPath) needCm.add(commentPath);
     }
 
     const pending = slotMeta.filter(({ el }) => el.dataset.listStatsDone !== '1');
-    if (!pending.length) return;
+    if (!pending.length || (!needPv.size && !needCm.size)) return;
 
     const [pvMap, cmMap] = await Promise.all([
       needPv.size ? batchGetPageViews([...needPv]).catch(() => ({})) : Promise.resolve({}),
@@ -371,12 +424,11 @@ export async function renderArticleListViews(root = document) {
 
     const mergedCache = readListStatsCache();
     for (const { el, pvPath, commentPath } of pending) {
-      if (el.dataset.listStatsDone === '1') continue;
       const pv = showPv && pvPath
-        ? (mergedCache?.pv?.[pvPath] ?? pvMap[pvPath] ?? 0)
+        ? (mergedCache?.pv?.[pvPath] ?? pvMap[pvPath] ?? staleCache?.pv?.[pvPath] ?? 0)
         : 0;
       const cm = showCm && commentPath
-        ? (mergedCache?.comments?.[commentPath] ?? cmMap[commentPath] ?? 0)
+        ? (mergedCache?.comments?.[commentPath] ?? cmMap[commentPath] ?? staleCache?.comments?.[commentPath] ?? 0)
         : 0;
       applyListStatsToSlot(el, pv, cm, { showPv, showCm });
     }
@@ -396,6 +448,8 @@ export function initPageviews() {
     hideAllSaobby(document);
     return;
   }
+
+  preloadPvBeacon();
 
   if (useCloudBase()) {
     injectCloudBaseSiteSlots(document);
