@@ -1,8 +1,10 @@
 /**
  * 文章主题插画封面：根据标题/摘要/标签匹配场景，生成无大段文字的 SVG 插画
  */
-const W = 1200;
-const H = 630;
+import {
+  W, H, PALETTES, wrap, layeredHills, softSun, cloud, bokeh,
+  glassCard, tree, waterReflection, openBook, fountainPen,
+} from './cover-illustration-helpers.mjs';
 
 /** @typedef {{ slug?: string, title?: string, summary?: string, tags?: string[], series?: string }} PostMeta */
 
@@ -65,519 +67,539 @@ export function pickCoverTheme(post) {
   return { theme: best.id, seed };
 }
 
-function wrap(svgBody, palette) {
-  const { skyTop, skyBot, accent } = palette;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-  <defs>
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${skyTop}"/>
-      <stop offset="100%" stop-color="${skyBot}"/>
-    </linearGradient>
-    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="${accent}" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="${accent}" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
-  <rect width="${W}" height="${H}" fill="url(#sky)"/>
-  <ellipse cx="980" cy="120" rx="280" ry="180" fill="url(#glow)"/>
-  ${svgBody}
-</svg>`;
-}
-
-const PALETTES = {
-  warm: { skyTop: '#fff4ee', skyBot: '#ffd9cc', accent: '#ea6f5a' },
-  cool: { skyTop: '#eef6ff', skyBot: '#c8dff5', accent: '#5b8def' },
-  green: { skyTop: '#f0faf0', skyBot: '#c8e8c8', accent: '#4caf7a' },
-  dusk: { skyTop: '#2a2040', skyBot: '#5a3d6e', accent: '#e8a87c' },
-  gold: { skyTop: '#fff8e8', skyBot: '#f5d9a0', accent: '#d4a03c' },
-  snow: { skyTop: '#e8f0f8', skyBot: '#b8cce0', accent: '#7eb8e8' },
-};
-
 function sceneRecommendation() {
+  const p = PALETTES.warm;
   return wrap(`
-  <g opacity="0.15"><circle cx="200" cy="150" r="80" fill="#ea6f5a"/><circle cx="1000" cy="480" r="120" fill="#ea6f5a"/></g>
-  <g transform="translate(180,120)">
-    ${[0, 1, 2, 3].map(i => `<circle cx="${i * 110}" cy="0" r="28" fill="#fff" stroke="#ea6f5a" stroke-width="3"/>`).join('')}
-    ${[0, 1, 2].map(i => `<rect x="${i * 130 + 20}" y="180" width="56" height="56" rx="8" fill="#fff" stroke="#5b8def" stroke-width="3"/>`).join('')}
+  ${bokeh(42, 22)}
+  <g opacity="0.12"><circle cx="180" cy="140" r="100" fill="${p.accent}"/><circle cx="1000" cy="460" r="140" fill="${p.accent2}"/></g>
+  <g transform="translate(120,100)" filter="url(#softShadow)">
+    ${[0, 1, 2, 3].map(i => `<circle cx="${i * 130 + 40}" cy="60" r="34" fill="#fff" stroke="${p.accent}" stroke-width="2.5" opacity="0.95"/>`).join('')}
+    ${[0, 1, 2].map(i => `<rect x="${i * 150 + 20}" y="220" width="64" height="64" rx="14" fill="#fff" stroke="${p.accent2}" stroke-width="2" opacity="0.9"/>`).join('')}
     ${[0, 1, 2, 3].flatMap(ui => [0, 1, 2].map(ii => {
-      const x1 = ui * 110, y1 = 0, x2 = ii * 130 + 48, y2 = 208;
-      const opacity = 0.15 + ((ui + ii) % 3) * 0.12;
-      return `<line x1="${x1}" y1="${y1 + 28}" x2="${x2}" y2="${y2}" stroke="#ea6f5a" stroke-width="2" opacity="${opacity}"/>`;
+      const x1 = ui * 130 + 40, y1 = 94, x2 = ii * 150 + 52, y2 = 220;
+      const op = 0.1 + ((ui + ii) % 4) * 0.08;
+      return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${p.accent}" stroke-width="2.5" opacity="${op}" stroke-linecap="round"/>`;
     })).join('')}
-    <text x="220" y="320" fill="#888" font-size="22" font-family="monospace">U2I · Matrix Factorization</text>
   </g>
-  <g transform="translate(700,80)">
-    <rect x="0" y="0" width="380" height="380" rx="20" fill="#fff" opacity="0.85"/>
-    ${Array.from({ length: 5 }, (_, r) => Array.from({ length: 5 }, (_, c) => {
-      const v = (r * 5 + c) % 7;
-      const colors = ['#ea6f5a', '#5b8def', '#4caf7a', '#f5c842', '#c77dff'];
-      return `<rect x="${20 + c * 68}" y="${20 + r * 68}" width="56" height="56" rx="6" fill="${colors[v]}" opacity="${0.3 + v * 0.08}"/>`;
+  ${glassCard(680, 90, 400, 400, 24, `
+    ${Array.from({ length: 6 }, (_, r) => Array.from({ length: 6 }, (_, c) => {
+      const v = (r * 6 + c) % 8;
+      const colors = ['#e86f5a', '#5b9ef0', '#4caf7a', '#f0c040', '#b070e8', '#f080a0'];
+      return `<rect x="${24 + c * 58}" y="${24 + r * 58}" width="48" height="48" rx="10" fill="${colors[v]}" opacity="${0.22 + v * 0.06}"/>`;
     }).join('')).join('')}
-  </g>
-  `, PALETTES.warm);
+    <circle cx="200" cy="200" r="80" fill="${p.accent}" opacity="0.08" filter="url(#blur20)"/>
+  `)}
+  `, p);
 }
 
 function sceneCampusSummer(seed) {
-  const treeX = [80, 200, 340, 480, 620, 760, 900, 1050];
+  const p = PALETTES.green;
+  const treeXs = [60, 180, 310, 450, 590, 730, 870, 1010];
   return wrap(`
-  <rect x="0" y="420" width="${W}" height="210" fill="#8bc96a"/>
-  <path d="M0,420 Q300,390 600,420 T1200,420 L1200,630 L0,630Z" fill="#6aad4e"/>
-  ${treeX.map((x, i) => `
-    <rect x="${x + 15}" y="${300 + (i % 3) * 10}" width="12" height="130" fill="#7a5c3a"/>
-    <ellipse cx="${x + 21}" cy="${270 + (i % 3) * 10}" rx="45" ry="55" fill="#${i % 2 ? '5a9e42' : '4a8e32'}"/>
-    <ellipse cx="${x + 5}" cy="${285 + (i % 3) * 10}" rx="30" ry="38" fill="#6aad4e" opacity="0.8"/>
-  `).join('')}
-  <path d="M100,420 Q400,400 700,415 T1100,405" fill="none" stroke="#c8deb0" stroke-width="40" stroke-linecap="round" opacity="0.5"/>
-  <g transform="translate(520,360)">
-    <rect x="0" y="30" width="80" height="90" rx="4" fill="#e8d5b5"/>
-    <polygon points="0,30 40,0 80,30" fill="#c0392b"/>
-    <rect x="25" y="55" width="30" height="40" fill="#8b6914" opacity="0.5"/>
+  ${softSun(980, 95, 48)}
+  ${cloud(200, 80, 1.1, 0.7)}
+  ${cloud(750, 60, 0.9, 0.55)}
+  ${layeredHills([
+    { color: '#8ac878' },
+    { color: '#6aad5a' },
+    { color: '#4a8e42' },
+  ], 400)}
+  <path d="M0,430 Q280,400 520,418 T900,405 T1200,420 L1200,${H} L0,${H}Z" fill="${p.ground}" opacity="0.85"/>
+  <path d="M80,430 Q400,395 700,415 T1150,400" fill="none" stroke="#fff" stroke-width="48" stroke-linecap="round" opacity="0.35"/>
+  ${treeXs.map((x, i) => tree(x, 430, 0.85 + (i % 3) * 0.12, ['#4a9e42', '#5aae4a', '#3d8e38'][i % 3])).join('')}
+  <g transform="translate(500,310)" filter="url(#softShadow)">
+    <rect x="0" y="50" width="200" height="120" rx="6" fill="#f0e0c8"/>
+    <polygon points="0,50 100,0 200,50" fill="#c84838"/>
+    <rect x="75" y="85" width="50" height="65" rx="3" fill="#8b6020" opacity="0.45"/>
+    <rect x="30" y="75" width="35" height="28" rx="2" fill="#87ceeb" opacity="0.5"/>
+    <rect x="135" y="75" width="35" height="28" rx="2" fill="#87ceeb" opacity="0.5"/>
   </g>
-  <g transform="translate(380,440)">
-    <circle cx="20" cy="15" r="14" fill="#f5c6a0"/>
-    <rect x="8" y="28" width="24" height="40" rx="6" fill="#5b8def"/>
-    <line x1="20" y1="68" x2="12" y2="90" stroke="#333" stroke-width="3"/>
-    <line x1="20" y1="68" x2="28" y2="90" stroke="#333" stroke-width="3"/>
+  <g transform="translate(360,400)" opacity="0.9">
+    <circle cx="18" cy="12" r="16" fill="#f5c8a0"/>
+    <rect x="4" y="28" width="28" height="42" rx="8" fill="#5b8def"/>
+    <line x1="18" y1="70" x2="10" y2="95" stroke="#3a3848" stroke-width="3" stroke-linecap="round"/>
+    <line x1="18" y1="70" x2="26" y2="95" stroke="#3a3848" stroke-width="3" stroke-linecap="round"/>
   </g>
-  <circle cx="950" cy="100" r="55" fill="#ffe08a" opacity="0.9"/>
-  `, PALETTES.green);
+  ${bokeh(seed, 14)}
+  `, p);
 }
 
 function sceneLifeSeasons() {
+  const p = PALETTES.gold;
   return wrap(`
-  <rect x="0" y="0" width="600" height="${H}" fill="#fff0e8"/>
-  <rect x="600" y="0" width="600" height="${H}" fill="#f5ebe0"/>
-  <line x1="600" y1="0" x2="600" y2="${H}" stroke="#ccc" stroke-width="2" stroke-dasharray="8 6"/>
-  <g transform="translate(80,80)">
-    ${[0, 1, 2, 3, 4].map(i => `<ellipse cx="${60 + i * 90}" cy="${200 - (i % 3) * 30}" rx="35" ry="50" fill="#${['e84393', 'fd79a8', 'e17055', 'fdcb6e', 'e84393'][i]}" opacity="0.85"/>`).join('')}
-    ${[0, 1, 2, 3, 4].map(i => `<line x1="${60 + i * 90}" y1="250" x2="${60 + i * 90}" y2="350" stroke="#4a7a3a" stroke-width="3"/>`).join('')}
-    <text x="200" y="420" text-anchor="middle" fill="#c0392b" font-size="28" font-style="italic" opacity="0.6">夏花</text>
+  <rect x="0" y="0" width="580" height="${H}" fill="#fff5ee" opacity="0.6"/>
+  <rect x="620" y="0" width="580" height="${H}" fill="#f8f0e4" opacity="0.6"/>
+  <line x1="600" y1="40" x2="600" y2="${H - 40}" stroke="#d8c8b8" stroke-width="1.5" opacity="0.5"/>
+  <g transform="translate(60,70)">
+    ${[0, 1, 2, 3, 4].map(i => `
+      <line x1="${80 + i * 85}" y1="280" x2="${80 + i * 85}" y2="380" stroke="#5a8a48" stroke-width="3" opacity="0.7"/>
+      <ellipse cx="${80 + i * 85}" cy="${240 - (i % 3) * 25}" rx="32" ry="48" fill="${['#e84888', '#f878a8', '#e86848', '#f0b040', '#e84888'][i]}" opacity="0.82"/>
+      <ellipse cx="${65 + i * 85}" cy="${255 - (i % 3) * 25}" rx="22" ry="32" fill="${['#f878a8', '#e86848', '#f0b040', '#e84888', '#f878a8'][i]}" opacity="0.55"/>
+    `).join('')}
+    <ellipse cx="280" cy="420" rx="200" ry="30" fill="${p.accent}" opacity="0.12"/>
   </g>
-  <g transform="translate(680,60)">
-    ${[0, 1, 2, 3, 4, 5].map(i => {
-      const rot = -30 + i * 15;
-      return `<g transform="translate(${80 + (i % 3) * 100},${120 + Math.floor(i / 3) * 100}) rotate(${rot})">
-        <ellipse cx="0" cy="0" rx="18" ry="28" fill="#${['c0392b', 'd35400', 'e67e22', 'f39c12', 'd35400', 'c0392b'][i]}" opacity="0.8"/>
-        <line x1="0" y1="28" x2="0" y2="55" stroke="#8b6914" stroke-width="2"/>
+  <g transform="translate(660,50)">
+    ${[0, 1, 2, 3, 4, 5, 6].map(i => {
+      const rot = -35 + i * 12;
+      const colors = ['#c83828', '#d85820', '#e07828', '#d0a030', '#c83828', '#b05018', '#d85820'];
+      return `<g transform="translate(${60 + (i % 4) * 105},${100 + Math.floor(i / 4) * 110}) rotate(${rot})">
+        <ellipse cx="0" cy="0" rx="16" ry="26" fill="${colors[i]}" opacity="0.82"/>
+        <line x1="0" y1="26" x2="0" y2="50" stroke="#8b7020" stroke-width="2"/>
       </g>`;
     }).join('')}
-    <text x="200" y="420" text-anchor="middle" fill="#8b6914" font-size="28" font-style="italic" opacity="0.6">秋叶</text>
+    <path d="M80,380 Q280,340 480,370" fill="none" stroke="#a08050" stroke-width="2" opacity="0.25"/>
   </g>
-  `, PALETTES.gold);
+  ${softSun(520, 120, 35, '#ffe8b0')}
+  `, p);
 }
 
 function sceneNordicAutumn() {
+  const p = PALETTES.dusk;
   return wrap(`
-  <polygon points="0,350 200,200 400,280 600,180 800,250 1000,150 1200,220 1200,630 0,630" fill="#5a7a9a" opacity="0.5"/>
-  <polygon points="0,400 300,300 600,380 900,280 1200,350 1200,630 0,630" fill="#3a5a7a"/>
-  <rect x="0" y="480" width="${W}" height="150" fill="#2a4a6a"/>
-  <ellipse cx="600" cy="500" rx="500" ry="40" fill="#4a8ab0" opacity="0.6"/>
-  <ellipse cx="600" cy="510" rx="450" ry="25" fill="#6ab0d0" opacity="0.4"/>
-  ${[120, 280, 450, 620, 800, 980, 1100].map((x, i) => `
-    <rect x="${x}" y="${340 - (i % 3) * 40}" width="14" height="${150 + (i % 3) * 40}" fill="#5a4030"/>
-    <circle cx="${x + 7}" cy="${300 - (i % 3) * 40}" r="${40 + (i % 2) * 15}" fill="#${['c0392b', 'd35400', 'e67e22'][i % 3]}" opacity="0.85"/>
+  ${softSun(140, 110, 42, '#f0c878')}
+  ${layeredHills([
+    { color: '#4a6888', points: `0,320 250,200 500,260 750,170 1000,230 1200,190 1200,${H} 0,${H}` },
+    { color: '#3a5878', points: `0,380 350,280 650,340 950,260 1200,320 1200,${H} 0,${H}` },
+    { color: '#2a4868' },
+  ], 420)}
+  <rect x="0" y="470" width="${W}" height="160" fill="#1a3858"/>
+  ${waterReflection(478, '#4a90b8', 0.45)}
+  ${[100, 260, 420, 580, 740, 900, 1060].map((x, i) => `
+    <rect x="${x}" y="${360 - (i % 3) * 35}" width="12" height="${130 + (i % 3) * 35}" fill="#4a3828" opacity="0.85"/>
+    <circle cx="${x + 6}" cy="${320 - (i % 3) * 35}" r="${38 + (i % 2) * 14}" fill="${['#d84820', '#e07828', '#c83818'][i % 3]}" opacity="0.88"/>
+    <circle cx="${x - 12}" cy="${330 - (i % 3) * 35}" r="${22}" fill="${['#e07828', '#d84820'][i % 2]}" opacity="0.6"/>
   `).join('')}
-  <polygon points="900,200 1050,120 1100,250" fill="#f0f4f8" opacity="0.9"/>
-  <polygon points="950,180 1150,100 1180,220" fill="#e8ecf0" opacity="0.7"/>
-  <circle cx="150" cy="100" r="50" fill="#f5d78a" opacity="0.8"/>
-  `, PALETTES.dusk);
+  <polygon points="880,180 1080,90 1120,210" fill="#f0f4f8" opacity="0.92"/>
+  <polygon points="940,160 1160,70 1180,200" fill="#e8ecf4" opacity="0.65"/>
+  ${bokeh(77, 16)}
+  `, p);
 }
 
 function sceneNordicWinter() {
+  const p = PALETTES.snow;
   return wrap(`
-  <rect x="0" y="380" width="${W}" height="250" fill="#e8eef5"/>
-  ${[100, 250, 400, 550, 700, 850, 1000].map((x, i) => `
-    <rect x="${x}" y="${280 + (i % 2) * 20}" width="${90 + (i % 3) * 20}" height="${100 + (i % 2) * 30}" fill="#d0dae8" stroke="#b0c0d0" stroke-width="1"/>
-    <polygon points="${x},${280 + (i % 2) * 20} ${x + 45 + (i % 3) * 10},${240 + (i % 2) * 20} ${x + 90 + (i % 3) * 20},${280 + (i % 2) * 20}" fill="#c0392b" opacity="0.7"/>
-    <rect x="${x + 30}" y="${330 + (i % 2) * 20}" width="25" height="30" fill="#ffe08a" opacity="0.9"/>
+  ${cloud(300, 70, 1.2, 0.5)}
+  ${cloud(850, 50, 1, 0.4)}
+  <rect x="0" y="400" width="${W}" height="230" fill="#eef4fa"/>
+  ${[90, 240, 390, 540, 690, 840, 990].map((x, i) => `
+    <g filter="url(#cardShadow)">
+      <rect x="${x}" y="${300 + (i % 2) * 18}" width="${95 + (i % 3) * 18}" height="${105 + (i % 2) * 28}" fill="#e8f0f8" stroke="#c0d4e8" stroke-width="1"/>
+      <polygon points="${x},${300 + (i % 2) * 18} ${x + 47 + (i % 3) * 9},${258 + (i % 2) * 18} ${x + 95 + (i % 3) * 18},${300 + (i % 2) * 18}" fill="#c84838" opacity="0.75"/>
+      <rect x="${x + 32}" y="${350 + (i % 2) * 18}" width="28" height="32" fill="#ffe8a0" opacity="0.85" rx="2"/>
+    </g>
   `).join('')}
-  <ellipse cx="600" cy="420" rx="500" ry="30" fill="#fff" opacity="0.8"/>
-  ${Array.from({ length: 40 }, (_, i) => `<circle cx="${(i * 97 + 30) % 1200}" cy="${(i * 53 + 20) % 350}" r="${1.5 + (i % 3)}" fill="#fff" opacity="${0.5 + (i % 5) * 0.1}"/>`).join('')}
-  <g transform="translate(480,300)">
-    <rect x="0" y="40" width="120" height="80" rx="4" fill="#8b6914"/>
-    <rect x="10" y="50" width="100" height="60" fill="#ffe08a" opacity="0.85"/>
-    <rect x="0" y="30" width="120" height="15" fill="#6a4a20"/>
-    <text x="60" y="78" text-anchor="middle" fill="#8b6914" font-size="14" font-weight="bold">SHOP</text>
+  <ellipse cx="600" cy="430" rx="520" ry="28" fill="#fff" opacity="0.85"/>
+  ${Array.from({ length: 50 }, (_, i) => `<circle cx="${(i * 97 + 30) % 1200}" cy="${(i * 53 + 15) % 320}" r="${1.2 + (i % 3) * 0.8}" fill="#fff" opacity="${0.45 + (i % 5) * 0.1}"/>`).join('')}
+  <g transform="translate(470,280)" filter="url(#softShadow)">
+    <rect x="0" y="50" width="140" height="90" rx="6" fill="#8b6028"/>
+    <rect x="12" y="62" width="116" height="68" fill="#ffe8a8" opacity="0.9" rx="3"/>
+    <rect x="0" y="40" width="140" height="18" fill="#5a4020" rx="3"/>
+    <rect x="55" y="95" width="30" height="40" fill="#4a3020" rx="2"/>
   </g>
-  `, PALETTES.snow);
+  `, p);
 }
 
 function sceneAnfengRoad() {
+  const p = PALETTES.green;
   return wrap(`
-  <path d="M0,500 Q400,350 800,420 T1200,380 L1200,630 L0,630Z" fill="#7a9a5a"/>
-  <path d="M0,520 Q300,440 600,480 T1200,450" fill="none" stroke="#c8b888" stroke-width="50" stroke-linecap="round" opacity="0.7"/>
-  <path d="M0,530 Q300,460 600,490 T1200,465" fill="none" stroke="#a09060" stroke-width="4" stroke-dasharray="12 8" opacity="0.4"/>
-  ${[80, 200, 350, 500, 650, 800, 950, 1100].map((x, i) => `
-    <circle cx="${x}" cy="${430 + (i % 4) * 15}" r="8" fill="#${['e84393', 'e17055', 'fdcb6e', '6c5ce7'][i % 4]}" opacity="0.8"/>
-    <line x1="${x}" y1="${438 + (i % 4) * 15}" x2="${x}" y2="${460 + (i % 4) * 15}" stroke="#4a7a3a" stroke-width="2"/>
+  ${softSun(1050, 130, 38)}
+  ${cloud(180, 90, 0.8)}
+  ${layeredHills([{ color: '#98c878' }, { color: '#78a858' }], 360)}
+  <path d="M0,480 Q350,360 650,420 T1200,380 L1200,${H} L0,${H}Z" fill="#88b868" opacity="0.9"/>
+  <path d="M0,500 Q280,430 580,470 T1200,440" fill="none" stroke="#e8d8a8" stroke-width="55" stroke-linecap="round" opacity="0.65"/>
+  <path d="M0,510 Q280,450 580,480 T1200,455" fill="none" stroke="#a89868" stroke-width="3" stroke-dasharray="14 10" opacity="0.3"/>
+  ${[70, 190, 320, 460, 600, 740, 880, 1020].map((x, i) => `
+    <circle cx="${x}" cy="${410 + (i % 4) * 12}" r="9" fill="${['#e84888', '#e87848', '#f0c848', '#8868d8'][i % 4]}" opacity="0.75"/>
+    <line x1="${x}" y1="${419 + (i % 4) * 12}" x2="${x}" y2="${440 + (i % 4) * 12}" stroke="#5a8a40" stroke-width="2"/>
   `).join('')}
-  <g transform="translate(200,320)">
-    <rect x="0" y="60" width="280" height="100" rx="20" fill="#f5c842" opacity="0.9"/>
-    <rect x="20" y="30" width="240" height="80" rx="16" fill="#ffe08a"/>
-    ${[0, 1, 2, 3, 4].map(i => `<rect x="${35 + i * 42}" y="45" width="30" height="35" rx="4" fill="#87ceeb" opacity="0.6"/>`).join('')}
-    <rect x="0" y="130" width="280" height="20" rx="4" fill="#555"/>
-    <circle cx="50" cy="155" r="18" fill="#333"/>
-    <circle cx="230" cy="155" r="18" fill="#333"/>
+  <g transform="translate(180,280)" filter="url(#softShadow)">
+    <rect x="0" y="70" width="300" height="110" rx="22" fill="#f0c040"/>
+    <rect x="18" y="38" width="264" height="88" rx="18" fill="#ffe898"/>
+    ${[0, 1, 2, 3, 4].map(i => `<rect x="${32 + i * 46}" y="52" width="34" height="38" rx="5" fill="#98d0f0" opacity="0.55"/>`).join('')}
+    <rect x="0" y="150" width="300" height="22" rx="5" fill="#484848"/>
+    <circle cx="55" cy="175" r="20" fill="#303030"/><circle cx="245" cy="175" r="20" fill="#303030"/>
   </g>
-  <ellipse cx="1000" cy="200" rx="120" ry="60" fill="#b0d0e8" opacity="0.5"/>
-  `, PALETTES.green);
+  `, p);
 }
 
 function sceneCompiler() {
+  const p = PALETTES.warm;
   return wrap(`
-  <g transform="translate(100,100)">
-    <rect x="0" y="0" width="200" height="380" rx="16" fill="#3776ab"/>
-    <text x="100" y="60" text-anchor="middle" fill="#fff" font-size="48" font-weight="bold">Py</text>
-    <text x="100" y="200" text-anchor="middle" fill="#ffd43b" font-size="20" font-family="monospace">def compile():</text>
-    <text x="100" y="230" text-anchor="middle" fill="#fff" font-size="16" font-family="monospace">  parse()</text>
-    <text x="100" y="255" text-anchor="middle" fill="#fff" font-size="16" font-family="monospace">  emit()</text>
+  ${bokeh(11, 16)}
+  <g transform="translate(80,80)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="220" height="400" rx="20" fill="#3a7ab0"/>
+  <text x="110" y="70" text-anchor="middle" fill="#fff" font-size="52" font-weight="bold" font-family="system-ui,sans-serif">Py</text>
+    <rect x="30" y="120" width="160" height="200" rx="12" fill="#2a5a88" opacity="0.5"/>
+    <rect x="45" y="140" width="90" height="10" rx="3" fill="#ffd858" opacity="0.8"/>
+    <rect x="45" y="165" width="120" height="8" rx="2" fill="#fff" opacity="0.5"/>
+    <rect x="45" y="185" width="100" height="8" rx="2" fill="#fff" opacity="0.4"/>
+    <rect x="45" y="205" width="110" height="8" rx="2" fill="#fff" opacity="0.4"/>
   </g>
-  <g transform="translate(480,200)">
-    ${[0, 1, 2].map(i => `<rect x="${i * 30}" y="${i * 20}" width="80" height="50" rx="8" fill="#ea6f5a" opacity="${0.5 + i * 0.15}" transform="rotate(${i * 15} 40 25)"/>`).join('')}
-    <text x="60" y="120" text-anchor="middle" fill="#888" font-size="18">LEX → AST → ASM</text>
+  <g transform="translate(470,180)">
+    ${[0, 1, 2].map(i => `<rect x="${i * 28}" y="${i * 18}" width="90" height="55" rx="12" fill="${p.accent}" opacity="${0.35 + i * 0.18}" transform="rotate(${i * 12} 45 27)"/>`).join('')}
+    <circle cx="80" cy="130" r="6" fill="${p.accent2}" opacity="0.6"/><circle cx="130" cy="130" r="6" fill="${p.accent2}" opacity="0.6"/>
+    <line x1="86" y1="130" x2="124" y2="130" stroke="${p.accent}" stroke-width="2" opacity="0.5"/>
   </g>
-  <g transform="translate(800,100)">
-    <rect x="0" y="0" width="200" height="380" rx="16" fill="#555"/>
-    <text x="100" y="60" text-anchor="middle" fill="#5b8def" font-size="48" font-weight="bold">C</text>
-    <text x="100" y="200" text-anchor="middle" fill="#0f0" font-size="16" font-family="monospace">mov eax, 1</text>
-    <text x="100" y="225" text-anchor="middle" fill="#0f0" font-size="16" font-family="monospace">call printf</text>
-    <text x="100" y="250" text-anchor="middle" fill="#0f0" font-size="16" font-family="monospace">ret</text>
+  <g transform="translate(780,80)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="220" height="400" rx="20" fill="#3a3a48"/>
+    <text x="110" y="70" text-anchor="middle" fill="#5b9ef0" font-size="52" font-weight="bold" font-family="system-ui,sans-serif">C</text>
+    <rect x="30" y="120" width="160" height="200" rx="12" fill="#1a1a28" opacity="0.6"/>
+    <rect x="45" y="150" width="100" height="8" rx="2" fill="#68e878" opacity="0.7"/>
+    <rect x="45" y="175" width="80" height="8" rx="2" fill="#68e878" opacity="0.55"/>
+    <rect x="45" y="200" width="90" height="8" rx="2" fill="#68e878" opacity="0.55"/>
   </g>
-  <path d="M300,290 L480,290" stroke="#ea6f5a" stroke-width="3" marker-end="url(#arrow)"/>
-  <path d="M680,290 L800,290" stroke="#ea6f5a" stroke-width="3"/>
-  <defs><marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#ea6f5a"/></marker></defs>
-  `, PALETTES.warm);
+  <path d="M300,280 L470,280" stroke="${p.accent}" stroke-width="3" opacity="0.6" marker-end="url(#arrow)"/>
+  <path d="M680,280 L780,280" stroke="${p.accent}" stroke-width="3" opacity="0.6"/>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="${p.accent}"/></marker></defs>
+  `, p);
 }
 
 function sceneSqlDb() {
+  const p = PALETTES.cool;
   return wrap(`
-  <g transform="translate(350,80)">
-    <ellipse cx="200" cy="60" rx="160" ry="40" fill="#5b8def"/>
-    <rect x="40" y="60" width="320" height="200" fill="#4a7ad0"/>
-    <ellipse cx="200" cy="260" rx="160" ry="40" fill="#3a6ac0"/>
-    <ellipse cx="200" cy="120" rx="160" ry="40" fill="#6a9ae8" opacity="0.5"/>
-    <ellipse cx="200" cy="180" rx="160" ry="40" fill="#6a9ae8" opacity="0.3"/>
-    <text x="200" y="170" text-anchor="middle" fill="#fff" font-size="36" font-weight="bold">SQL</text>
+  ${bokeh(33, 18)}
+  <g transform="translate(380,70)" filter="url(#softShadow)">
+    <ellipse cx="200" cy="55" rx="170" ry="42" fill="#4a88e8"/>
+    <rect x="30" y="55" width="340" height="210" fill="#3a78d8"/>
+    <ellipse cx="200" cy="265" rx="170" ry="42" fill="#2a68c8"/>
+    <ellipse cx="200" cy="115" rx="170" ry="42" fill="#5a98f0" opacity="0.35"/>
+    <ellipse cx="200" cy="175" rx="170" ry="42" fill="#5a98f0" opacity="0.2"/>
+    <text x="200" y="175" text-anchor="middle" fill="#fff" font-size="42" font-weight="bold" font-family="system-ui,sans-serif" opacity="0.95">SQL</text>
   </g>
-  <g transform="translate(100,200)" opacity="0.8">
-    <rect x="0" y="0" width="180" height="120" rx="8" fill="#fff" stroke="#5b8def" stroke-width="2"/>
-    ${[0, 1, 2, 3].map(r => `<line x1="10" y1="${25 + r * 25}" x2="170" y2="${25 + r * 25}" stroke="#ddd" stroke-width="1"/>`).join('')}
-    ${[0, 1, 2, 3].map(r => [0, 1, 2].map(c => `<rect x="${15 + c * 55}" y="${8 + r * 25}" width="45" height="18" rx="3" fill="#${['e8f0ff', 'd0e4ff', 'e8f0ff'][c]}" opacity="0.8"/>`).join('')).join('')}
-  </g>
-  <g transform="translate(750,180)" opacity="0.8">
-    <rect x="0" y="0" width="280" height="160" rx="8" fill="#1e1e2e"/>
-    <text x="20" y="35" fill="#c678dd" font-size="16" font-family="monospace">SELECT * FROM</text>
-    <text x="20" y="60" fill="#98c379" font-size="16" font-family="monospace">  users WHERE id=1;</text>
-    <text x="20" y="100" fill="#61afef" font-size="16" font-family="monospace">JOIN orders ON ...</text>
-  </g>
-  `, PALETTES.cool);
+  ${glassCard(90, 170, 200, 140, 14, `
+    ${[0, 1, 2, 3].map(r => `<line x1="16" y1="${28 + r * 26}" x2="184" y2="${28 + r * 26}" stroke="#d8e8f8" stroke-width="1"/>`).join('')}
+    ${[0, 1, 2, 3].map(r => [0, 1, 2].map(c => `<rect x="${18 + c * 58}" y="${12 + r * 26}" width="48" height="16" rx="4" fill="${['#e8f2ff', '#d0e8ff', '#e8f2ff'][c]}" opacity="0.85"/>`).join('')).join('')}
+  `)}
+  ${glassCard(720, 150, 320, 200, 14, `
+    <rect x="20" y="28" width="120" height="10" rx="3" fill="#c878e8" opacity="0.7"/>
+    <rect x="20" y="52" width="200" height="8" rx="2" fill="#88c878" opacity="0.6"/>
+    <rect x="20" y="72" width="180" height="8" rx="2" fill="#88c878" opacity="0.5"/>
+    <rect x="20" y="110" width="160" height="8" rx="2" fill="#78b8f0" opacity="0.6"/>
+    <rect x="20" y="130" width="140" height="8" rx="2" fill="#78b8f0" opacity="0.5"/>
+  `)}
+  `, p);
 }
 
 function sceneMiniprogram() {
+  const p = PALETTES.green;
   return wrap(`
-  <rect x="380" y="60" width="440" height="520" rx="40" fill="#1a1a2e" stroke="#333" stroke-width="4"/>
-  <rect x="400" y="100" width="400" height="460" rx="8" fill="#fff"/>
-  <rect x="400" y="100" width="400" height="50" fill="#07c160"/>
-  <text x="600" y="133" text-anchor="middle" fill="#fff" font-size="20">微信小程序</text>
-  <g transform="translate(430,180)">
-    ${[0, 1, 2].map(r => [0, 1, 2].map(c => `
-      <rect x="${c * 120}" y="${r * 110}" width="100" height="90" rx="12" fill="#${['fff0ee', 'eef6ff', 'f0fff0'][c]}" stroke="#ddd" stroke-width="1"/>
-      <circle cx="${c * 120 + 50}" cy="${r * 110 + 35}" r="20" fill="#${['ea6f5a', '5b8def', '4caf7a'][c]}"/>
-      <rect x="${c * 120 + 20}" y="${r * 110 + 65}" width="60" height="8" rx="4" fill="#ddd"/>
-    `).join('')).join('')}
+  <circle cx="200" cy="280" r="100" fill="#07c160" opacity="0.12"/>
+  <circle cx="1020" cy="180" r="80" fill="#07c160" opacity="0.1"/>
+  <g transform="translate(370,50)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="460" height="540" rx="44" fill="#1a1a2e" stroke="#3a3a50" stroke-width="3"/>
+    <rect x="18" y="38" width="424" height="480" rx="12" fill="#fff"/>
+    <rect x="18" y="38" width="424" height="54" fill="#07c160" rx="12"/>
+    <rect x="18" y="68" width="424" height="24" fill="#07c160"/>
+    <g transform="translate(38,110)">
+      ${[0, 1, 2].map(r => [0, 1, 2].map(c => `
+        <rect x="${c * 128}" y="${r * 118}" width="108" height="98" rx="14" fill="${['#fff5f2', '#f2f8ff', '#f2fff5'][c]}" stroke="#e8e8e8" stroke-width="1"/>
+        <circle cx="${c * 128 + 54}" cy="${r * 118 + 38}" r="22" fill="${['#e86f5a', '#5b9ef0', '#4caf7a'][c]}" opacity="0.85"/>
+        <rect x="${c * 128 + 22}" y="${r * 118 + 68}" width="64" height="8" rx="4" fill="#e0e0e0"/>
+      `).join('')).join('')}
+    </g>
   </g>
-  <circle cx="200" cy="300" r="80" fill="#07c160" opacity="0.2"/>
-  <circle cx="1000" cy="200" r="60" fill="#07c160" opacity="0.15"/>
-  `, PALETTES.green);
+  `, p);
 }
 
 function sceneWordpressBlog() {
+  const p = PALETTES.warm;
   return wrap(`
-  <g transform="translate(200,100)">
-    <rect x="0" y="80" width="500" height="350" rx="12" fill="#fff" stroke="#ddd" stroke-width="2"/>
-    <rect x="0" y="80" width="500" height="40" fill="#f0f0f0"/>
-    <circle cx="25" cy="100" r="8" fill="#ea6f5a"/><circle cx="50" cy="100" r="8" fill="#f5c842"/><circle cx="75" cy="100" r="8" fill="#4caf7a"/>
-    <rect x="30" y="150" width="200" height="12" rx="4" fill="#ddd"/>
-    <rect x="30" y="175" width="440" height="8" rx="3" fill="#eee"/>
-    <rect x="30" y="195" width="400" height="8" rx="3" fill="#eee"/>
-    <rect x="30" y="215" width="420" height="8" rx="3" fill="#eee"/>
-    <rect x="30" y="260" width="180" height="100" rx="8" fill="#ffd9cc"/>
-    <rect x="230" y="260" width="240" height="8" rx="3" fill="#eee"/>
-    <rect x="230" y="280" width="200" height="8" rx="3" fill="#eee"/>
+  ${glassCard(180, 90, 540, 380, 18, `
+    <rect x="0" y="0" width="540" height="42" fill="#f4f4f4" rx="18"/>
+    <circle cx="28" cy="21" r="7" fill="#e86f5a"/><circle cx="50" cy="21" r="7" fill="#f0c040"/><circle cx="72" cy="21" r="7" fill="#4caf7a"/>
+    <rect x="28" y="68" width="220" height="12" rx="4" fill="#d8d8d8"/>
+    <rect x="28" y="92" width="460" height="8" rx="3" fill="#ececec"/>
+    <rect x="28" y="110" width="420" height="8" rx="3" fill="#ececec"/>
+    <rect x="28" y="128" width="440" height="8" rx="3" fill="#ececec"/>
+    <rect x="28" y="170" width="200" height="120" rx="10" fill="#ffd8cc"/>
+    <rect x="250" y="175" width="260" height="8" rx="3" fill="#ececec"/>
+    <rect x="250" y="195" width="220" height="8" rx="3" fill="#ececec"/>
+    <rect x="250" y="215" width="240" height="8" rx="3" fill="#ececec"/>
+  `)}
+  <g transform="translate(800,130)" filter="url(#softShadow)">
+    <circle cx="90" cy="90" r="78" fill="#21759b"/>
+    <text x="90" y="108" text-anchor="middle" fill="#fff" font-size="54" font-weight="bold" font-family="Georgia,serif">W</text>
   </g>
-  <g transform="translate(780,150)">
-    <circle cx="80" cy="80" r="70" fill="#21759b"/>
-    <text x="80" y="95" text-anchor="middle" fill="#fff" font-size="48" font-weight="bold">W</text>
-  </g>
-  <g transform="translate(820,350)">
-    <rect x="0" y="0" width="120" height="140" rx="6" fill="#fff" stroke="#ea6f5a" stroke-width="2"/>
-    <line x1="15" y1="25" x2="105" y2="25" stroke="#ea6f5a" stroke-width="2"/>
-    <line x1="15" y1="45" x2="90" y2="45" stroke="#ccc" stroke-width="2"/>
-    <line x1="15" y1="65" x2="100" y2="65" stroke="#ccc" stroke-width="2"/>
-  </g>
-  `, PALETTES.warm);
+  ${glassCard(840, 340, 140, 160, 10, `
+    <line x1="18" y1="28" x2="122" y2="28" stroke="${p.accent}" stroke-width="2.5"/>
+    <line x1="18" y1="50" x2="100" y2="50" stroke="#ccc" stroke-width="2"/>
+    <line x1="18" y1="72" x2="110" y2="72" stroke="#ccc" stroke-width="2"/>
+    <line x1="18" y1="94" x2="90" y2="94" stroke="#ccc" stroke-width="2"/>
+  `)}
+  `, p);
 }
 
 function sceneVimEditor() {
+  const p = PALETTES.dusk;
   return wrap(`
-  <rect x="150" y="60" width="900" height="510" rx="12" fill="#1e1e2e" stroke="#444" stroke-width="3"/>
-  <rect x="150" y="60" width="900" height="35" fill="#2d2d3d"/>
-  <text x="180" y="84" fill="#888" font-size="16" font-family="monospace">vim — config</text>
-  <text x="180" y="130" fill="#61afef" font-size="18" font-family="monospace">set number</text>
-  <text x="180" y="160" fill="#98c379" font-size="18" font-family="monospace">syntax on</text>
-  <text x="180" y="190" fill="#c678dd" font-size="18" font-family="monospace">colorscheme desert</text>
-  <text x="180" y="220" fill="#e5c07b" font-size="18" font-family="monospace">set tabstop=4</text>
-  <text x="180" y="250" fill="#61afef" font-size="18" font-family="monospace">nnoremap &lt;leader&gt;w :w&lt;CR&gt;</text>
-  <rect x="150" y="535" width="900" height="35" fill="#2d2d3d"/>
-  <text x="180" y="558" fill="#4caf7a" font-size="16" font-family="monospace">-- NORMAL --</text>
-  <text x="950" y="558" text-anchor="end" fill="#888" font-size="16" font-family="monospace">Vim 8.2</text>
-  <g transform="translate(920,120)">
-    <rect x="0" y="0" width="80" height="380" rx="4" fill="#019833" opacity="0.85"/>
-    <text x="40" y="200" text-anchor="middle" fill="#fff" font-size="36" font-weight="bold" transform="rotate(90 40 200)">VIM</text>
+  <g transform="translate(120,50)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="960" height="530" rx="14" fill="#1e1e2e" stroke="#3a3a50" stroke-width="2"/>
+    <rect x="0" y="0" width="960" height="38" fill="#2d2d3d" rx="14"/>
+    <rect x="0" y="20" width="960" height="18" fill="#2d2d3d"/>
+    <rect x="0" y="492" width="960" height="38" fill="#2d2d3d" rx="14"/>
+    <rect x="0" y="510" width="960" height="20" fill="#2d2d3d"/>
+    ${[
+      ['#78b8f0', 90], ['#98d878', 120], ['#d888e8', 150],
+      ['#e8c878', 180], ['#78b8f0', 210], ['#98d878', 240],
+    ].map(([color, y]) => `<rect x="36" y="${y}" width="${120 + (y % 60)}" height="10" rx="3" fill="${color}" opacity="0.65"/>`).join('')}
+    <rect x="880" y="50" width="56" height="420" rx="6" fill="#019833" opacity="0.9"/>
+    <text x="908" y="270" text-anchor="middle" fill="#fff" font-size="28" font-weight="bold" font-family="system-ui,sans-serif" transform="rotate(90 908 270)">VIM</text>
   </g>
-  `, PALETTES.dusk);
+  `, p);
 }
 
 function sceneVueFrontend() {
+  const p = PALETTES.green;
   return wrap(`
-  <g transform="translate(300,80)">
-    <rect x="0" y="0" width="600" height="400" rx="16" fill="#fff" stroke="#ddd" stroke-width="2"/>
-    <rect x="0" y="0" width="600" height="50" fill="#42b883" rx="16"/>
-    <rect x="0" y="25" width="600" height="25" fill="#42b883"/>
-    <text x="300" y="35" text-anchor="middle" fill="#fff" font-size="20" font-weight="bold">Vue Component</text>
-    <g transform="translate(30,80)">
-      <rect x="0" y="0" width="160" height="280" rx="8" fill="#f0faf5" stroke="#42b883" stroke-width="2"/>
-      <rect x="20" y="30" width="120" height="60" rx="6" fill="#42b883" opacity="0.3"/>
-      <rect x="20" y="110" width="120" height="60" rx="6" fill="#35495e" opacity="0.2"/>
-      <rect x="20" y="190" width="120" height="60" rx="6" fill="#42b883" opacity="0.3"/>
+  ${glassCard(280, 70, 640, 420, 20, `
+    <rect x="0" y="0" width="640" height="52" fill="#42b883" rx="20"/>
+    <rect x="0" y="26" width="640" height="26" fill="#42b883"/>
+    <g transform="translate(28,78)">
+      <rect x="0" y="0" width="170" height="290" rx="10" fill="#f0faf5" stroke="#42b883" stroke-width="1.5"/>
+      <rect x="18" y="28" width="134" height="65" rx="8" fill="#42b883" opacity="0.28"/>
+      <rect x="18" y="108" width="134" height="65" rx="8" fill="#35495e" opacity="0.15"/>
+      <rect x="18" y="188" width="134" height="65" rx="8" fill="#42b883" opacity="0.28"/>
     </g>
-    <g transform="translate(220,80)">
-      <rect x="0" y="100" width="340" height="180" rx="8" fill="#fff5f0" stroke="#ea6f5a" stroke-width="2"/>
-      <rect x="20" y="30" width="300" height="120" rx="8" fill="#ffd9cc" opacity="0.5"/>
-      <circle cx="60" cy="180" r="8" fill="#ea6f5a"/><circle cx="90" cy="180" r="8" fill="#ddd"/><circle cx="120" cy="180" r="8" fill="#ddd"/>
+    <g transform="translate(220,78)">
+      <rect x="0" y="90" width="390" height="200" rx="10" fill="#fff8f5" stroke="#e86f5a" stroke-width="1.5"/>
+      <rect x="18" y="18" width="354" height="130" rx="10" fill="#ffd8cc" opacity="0.45"/>
+      <circle cx="48" cy="175" r="9" fill="#e86f5a"/><circle cx="82" cy="175" r="9" fill="#ddd"/><circle cx="116" cy="175" r="9" fill="#ddd"/>
     </g>
-  </g>
-  <polygon points="150,300 220,260 220,340" fill="#42b883" opacity="0.6"/>
-  <polygon points="1050,300 980,260 980,340" fill="#42b883" opacity="0.6"/>
-  `, PALETTES.green);
+  `)}
+  <polygon points="140,300 210,255 210,345" fill="#42b883" opacity="0.45"/>
+  <polygon points="1060,300 990,255 990,345" fill="#42b883" opacity="0.45"/>
+  `, p);
 }
 
 function sceneAlgorithmPat() {
+  const p = PALETTES.cool;
   return wrap(`
-  <g transform="translate(150,80)">
-    <rect x="0" y="0" width="900" height="420" rx="16" fill="#fff" stroke="#5b8def" stroke-width="2"/>
-    <text x="450" y="50" text-anchor="middle" fill="#5b8def" font-size="24" font-weight="bold">Algorithm</text>
+  ${glassCard(120, 70, 960, 440, 20, `
     ${[0, 1, 2, 3, 4].map(i => `
-      <g transform="translate(${80 + i * 160}, 100)">
-        <rect x="0" y="0" width="120" height="80" rx="8" fill="#${['e8f0ff', 'd0e4ff', 'e8f0ff', 'd0e4ff', 'e8f0ff'][i]}" stroke="#5b8def" stroke-width="1"/>
-        <text x="60" y="48" text-anchor="middle" fill="#5b8def" font-size="28" font-weight="bold">${['A', 'B', 'C', 'D', 'E'][i]}</text>
-        ${i < 4 ? `<line x1="120" y1="40" x2="160" y2="40" stroke="#ea6f5a" stroke-width="2"/>` : ''}
+      <g transform="translate(${70 + i * 170}, 80)">
+        <rect x="0" y="0" width="130" height="88" rx="12" fill="${['#e8f2ff', '#d8e8ff', '#e8f2ff', '#d8e8ff', '#e8f2ff'][i]}" stroke="#5b9ef0" stroke-width="1.5"/>
+        <circle cx="65" cy="44" r="22" fill="#5b9ef0" opacity="0.2"/>
+        <text x="65" y="52" text-anchor="middle" fill="#4a80d8" font-size="30" font-weight="bold" font-family="system-ui,sans-serif">${['A', 'B', 'C', 'D', 'E'][i]}</text>
+        ${i < 4 ? `<line x1="130" y1="44" x2="170" y2="44" stroke="${p.accent}" stroke-width="2.5" opacity="0.5"/>` : ''}
       </g>
     `).join('')}
-    <g transform="translate(80, 240)">
-      <rect x="0" y="0" width="740" height="120" rx="8" fill="#1e1e2e"/>
-      <text x="30" y="40" fill="#98c379" font-size="18" font-family="monospace">for (int i = 0; i &lt; n; i++) {</text>
-      <text x="50" y="70" fill="#61afef" font-size="18" font-family="monospace">  dp[i] = max(dp[i-1], dp[i-2] + a[i]);</text>
-      <text x="30" y="100" fill="#98c379" font-size="18" font-family="monospace">}</text>
-    </g>
-  </g>
-  `, PALETTES.cool);
+    <rect x="60" y="220" width="840" height="140" rx="12" fill="#1e1e2e" opacity="0.92"/>
+    <rect x="80" y="248" width="280" height="10" rx="3" fill="#98d878" opacity="0.7"/>
+    <rect x="100" y="272" width="400" height="10" rx="3" fill="#78b8f0" opacity="0.65"/>
+    <rect x="80" y="296" width="120" height="10" rx="3" fill="#98d878" opacity="0.7"/>
+    <rect x="80" y="320" width="200" height="10" rx="3" fill="#d888e8" opacity="0.5"/>
+  `)}
+  `, p);
 }
 
 function sceneIslandMemoir() {
+  const p = PALETTES.gold;
   return wrap(`
-  <ellipse cx="600" cy="520" rx="550" ry="60" fill="#4a8ab0" opacity="0.5"/>
-  <path d="M0,480 Q200,440 400,460 T800,450 T1200,470 L1200,630 L0,630Z" fill="#c8a882"/>
-  <path d="M100,480 Q250,420 400,460 Q550,500 700,440 Q850,380 1000,450" fill="#8b7355" opacity="0.6"/>
-  <g transform="translate(400,280)">
-    <rect x="0" y="80" width="400" height="120" rx="8" fill="#8b6914" opacity="0.8"/>
-    <rect x="20" y="40" width="360" height="80" rx="6" fill="#a08050"/>
-    <rect x="40" y="10" width="320" height="60" rx="4" fill="#c0a070"/>
-    <rect x="0" y="200" width="400" height="30" fill="#555"/>
-    <path d="M-20,200 Q200,150 420,200" fill="none" stroke="#666" stroke-width="3"/>
+  ${softSun(190, 100, 40)}
+  ${cloud(900, 80, 0.9, 0.5)}
+  <ellipse cx="600" cy="530" rx="560" ry="55" fill="#5a98c0" opacity="0.45"/>
+  <path d="M0,490 Q220,440 450,470 Q680,500 900,450 T1200,480 L1200,${H} L0,${H}Z" fill="#d8b888"/>
+  <path d="M120,490 Q300,430 480,460 Q660,490 840,440 Q1020,390 1150,460" fill="#a88868" opacity="0.55"/>
+  <g transform="translate(380,260)" filter="url(#softShadow)">
+    <rect x="0" y="90" width="440" height="130" rx="10" fill="#8b6828" opacity="0.85"/>
+    <rect x="20" y="48" width="400" height="88" rx="8" fill="#b09060"/>
+    <rect x="40" y="18" width="360" height="68" rx="6" fill="#d0b080"/>
+    <rect x="0" y="220" width="440" height="28" fill="#484848" rx="4"/>
+    <path d="M-30,220 Q220,160 470,220" fill="none" stroke="#585858" stroke-width="3"/>
   </g>
-  <circle cx="200" cy="120" r="45" fill="#ffe08a" opacity="0.7"/>
-  <g transform="translate(150,350)">
-    <rect x="0" y="0" width="60" height="80" rx="4" fill="#e8d5b5"/>
-    <polygon points="0,0 30,-25 60,0" fill="#8b4513"/>
+  <g transform="translate(140,340)" filter="url(#cardShadow)">
+    <rect x="0" y="0" width="65" height="85" rx="5" fill="#f0e0c8"/>
+    <polygon points="0,0 32,-28 65,0" fill="#7a4820"/>
   </g>
-  <g transform="translate(900,360)">
-    <rect x="0" y="0" width="50" height="70" rx="4" fill="#d0c0a0"/>
-    <polygon points="0,0 25,-20 50,0" fill="#6a4020"/>
+  <g transform="translate(920,350)" filter="url(#cardShadow)">
+    <rect x="0" y="0" width="55" height="75" rx="5" fill="#e0d0b0"/>
+    <polygon points="0,0 27,-22 55,0" fill="#5a3818"/>
   </g>
-  `, PALETTES.gold);
+  ${waterReflection(505, '#6ab0d0', 0.3)}
+  `, p);
 }
 
 function sceneTravelLake() {
+  const p = PALETTES.cool;
   return wrap(`
-  <polygon points="0,280 300,120 600,200 900,100 1200,180 1200,630 0,630" fill="#6a8a5a"/>
-  <polygon points="0,320 400,200 800,280 1200,220 1200,630 0,630" fill="#5a7a4a"/>
-  <ellipse cx="600" cy="450" rx="550" ry="80" fill="#4a9ac0" opacity="0.7"/>
-  <ellipse cx="600" cy="470" rx="500" ry="50" fill="#6ab8d8" opacity="0.5"/>
-  <circle cx="150" cy="100" r="50" fill="#ffe08a"/>
-  <path d="M500,450 Q600,420 700,450" fill="none" stroke="#fff" stroke-width="2" opacity="0.4"/>
-  <g transform="translate(750,300)">
-  ${[0, 1, 2].map(i => `<polygon points="${i * 40},80 ${i * 40 + 30},0 ${i * 40 + 60},80" fill="#fff" opacity="${0.5 - i * 0.1}"/>`).join('')}
+  ${softSun(130, 90, 50)}
+  ${cloud(700, 60, 1.1, 0.55)}
+  ${layeredHills([
+    { color: '#7aaa5a', points: `0,300 280,160 560,220 840,140 1200,200 1200,${H} 0,${H}` },
+    { color: '#5a8a42' },
+  ], 340)}
+  <ellipse cx="600" cy="460" rx="560" ry="75" fill="#4a98c8" opacity="0.65"/>
+  <ellipse cx="600" cy="478" rx="500" ry="42" fill="#78c8e8" opacity="0.4"/>
+  <path d="M480,460 Q600,430 720,460" fill="none" stroke="#fff" stroke-width="2" opacity="0.35"/>
+  <g transform="translate(780,260)" opacity="0.6">
+    ${[0, 1, 2].map(i => `<polygon points="${i * 42},90 ${i * 42 + 32},0 ${i * 42 + 64},90" fill="#fff" opacity="${0.55 - i * 0.12}"/>`).join('')}
   </g>
-  `, PALETTES.cool);
+  ${bokeh(55, 12)}
+  `, p);
 }
 
 function sceneLoveEmotion() {
+  const p = PALETTES.warm;
   return wrap(`
-  <circle cx="600" cy="500" r="300" fill="#ffd9cc" opacity="0.4"/>
-  <circle cx="500" cy="280" r="80" fill="#ea6f5a" opacity="0.85" transform="rotate(-30 500 280)"/>
-  <circle cx="580" cy="240" r="80" fill="#ea6f5a" opacity="0.85" transform="rotate(30 580 240)"/>
-  <polygon points="540,320 600,420 660,320" fill="#ea6f5a" opacity="0.85"/>
-  <circle cx="900" cy="150" r="40" fill="#ffe08a" opacity="0.8"/>
-  <circle cx="950" cy="130" r="30" fill="#ffd9cc" opacity="0.6"/>
-  ${[0, 1, 2, 3, 4].map(i => `<circle cx="${200 + i * 80}" cy="${400 + (i % 2) * 30}" r="4" fill="#ea6f5a" opacity="0.5"/>`).join('')}
-  <path d="M100,500 Q300,350 500,450 T900,400" fill="none" stroke="#ea6f5a" stroke-width="2" opacity="0.3" stroke-dasharray="6 4"/>
-  `, PALETTES.warm);
+  <circle cx="600" cy="480" r="320" fill="${p.accent}" opacity="0.1" filter="url(#blur20)"/>
+  <g filter="url(#softShadow)">
+    <circle cx="490" cy="260" r="85" fill="${p.accent}" opacity="0.88" transform="rotate(-32 490 260)"/>
+    <circle cx="580" cy="215" r="85" fill="${p.accent}" opacity="0.88" transform="rotate(32 580 215)"/>
+    <polygon points="535,310 600,430 665,310" fill="${p.accent}" opacity="0.88"/>
+  </g>
+  ${softSun(920, 140, 32, '#ffe8a8')}
+  ${bokeh(88, 20)}
+  <path d="M80,500 Q300,360 520,440 T920,390" fill="none" stroke="${p.accent}" stroke-width="2" opacity="0.2" stroke-dasharray="8 6"/>
+  `, p);
 }
 
 function sceneLifeReflection() {
+  const p = PALETTES.dusk;
   return wrap(`
-  <rect x="0" y="400" width="${W}" height="230" fill="#3a2a1a"/>
-  <rect x="500" y="200" width="200" height="280" fill="#5a4030"/>
-  <polygon points="500,200 600,120 700,200" fill="#4a3020"/>
-  <rect x="560" y="280" width="30" height="50" fill="#ffe08a" opacity="0.7"/>
-  <rect x="620" y="250" width="25" height="40" fill="#ffe08a" opacity="0.5"/>
-  <circle cx="300" cy="350" r="8" fill="#ffe08a"/>
-  <circle cx="900" cy="320" r="6" fill="#ffe08a" opacity="0.7"/>
-  <ellipse cx="600" cy="430" rx="400" ry="30" fill="#2a1a0a" opacity="0.5"/>
-  <g transform="translate(200,300)">
-    <rect x="0" y="40" width="8" height="60" fill="#8b6914"/>
-    <ellipse cx="4" cy="30" rx="50" ry="35" fill="#ea6f5a" opacity="0.7"/>
-    <rect x="60" y="50" width="100" height="6" rx="2" fill="#c0a070"/>
-    <rect x="60" y="65" width="80" height="6" rx="2" fill="#c0a070" opacity="0.6"/>
+  ${softSun(140, 100, 38, '#f0d080')}
+  <rect x="0" y="410" width="${W}" height="220" fill="#2a2018"/>
+  <g filter="url(#softShadow)">
+    <rect x="490" y="190" width="220" height="290" fill="#5a4030"/>
+    <polygon points="490,190 600,95 710,190" fill="#3a2818"/>
+    <rect x="555" y="280" width="35" height="55" fill="#ffe8a0" opacity="0.65" rx="2"/>
+    <rect x="620" y="250" width="28" height="45" fill="#ffe8a0" opacity="0.45" rx="2"/>
   </g>
-  <circle cx="150" cy="120" r="45" fill="#f5d78a" opacity="0.6"/>
-  `, PALETTES.dusk);
+  <ellipse cx="600" cy="440" rx="420" ry="32" fill="#1a1008" opacity="0.45"/>
+  <g transform="translate(190,290)">
+    <rect x="0" y="45" width="10" height="65" fill="#8b6820"/>
+    <ellipse cx="5" cy="32" rx="55" ry="38" fill="${p.accent}" opacity="0.65"/>
+    <rect x="65" y="55" width="110" height="7" rx="2" fill="#c0a070" opacity="0.7"/>
+    <rect x="65" y="72" width="90" height="7" rx="2" fill="#c0a070" opacity="0.5"/>
+  </g>
+  <circle cx="280" cy="350" r="7" fill="#ffe8a0" opacity="0.8"/>
+  <circle cx="920" cy="330" r="5" fill="#ffe8a0" opacity="0.6"/>
+  `, p);
 }
 
 function sceneCloudServer() {
+  const p = PALETTES.cool;
   return wrap(`
-  <ellipse cx="400" cy="200" rx="120" ry="60" fill="#fff" opacity="0.9"/>
-  <ellipse cx="500" cy="180" rx="100" ry="50" fill="#fff" opacity="0.85"/>
-  <ellipse cx="350" cy="180" rx="80" ry="40" fill="#fff" opacity="0.8"/>
-  <g transform="translate(650,120)">
-    <rect x="0" y="0" width="120" height="200" rx="8" fill="#2d2d3d"/>
-    <rect x="10" y="15" width="100" height="8" rx="2" fill="#4caf7a"/>
-    <rect x="10" y="30" width="100" height="8" rx="2" fill="#4caf7a" opacity="0.7"/>
-    <rect x="10" y="45" width="100" height="8" rx="2" fill="#f5c842" opacity="0.5"/>
-    ${[0, 1, 2].map(i => `<circle cx="60" cy="${100 + i * 30}" r="4" fill="#4caf7a"/>`).join('')}
-  </g>
-  <g transform="translate(820,120)">
-    <rect x="0" y="0" width="120" height="200" rx="8" fill="#2d2d3d"/>
-    <rect x="10" y="15" width="100" height="8" rx="2" fill="#5b8def"/>
-    <rect x="10" y="30" width="100" height="8" rx="2" fill="#5b8def" opacity="0.7"/>
-    ${[0, 1, 2].map(i => `<circle cx="60" cy="${100 + i * 30}" r="4" fill="#5b8def"/>`).join('')}
-  </g>
-  <path d="M500,240 L650,180" stroke="#5b8def" stroke-width="2" stroke-dasharray="6 4" opacity="0.5"/>
-  <path d="M500,240 L820,180" stroke="#5b8def" stroke-width="2" stroke-dasharray="6 4" opacity="0.5"/>
-  <rect x="200" y="380" width="800" height="160" rx="12" fill="#1e1e2e"/>
-  <text x="600" y="470" text-anchor="middle" fill="#4caf7a" font-size="20" font-family="monospace">$ deploy --production</text>
-  `, PALETTES.cool);
+  ${cloud(380, 150, 1.3, 0.88)}
+  ${cloud(520, 130, 1.1, 0.75)}
+  ${cloud(300, 170, 0.8, 0.6)}
+  ${[640, 810].map((x, i) => `
+    <g transform="translate(${x},110)" filter="url(#softShadow)">
+      <rect x="0" y="0" width="130" height="210" rx="10" fill="#2a2a38"/>
+      ${[0, 1, 2, 3].map(j => `<rect x="14" y="${18 + j * 18}" width="102" height="9" rx="2" fill="${i ? '#5b9ef0' : '#4caf7a'}" opacity="${0.85 - j * 0.12}"/>`).join('')}
+      ${[0, 1, 2].map(j => `<circle cx="65" cy="${110 + j * 32}" r="5" fill="${i ? '#5b9ef0' : '#4caf7a'}"/>`).join('')}
+    </g>
+  `).join('')}
+  <path d="M520,280 L640,200" stroke="#5b9ef0" stroke-width="2" stroke-dasharray="8 5" opacity="0.4"/>
+  <path d="M520,280 L810,200" stroke="#5b9ef0" stroke-width="2" stroke-dasharray="8 5" opacity="0.4"/>
+  ${glassCard(180, 360, 840, 150, 16, `
+    <rect x="40" y="55" width="320" height="12" rx="4" fill="#4caf7a" opacity="0.55"/>
+    <rect x="40" y="80" width="240" height="10" rx="3" fill="#78b8f0" opacity="0.45"/>
+    <circle cx="720" cy="75" r="40" fill="#4caf7a" opacity="0.15"/>
+  `)}
+  `, p);
 }
 
 function sceneFarmGame() {
+  const p = PALETTES.green;
   return wrap(`
-  <rect x="0" y="350" width="${W}" height="280" fill="#8b6914"/>
+  ${softSun(90, 75, 42)}
+  ${cloud(500, 60, 0.8, 0.5)}
+  <rect x="0" y="360" width="${W}" height="270" fill="#8b7028"/>
   ${[0, 1, 2, 3, 4, 5].map(i => `
-    <rect x="${80 + i * 180}" y="380" width="140" height="100" rx="4" fill="#${['8b7355', 'a08050', '8b7355', 'a08050', '8b7355', 'a08050'][i]}" stroke="#6a5030" stroke-width="1"/>
-    <text x="${150 + i * 180}" y="445" text-anchor="middle" font-size="36">${['🥬', '🥕', '🌽', '🍅', '🍆', '🌻'][i]}</text>
+    <rect x="${70 + i * 185}" y="390" width="150" height="110" rx="6" fill="${['#9a8060', '#b09070', '#9a8060', '#b09070', '#9a8060', '#b09070'][i]}" stroke="#7a5830" stroke-width="1.5"/>
+    <text x="${145 + i * 185}" y="460" text-anchor="middle" font-size="40">${['🥬', '🥕', '🌽', '🍅', '🍆', '🌻'][i]}</text>
   `).join('')}
-  <g transform="translate(450,120)">
-    <rect x="0" y="60" width="300" height="180" rx="12" fill="#c0392b" opacity="0.8"/>
-    <polygon points="0,60 150,0 300,60" fill="#8b2020"/>
-    <rect x="120" y="120" width="60" height="80" fill="#5a3010"/>
-    <rect x="40" y="100" width="50" height="40" fill="#ffe08a" opacity="0.6"/>
-    <rect x="210" y="100" width="50" height="40" fill="#ffe08a" opacity="0.6"/>
+  <g transform="translate(430,100)" filter="url(#softShadow)">
+    <rect x="0" y="70" width="340" height="200" rx="14" fill="#c83828" opacity="0.88"/>
+    <polygon points="0,70 170,0 340,70" fill="#982018"/>
+    <rect x="130" y="140" width="70" height="95" fill="#5a3010" rx="3"/>
+    <rect x="40" y="115" width="55" height="45" fill="#ffe8a0" opacity="0.55" rx="3"/>
+    <rect x="245" y="115" width="55" height="45" fill="#ffe8a0" opacity="0.55" rx="3"/>
   </g>
-  <circle cx="100" cy="80" r="45" fill="#ffe08a"/>
-  `, PALETTES.green);
+  `, p);
 }
 
 function sceneLinkCard() {
+  const p = PALETTES.cool;
   return wrap(`
-  <rect x="250" y="150" width="700" height="200" rx="12" fill="#fff" stroke="#ddd" stroke-width="2"/>
-  <rect x="250" y="150" width="200" height="200" rx="12" fill="#e8f0ff"/>
-  <rect x="280" y="200" width="140" height="100" rx="8" fill="#5b8def" opacity="0.3"/>
-  <rect x="480" y="180" width="300" height="14" rx="4" fill="#333"/>
-  <rect x="480" y="210" width="400" height="10" rx="3" fill="#ccc"/>
-  <rect x="480" y="235" width="350" height="10" rx="3" fill="#ccc"/>
-  <rect x="480" y="260" width="200" height="10" rx="3" fill="#ccc"/>
-  <text x="480" y="310" fill="#0084ff" font-size="16">zhihu.com/question/...</text>
-  <rect x="250" y="400" width="700" height="120" rx="12" fill="#fff" stroke="#ddd" stroke-width="2"/>
-  <rect x="280" y="425" width="80" height="70" rx="8" fill="#ffd9cc"/>
-  <rect x="380" y="430" width="250" height="12" rx="4" fill="#333"/>
-  <rect x="380" y="455" width="400" height="8" rx="3" fill="#ccc"/>
-  <rect x="380" y="475" width="300" height="8" rx="3" fill="#ccc"/>
-  `, PALETTES.cool);
+  ${glassCard(220, 120, 760, 210, 16, `
+    <rect x="0" y="0" width="210" height="210" rx="16" fill="#e8f2ff"/>
+    <rect x="35" y="55" width="140" height="100" rx="10" fill="#5b9ef0" opacity="0.25"/>
+    <rect x="240" y="48" width="320" height="14" rx="5" fill="#333"/>
+    <rect x="240" y="78" width="420" height="10" rx="4" fill="#ccc"/>
+    <rect x="240" y="100" width="380" height="10" rx="4" fill="#ddd"/>
+    <rect x="240" y="122" width="300" height="10" rx="4" fill="#ddd"/>
+    <rect x="240" y="160" width="180" height="10" rx="4" fill="#5b9ef0" opacity="0.5"/>
+  `)}
+  ${glassCard(220, 370, 760, 130, 16, `
+    <rect x="28" y="28" width="90" height="74" rx="10" fill="#ffd8cc"/>
+    <rect x="140" y="38" width="280" height="12" rx="4" fill="#333"/>
+    <rect x="140" y="62" width="420" height="8" rx="3" fill="#ccc"/>
+    <rect x="140" y="82" width="340" height="8" rx="3" fill="#ddd"/>
+  `)}
+  `, p);
 }
 
 function sceneCommentSystem() {
+  const p = PALETTES.warm;
   return wrap(`
-  <g transform="translate(200,100)">
+  <g transform="translate(180,90)">
     ${[0, 1, 2].map(i => `
-      <g transform="translate(0, ${i * 150})">
-        <circle cx="30" cy="30" r="25" fill="#${['ea6f5a', '5b8def', '4caf7a'][i]}"/>
-        <rect x="70" y="10" width="500" height="80" rx="12" fill="#fff" stroke="#ddd" stroke-width="1"/>
-        <rect x="90" y="25" width="300" height="8" rx="3" fill="#ddd"/>
-        <rect x="90" y="45" width="400" height="8" rx="3" fill="#eee"/>
-        <rect x="90" y="65" width="200" height="8" rx="3" fill="#eee"/>
+      <g transform="translate(0, ${i * 155})" filter="url(#cardShadow)">
+        <circle cx="35" cy="38" r="30" fill="${['#e86f5a', '#5b9ef0', '#4caf7a'][i]}"/>
+        <rect x="78" y="8" width="520" height="88" rx="16" fill="#fff" stroke="#e8e8e8" stroke-width="1"/>
+        <rect x="98" y="28" width="320" height="9" rx="3" fill="#e0e0e0"/>
+        <rect x="98" y="48" width="420" height="9" rx="3" fill="#ececec"/>
+        <rect x="98" y="68" width="220" height="9" rx="3" fill="#ececec"/>
       </g>
     `).join('')}
   </g>
-  <g transform="translate(800,150)">
-    <circle cx="80" cy="80" r="70" fill="none" stroke="#ea6f5a" stroke-width="6" opacity="0.3"/>
-    <path d="M50,80 L70,100 L110,60" fill="none" stroke="#4caf7a" stroke-width="6" stroke-linecap="round"/>
+  <g transform="translate(820,140)">
+    <circle cx="85" cy="85" r="75" fill="none" stroke="${p.accent}" stroke-width="5" opacity="0.2"/>
+    <path d="M50,85 L72,108 L120,58" fill="none" stroke="#4caf7a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
-  `, PALETTES.warm);
+  `, p);
 }
 
 function sceneChildhood() {
+  const p = PALETTES.green;
   return wrap(`
-  <rect x="0" y="420" width="${W}" height="210" fill="#90c860"/>
-  <g transform="translate(300,200)">
-    <circle cx="60" cy="40" r="30" fill="#f5c6a0"/>
-    <rect x="35" y="70" width="50" height="70" rx="8" fill="#5b8def"/>
-    <line x1="60" y1="140" x2="40" y2="200" stroke="#333" stroke-width="4"/>
-    <line x1="60" y1="140" x2="80" y2="200" stroke="#333" stroke-width="4"/>
-  </g>
-  <g transform="translate(550,210)">
-    <circle cx="60" cy="40" r="30" fill="#f5c6a0"/>
-    <rect x="35" y="70" width="50" height="70" rx="8" fill="#ea6f5a"/>
-    <line x1="60" y1="140" x2="40" y2="200" stroke="#333" stroke-width="4"/>
-    <line x1="60" y1="140" x2="80" y2="200" stroke="#333" stroke-width="4"/>
-  </g>
-  <rect x="450" y="350" width="300" height="15" rx="4" fill="#8b6914"/>
-  <circle cx="200" cy="100" r="40" fill="#ffe08a" opacity="0.8"/>
-  ${[0, 1, 2, 3].map(i => `<circle cx="${100 + i * 60}" cy="${380 + (i % 2) * 20}" r="5" fill="#fff" opacity="0.6"/>`).join('')}
-  `, PALETTES.green);
+  ${softSun(180, 90, 38)}
+  ${cloud(800, 70, 0.7, 0.45)}
+  <rect x="0" y="430" width="${W}" height="200" fill="#90d070"/>
+  <path d="M0,430 Q400,400 800,420 T1200,410" fill="#78b858" opacity="0.5"/>
+  ${[[300, 200], [540, 210]].map(([x, y], i) => `
+    <g transform="translate(${x},${y})" filter="url(#softShadow)">
+      <circle cx="55" cy="38" r="32" fill="#f5c8a0"/>
+      <rect x="30" y="68" width="50" height="72" rx="10" fill="${['#5b9ef0', '#e86f5a'][i]}"/>
+      <line x1="55" y1="140" x2="38" y2="200" stroke="#3a3848" stroke-width="4" stroke-linecap="round"/>
+      <line x1="55" y1="140" x2="72" y2="200" stroke="#3a3848" stroke-width="4" stroke-linecap="round"/>
+    </g>
+  `).join('')}
+  <rect x="430" y="360" width="340" height="18" rx="5" fill="#8b6820" opacity="0.8"/>
+  ${bokeh(66, 14)}
+  `, p);
 }
 
 function sceneLiteraryDefault(seed) {
-  const hues = ['#ea6f5a', '#5b8def', '#4caf7a', '#f5c842', '#c77dff'];
+  const hues = ['#e86f5a', '#5b9ef0', '#4caf7a', '#f0c040', '#b070e8'];
   const accent = hues[seed % hues.length];
+  const p = { ...PALETTES.warm, accent, accent2: accent };
   return wrap(`
-  <g opacity="0.12"><circle cx="150" cy="500" r="200" fill="${accent}"/><circle cx="1050" cy="130" r="160" fill="${accent}"/></g>
-  <g transform="translate(350,120)">
-    <rect x="0" y="0" width="500" height="360" rx="8" fill="#fff" opacity="0.9" stroke="${accent}" stroke-width="2"/>
-    <line x1="60" y1="60" x2="440" y2="60" stroke="#ddd" stroke-width="2"/>
-    <line x1="60" y1="100" x2="400" y2="100" stroke="#eee" stroke-width="2"/>
-    <line x1="60" y1="130" x2="420" y2="130" stroke="#eee" stroke-width="2"/>
-    <line x1="60" y1="160" x2="380" y2="160" stroke="#eee" stroke-width="2"/>
-    <line x1="60" y1="190" x2="410" y2="190" stroke="#eee" stroke-width="2"/>
-    <line x1="60" y1="220" x2="350" y2="220" stroke="#eee" stroke-width="2"/>
-    <path d="M60,280 Q200,250 350,280" fill="none" stroke="${accent}" stroke-width="2" opacity="0.4"/>
-    <circle cx="420" cy="300" r="30" fill="${accent}" opacity="0.2"/>
+  ${softSun(900, 120, 55, '#ffe0c0')}
+  ${bokeh(seed, 24)}
+  <g opacity="0.1"><circle cx="140" cy="500" r="220" fill="${accent}"/><circle cx="1080" cy="100" r="180" fill="${accent}"/></g>
+  ${openBook(600, 280, 1.35, accent)}
+  ${fountainPen(820, 340, -20)}
+  <g transform="translate(200,180)" opacity="0.75">
+    <path d="M0,200 Q40,80 80,120 Q120,160 100,200 Q60,240 0,200Z" fill="${accent}" opacity="0.25"/>
+    <path d="M20,200 Q50,100 70,130 Q90,160 80,190" fill="none" stroke="${accent}" stroke-width="2" opacity="0.35"/>
+    <circle cx="75" cy="115" r="18" fill="${accent}" opacity="0.35"/>
+    <circle cx="55" cy="95" r="14" fill="${accent}" opacity="0.25"/>
+    <circle cx="95" cy="100" r="12" fill="${accent}" opacity="0.2"/>
   </g>
-  <g transform="translate(150,350)">
-    <rect x="0" y="0" width="120" height="8" rx="3" fill="${accent}" opacity="0.5" transform="rotate(-15 60 4)"/>
-    <rect x="20" y="20" width="80" height="6" rx="2" fill="${accent}" opacity="0.3" transform="rotate(-10 60 23)"/>
-  </g>
-  `, { ...PALETTES.warm, accent });
+  <ellipse cx="600" cy="520" rx="280" ry="35" fill="${accent}" opacity="0.08"/>
+  `, p);
 }
 
 const SCENE_BUILDERS = {
