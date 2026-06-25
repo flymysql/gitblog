@@ -151,7 +151,7 @@ export const CONFIG = {
     paypal: ""
   },
   decor: {
-    enabled: true,
+    enabled: false,
     pcCornerImage: "assets/uploads/2026/06/pc-corner-mascot.webp"
   }
 };
