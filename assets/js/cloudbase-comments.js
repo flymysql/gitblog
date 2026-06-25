@@ -796,9 +796,8 @@ function isMobileComposeActive(opts = {}) {
   return shouldUseMobileCommentDock(opts);
 }
 
-function syncEmbedComposePin(embedWrap, open) {
-  if (!embedWrap) return;
-  embedWrap.classList.toggle('cb-embed-wrap--compose-pinned', !!open);
+function syncEmbedComposePin(_embedWrap, _open) {
+  /* 移动端评论抽屉在 iframe 内 portal 固定底栏；父页不再折叠 embed，避免评论列表消失 */
 }
 
 function isEmbedIframe() {
@@ -997,7 +996,6 @@ function syncCommentsEndHint(targetEl, commentCount) {
 
 function resolveEmbedFrameMinHeight(data, opts = {}) {
   const mobile = isMobileCommentDock();
-  if (data.composeOpen) return 160;
   if (mobile && Number(data.commentCount) === 0) return 48;
   return mobile ? 160 : 320;
 }
@@ -1165,7 +1163,7 @@ function bindMobileEmbedDock(embedWrap, iframe, opts = {}) {
   };
 
   const closeCompose = () => {
-    if (!composeOpen && !embedWrap.classList.contains('cb-embed-wrap--compose-pinned')) return;
+    if (!composeOpen) return;
     setComposeOpen(false);
   };
 
@@ -1202,7 +1200,6 @@ function bindMobileEmbedDock(embedWrap, iframe, opts = {}) {
     dock?.remove();
     window.removeEventListener('message', onMessage);
     document.body.classList.remove('cb-has-mobile-dock');
-    embedWrap.classList.remove('cb-embed-wrap--compose-pinned');
   };
 }
 
@@ -1498,15 +1495,8 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
     if (e.data.type === 'gitblog-comments-height') {
       const h = Number(e.data.height);
       if (h > 0 && iframe) {
-        if (e.data.composeOpen) {
-          syncEmbedComposePin(embedWrap, true);
-          const ch = Number(e.data.composeHeight) || h;
-          iframe.style.height = `${Math.min(Math.max(ch, 160), Math.round(window.innerHeight * 0.85))}px`;
-        } else {
-          syncEmbedComposePin(embedWrap, false);
-          const minH = resolveEmbedFrameMinHeight(e.data, opts);
-          iframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
-        }
+        const minH = resolveEmbedFrameMinHeight(e.data, opts);
+        iframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
       }
       if (hint && e.data.ready) hint.hidden = true;
       if (e.data.ready && Object.prototype.hasOwnProperty.call(e.data, 'commentCount')) {
