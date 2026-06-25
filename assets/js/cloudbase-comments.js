@@ -1622,8 +1622,12 @@ function mountCloudBaseEmbedSplit(targetEl, path, opts = {}) {
   });
 
   openCompose = (data = {}) => {
+    const scrollY = window.scrollY;
     composeOpen = true;
     dockApi.setComposeOpen(true);
+    if (composeLayer.parentElement !== document.body) {
+      document.body.appendChild(composeLayer);
+    }
     composeLayer.hidden = false;
     composeLayer.setAttribute('aria-hidden', 'false');
     document.body.classList.add('cb-compose-layer-open');
@@ -1632,6 +1636,11 @@ function mountCloudBaseEmbedSplit(targetEl, path, opts = {}) {
     } else {
       pendingComposeInit = data;
     }
+    requestAnimationFrame(() => {
+      if (Math.abs(window.scrollY - scrollY) > 2) {
+        window.scrollTo(0, scrollY);
+      }
+    });
   };
 
   const closeCompose = () => {
@@ -1690,7 +1699,6 @@ function mountCloudBaseEmbedSplit(targetEl, path, opts = {}) {
   };
 
   window.addEventListener('message', onMessage);
-  backdrop?.addEventListener('click', closeCompose);
 
   return true;
 }

@@ -719,7 +719,11 @@ class CommentRichEditor {
     const space = document.createTextNode(' ');
     this.body.appendChild(mention);
     this.body.appendChild(space);
-    this.body.focus();
+    try {
+      this.body.focus({ preventScroll: true });
+    } catch {
+      this.body.focus();
+    }
     try {
       const range = document.createRange();
       range.setStart(space, 1);
@@ -1338,7 +1342,6 @@ function bindCommentListInteractions(listEl, ctx) {
     if (isMobileComposeActive()) {
       closeAllInlineReplies(btn.closest('.cb-comments'));
       if (isSplitListView()) {
-        btn.closest('.cb-comment')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
         requestParentCompose({
           parentId: btn.dataset.reply || '',
           replyNick: btn.dataset.replyNick || '访客',
@@ -1529,7 +1532,13 @@ async function mountComposeOnly() {
       editor.setReplyMention(replyState.replyNick);
     }
     postComposeHeight(true);
-    setTimeout(() => editor.body?.focus(), 120);
+    setTimeout(() => {
+      try {
+        editor.body?.focus({ preventScroll: true });
+      } catch {
+        editor.body?.focus();
+      }
+    }, 120);
   };
 
   form.querySelector('.cb-mobile-sheet-close')?.addEventListener('click', () => {
