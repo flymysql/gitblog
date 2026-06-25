@@ -34,7 +34,7 @@ if (!fs.existsSync(staticDir)) {
 }
 
 console.log(`部署评论嵌入页 → ${envId}`);
-console.log('目录：cloudbase/static/（comments-embed.* / comments-admin-embed.*）\n');
+  console.log('目录：cloudbase/static/（comments-embed.* / comment-avatars/ / comments-admin-embed.*）\n');
 
 try {
   execSync(`tcb hosting deploy ./static -e ${envId}`, {
