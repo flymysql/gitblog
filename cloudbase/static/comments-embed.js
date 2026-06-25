@@ -3,13 +3,16 @@
  * 优先用 Web SDK callFunction（同环境托管域，移动端/微信更稳定）；
  * HTTP 仅作桌面端兜底。
  */
-import {
+const params = new URLSearchParams(location.search);
+const embedAssetVersion = String(params.get('v') || '').trim();
+const avatarAssetQuery = embedAssetVersion ? `?v=${encodeURIComponent(embedAssetVersion)}` : '';
+const {
   mountAvatarPicker,
   renderCommentAvatarHtml,
   resolveCommentAvatar,
   isValidCommentAvatar,
   pickRandomCommentAvatar,
-} from './comment-avatars.js';
+} = await import(`./comment-avatars.js${avatarAssetQuery}`);
 
 const SDK_URL = 'https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js';
 const COMMENT_IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -26,7 +29,6 @@ const EMOJI_GROUPS = [
   ['🌸', '🌿', '☀️', '🌙', '⭐', '🍵', '☕', '🍜', '🎈', '📚', '💡', '🚀'],
 ];
 
-const params = new URLSearchParams(location.search);
 const cfg = {
   path: String(params.get('path') || '').trim(),
   envId: String(params.get('env') || '').trim(),
