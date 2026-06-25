@@ -976,7 +976,7 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
   .preset-picker-grid { grid-template-columns: 1fr; }
 }
 
-/* PC 端右下角装饰图（仅宽屏显示，不挡点击） */
+/* PC 端右下角装饰图（仅宽屏显示，不挡点击；需在 config.decor.enabled 开启） */
 .site-pc-corner-decor {
   display: none;
 }
@@ -990,22 +990,23 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
     z-index: -1;
     pointer-events: none;
     user-select: none;
-    max-width: min(300px, 26vw);
+    width: min(280px, 24vw);
+    height: min(420px, 58vh);
+    overflow: hidden;
     line-height: 0;
   }
 
   .site-pc-corner-decor img {
     width: 100%;
-    height: auto;
-    max-height: min(520px, 72vh);
+    height: 100%;
     object-fit: contain;
     object-position: bottom right;
-    opacity: 0.95;
+    opacity: 0.42;
   }
 
   :root[data-mode="dark"] .site-pc-corner-decor img,
   :root[data-theme="dark"] .site-pc-corner-decor img {
-    opacity: 0.88;
+    opacity: 0.34;
   }
 }
 
