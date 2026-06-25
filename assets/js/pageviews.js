@@ -1,22 +1,31 @@
 // ============================================================================
-// 访问计数（固定双通道）
+// 访问计数
 //
-//   · 站点总访问量（首页 Hero / Footer）：Saobby 计数图片
-//   · 文章页 / 独立页（post.html?slug=…）阅读量：Vercount（events.vercount.one）
-//
-// 不再支持不蒜子、Page Views API 或其它 provider。
+//   provider: cloudbase — 站点总访问 + 文章阅读量（CloudBase 数据库）
+//   provider: third-party — Saobby 站点图 + Vercount 文章阅读（默认兼容）
 // ============================================================================
 
 import { CONFIG } from './config.js';
+import {
+  isCloudBasePvEnabled,
+  renderSitePvSlot,
+  renderPagePvEl,
+  hitPageView,
+} from './cloudbase-pv.js';
 
 const VCOUNT_DEFAULT_SRC = 'https://events.vercount.one/js';
 
 const STATE = {
   vercountInjected: false,
+  cloudbaseBooted: false,
 };
 
 function pvCfg() {
   return CONFIG.pageviews || {};
+}
+
+function useCloudBase() {
+  return isCloudBasePvEnabled();
 }
 
 function saobbyCfg() {
@@ -36,20 +45,22 @@ function vercountScriptSrc() {
   return s || VCOUNT_DEFAULT_SRC;
 }
 
-/** 站点级 Saobby 已配置且总开关打开（供后台「访问数据」等判断） */
 export function isSaobbyOn() {
+  if (useCloudBase()) return pvCfg().enabled !== false;
   const c = pvCfg();
   return c.enabled !== false && !!saobbySiteImg();
 }
-
-// ---------- Saobby（仅站点 slot） -------------------------------------------
 
 function hideAllSaobby(root = document) {
   root.querySelectorAll('[data-saobby-slot]').forEach(el => { el.hidden = true; });
 }
 
 function siteSlotPrefix() {
-  return String(((saobbyCfg().site || {}).label || '总访问')).trim() || '总访问';
+  return String(((saobbyCfg().site || {}).label || pvCfg().siteLabel || '总访问')).trim() || '总访问';
+}
+
+function pagePvLabel() {
+  return String(vercountCfg().label || pvCfg().label || '阅读').trim() || '阅读';
 }
 
 function fillSaobbySite(slotEl, src, label = '访问') {
@@ -90,12 +101,16 @@ function injectSaobbySiteSlots(root = document) {
   });
 }
 
-// ---------- Vercount（仅文章页 #vercount_value_page_pv） --------------------
+function injectCloudBaseSiteSlots(root = document) {
+  root.querySelectorAll('[data-saobby-slot="site"]').forEach(el => {
+    renderSitePvSlot(el);
+  });
+}
 
 function injectVercountScript() {
   if (STATE.vercountInjected) return;
-  const el = document.getElementById('vercount_value_page_pv');
-  if (!el) return;
+  const el = document.getElementById('vercount_value_page_pv') || document.getElementById('gitblog_page_pv');
+  if (!el || useCloudBase()) return;
   const cfg = pvCfg();
   if (cfg.enabled === false || cfg.showPostViews === false) return;
   STATE.vercountInjected = true;
@@ -107,11 +122,10 @@ function injectVercountScript() {
   document.head.appendChild(s);
 }
 
-/** 预渲染 HTML 可能缺少 Vercount 占位，运行时补注入 */
 function ensureArticlePagePvPlaceholder(root = document) {
   const cfg = pvCfg();
   if (cfg.enabled === false || cfg.showPostViews === false) return;
-  if (root.getElementById('vercount_value_page_pv')) return;
+  if (root.getElementById('gitblog_page_pv') || root.getElementById('vercount_value_page_pv')) return;
   const meta = root.querySelector('#article .article-author .meta');
   if (!meta) return;
   const html = bszPagePvHtml();
@@ -119,7 +133,14 @@ function ensureArticlePagePvPlaceholder(root = document) {
   meta.insertAdjacentHTML('beforeend', `<span class="dot"></span>${html}`);
 }
 
-// ---------- public API -------------------------------------------------------
+async function bootCloudBasePagePv(root = document) {
+  const el = root.getElementById('gitblog_page_pv');
+  if (!el || STATE.cloudbaseBooted) return;
+  STATE.cloudbaseBooted = true;
+  const slug = root.querySelector('#article')?.dataset?.slug || '';
+  const title = root.querySelector('#article h1')?.textContent?.trim() || '';
+  await renderPagePvEl(el, { slug, title, hit: true });
+}
 
 export function initPageviews() {
   const cfg = pvCfg();
@@ -127,19 +148,24 @@ export function initPageviews() {
     hideAllSaobby(document);
     return;
   }
-  if (saobbySiteImg()) {
-    injectSaobbySiteSlots(document);
-  } else {
-    hideAllSaobby(document);
+
+  if (useCloudBase()) {
+    injectCloudBaseSiteSlots(document);
+    ensureArticlePagePvPlaceholder(document);
+    bootCloudBasePagePv(document);
+    return;
   }
+
+  if (saobbySiteImg()) injectSaobbySiteSlots(document);
+  else hideAllSaobby(document);
   ensureArticlePagePvPlaceholder(document);
   injectVercountScript();
 }
 
-/** 首页 Hero / Footer：站点 Saobby 占位 */
 export function bszSiteStatsHtml({ compact = false } = {}) {
   const cfg = pvCfg();
-  if (cfg.enabled === false || !saobbySiteImg()) return '';
+  if (cfg.enabled === false) return '';
+  if (!useCloudBase() && !saobbySiteImg()) return '';
   const prefix = siteSlotPrefix();
   if (compact) {
     return `<span class="saobby-slot saobby-slot-compact" data-saobby-slot="site" data-saobby-suffix="${escapeAttr(prefix)}" hidden></span>`;
@@ -147,24 +173,29 @@ export function bszSiteStatsHtml({ compact = false } = {}) {
   return `<div class="stat saobby-slot saobby-slot-stat" data-saobby-slot="site" data-saobby-prefix="${escapeAttr(prefix)}" hidden></div>`;
 }
 
-/** 文章 meta：Vercount 页阅读量（按当前 URL 区分 slug） */
 export function bszPagePvHtml() {
   const cfg = pvCfg();
   if (cfg.enabled === false || cfg.showPostViews === false) return '';
-  const label = String(vercountCfg().label || '阅读').trim() || '阅读';
+  const label = pagePvLabel();
+  if (useCloudBase()) {
+    return `<span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">${escapeHtml(label)} </span><span id="gitblog_page_pv">…</span><span class="gitblog-pv-suffix"> 次</span></span>`;
+  }
   return `<span class="vercount-inline"><span class="vercount-prefix">${escapeHtml(label)} </span><span id="vercount_value_page_pv">…</span><span class="vercount-suffix"> 次</span></span>`;
 }
 
-/** 已废弃：首页列表不再展示逐篇阅读数 */
 export function articleListPvHtml() {
   return '';
 }
 
-/** 占位：兼容旧 home.js 调用链 */
 export async function renderArticleListViews() {}
 
-export async function trackAndRenderArticleView() {
+export async function trackAndRenderArticleView(meta = {}) {
   ensureArticlePagePvPlaceholder(document);
+  if (useCloudBase()) {
+    const el = document.getElementById('gitblog_page_pv');
+    if (el) await renderPagePvEl(el, { ...meta, hit: true });
+    return;
+  }
   injectVercountScript();
 }
 

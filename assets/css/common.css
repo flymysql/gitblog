@@ -566,6 +566,21 @@ mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; bo
   display: inline-block;
 }
 
+/* ---------- CloudBase 访问计数（纯文本数字）---------- */
+.gitblog-pv-inline {
+  display: inline;
+  white-space: nowrap;
+}
+.gitblog-pv-num,
+#gitblog_page_pv {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.saobby-slot-stat .gitblog-pv-num {
+  font-size: inherit;
+  line-height: 1.1;
+}
+
 /* ---------- saobby 计数器（图片即数字）---------- */
 /* 内联版：[前缀] [小图] [后缀] —— 用于 footer / 文章 meta */
 .saobby-slot {
