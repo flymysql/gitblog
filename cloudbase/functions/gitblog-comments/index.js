@@ -545,6 +545,32 @@ async function handleAdminDelete(event) {
   return jsonOk({ deleted: true, cascaded: children.length });
 }
 
+async function handleCommentCountBatch(event) {
+  const raw = Array.isArray(event.paths) ? event.paths : [];
+  const paths = [...new Set(raw.map(s => String(s || '').trim()).filter(Boolean))].slice(0, 100);
+  const counts = {};
+  paths.forEach(p => { counts[p] = 0; });
+  if (!paths.length) return jsonOk({ counts });
+
+  const _ = db.command;
+  const CHUNK = 10;
+  for (let i = 0; i < paths.length; i += CHUNK) {
+    const chunk = paths.slice(i, i + CHUNK);
+    const res = await db.collection(COLLECTION).where({ path: _.in(chunk) })
+      .field({ path: true, status: true })
+      .limit(1000)
+      .get()
+      .catch(() => null);
+    for (const row of res?.data || []) {
+      const status = row.status || 'visible';
+      if (status !== 'visible') continue;
+      const p = String(row.path || '').trim();
+      if (p && Object.prototype.hasOwnProperty.call(counts, p)) counts[p] += 1;
+    }
+  }
+  return jsonOk({ counts });
+}
+
 async function handleGet(event) {
   const path = String(event.path || '').trim();
   if (!path) return jsonErr('缺少 path');
@@ -780,7 +806,9 @@ async function dispatch(event, context) {
   if (action === 'ADMIN_DELETE') return await handleAdminDelete(event);
   if (action === 'PV_HIT') return await pvApi.handlePvHit(event, context);
   if (action === 'PV_GET') return await pvApi.handlePvGet(event);
+  if (action === 'PV_BATCH_GET') return await pvApi.handlePvBatchGet(event);
   if (action === 'PV_SITE') return await pvApi.handlePvSite();
+  if (action === 'COMMENT_COUNT_BATCH') return await handleCommentCountBatch(event);
   if (action === 'PV_ADMIN_TOP') return await pvApi.handlePvAdminTop(event);
   if (action === 'PV_IMPORT') return await pvApi.handlePvImport(event);
   return jsonErr('未知 action');

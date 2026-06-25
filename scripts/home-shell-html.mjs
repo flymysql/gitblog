@@ -219,17 +219,43 @@ export function buildHeroShell({
     </a>`;
 }
 
+const POST_URL_KEY_RE = /^\d{8}(-\d+)?$/;
+const POST_PATH_SLUGS = new Set(['welcome', 'about']);
+
+function isPostPublicPathKey(seg) {
+  const s = String(seg || '').trim();
+  return POST_URL_KEY_RE.test(s) || POST_PATH_SLUGS.has(s);
+}
+
+function commentPathForPost({ slug, urlKey } = {}) {
+  const k = String(urlKey || '').trim();
+  if (k && isPostPublicPathKey(k)) return k;
+  return String(slug || '').trim();
+}
+
+function pvPathForPost(p) {
+  const urlKey = String(p?.urlKey || '').trim();
+  if (urlKey && /^[a-z0-9-]+$/i.test(urlKey)) return `/post/${urlKey}`;
+  const slug = String(p?.slug || '').trim();
+  return slug ? `/post/${slug}` : '';
+}
+
 export function buildPostItemShell(p, { author, avatar, postHrefFromEntry: hrefFn }) {
   const href = hrefFn(p);
   const coverAttrs = p.cover ? progressiveImgAttrs(p.cover, { alt: p.title || '' }) : '';
+  const commentPath = commentPathForPost({ slug: p.slug, urlKey: p.urlKey });
+  const pvPath = pvPathForPost(p);
   return `<li class="post-item" data-slug="${escapeHtml(p.slug || '')}">
       <a class="post-content" href="${escapeHtml(href)}">
         <div class="post-author-row">
-          <div class="avatar" style="background-image:url(${escapeHtml(p.avatar || avatar || '')})"></div>
-          <span class="name">${escapeHtml(p.author || author || '')}</span>
-          <span>·</span>
-          <span>${escapeHtml(timeAgo(p.date))}</span>
-          ${p.pinned ? '<span class="post-pin">置顶</span>' : ''}
+          <div class="post-author-main">
+            <div class="avatar" style="background-image:url(${escapeHtml(p.avatar || avatar || '')})"></div>
+            <span class="name">${escapeHtml(p.author || author || '')}</span>
+            <span>·</span>
+            <span>${escapeHtml(timeAgo(p.date))}</span>
+            ${p.pinned ? '<span class="post-pin">置顶</span>' : ''}
+          </div>
+          <span class="post-list-stats" data-slug="${escapeHtml(p.slug || '')}" data-pv-path="${escapeHtml(pvPath)}" data-comment-path="${escapeHtml(commentPath)}" aria-label="阅读与评论" hidden>…</span>
         </div>
         <h3 class="post-title">${escapeHtml(p.title || '无标题')}</h3>
         <p class="post-summary">${escapeHtml(p.summary || '')}</p>

@@ -183,6 +183,20 @@ export async function getSiteViewStats() {
   return callBeacon({ action: 'site' });
 }
 
+export async function batchGetPageViews(paths = []) {
+  const list = [...new Set((Array.isArray(paths) ? paths : []).map(normalizeClientPath).filter(Boolean))];
+  if (!list.length) return {};
+  const data = parsePvData(await callBeacon({ action: 'batch-get', paths: list }));
+  return data.pages && typeof data.pages === 'object' ? data.pages : {};
+}
+
+export async function batchGetCommentCounts(paths = []) {
+  const list = [...new Set((Array.isArray(paths) ? paths : []).map(s => String(s || '').trim()).filter(Boolean))];
+  if (!list.length) return {};
+  const data = parsePvData(await callBeacon({ action: 'comment-counts', paths: list }));
+  return data.counts && typeof data.counts === 'object' ? data.counts : {};
+}
+
 export async function getAdminTopPages(adminSecret, limit = 20) {
   return callBeacon({ action: 'admin-top', adminSecret, limit });
 }
