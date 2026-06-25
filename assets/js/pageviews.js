@@ -11,14 +11,22 @@ import {
   renderSitePvSlot,
   renderPagePvEl,
   hitPageView,
+  batchGetPageViews,
+  batchGetCommentCounts,
+  formatCount,
 } from './cloudbase-pv.js';
+import { isCommentsReady } from './comments-embed.js';
 
 const VCOUNT_DEFAULT_SRC = 'https://events.vercount.one/js';
 
 const STATE = {
   vercountInjected: false,
   articlePvTask: null,
+  listStatsTask: null,
 };
+
+const LIST_STATS_CACHE_KEY = 'gitblog_list_stats_v1';
+const LIST_STATS_CACHE_MS = 5 * 60 * 1000;
 
 function pvCfg() {
   return CONFIG.pageviews || {};
@@ -185,7 +193,137 @@ export function articleListPvHtml() {
   return '';
 }
 
-export async function renderArticleListViews() {}
+function readListStatsCache() {
+  try {
+    const raw = sessionStorage.getItem(LIST_STATS_CACHE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (!data || typeof data !== 'object') return null;
+    if (!Number.isFinite(data.ts) || Date.now() - data.ts > LIST_STATS_CACHE_MS) return null;
+    return {
+      pv: data.pv && typeof data.pv === 'object' ? data.pv : {},
+      comments: data.comments && typeof data.comments === 'object' ? data.comments : {},
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeListStatsCache(pvMap, commentMap) {
+  try {
+    const prev = readListStatsCache() || { pv: {}, comments: {} };
+    sessionStorage.setItem(LIST_STATS_CACHE_KEY, JSON.stringify({
+      ts: Date.now(),
+      pv: { ...prev.pv, ...pvMap },
+      comments: { ...prev.comments, ...commentMap },
+    }));
+  } catch { /* ignore */ }
+}
+
+function listStatsHtml(pv, comments, { showPv, showCm }) {
+  const parts = [];
+  if (showPv) parts.push(`<span class="post-stat-pv" title="阅读">👀 ${escapeHtml(formatCount(pv))}</span>`);
+  if (showCm) parts.push(`<span class="post-stat-cm" title="评论">💬 ${escapeHtml(formatCount(comments))}</span>`);
+  return parts.join(' ');
+}
+
+function applyListStatsToSlot(el, pv, comments, opts) {
+  if (!el || el.dataset.listStatsDone === '1') return;
+  const html = listStatsHtml(pv, comments, opts);
+  if (!html) {
+    el.hidden = true;
+    el.dataset.listStatsDone = '1';
+    return;
+  }
+  el.innerHTML = html;
+  el.hidden = false;
+  el.dataset.listStatsDone = '1';
+}
+
+function scheduleListStatsWork(fn) {
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(() => fn(), { timeout: 2000 });
+  } else {
+    setTimeout(fn, 0);
+  }
+}
+
+export async function renderArticleListViews(root = document) {
+  const list = root.querySelector ? root.querySelector('#postList') : null;
+  if (!list || list.classList.contains('post-list--giscus')) return;
+
+  const showPv = useCloudBase() && pvCfg().showPostViews !== false;
+  const showCm = isCommentsReady();
+  if (!showPv && !showCm) return;
+
+  const slots = [...list.querySelectorAll('.post-list-stats:not([data-list-stats-done="1"])')];
+  if (!slots.length) return;
+
+  if (STATE.listStatsTask) {
+    try { await STATE.listStatsTask; } catch { /* ignore */ }
+  }
+
+  const task = (async () => {
+    const cache = readListStatsCache();
+    const needPv = new Set();
+    const needCm = new Set();
+    const slotMeta = slots.map(el => ({
+      el,
+      pvPath: String(el.dataset.pvPath || '').trim(),
+      commentPath: String(el.dataset.commentPath || '').trim(),
+    }));
+
+    for (const { el, pvPath, commentPath } of slotMeta) {
+      const cachedPv = showPv && pvPath && cache?.pv ? cache.pv[pvPath] : undefined;
+      const cachedCm = showCm && commentPath && cache?.comments ? cache.comments[commentPath] : undefined;
+      const hasPv = !showPv || cachedPv != null;
+      const hasCm = !showCm || cachedCm != null;
+      if (hasPv && hasCm) {
+        applyListStatsToSlot(el, cachedPv ?? 0, cachedCm ?? 0, { showPv, showCm });
+        continue;
+      }
+      if (showPv && pvPath && cachedPv == null) needPv.add(pvPath);
+      if (showCm && commentPath && cachedCm == null) needCm.add(commentPath);
+    }
+
+    const pending = slotMeta.filter(({ el }) => el.dataset.listStatsDone !== '1');
+    if (!pending.length) return;
+
+    const [pvMap, cmMap] = await Promise.all([
+      needPv.size ? batchGetPageViews([...needPv]).catch(() => ({})) : Promise.resolve({}),
+      needCm.size ? batchGetCommentCounts([...needCm]).catch(() => ({})) : Promise.resolve({}),
+    ]);
+
+    if (Object.keys(pvMap).length || Object.keys(cmMap).length) {
+      writeListStatsCache(pvMap, cmMap);
+    }
+
+    const mergedCache = readListStatsCache();
+    for (const { el, pvPath, commentPath } of pending) {
+      if (el.dataset.listStatsDone === '1') continue;
+      const pv = showPv && pvPath
+        ? (mergedCache?.pv?.[pvPath] ?? pvMap[pvPath] ?? 0)
+        : 0;
+      const cm = showCm && commentPath
+        ? (mergedCache?.comments?.[commentPath] ?? cmMap[commentPath] ?? 0)
+        : 0;
+      applyListStatsToSlot(el, pv, cm, { showPv, showCm });
+    }
+  })();
+
+  STATE.listStatsTask = task;
+  try {
+    await task;
+  } finally {
+    if (STATE.listStatsTask === task) STATE.listStatsTask = null;
+  }
+}
+
+export function queueArticleListViews(root = document) {
+  scheduleListStatsWork(() => {
+    renderArticleListViews(root).catch(() => {});
+  });
+}
 
 export function initPageviews() {
   const cfg = pvCfg();
