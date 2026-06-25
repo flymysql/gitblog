@@ -123,22 +123,35 @@ function dedupeKey(path) {
 
 function shouldSkipClientDedupe(path) {
   try {
-    if (sessionStorage.getItem(dedupeKey(path)) === '1') return true;
+    return sessionStorage.getItem(dedupeKey(path)) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function markClientDedupe(path) {
+  try {
     sessionStorage.setItem(dedupeKey(path), '1');
   } catch { /* ignore */ }
-  return false;
 }
 
 export async function hitPageView({ path, slug, title } = {}) {
   const p = normalizeClientPath(path);
   if (shouldSkipClientDedupe(p)) {
-    return callBeacon({ action: 'get', path: p });
+    return callBeacon({ action: 'get', path: p, slug, title });
   }
-  return callBeacon({ action: 'hit', path: p, slug, title });
+  try {
+    const data = await callBeacon({ action: 'hit', path: p, slug, title });
+    markClientDedupe(p);
+    return data;
+  } catch (err) {
+    try { sessionStorage.removeItem(dedupeKey(p)); } catch { /* ignore */ }
+    throw err;
+  }
 }
 
-export async function getPageView(path) {
-  return callBeacon({ action: 'get', path: normalizeClientPath(path) });
+export async function getPageView(path, { slug, title } = {}) {
+  return callBeacon({ action: 'get', path: normalizeClientPath(path), slug, title });
 }
 
 export async function getSiteViewStats() {
