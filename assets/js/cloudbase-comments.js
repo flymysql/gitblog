@@ -633,14 +633,19 @@ class CommentRichEditor {
 
   setReplyMention(nick) {
     const name = String(nick || '访客').trim() || '访客';
-    const prefix = `@${name} `;
     this.body.innerHTML = '';
-    const textNode = document.createTextNode(prefix);
-    this.body.appendChild(textNode);
+    const mention = document.createElement('span');
+    mention.className = 'cb-mention';
+    mention.setAttribute('data-mention', name);
+    mention.setAttribute('contenteditable', 'false');
+    mention.textContent = `@${name}`;
+    const space = document.createTextNode(' ');
+    this.body.appendChild(mention);
+    this.body.appendChild(space);
     this.body.focus();
     try {
       const range = document.createRange();
-      range.setStart(textNode, textNode.length);
+      range.setStart(space, 1);
       range.collapse(true);
       const sel = window.getSelection();
       sel?.removeAllRanges();
@@ -758,8 +763,15 @@ function syncReplyMetaVisibility(editor, metaEl) {
   editor._autosizeBody?.();
 }
 
-function bindInlineReplyReveal(editor, metaEl) {
-  const refresh = () => syncReplyMetaVisibility(editor, metaEl);
+function bindInlineReplyReveal(editor, metaEl, panel) {
+  const footer = panel?.querySelector('.cb-compose-footer');
+  const refresh = () => {
+    const show = editorHasContent(editor);
+    syncReplyMetaVisibility(editor, metaEl);
+    if (footer) footer.hidden = !show;
+    panel?.classList.toggle('cb-inline-reply--active', show);
+    editor._autosizeBody?.();
+  };
   const prevOnChange = editor.onChange;
   editor.onChange = () => {
     prevOnChange?.(editor.getPlainLength());
@@ -796,8 +808,28 @@ function isMobileComposeActive(opts = {}) {
   return shouldUseMobileCommentDock(opts);
 }
 
-function syncEmbedComposePin(_embedWrap, _open) {
-  /* 移动端评论抽屉在 iframe 内 portal 固定底栏；父页不再折叠 embed，避免评论列表消失 */
+function syncEmbedComposePin(embedWrap, open, composeHeight = 0) {
+  if (!embedWrap) return;
+  const iframe = embedWrap.querySelector('.cb-embed-frame');
+  if (!iframe) return;
+  if (open) {
+    const spacer = Number(embedWrap.dataset.cbEmbedHeight) || iframe.offsetHeight || 0;
+    if (spacer > 0) embedWrap.style.minHeight = `${spacer}px`;
+    embedWrap.classList.add('cb-embed-wrap--compose-pinned');
+    const ch = Math.min(
+      Math.max(Number(composeHeight) || 280, 160),
+      Math.round(window.innerHeight * 0.85),
+    );
+    iframe.style.height = `${ch}px`;
+    try {
+      iframe.contentWindow?.postMessage({ type: 'gitblog-comments-compose-scroll-bottom' }, '*');
+    } catch { /* ignore */ }
+  } else {
+    embedWrap.classList.remove('cb-embed-wrap--compose-pinned');
+    embedWrap.style.minHeight = '';
+    const h = Number(embedWrap.dataset.cbEmbedHeight);
+    if (h > 0) iframe.style.height = `${h}px`;
+  }
 }
 
 function isEmbedIframe() {
@@ -946,6 +978,7 @@ function createMobileComposeController(root, form, editor, { onSheetOpen, onShee
     getParentId: () => (state.mode === 'reply' ? state.parentId : null),
     open: replyCtx => {
       if (replyCtx?.parentId) {
+        replyCtx.replyBtn?.closest('.cb-comment')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
         setReply(replyCtx);
         sheet.open({ onReady: applyReplyMention });
       } else {
@@ -1143,9 +1176,10 @@ function bindMobileEmbedDock(embedWrap, iframe, opts = {}) {
     postDockState(show);
   };
 
-  const setComposeOpen = open => {
+  const setComposeOpen = (open, composeHeight = 0) => {
     composeOpen = !!open;
-    syncEmbedComposePin(embedWrap, composeOpen);
+    syncEmbedComposePin(embedWrap, composeOpen, composeHeight);
+    if (open) embedWrap.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     syncDock();
   };
 
@@ -1174,14 +1208,14 @@ function bindMobileEmbedDock(embedWrap, iframe, opts = {}) {
     if (e.data?.type === 'gitblog-comments-compose-close') closeCompose();
     if (e.data?.type === 'gitblog-comments-compose-submitted') closeCompose();
     if (e.data?.type === 'gitblog-comments-compose-pin') {
-      setComposeOpen(!!e.data.open);
+      setComposeOpen(!!e.data.open, Number(e.data.composeHeight) || 0);
       return;
     }
     if (
       e.data?.type === 'gitblog-comments-height'
       && e.data.composeOpen === true
     ) {
-      setComposeOpen(true);
+      setComposeOpen(true, Number(e.data.composeHeight) || 0);
       return;
     }
     if (
@@ -1287,7 +1321,10 @@ function mountInlineReply(slot, ctx) {
   const panel = document.createElement('div');
   panel.className = 'cb-inline-reply';
   panel.innerHTML = `
-    <div class="cb-inline-reply-head">回复 ${escapeHtml(replyNick)}</div>
+    <div class="cb-inline-reply-head">
+      <span class="cb-inline-reply-head-title">回复 ${escapeHtml(replyNick)}</span>
+      <button type="button" class="cb-link-btn" data-cancel-reply>取消</button>
+    </div>
     <div class="cb-inline-reply-editor"></div>
     <div class="cb-inline-reply-actions">
       <div class="cb-inline-reply-meta cb-compose-meta" hidden>
@@ -1300,8 +1337,7 @@ function mountInlineReply(slot, ctx) {
           <input type="email" name="email" maxlength="120" placeholder="可选，用于接收回复通知" autocomplete="email">
         </label>
       </div>
-      <div class="cb-inline-reply-buttons">
-        <button type="button" class="cb-link-btn" data-cancel-reply>取消</button>
+      <div class="cb-inline-reply-buttons" hidden>
         <button type="button" class="cb-submit cb-submit--sm" data-submit-reply>发送</button>
       </div>
     </div>
@@ -1311,6 +1347,7 @@ function mountInlineReply(slot, ctx) {
 
   const editorHost = panel.querySelector('.cb-inline-reply-editor');
   const metaEl = panel.querySelector('.cb-inline-reply-meta');
+  const actionsEl = panel.querySelector('.cb-inline-reply-buttons');
   const nickInput = panel.querySelector('[name="nick"]');
   const emailInput = panel.querySelector('[name="email"]');
   const statusEl = panel.querySelector('.cb-inline-reply-status');
@@ -1337,7 +1374,8 @@ function mountInlineReply(slot, ctx) {
       return { url: res.url, fileId: res.fileId };
     },
   });
-  bindInlineReplyReveal(editor, metaEl);
+  setupComposeFooterChrome(panel, metaEl, actionsEl);
+  bindInlineReplyReveal(editor, metaEl, panel);
   editor.setReplyMention(replyNick);
 
   const replyBtn = commentsRoot?.querySelector(`[data-reply="${CSS.escape(parentId)}"]`);
@@ -1413,6 +1451,7 @@ function bindCommentListInteractions(listEl, ctx) {
     if (isMobileComposeActive(ctx.opts)) {
       closeAllInlineReplies(btn.closest('.cb-comments'));
       if (!ctx.mobileCtrl) return;
+      btn.closest('.cb-comment')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
       ctx.mobileCtrl.open({
         parentId: btn.dataset.reply || '',
         replyNick: btn.dataset.replyNick || '访客',
@@ -1495,8 +1534,11 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
     if (e.data.type === 'gitblog-comments-height') {
       const h = Number(e.data.height);
       if (h > 0 && iframe) {
-        const minH = resolveEmbedFrameMinHeight(e.data, opts);
-        iframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
+        embedWrap.dataset.cbEmbedHeight = String(h);
+        if (!embedWrap.classList.contains('cb-embed-wrap--compose-pinned')) {
+          const minH = resolveEmbedFrameMinHeight(e.data, opts);
+          iframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
+        }
       }
       if (hint && e.data.ready) hint.hidden = true;
       if (e.data.ready && Object.prototype.hasOwnProperty.call(e.data, 'commentCount')) {
