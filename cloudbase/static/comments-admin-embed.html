@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-mode="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>评论管理</title>
+</head>
+<body>
+  <div id="comments-admin-root"></div>
+  <script type="module">
+    const v = new URLSearchParams(location.search).get('v') || '';
+    const q = v ? `?v=${encodeURIComponent(v)}` : '';
+    const mode = new URLSearchParams(location.search).get('mode') || 'light';
+    document.documentElement.setAttribute('data-mode', mode === 'dark' ? 'dark' : 'light');
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `./comments-admin-embed.css${q}`;
+    document.head.appendChild(link);
+    await import(`./comments-admin-embed.js${q}`);
+  </script>
+</body>
+</html>
