@@ -904,8 +904,14 @@ body { padding: 0 2px 8px; }
 /* 父页钉住 iframe 视口时，列表在 iframe 内滚动 */
 html.cb-compose-sheet-active,
 html.cb-compose-sheet-active body {
+  height: 100%;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.cb-comments--mobile-dock.cb-comments--compose-only {
+  min-height: 100%;
+  box-sizing: border-box;
 }
 
 .cb-comments--mobile-dock .cb-compose.is-sheet-open {

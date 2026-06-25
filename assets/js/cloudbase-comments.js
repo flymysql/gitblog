@@ -808,37 +808,24 @@ function isMobileComposeActive(opts = {}) {
   return shouldUseMobileCommentDock(opts);
 }
 
-function syncEmbedComposePin(embedWrap, open, composeHeight = 0) {
+function syncEmbedComposePin(embedWrap, open) {
+  if (!embedWrap || !open) return;
+  requestAnimationFrame(() => scrollEmbedForCompose(embedWrap));
+}
+
+/** 打开输入框时滚动父页，使 iframe 底边对齐视口底 —— iframe 内 fixed 输入框即贴屏幕底 */
+function scrollEmbedForCompose(embedWrap) {
   if (!embedWrap) return;
   const iframe = embedWrap.querySelector('.cb-embed-frame');
-  if (!iframe) return;
-
-  if (open) {
-    const spacer = Number(embedWrap.dataset.cbEmbedHeight) || iframe.offsetHeight || 0;
-    if (spacer > 0) embedWrap.style.minHeight = `${spacer}px`;
-
-    const ch = Math.min(
-      Math.max(Number(composeHeight) || 280, 160),
-      Math.round(window.innerHeight * 0.85),
-    );
-    const pinTop = Math.max(0, Math.round(embedWrap.getBoundingClientRect().top));
-
-    embedWrap.style.setProperty('--cb-compose-pin-h', `${ch}px`);
-    embedWrap.style.setProperty('--cb-embed-pin-top', `${pinTop}px`);
-    embedWrap.classList.add('cb-embed-wrap--compose-pinned');
-    iframe.style.height = 'auto';
-
-    try {
-      iframe.contentWindow?.postMessage({ type: 'gitblog-comments-compose-scroll-bottom' }, '*');
-    } catch { /* ignore */ }
-  } else {
-    embedWrap.classList.remove('cb-embed-wrap--compose-pinned');
-    embedWrap.style.minHeight = '';
-    embedWrap.style.removeProperty('--cb-compose-pin-h');
-    embedWrap.style.removeProperty('--cb-embed-pin-top');
-    const h = Number(embedWrap.dataset.cbEmbedHeight);
-    if (h > 0) iframe.style.height = `${h}px`;
-    else iframe.style.height = '';
+  const rect = embedWrap.getBoundingClientRect();
+  const iframeH = iframe?.getBoundingClientRect().height || rect.height;
+  const bottom = rect.top + iframeH;
+  const delta = bottom - window.innerHeight;
+  if (Math.abs(delta) > 4 || rect.top < 0) {
+    window.scrollTo({
+      top: Math.max(0, window.scrollY + delta),
+      behavior: 'smooth',
+    });
   }
 }
 
@@ -1201,7 +1188,7 @@ function bindMobileEmbedDock(embedWrap, iframe, opts = {}) {
 
   const setComposeOpen = (open, _composeHeight = 0) => {
     composeOpen = !!open;
-    syncEmbedComposePin(embedWrap, composeOpen);
+    if (open) syncEmbedComposePin(embedWrap, true);
     syncDock();
   };
 
@@ -1555,13 +1542,13 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
     if (e.source !== iframe?.contentWindow || !e.data) return;
     if (e.data.type === 'gitblog-comments-height') {
       const h = Number(e.data.height);
-      if (h > 0 && iframe) {
+      const composeOpen = !!e.data.composeOpen;
+      if (h > 0 && iframe && !composeOpen) {
         embedWrap.dataset.cbEmbedHeight = String(h);
-        if (!embedWrap.classList.contains('cb-embed-wrap--compose-pinned')) {
-          const minH = resolveEmbedFrameMinHeight(e.data, opts);
-          iframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
-        }
+        const minH = resolveEmbedFrameMinHeight(e.data, opts);
+        iframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
       }
+      if (composeOpen) syncEmbedComposePin(embedWrap, true);
       if (hint && e.data.ready) hint.hidden = true;
       if (e.data.ready && Object.prototype.hasOwnProperty.call(e.data, 'commentCount')) {
         syncCommentsEndHint(targetEl, e.data.commentCount);
