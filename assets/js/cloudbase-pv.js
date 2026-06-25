@@ -182,7 +182,8 @@ export async function renderSitePvSlot(el) {
   if (!el) return;
   const label = String(pvCfg().siteLabel || '人来过').trim() || '人来过';
   try {
-    const data = await getSiteViewStats();
+    // 记录当前页访问（累加站点 PV）；同会话同路径由 hitPageView 去重
+    const data = await hitPageView({ path: location.pathname });
     const num = formatCount(data.sitePv);
     if (el.classList.contains('saobby-slot-stat')) {
       el.innerHTML = `<strong class="saobby-num gitblog-pv-num">${num}</strong><span class="saobby-label">${escapeHtml(label)}</span>`;
