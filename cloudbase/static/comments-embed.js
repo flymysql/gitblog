@@ -200,13 +200,22 @@ function measureComposeHeight(form) {
   return Math.ceil(Math.max(form.offsetHeight, form.scrollHeight, form.getBoundingClientRect().height));
 }
 
+/** compose 打开期间锁定上报高度，避免 padding-bottom 撑大 iframe */
+let _embedLockedHeight = 0;
+
 function postHeight(ready = false) {
   clearTimeout(_heightTimer);
   _heightTimer = setTimeout(() => {
     const form = document.querySelector('.cb-compose.is-sheet-open');
     const composeOpen = !!form;
     const composeHeight = composeOpen ? measureComposeHeight(form) : 0;
-    const h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    let h;
+    if (composeOpen && _embedLockedHeight > 0) {
+      h = _embedLockedHeight;
+    } else {
+      h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+      if (!composeOpen) _embedLockedHeight = h;
+    }
     try {
       window.parent.postMessage({
         type: 'gitblog-comments-height',
@@ -1047,6 +1056,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     commentsRoot?.classList.remove('cb-comments--compose-only');
     commentsRoot?.style.removeProperty('--cb-compose-sheet-h');
     document.documentElement.classList.remove('cb-compose-sheet-active');
+    _embedLockedHeight = 0;
     editor.clear();
     editor.body.blur();
     form.dispatchEvent(new CustomEvent('cb-compose-sheet-change', { bubbles: true }));
@@ -1061,11 +1071,14 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
   const open = (opts = {}) => {
     const wasOpen = form.classList.contains('is-sheet-open');
     if (!wasOpen) {
+      _embedLockedHeight = Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight,
+      );
       form.classList.add('is-sheet-open');
       commentsRoot?.classList.add('cb-comments--compose-only');
       document.documentElement.classList.add('cb-compose-sheet-active');
       onOpen?.();
-      postHeight(true);
     }
     setupComposeFooterChrome(form, form.querySelector('.cb-compose-meta'), form.querySelector('.cb-compose-actions'));
     notifyParentComposePin(true);
