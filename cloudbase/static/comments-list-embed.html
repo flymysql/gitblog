@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-mode="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>评论列表</title>
+</head>
+<body>
+  <div id="gitblog-comments-root"></div>
+  <script type="module">
+    const v = new URLSearchParams(location.search).get('v') || '';
+    const q = v ? `?v=${encodeURIComponent(v)}` : '';
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `./comments-embed.css${q}`;
+    document.head.appendChild(link);
+    await import(`./comments-embed.js${q}`);
+  </script>
+</body>
+</html>

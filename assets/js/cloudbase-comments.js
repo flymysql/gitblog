@@ -1478,7 +1478,7 @@ function bindCommentListInteractions(listEl, ctx) {
   });
 }
 
-function resolveEmbedPageUrl(cfg, path, opts = {}) {
+function resolveEmbedPageUrl(cfg, path, opts = {}, embedPageOverride = null) {
   const custom = String(cfg.embedUrl || '').trim();
   const envId = String(cfg.envId || '').trim();
   const region = String(cfg.region || 'ap-shanghai').trim() || 'ap-shanghai';
@@ -1488,7 +1488,9 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
   } else {
     const base = String(cfg.embedBaseUrl || '').trim();
     if (!base) return null;
-    const page = String(cfg.embedPage || 'comments-embed.html').trim() || 'comments-embed.html';
+    const page = embedPageOverride
+      || String(cfg.embedPage || 'comments-embed.html').trim()
+      || 'comments-embed.html';
     url = new URL(page, base.endsWith('/') ? base : `${base}/`);
   }
   url.searchParams.set('path', path);
@@ -1516,7 +1518,187 @@ function resolveEmbedPageUrl(cfg, path, opts = {}) {
 
 const EMBED_BASE_HINT = '请在 config.js 或后台设置填写 <code>embedBaseUrl</code>，值为 <code>tcb hosting deploy</code> 输出中的完整域名（形如 <code>https://{envId}-{数字}.tcloudbaseapp.com</code>，不是 <code>{envId}.tcloudbaseapp.com</code>）。';
 
+/** 移动端双 iframe：列表 iframe + 父页底部悬浮 compose iframe */
+function bindMobileEmbedDockSplit(listWrap, opts = {}) {
+  if (!isMobileCommentDock()) return { cleanup: () => {}, setComposeOpen: () => {} };
+
+  const persistentDock = shouldShowPersistentMobileDock(opts);
+  let dock = null;
+  if (persistentDock) {
+    ({ dock } = createMobileDockChrome());
+  }
+
+  let sectionVisible = false;
+  let composeOpen = false;
+
+  const syncDock = () => {
+    if (!persistentDock || !dock) return;
+    const show = sectionVisible && !composeOpen;
+    dock.hidden = !show;
+    document.body.classList.toggle('cb-has-mobile-dock', show);
+  };
+
+  const io = persistentDock
+    ? bindMobileDockVisibility(listWrap, visible => {
+      sectionVisible = visible;
+      syncDock();
+    })
+    : () => {};
+
+  dock?.querySelector('.cb-mobile-dock-trigger')?.addEventListener('click', () => {
+    opts.openCompose?.({});
+  });
+
+  return {
+    setComposeOpen: open => {
+      composeOpen = !!open;
+      syncDock();
+    },
+    cleanup: () => {
+      io();
+      dock?.remove();
+      document.body.classList.remove('cb-has-mobile-dock');
+    },
+  };
+}
+
+function mountCloudBaseEmbedSplit(targetEl, path, opts = {}) {
+  const cfg = cloudbaseCfg();
+  const listSrc = resolveEmbedPageUrl(cfg, path, opts, 'comments-list-embed.html');
+  const composeSrc = resolveEmbedPageUrl(cfg, path, opts, 'comments-compose-embed.html');
+  if (!listSrc || !composeSrc) {
+    targetEl.innerHTML = `<div class="comments-hint">${EMBED_BASE_HINT}</div>`;
+    return false;
+  }
+
+  targetEl.innerHTML = `
+    <div class="cb-embed-split">
+      <div class="cb-embed-wrap cb-embed-wrap--list">
+        <iframe
+          class="cb-embed-frame cb-embed-frame--list"
+          title="评论区"
+          loading="eager"
+          referrerpolicy="strict-origin-when-cross-origin"
+          src="${escapeHtml(listSrc)}"
+        ></iframe>
+      </div>
+      <div class="cb-embed-compose-layer" hidden aria-hidden="true">
+        <button type="button" class="cb-embed-compose-backdrop" aria-label="关闭评论"></button>
+        <iframe
+          class="cb-embed-frame cb-embed-frame--compose"
+          title="发表评论"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          src="${escapeHtml(composeSrc)}"
+        ></iframe>
+      </div>
+      <p class="cb-embed-hint comments-hint">评论由 CloudBase 提供；若空白或 404，请核对 <code>embedBaseUrl</code> 是否与 <code>tcb hosting deploy</code> 输出一致（见 cloudbase/README.md）。</p>
+    </div>
+  `;
+
+  const listWrap = targetEl.querySelector('.cb-embed-wrap--list');
+  const listIframe = targetEl.querySelector('.cb-embed-frame--list');
+  const composeLayer = targetEl.querySelector('.cb-embed-compose-layer');
+  const composeIframe = targetEl.querySelector('.cb-embed-frame--compose');
+  const hint = targetEl.querySelector('.cb-embed-hint');
+  const backdrop = composeLayer?.querySelector('.cb-embed-compose-backdrop');
+
+  let composeReady = false;
+  let composeOpen = false;
+  let pendingComposeInit = null;
+  let openCompose = () => {};
+
+  const sendComposeInit = data => {
+    composeIframe?.contentWindow?.postMessage({
+      type: 'gitblog-comments-compose-init',
+      parentId: data?.parentId || '',
+      replyNick: data?.replyNick || '',
+    }, '*');
+  };
+
+  const dockApi = bindMobileEmbedDockSplit(listWrap, {
+    ...opts,
+    openCompose: data => openCompose(data),
+  });
+
+  openCompose = (data = {}) => {
+    composeOpen = true;
+    dockApi.setComposeOpen(true);
+    composeLayer.hidden = false;
+    composeLayer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('cb-compose-layer-open');
+    if (composeReady) {
+      sendComposeInit(data);
+    } else {
+      pendingComposeInit = data;
+    }
+  };
+
+  const closeCompose = () => {
+    if (!composeOpen) return;
+    composeOpen = false;
+    dockApi.setComposeOpen(false);
+    composeLayer.hidden = true;
+    composeLayer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('cb-compose-layer-open');
+    composeIframe?.contentWindow?.postMessage({ type: 'gitblog-comments-compose-reset' }, '*');
+  };
+
+  const onMessage = e => {
+    if (e.source === listIframe?.contentWindow && e.data) {
+      if (e.data.type === 'gitblog-comments-height') {
+        const h = Number(e.data.height);
+        if (h > 0 && listIframe && !composeOpen) {
+          listWrap.dataset.cbEmbedHeight = String(h);
+          const minH = resolveEmbedFrameMinHeight(e.data, opts);
+          listIframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
+        }
+        if (hint && e.data.ready) hint.hidden = true;
+        if (e.data.ready && Object.prototype.hasOwnProperty.call(e.data, 'commentCount')) {
+          syncCommentsEndHint(targetEl, e.data.commentCount);
+        }
+      }
+      if (e.data.type === 'gitblog-comments-open-compose') {
+        openCompose({
+          parentId: e.data.parentId,
+          replyNick: e.data.replyNick,
+        });
+      }
+      return;
+    }
+
+    if (e.source === composeIframe?.contentWindow && e.data) {
+      if (e.data.type === 'gitblog-comments-compose-ready') {
+        composeReady = true;
+        if (pendingComposeInit && composeOpen) {
+          sendComposeInit(pendingComposeInit);
+          pendingComposeInit = null;
+        }
+      }
+      if (e.data.type === 'gitblog-comments-compose-height') {
+        const h = Number(e.data.height);
+        if (h > 0 && composeIframe) {
+          composeIframe.style.height = `${Math.min(h, Math.round(window.innerHeight * 0.85))}px`;
+        }
+      }
+      if (e.data.type === 'gitblog-comments-compose-close') closeCompose();
+      if (e.data.type === 'gitblog-comments-compose-submitted') {
+        closeCompose();
+        listIframe?.contentWindow?.postMessage({ type: 'gitblog-comments-reload' }, '*');
+      }
+    }
+  };
+
+  window.addEventListener('message', onMessage);
+  backdrop?.addEventListener('click', closeCompose);
+
+  return true;
+}
+
 function mountCloudBaseEmbed(targetEl, path, opts = {}) {
+  if (shouldUseMobileCommentDock(opts)) {
+    return mountCloudBaseEmbedSplit(targetEl, path, opts);
+  }
   const cfg = cloudbaseCfg();
   const src = resolveEmbedPageUrl(cfg, path, opts);
   if (!src) {
@@ -1556,9 +1738,6 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
     }
   };
   window.addEventListener('message', onMessage);
-  if (shouldUseMobileCommentDock(opts)) {
-    bindMobileEmbedDock(embedWrap, iframe, opts);
-  }
   return true;
 }
 

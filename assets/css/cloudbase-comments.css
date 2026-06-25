@@ -18,6 +18,51 @@
 .cb-embed-hint { margin-top: 10px; font-size: 12.5px; }
 .cb-embed-hint[hidden] { display: none; }
 
+/* 移动端双 iframe：列表 + 底部悬浮 compose */
+.cb-embed-split { margin: 0; }
+
+.cb-embed-compose-layer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+.cb-embed-compose-layer[hidden] { display: none !important; }
+
+.cb-embed-compose-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
+.cb-embed-frame--compose {
+  position: relative;
+  z-index: 1001;
+  width: 100%;
+  border: 0;
+  display: block;
+  min-height: 120px;
+  height: 280px;
+  background: var(--bg-elev);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.14);
+}
+
+body.cb-compose-layer-open {
+  overflow: hidden;
+}
+
+body.cb-compose-layer-open.cb-has-mobile-dock .cb-mobile-dock {
+  display: none !important;
+}
+
 .cb-comments {
   font-size: 14px;
   line-height: 1.65;
