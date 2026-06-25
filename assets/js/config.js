@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260626190000';
+export const VERSION = '20260626210000';
 
 export const CONFIG = {
   repo: {
@@ -69,7 +69,7 @@ export const CONFIG = {
     embedBaseUrl: "https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com",
     embedPage: "comments-embed.html",
     /** 嵌入页静态资源版本；更新 cloudbase/static 后递增，并重新 hosting deploy */
-    embedAssetVersion: "20260626190000",
+    embedAssetVersion: "20260626210000",
     placeholderNick: "访客",
     moderation: false,
     maxLength: 5000,
@@ -98,9 +98,12 @@ export const CONFIG = {
   },
   pageviews: {
     enabled: true,
+    provider: "cloudbase",
     showHomeStats: true,
     showPostViews: true,
     showFooterStats: true,
+    label: "阅读",
+    siteLabel: "人来过",
     saobby: {
       site: {
         img: "https://w.saobby.com/w/ivywp8ie",

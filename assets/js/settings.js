@@ -185,7 +185,8 @@ function normalizeConfig(config) {
   config.pageviews.saobby.site = config.pageviews.saobby.site || { img: '', dashboard: '', label: '' };
   if (!Array.isArray(config.pageviews.saobby.extra)) config.pageviews.saobby.extra = [];
   config.pageviews.vercount = config.pageviews.vercount || { scriptSrc: '', label: '' };
-  delete config.pageviews.provider;
+  const provider = String(config.pageviews.provider || 'cloudbase').trim().toLowerCase();
+  config.pageviews.provider = provider === 'third-party' ? 'third-party' : 'cloudbase';
   delete config.pageviews.articleProvider;
   delete config.pageviews.showListPostViews;
   if (config.pageviews.saobby.article) delete config.pageviews.saobby.article;
@@ -234,6 +235,8 @@ function normalizeConfig(config) {
   config.pageviews.showHomeStats = config.pageviews.showHomeStats !== false;
   config.pageviews.showPostViews = config.pageviews.showPostViews !== false;
   config.pageviews.showFooterStats = config.pageviews.showFooterStats !== false;
+  config.pageviews.label = String(config.pageviews.label || config.pageviews.vercount.label || '阅读').trim() || '阅读';
+  config.pageviews.siteLabel = String(config.pageviews.siteLabel || config.pageviews.saobby.site.label || '人来过').trim() || '人来过';
   const site = config.pageviews.saobby.site;
   site.img = String(site.img || '').trim();
   site.dashboard = String(site.dashboard || '').trim();
@@ -567,18 +570,26 @@ function settingsContentHtml() {
 
       <section class="settings-card">
         <h3>访问计数（前台展示）</h3>
-        <p class="settings-help">本站固定为双通道：<b>Saobby</b> 统计站点总访问（首页 Hero / Footer 计数图）；<b>Vercount</b> 按页面 URL 统计每篇文章 / 独立页阅读（见 <a href="https://vercount.one" target="_blank" rel="noopener">vercount.one</a>）。二者互不影响。</p>
+        <p class="settings-help">推荐 <b>CloudBase</b>：站点总访问与文章阅读均写入自建数据库，不依赖第三方脚本。也可选 <b>第三方</b>（Saobby 站点图 + Vercount 文章阅读）。</p>
         <div class="settings-grid">
+          <label>统计来源
+            <select name="pageviews.provider">
+              <option value="cloudbase">CloudBase（自建）</option>
+              <option value="third-party">第三方（Saobby + Vercount）</option>
+            </select>
+          </label>
           <label class="settings-check"><input type="checkbox" name="pageviews.enabled"> 启用访问计数</label>
-          <label class="settings-check"><input type="checkbox" name="pageviews.showHomeStats"> 首页 Hero 显示站点访问（Saobby）</label>
-          <label class="settings-check"><input type="checkbox" name="pageviews.showPostViews"> 文章页显示阅读次数（Vercount）</label>
-          <label class="settings-check"><input type="checkbox" name="pageviews.showFooterStats"> Footer 显示站点访问（Saobby）</label>
+          <label class="settings-check"><input type="checkbox" name="pageviews.showHomeStats"> 首页 Hero 显示站点访问</label>
+          <label class="settings-check"><input type="checkbox" name="pageviews.showPostViews"> 文章页显示阅读次数</label>
+          <label class="settings-check"><input type="checkbox" name="pageviews.showFooterStats"> Footer 显示站点访问</label>
+          <label>站点计数前缀 <input name="pageviews.siteLabel" placeholder="人来过"><span class="settings-hint">首页 / Footer 旁的文字</span></label>
+          <label>文章阅读前缀 <input name="pageviews.label" placeholder="阅读"><span class="settings-hint">文章 meta 区数字前的文字</span></label>
         </div>
       </section>
 
       <section class="settings-card">
-        <h3>Saobby（站点总访问）</h3>
-        <p class="settings-help">在 <a href="https://www.saobby.com/create_webcounter" target="_blank" rel="noopener">saobby.com</a> 创建计数器后，把图片 URL 与控制面板 URL 粘到下方。后台「访问数据」可 iframe 嵌入控制面板。</p>
+        <h3>Saobby（第三方 · 站点总访问）</h3>
+        <p class="settings-help">仅在统计来源为「第三方」时使用；CloudBase 模式下可保留配置供历史数据迁移参考。在 <a href="https://www.saobby.com/create_webcounter" target="_blank" rel="noopener">saobby.com</a> 创建计数器后填写下方 URL。</p>
         <div class="settings-grid">
           <label class="span-2">图片 URL <input name="pageviews.saobby.site.img" placeholder="https://www.saobby.com/webcounter/svg?id=..."></label>
           <label class="span-2">控制面板 URL <input name="pageviews.saobby.site.dashboard" placeholder="https://www.saobby.com/webcounter_dashboard?key=..."></label>
@@ -594,8 +605,8 @@ function settingsContentHtml() {
       </section>
 
       <section class="settings-card">
-        <h3>Vercount（文章 / 独立页阅读）</h3>
-        <p class="settings-help">文章页会加载官方脚本并显示 <code>#vercount_value_page_pv</code>。留空脚本地址则使用默认 <code>https://events.vercount.one/js</code>；自托管请改成你的脚本 URL。统计需在 <a href="https://vercount.one" target="_blank" rel="noopener">vercount.one</a> 验证域名后查看。</p>
+        <h3>Vercount（第三方 · 文章阅读）</h3>
+        <p class="settings-help">仅在统计来源为「第三方」时使用。文章页加载官方脚本并显示阅读数；留空脚本地址则使用默认 <code>https://events.vercount.one/js</code>。</p>
         <div class="settings-grid">
           <label class="span-2">脚本 URL（可选） <input name="pageviews.vercount.scriptSrc" placeholder="https://events.vercount.one/js"></label>
           <label>前缀文字 <input name="pageviews.vercount.label" placeholder="阅读"><span class="settings-hint">显示在数字前，例如「阅读」「浏览」</span></label>
