@@ -8,6 +8,7 @@ const REQ_PREFIX = 'pv_';
 let _reqSeq = 0;
 let _iframe = null;
 let _ready = null;
+let _beaconAttempt = 0;
 let _pending = new Map();
 let _replyRouterBound = false;
 let _writeQueue = Promise.resolve();
@@ -142,6 +143,23 @@ export function preloadPvBeacon() {
   ensureBeacon().catch(() => {});
 }
 
+/** 等待 pv-beacon 就绪（列表统计等批量请求应先 await） */
+export function waitForPvBeacon(timeoutMs = 15000) {
+  if (!isCloudBasePvEnabled()) return Promise.resolve();
+  return Promise.race([
+    ensureBeacon().then(() => {}),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('PV beacon 等待超时')), timeoutMs)),
+  ]);
+}
+
+function resetPvBeacon() {
+  _ready = null;
+  if (_iframe) {
+    try { _iframe.remove(); } catch { /* ignore */ }
+    _iframe = null;
+  }
+}
+
 /** 在 document.head 注入 preconnect / dns-prefetch（幂等） */
 export function injectPvBeaconHeadHints() {
   if (!isCloudBasePvEnabled() || !document.head) return;
@@ -184,16 +202,21 @@ function ensureBeacon() {
   bindReplyRouter();
   if (_ready) return _ready;
   _ready = new Promise((resolve, reject) => {
+    const attempt = ++_beaconAttempt;
     const iframe = document.createElement('iframe');
     iframe.src = beaconUrl();
     iframe.title = 'GitBlog PV';
-    iframe.hidden = true;
     iframe.setAttribute('aria-hidden', 'true');
-    iframe.style.cssText = 'position:absolute;width:0;height:0;border:0;clip:rect(0,0,0,0);';
+    // 移动端部分浏览器会延迟/拦截 0×0 隐藏 iframe，用 1×1 离屏更可靠
+    iframe.loading = 'eager';
+    iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none;';
     const timer = setTimeout(() => {
       window.removeEventListener('message', onReady);
+      if (_iframe === iframe) _iframe = null;
+      try { iframe.remove(); } catch { /* ignore */ }
+      if (attempt === _beaconAttempt) _ready = null;
       reject(new Error('PV beacon 超时'));
-    }, 12000);
+    }, 15000);
     const onReady = (e) => {
       if (e.source !== iframe.contentWindow) return;
       const msg = e.data;
@@ -207,9 +230,12 @@ function ensureBeacon() {
     iframe.addEventListener('error', () => {
       clearTimeout(timer);
       window.removeEventListener('message', onReady);
+      if (_iframe === iframe) _iframe = null;
+      try { iframe.remove(); } catch { /* ignore */ }
+      if (attempt === _beaconAttempt) _ready = null;
       reject(new Error('PV beacon 加载失败'));
     }, { once: true });
-    document.body.appendChild(iframe);
+    (document.body || document.documentElement).appendChild(iframe);
   });
   return _ready;
 }
@@ -220,6 +246,10 @@ function isWriteBeaconAction(action) {
 
 function callBeacon(payload) {
   const run = () => ensureBeacon().then(() => new Promise((resolve, reject) => {
+    if (!_iframe?.contentWindow) {
+      reject(new Error('PV beacon 未就绪'));
+      return;
+    }
     const reqId = `${REQ_PREFIX}${Date.now()}_${++_reqSeq}`;
     _pending.set(reqId, { resolve, reject });
     _iframe.contentWindow.postMessage({
@@ -241,6 +271,22 @@ function callBeacon(payload) {
     return task;
   }
   return run();
+}
+
+async function callBeaconWithRetry(payload, { retries = 2 } = {}) {
+  let lastErr;
+  for (let i = 0; i <= retries; i += 1) {
+    try {
+      return await callBeacon(payload);
+    } catch (err) {
+      lastErr = err;
+      if (i < retries) {
+        resetPvBeacon();
+        await new Promise(r => setTimeout(r, 400 * (i + 1)));
+      }
+    }
+  }
+  throw lastErr;
 }
 
 export function normalizeClientPath(pathOrUrl) {
@@ -310,14 +356,14 @@ export async function batchGetPageViews(entries = []) {
     });
   }
   if (!items.length) return {};
-  const data = parsePvData(await callBeacon({ action: 'batch-get', items }));
+  const data = parsePvData(await callBeaconWithRetry({ action: 'batch-get', items }));
   return data.pages && typeof data.pages === 'object' ? data.pages : {};
 }
 
 export async function batchGetCommentCounts(paths = []) {
   const list = [...new Set((Array.isArray(paths) ? paths : []).map(s => String(s || '').trim()).filter(Boolean))];
   if (!list.length) return {};
-  const data = parsePvData(await callBeacon({ action: 'comment-counts', paths: list }));
+  const data = parsePvData(await callBeaconWithRetry({ action: 'comment-counts', paths: list }));
   return data.counts && typeof data.counts === 'object' ? data.counts : {};
 }
 
