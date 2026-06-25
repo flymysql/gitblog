@@ -6,6 +6,7 @@ author: Jimmy
 tags: [杂七杂八]
 carousel: true
 summary: 一个跑在 Windows 上的 QQ 经典农场（微信小游戏）桌面辅助：用图像识别锁定微信窗口，自动收菜、补种、逛好友农场偷菜，支持虚拟机前台挂机。双击 init.bat 初始化，双击 start.bat 开跑，日志写在 logs/daemon.log。
+cover: ../assets/uploads/2026/06/covers/qq-farm-assistant-经典农场辅助.webp
 ---
 
 > **项目地址**：[github.com/flymysql/qq-farm-assistant](https://github.com/flymysql/qq-farm-assistant)
