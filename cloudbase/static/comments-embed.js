@@ -663,8 +663,21 @@ class CommentRichEditor {
     this._syncCount();
   }
 
-  setMentionPrefix() {
-    /* @mention 已停用 */
+  setReplyMention(nick) {
+    const name = String(nick || '访客').trim() || '访客';
+    const prefix = `@${name} `;
+    this.body.innerHTML = '';
+    this.body.focus();
+    const sel = window.getSelection();
+    if (sel) {
+      const range = document.createRange();
+      range.selectNodeContents(this.body);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+    document.execCommand('insertText', false, prefix);
+    this._syncCount();
   }
 
   isValid() {
@@ -915,6 +928,8 @@ function createMobileComposeController(root, form, editor) {
     state.replyBtn = replyBtn;
     replyBtn?.classList.add('is-active');
     updateSheetTitle();
+    editor.clear();
+    editor.setReplyMention(replyNick);
   };
 
   const sheet = bindMobileComposeSheet(form, editor, {
@@ -951,7 +966,10 @@ function createMobileComposeController(root, form, editor) {
     getParentId: () => (state.mode === 'reply' ? state.parentId : null),
     open: replyCtx => {
       if (replyCtx?.parentId) setReply(replyCtx);
-      else clearReply();
+      else {
+        clearReply();
+        editor.clear();
+      }
       sheet.open();
     },
     close: () => sheet.close(),
@@ -982,10 +1000,7 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     if (!form.classList.contains('is-sheet-open')) return;
     form.classList.remove('is-sheet-open');
     commentsRoot?.classList.remove('cb-comments--compose-only');
-    const listEl = commentsRoot?.querySelector('.cb-comments-list');
-    const loadingEl = commentsRoot?.querySelector('.cb-comments-loading');
-    if (listEl?.innerHTML) listEl.hidden = false;
-    if (loadingEl) loadingEl.hidden = true;
+    editor.clear();
     editor.body.blur();
     form.dispatchEvent(new CustomEvent('cb-compose-sheet-change', { bubbles: true }));
     notifyParentComposePin(false);
@@ -1001,10 +1016,6 @@ function bindMobileComposeSheet(form, editor, { root, onClose, onOpen } = {}) {
     if (!wasOpen) {
       form.classList.add('is-sheet-open');
       commentsRoot?.classList.add('cb-comments--compose-only');
-      const listEl = commentsRoot?.querySelector('.cb-comments-list');
-      const loadingEl = commentsRoot?.querySelector('.cb-comments-loading');
-      if (listEl) listEl.hidden = true;
-      if (loadingEl) loadingEl.hidden = true;
       onOpen?.();
       postHeight(true);
     }
@@ -1111,11 +1122,11 @@ function mountInlineReply(slot, ctx) {
     },
   });
   bindInlineReplyReveal(editor, metaEl);
+  editor.setReplyMention(replyNick);
   if (typeof ResizeObserver !== 'undefined') {
     const ro = new ResizeObserver(() => postHeight(true));
     ro.observe(panel);
   }
-  // 不再自动插入 @ 前缀
 
   const replyBtn = commentsRoot?.querySelector(`[data-reply="${CSS.escape(parentId)}"]`);
   replyBtn?.classList.add('is-active');
