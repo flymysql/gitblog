@@ -100,18 +100,22 @@ embedBaseUrl: 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com',
 | 文件 | 说明 |
 |------|------|
 | `static/comments-embed.html` | 嵌入页入口 |
-| `static/comments-embed.js` | 评论 UI + SDK 调用云函数（HTTP 兜底） |
+| `static/comments-embed.js` | 评论 UI 源码（含 `comment-avatars.js` import） |
+| `static/comment-avatars.js` | 头像逻辑源码（部署时打进 `comments-embed.js`） |
+| `static/comment-avatars/` | 头像图片 webp |
 | `static/comments-embed.css` | 样式（支持 light/dark） |
+| `.deploy-static/` | 打包输出（gitignore），**实际部署此目录** |
 
 更新评论 UI 后需重新执行静态托管部署（**仅 `npm run build` 不会更新 iframe 内的编辑框**）：
 
 ```bash
-cd cloudbase
-node deploy-static-embed.mjs
-# 或：tcb hosting deploy ./static -e gitbolg-d7gmnsrw46e011706
+npm run cloudbase:deploy-embed
+# 内部会：build-embed-static（esbuild 打包）→ tcb hosting deploy
 ```
 
-同时递增 `config.js` 中的 `embedAssetVersion`，并同步 `comments-embed.html` 里 CSS/JS 的 `?v=` 参数，避免 CDN/浏览器缓存旧版 JS。
+`deploy-static-embed.mjs` 会把 `comment-avatars.js` **打进** `comments-embed.js`，嵌入页运行时不再单独请求 `comment-avatars.js`，避免 CloudBase CDN 上无 `?v=` 的旧 jsDelivr 文件被命中。同时仍会上传新版 `comment-avatars.js` 覆盖线上旧文件。
+
+同时递增 `config.js` 中的 `embedAssetVersion`，并 `npm run bundle` 更新主站 `post.min.js`，避免浏览器 / Service Worker 缓存旧版。
 
 ### 移动端底部吸附评论栏
 

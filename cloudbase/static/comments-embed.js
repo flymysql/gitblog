@@ -2,17 +2,17 @@
  * CloudBase 评论嵌入页（托管于 {envId}-{appId}.tcloudbaseapp.com）
  * 优先用 Web SDK callFunction（同环境托管域，移动端/微信更稳定）；
  * HTTP 仅作桌面端兜底。
+ *
+ * 部署前由 scripts/build-embed-static.mjs 将本文件与 comment-avatars.js 打成单文件，
+ * 避免运行时单独请求 comment-avatars.js 命中 CDN 旧缓存。
  */
-const params = new URLSearchParams(location.search);
-const embedAssetVersion = String(params.get('v') || '').trim();
-const avatarAssetQuery = embedAssetVersion ? `?v=${encodeURIComponent(embedAssetVersion)}` : '';
-const {
+import {
   mountAvatarPicker,
   renderCommentAvatarHtml,
   resolveCommentAvatar,
   isValidCommentAvatar,
   pickRandomCommentAvatar,
-} = await import(`./comment-avatars.js${avatarAssetQuery}`);
+} from './comment-avatars.js';
 
 const SDK_URL = 'https://static.cloudbase.net/cloudbase-js-sdk/2.17.3/cloudbase.full.js';
 const COMMENT_IMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -29,6 +29,7 @@ const EMOJI_GROUPS = [
   ['🌸', '🌿', '☀️', '🌙', '⭐', '🍵', '☕', '🍜', '🎈', '📚', '💡', '🚀'],
 ];
 
+const params = new URLSearchParams(location.search);
 const cfg = {
   path: String(params.get('path') || '').trim(),
   envId: String(params.get('env') || '').trim(),
