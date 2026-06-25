@@ -1443,31 +1443,40 @@ async function mountComposeOnly() {
 
   root.innerHTML = `
     <div class="cb-comments cb-comments--compose-only-view" data-path="${escapeHtml(cfg.path)}">
-      <form class="cb-compose cb-compose--minimal is-sheet-open" novalidate>
-        <div class="cb-mobile-sheet-header">
-          <span class="cb-mobile-sheet-title">发表评论</span>
-          <button type="button" class="cb-mobile-sheet-close" aria-label="关闭">取消</button>
-        </div>
-        <div class="cb-compose-editor"></div>
-        <div class="cb-compose-meta" hidden>
-          <label class="cb-field">
-            <span>昵称</span>
-            <input type="text" name="nick" maxlength="40" placeholder="${escapeHtml(cfg.placeholderNick)}（可选）" autocomplete="nickname">
-          </label>
-          <label class="cb-field">
-            <span>邮箱</span>
-            <input type="email" name="email" maxlength="120" placeholder="可选，用于接收回复通知" autocomplete="email">
-          </label>
-        </div>
-        <div class="cb-compose-actions" hidden>
-          <span class="cb-compose-status" aria-live="polite"></span>
-          <button type="submit" class="cb-submit">发表</button>
-        </div>
-      </form>
+      <div class="cb-compose-sheet-pad">
+        <form class="cb-compose cb-compose--minimal is-sheet-open" novalidate>
+          <div class="cb-mobile-sheet-header">
+            <span class="cb-mobile-sheet-title">发表评论</span>
+            <button type="button" class="cb-mobile-sheet-close" aria-label="关闭">取消</button>
+          </div>
+          <div class="cb-compose-editor"></div>
+          <div class="cb-compose-meta" hidden>
+            <label class="cb-field">
+              <span>昵称</span>
+              <input type="text" name="nick" maxlength="40" placeholder="${escapeHtml(cfg.placeholderNick)}（可选）" autocomplete="nickname">
+            </label>
+            <label class="cb-field">
+              <span>邮箱</span>
+              <input type="email" name="email" maxlength="120" placeholder="可选，用于接收回复通知" autocomplete="email">
+            </label>
+          </div>
+          <div class="cb-compose-actions" hidden>
+            <span class="cb-compose-status" aria-live="polite"></span>
+            <button type="submit" class="cb-submit">发表</button>
+          </div>
+        </form>
+      </div>
     </div>
   `;
 
   const commentsRoot = root.querySelector('.cb-comments') || root;
+  const sheetPad = commentsRoot.querySelector('.cb-compose-sheet-pad');
+  if (sheetPad) {
+    sheetPad.style.boxSizing = 'border-box';
+    sheetPad.style.paddingLeft = '16px';
+    sheetPad.style.paddingRight = '16px';
+    sheetPad.style.paddingBottom = 'calc(16px + env(safe-area-inset-bottom))';
+  }
   const form = commentsRoot.querySelector('.cb-compose');
   const statusEl = commentsRoot.querySelector('.cb-compose-status');
   const metaEl = form.querySelector('.cb-compose-meta');
