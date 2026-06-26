@@ -28,7 +28,7 @@ Workflow 使用 `environment: github-pages`，密钥必须配置在 **Environmen
 
 推荐 CI 调用方式（按优先级）：
 
-- `TENCENTCLOUD_SECRETID` + `TENCENTCLOUD_SECRETKEY` — 走 `tcb fn invoke`（最稳定）
+- `TENCENTCLOUD_SECRETID` + `TENCENTCLOUD_SECRETKEY` — 走 Node SDK（比 `tcb fn invoke` 更稳定，需与本地为同一腾讯云账号）
 - 或 `CLOUDBASE_HTTP_URL` — 云函数 HTTP 访问地址
 
 首次启用前需部署含 `ADMIN_EXPORT` / `PV_ADMIN_EXPORT` 的云函数：
@@ -45,4 +45,4 @@ npm run cloudbase:deploy-comments
 2. **管理密钥不一致** — GitHub `COMMENT_ADMIN_SECRET` 与云函数环境变量不匹配
 3. **CI 连错环境** — 检查 `cloudbaserc.json` / `config.js` 的 `envId` 与密钥所属账号
 
-备份脚本会先调用公开的 `PV_SITE` 探测；若线上有 PV 但导出为空，将 **失败并输出诊断信息**，避免把空文件 commit 进仓库。
+备份脚本会先调用公开的 `PV_SITE` 探测；若响应格式异常或 CI 与本地调用结果不一致，将 **失败或自动切换 Node SDK / HTTP / tcb 调用方式**，避免把解析失败导致的空 JSON commit 进仓库。
