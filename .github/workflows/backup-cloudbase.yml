@@ -1,0 +1,48 @@
+name: backup-cloudbase
+
+on:
+  schedule:
+    # 北京时间 0:00 = UTC 16:00（前一日）
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: backup-cloudbase
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Pull CloudBase backup
+        env:
+          COMMENT_ADMIN_SECRET: ${{ secrets.COMMENT_ADMIN_SECRET }}
+          CLOUDBASE_HTTP_URL: ${{ secrets.CLOUDBASE_HTTP_URL }}
+          TENCENTCLOUD_SECRETID: ${{ secrets.TENCENTCLOUD_SECRETID }}
+          TENCENTCLOUD_SECRETKEY: ${{ secrets.TENCENTCLOUD_SECRETKEY }}
+        run: node scripts/backup-cloudbase-data.mjs
+
+      - name: Commit backup if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/cloudbase-backup/
+          if git diff --cached --quiet; then
+            echo "No backup changes"
+          else
+            git commit -m "backup: cloudbase comments and pageviews [skip ci]"
+            git push
+          fi
