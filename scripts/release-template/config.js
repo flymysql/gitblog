@@ -63,20 +63,8 @@ export const CONFIG = {
     showHomeStats: true,
     showPostViews: true,
     showFooterStats: true,
-    // 站点总访问：Saobby 计数图（首页 Hero / Footer）
-    saobby: {
-      site: {
-        img: "",          // 站点级计数器图片 URL
-        dashboard: "",    // 控制面板 URL（后台「访问数据」iframe）
-        label: "总访问"
-      },
-      extra: []           // [{ name, img, dashboard }] 额外计数器
-    },
-    // 文章 / 独立页阅读：Vercount（https://vercount.one），按当前页面 URL 区分
-    vercount: {
-      scriptSrc: "",      // 默认可留空，使用 https://events.vercount.one/js
-      label: "阅读"       // 显示在数字前的文案
-    }
+    label: "阅读",
+    siteLabel: "人来过"
   },
   auth: {
     githubDeviceFlow: {
