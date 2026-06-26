@@ -595,9 +595,9 @@ function settingsContentHtml() {
           </label>
           <label class="settings-check"><input type="checkbox" name="cloudbase.allowImage"> 允许评论插入图片</label>
           <label class="settings-check"><input type="checkbox" name="cloudbase.moderation"> 前端提示「待审核」（须云函数环境变量 COMMENT_MODERATION=1）</label>
-          <label class="span-2">随笔讨论 path（notesTerm）
+          <label class="span-2">留言板讨论 path（notesTerm）
             <input name="cloudbase.notesTerm" placeholder="gitblog-notes-feed">
-            <span class="settings-hint">首页「随笔」与 notes.html 共用此 path。</span>
+            <span class="settings-hint">首页「留言板」与 notes.html 共用此 path。</span>
           </label>
         </div>
       </section>
