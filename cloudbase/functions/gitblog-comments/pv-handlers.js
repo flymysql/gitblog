@@ -281,6 +281,29 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
     return jsonOk({ site, top: rows });
   }
 
+  async function handlePvAdminExport(event) {
+    if (!verifyAdminSecret(event)) return jsonErr('无权限', 403);
+    const limit = Math.min(Math.max(Number(event.limit) || 200, 1), 200);
+    const skip = Math.max(Number(event.skip) || 0, 0);
+    const res = await db.collection(PV_COLLECTION)
+      .orderBy('lastAt', 'desc')
+      .skip(skip)
+      .limit(limit)
+      .get();
+    const rows = res?.data || [];
+    const pages = rows.map(r => ({
+      path: r.path,
+      slug: String(r.slug || '').trim(),
+      title: String(r.title || '').trim(),
+      pv: Number(r.pv) || 0,
+      createdAt: Number(r.createdAt) || 0,
+      lastAt: Number(r.lastAt) || 0,
+      importedFrom: String(r.importedFrom || '').trim(),
+    }));
+    const site = skip === 0 ? await getSiteStats(db) : null;
+    return jsonOk({ site, pages, skip, limit, hasMore: rows.length === limit });
+  }
+
   async function handlePvBatchGet(event) {
     const rawItems = Array.isArray(event.items) ? event.items : null;
     const rawPaths = Array.isArray(event.paths) ? event.paths : [];
@@ -391,6 +414,7 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
     handlePvBatchGet,
     handlePvSite,
     handlePvAdminTop,
+    handlePvAdminExport,
     handlePvImport,
     normalizePvPath,
   };
