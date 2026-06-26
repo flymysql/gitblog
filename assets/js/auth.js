@@ -1,11 +1,5 @@
 // ============================================================================
-// 极简鉴权：粘贴 GitHub Fine-grained Personal Access Token
-// 完全没有后端 / 没有 OAuth Server / 没有 Cloudflare Worker
-// 流程：
-//   1. 在登录页粘贴 PAT
-//   2. 调一次 GET /user 验证 token 是否有效
-//   3. 通过后写入 localStorage（记住我）或 sessionStorage（仅本次）
-//   4. 检查 user.login 是否在 authorizedUsers 白名单中
+// 后台鉴权：CloudBase 短密码（默认）或 GitHub PAT（高级 / auth.editorMode=pat）
 // ============================================================================
 
 import { CONFIG } from './config.js';
@@ -16,18 +10,78 @@ import {
   getUser,
   clearAuth,
   getCurrentUser,
+  setAuthMode,
+  useCloudEditorProxy,
+  isCloudbaseEditorConfigured,
 } from './api.js';
+import { editorLogin, ghUser, preloadEditorBeacon } from './cloudbase-github.js';
+import { saveAdminSecret } from './cloudbase-admin-secret.js';
 
 const STORAGE_FLAG_KEY = 'gh_token_persistent';
 
-// 用 PAT 登录：验证 + 存储
+function assertWhitelisted(user) {
+  const allowed = (CONFIG.authorizedUsers || []).map(s => String(s).toLowerCase());
+  if (allowed.length && !allowed.includes(String(user.login || '').toLowerCase())) {
+    throw new Error(`账号 ${user.login} 不在白名单内`);
+  }
+}
+
+function persistSession(token, remember) {
+  setToken(token);
+  if (!remember) {
+    sessionStorage.setItem('gh_oauth_token_session', token);
+    localStorage.removeItem('gh_oauth_token');
+    localStorage.removeItem(STORAGE_FLAG_KEY);
+  } else {
+    localStorage.setItem(STORAGE_FLAG_KEY, '1');
+    sessionStorage.removeItem('gh_oauth_token_session');
+  }
+}
+
+/** 短密码登录（CloudBase 云函数校验 → 返回 session，GitHub PAT 仅存服务端） */
+export async function loginWithPassword(password, { remember = true } = {}) {
+  const trimmed = String(password || '').trim();
+  if (!trimmed) throw new Error('请输入管理密码');
+  if (!isCloudbaseEditorConfigured()) {
+    throw new Error('CloudBase 后台代理未启用，请在 config.js 开启 cloudbase 或改用 PAT 登录');
+  }
+
+  preloadEditorBeacon();
+  let res;
+  try {
+    res = await editorLogin(trimmed);
+  } catch (e) {
+    clearAuth();
+    throw new Error(e.message || '登录失败');
+  }
+
+  const sessionToken = String(res.sessionToken || '').trim();
+  const user = res.user;
+  if (!sessionToken || !user?.login) {
+    clearAuth();
+    throw new Error('登录响应无效，请确认云函数已部署 EDITOR_AUTH');
+  }
+
+  assertWhitelisted(user);
+  persistSession(sessionToken, remember);
+  setAuthMode('cloudbase');
+  setUser({
+    login: user.login,
+    name: user.name || user.login,
+    avatar_url: user.avatar_url,
+    html_url: user.html_url,
+  });
+  saveAdminSecret(trimmed);
+  if (res.expiresAt) storeSessionExpiry(res.expiresAt);
+  return user;
+}
+
+// 用 PAT 登录：验证 + 存储（auth.editorMode=pat 或高级入口）
 export async function loginWithToken(token, { remember = true } = {}) {
   if (!token || !/^[A-Za-z0-9_]{20,}$/.test(token.trim())) {
     throw new Error('Token 格式不对，请粘贴完整的 Personal Access Token');
   }
   const trimmed = token.trim();
-  // 临时把 token 放进 localStorage 让 api.ghFetch 用上，再调 /user 验证
-  // 验证失败会清掉
   setToken(trimmed);
   let user;
   try {
@@ -40,12 +94,8 @@ export async function loginWithToken(token, { remember = true } = {}) {
     throw new Error('验证失败：' + (e.message || String(e)));
   }
 
-  const allowed = (CONFIG.authorizedUsers || []).map(s => String(s).toLowerCase());
-  if (allowed.length && !allowed.includes(String(user.login).toLowerCase())) {
-    clearAuth();
-    throw new Error(`账号 ${user.login} 不在白名单内`);
-  }
-
+  assertWhitelisted(user);
+  setAuthMode('pat');
   setUser({
     login: user.login,
     name: user.name,
@@ -53,9 +103,7 @@ export async function loginWithToken(token, { remember = true } = {}) {
     html_url: user.html_url,
   });
 
-  // remember: 默认 localStorage（持久），否则切到 sessionStorage 模式
   if (!remember) {
-    // 把 token 从 localStorage 搬到 sessionStorage，之后 api.js 也会优先读 sessionStorage
     sessionStorage.setItem('gh_oauth_token_session', trimmed);
     localStorage.removeItem('gh_oauth_token');
     localStorage.removeItem(STORAGE_FLAG_KEY);
@@ -131,7 +179,6 @@ export function isAuthorized() {
   return allow.includes(String(user.login || '').toLowerCase());
 }
 
-// 用于在登录后跳回原页面
 const RETURN_KEY = 'login_return_to';
 
 export function rememberReturnTo(url) {
@@ -146,29 +193,41 @@ export function popReturnTo() {
 
 export { getToken, getUser, clearAuth };
 
-// ============================================================================
-// PAT 过期 / 无效 检测
-// 调一次 GET /user 检查 token 状态：
-//   - 200：还活着；如果响应里有 GitHub-Authentication-Token-Expiration（fine-grained PAT
-//          会带），把过期时间写入 localStorage 并按距离决定 banner 颜色
-//   - 401：token 已被吊销 / 过期 / 错误，立刻清掉登录状态
-// 因为 GitHub 不会主动通知前端 token 过期，我们 24h 主动复检一次即可，避免 rate-limit
-// ============================================================================
-const PAT_LAST_CHECK_KEY = 'gh_token_last_check';
-const PAT_EXPIRES_KEY = 'gh_token_expires_at';
-const PAT_CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000;
+const SESSION_LAST_CHECK_KEY = 'gh_token_last_check';
+const SESSION_EXPIRES_KEY = 'gh_token_expires_at';
+const SESSION_CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
 export async function checkPatStatus({ force = false } = {}) {
   const token = getToken();
   if (!token) return { state: 'no-token' };
-  const last = Number(localStorage.getItem(PAT_LAST_CHECK_KEY) || 0);
-  if (!force && last && Date.now() - last < PAT_CHECK_INTERVAL_MS) {
-    const expRaw = localStorage.getItem(PAT_EXPIRES_KEY);
+
+  if (useCloudEditorProxy()) {
+    const last = Number(localStorage.getItem(SESSION_LAST_CHECK_KEY) || 0);
+    const expRaw = localStorage.getItem(SESSION_EXPIRES_KEY);
+    if (!force && last && Date.now() - last < SESSION_CHECK_INTERVAL_MS && expRaw) {
+      return classifyExpiry(expRaw);
+    }
+    try {
+      await ghUser(token);
+      const exp = localStorage.getItem(SESSION_EXPIRES_KEY);
+      localStorage.setItem(SESSION_LAST_CHECK_KEY, String(Date.now()));
+      return exp ? classifyExpiry(exp) : { state: 'ok' };
+    } catch (e) {
+      if (e.code === 401 || /过期|无效/.test(String(e.message || ''))) {
+        clearAuth();
+        return { state: 'invalid' };
+      }
+      return { state: 'unknown', error: e.message || String(e) };
+    }
+  }
+
+  const last = Number(localStorage.getItem(SESSION_LAST_CHECK_KEY) || 0);
+  if (!force && last && Date.now() - last < SESSION_CHECK_INTERVAL_MS) {
+    const expRaw = localStorage.getItem(SESSION_EXPIRES_KEY);
     if (expRaw) return classifyExpiry(expRaw);
     return { state: 'ok' };
   }
   try {
-    // 用裸 fetch 拿到原始 headers
     const res = await fetch('https://api.github.com/user', {
       headers: {
         Accept: 'application/vnd.github+json',
@@ -178,18 +237,17 @@ export async function checkPatStatus({ force = false } = {}) {
     });
     if (res.status === 401) {
       clearAuth();
-      localStorage.removeItem(PAT_EXPIRES_KEY);
+      localStorage.removeItem(SESSION_EXPIRES_KEY);
       return { state: 'invalid' };
     }
     if (!res.ok) return { state: 'unknown', status: res.status };
     const exp = res.headers.get('GitHub-Authentication-Token-Expiration') ||
                 res.headers.get('github-authentication-token-expiration') || '';
-    if (exp) localStorage.setItem(PAT_EXPIRES_KEY, exp);
-    else localStorage.removeItem(PAT_EXPIRES_KEY);
-    localStorage.setItem(PAT_LAST_CHECK_KEY, String(Date.now()));
+    if (exp) localStorage.setItem(SESSION_EXPIRES_KEY, exp);
+    else localStorage.removeItem(SESSION_EXPIRES_KEY);
+    localStorage.setItem(SESSION_LAST_CHECK_KEY, String(Date.now()));
     return classifyExpiry(exp);
   } catch (e) {
-    // 离线 / CORS 等错误不强制踢人
     return { state: 'unknown', error: e.message || String(e) };
   }
 }
@@ -203,4 +261,8 @@ function classifyExpiry(expRaw) {
   if (ms <= 0) return { state: 'expired', expiresAt: expRaw, days };
   if (days <= 7) return { state: 'expiring', expiresAt: expRaw, days };
   return { state: 'ok', expiresAt: expRaw, days };
+}
+
+export function storeSessionExpiry(isoString) {
+  if (isoString) localStorage.setItem(SESSION_EXPIRES_KEY, isoString);
 }

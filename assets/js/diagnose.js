@@ -4,6 +4,15 @@
 
 import { CONFIG } from './config.js';
 import { getToken } from './auth.js';
+import {
+  getCurrentUser,
+  useCloudEditorProxy,
+  isCloudbaseEditorConfigured,
+  writeFile,
+  deleteFile,
+  readFile,
+} from './api.js';
+import { ghGetRepo, ghGetBranch } from './cloudbase-github.js';
 import { mountAdminShell, escapeHtml, showToast } from './admin-shell.js';
 import { postPathFromAdminPost } from './site.js';
 import { analyzeBrokenLinks, findOrphanImages, bulkDelete } from './admin-tools.js';
@@ -33,7 +42,7 @@ function setRow(id, status, detail) {
 }
 
 const checks = [
-  { id: 'token', title: '是否已登录（PAT 存在）' },
+  { id: 'token', title: isCloudbaseEditorConfigured() ? '是否已登录（管理 session）' : '是否已登录（PAT 存在）' },
   { id: 'user', title: 'GitHub 用户身份' },
   { id: 'whitelist', title: '账号是否在 authorizedUsers 白名单' },
   { id: 'repo', title: `仓库 ${CONFIG.repo.owner}/${CONFIG.repo.name} 是否可访问` },
@@ -44,6 +53,10 @@ const checks = [
 ];
 
 async function ghAuth(path) {
+  if (useCloudEditorProxy()) {
+    if (path === '/user') return { ok: true, json: async () => getCurrentUser() };
+    throw new Error('CloudBase 模式下请使用代理接口');
+  }
   const token = getToken();
   return fetch('https://api.github.com' + path, {
     headers: {
@@ -59,16 +72,16 @@ async function run() {
 
   const token = getToken();
   if (!token) {
-    setRow('token', 'fail', '没有 token。<a href="./" style="color:var(--primary)">前往登录</a>');
+    setRow('token', 'fail', '未登录。<a href="./" style="color:var(--primary)">前往登录</a>');
     return;
   }
-  setRow('token', 'ok', `已登录，token 后 6 位：<code>${escapeHtml(token.slice(-6))}</code>`);
+  setRow('token', 'ok', useCloudEditorProxy()
+    ? '已通过 CloudBase 短密码登录（session 已建立）'
+    : `已登录，token 后 6 位：<code>${escapeHtml(token.slice(-6))}</code>`);
 
   let userLogin = '';
   try {
-    const r = await ghAuth('/user');
-    const j = await r.json();
-    if (!r.ok) throw new Error(j.message || `${r.status}`);
+    const j = await getCurrentUser();
     userLogin = j.login;
     setRow('user', 'ok', `登录账号：<code>${escapeHtml(j.login)}</code> · ${escapeHtml(j.name || '')}`);
   } catch (e) {
@@ -83,107 +96,95 @@ async function run() {
 
   let repoData = null;
   try {
-    const r = await ghAuth(`/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}`);
-    const j = await r.json();
-    if (r.status === 404) {
-      setRow('repo', 'fail', `404：仓库不存在或 token 没有访问权限。<br>请检查：<br>1) 仓库名拼写（当前 <code>${escapeHtml(CONFIG.repo.owner)}/${escapeHtml(CONFIG.repo.name)}</code>）<br>2) Token 的 Repository access 是否包含此仓库`);
-      return;
+    if (useCloudEditorProxy()) {
+      repoData = await ghGetRepo(token);
+    } else {
+      const r = await ghAuth(`/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}`);
+      const j = await r.json();
+      if (r.status === 404) {
+        setRow('repo', 'fail', `404：仓库不存在或 token 没有访问权限。<br>请检查：<br>1) 仓库名拼写（当前 <code>${escapeHtml(CONFIG.repo.owner)}/${escapeHtml(CONFIG.repo.name)}</code>）<br>2) Token 的 Repository access 是否包含此仓库`);
+        return;
+      }
+      if (!r.ok) throw new Error(j.message || `${r.status}`);
+      repoData = j;
     }
-    if (!r.ok) throw new Error(j.message || `${r.status}`);
-    repoData = j;
-    const perm = j.permissions || {};
-    setRow('repo', 'ok', `<code>${escapeHtml(j.full_name)}</code> · ${j.private ? '私有' : '公开'} · 默认分支 <code>${escapeHtml(j.default_branch)}</code> · push:${perm.push ? '✓' : '✗'}`);
+    const perm = repoData.permissions || {};
+    setRow('repo', 'ok', `<code>${escapeHtml(repoData.full_name)}</code> · ${repoData.private ? '私有' : '公开'} · 默认分支 <code>${escapeHtml(repoData.default_branch)}</code> · push:${perm.push ? '✓' : '✗'}`);
   } catch (e) {
     setRow('repo', 'fail', '检查失败：' + escapeHtml(e.message));
     return;
   }
 
   try {
-    const r = await ghAuth(`/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}/branches/${encodeURIComponent(CONFIG.repo.branch)}`);
-    if (r.status === 404) {
-      setRow('branch', 'fail', `分支 <code>${escapeHtml(CONFIG.repo.branch)}</code> 不存在。仓库默认分支是 <code>${escapeHtml(repoData.default_branch)}</code>，请改 config.js`);
-    } else if (r.ok) {
+    if (useCloudEditorProxy()) {
+      await ghGetBranch(token, CONFIG.repo.branch);
       setRow('branch', 'ok', `分支 <code>${escapeHtml(CONFIG.repo.branch)}</code> 存在`);
     } else {
-      const j = await r.json();
-      setRow('branch', 'warn', '检查异常：' + escapeHtml(j.message || r.status));
+      const r = await ghAuth(`/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}/branches/${encodeURIComponent(CONFIG.repo.branch)}`);
+      if (r.status === 404) {
+        setRow('branch', 'fail', `分支 <code>${escapeHtml(CONFIG.repo.branch)}</code> 不存在。仓库默认分支是 <code>${escapeHtml(repoData.default_branch)}</code>，请改 config.js`);
+      } else if (r.ok) {
+        setRow('branch', 'ok', `分支 <code>${escapeHtml(CONFIG.repo.branch)}</code> 存在`);
+      } else {
+        const j = await r.json();
+        setRow('branch', 'warn', '检查异常：' + escapeHtml(j.message || r.status));
+      }
     }
   } catch (e) {
-    setRow('branch', 'warn', '检查失败：' + escapeHtml(e.message));
-  }
-
-  try {
-    const probe = `.diagnose/probe-${Date.now()}.txt`;
-    const put = await fetch(`https://api.github.com/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}/contents/${probe}`, {
-      method: 'PUT',
-      headers: {
-        Authorization: 'Bearer ' + token,
-        'Content-Type': 'application/json',
-        Accept: 'application/vnd.github+json',
-      },
-      body: JSON.stringify({
-        message: 'diagnose: probe write',
-        content: btoa('probe ' + new Date().toISOString()),
-        branch: CONFIG.repo.branch,
-      }),
-    });
-    const pj = await put.json();
-    if (put.ok) {
-      try {
-        await fetch(`https://api.github.com/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}/contents/${probe}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: 'Bearer ' + token,
-            'Content-Type': 'application/json',
-            Accept: 'application/vnd.github+json',
-          },
-          body: JSON.stringify({
-            message: 'diagnose: cleanup probe',
-            sha: pj.content && pj.content.sha,
-            branch: CONFIG.repo.branch,
-          }),
-        });
-      } catch {}
-      setRow('contents', 'ok', '可以写入仓库内容（已自动清理诊断文件）');
-    } else if (put.status === 403 || put.status === 404) {
-      setRow('contents', 'fail', `${put.status} ${escapeHtml(pj.message || '')}<br>多半是 token 的 Contents 权限不是 Read and write。<a target="_blank" href="https://github.com/settings/tokens?type=beta" style="color:var(--primary)">前往修复</a>`);
+    if (useCloudEditorProxy() && /404|Not Found/i.test(e.message || '')) {
+      setRow('branch', 'fail', `分支 <code>${escapeHtml(CONFIG.repo.branch)}</code> 不存在。仓库默认分支是 <code>${escapeHtml(repoData.default_branch)}</code>，请改 config.js`);
     } else {
-      setRow('contents', 'warn', `${put.status}: ${escapeHtml(pj.message || '')}`);
+      setRow('branch', 'warn', '检查失败：' + escapeHtml(e.message));
     }
-  } catch (e) {
-    setRow('contents', 'warn', '检查失败：' + escapeHtml(e.message));
   }
 
   try {
-    const r = await ghAuth(`/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}/contents/${encodeURI(CONFIG.paths.index)}?ref=${CONFIG.repo.branch}`);
-    if (r.status === 404) setRow('index', 'warn', `<code>${escapeHtml(CONFIG.paths.index)}</code> 不存在，第一次发布文章时会自动创建`);
-    else if (r.ok) {
-      const j = await r.json();
-      const txt = atob((j.content || '').replace(/\s/g, ''));
+    const probe = `assets/uploads/.diagnose/probe-${Date.now()}.txt`;
+    const content = `probe ${new Date().toISOString()}`;
+    await writeFile(probe, content, 'diagnose: probe write');
+    const got = await readFile(probe);
+    if (got?.sha) {
+      try { await deleteFile(probe, got.sha, 'diagnose: cleanup probe'); } catch { /* ignore */ }
+    }
+    setRow('contents', 'ok', useCloudEditorProxy()
+      ? 'CloudBase 代理写入成功（GITHUB_PAT 有效）'
+      : '可以写入仓库内容（已自动清理诊断文件）');
+  } catch (e) {
+    const hint = useCloudEditorProxy()
+      ? '<br>请检查云函数环境变量 GITHUB_PAT 是否有 Contents 写权限。'
+      : '<br>多半是 token 的 Contents 权限不是 Read and write。<a target="_blank" href="https://github.com/settings/tokens?type=beta" style="color:var(--primary)">前往修复</a>';
+    setRow('contents', 'fail', '写入失败：' + escapeHtml(e.message) + hint);
+  }
+
+  try {
+    const idxFile = await readFile(CONFIG.paths.index);
+    if (!idxFile) setRow('index', 'warn', `<code>${escapeHtml(CONFIG.paths.index)}</code> 不存在，第一次发布文章时会自动创建`);
+    else {
       try {
-        const obj = JSON.parse(decodeURIComponent(escape(txt)));
+        const obj = JSON.parse(idxFile.content);
         const cnt = (obj.posts || []).length;
         setRow('index', 'ok', `<code>${escapeHtml(CONFIG.paths.index)}</code> 已存在，包含 ${cnt} 篇文章`);
-      } catch (pe) {
+      } catch {
         setRow('index', 'warn', `<code>${escapeHtml(CONFIG.paths.index)}</code> 不是有效 JSON，建议手动修复`);
       }
-    } else {
-      const j = await r.json();
-      setRow('index', 'warn', `${r.status}: ${escapeHtml(j.message || '')}`);
     }
   } catch (e) {
     setRow('index', 'warn', '检查失败：' + escapeHtml(e.message));
   }
 
   try {
-    const r = await ghAuth(`/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}/pages`);
-    if (r.status === 404) setRow('pages', 'warn', 'GitHub Pages 尚未启用。仓库 Settings → Pages 中开启');
-    else if (r.ok) {
-      const j = await r.json();
-      setRow('pages', 'ok', `已启用，URL：<a href="${escapeHtml(j.html_url || '')}" target="_blank" style="color:var(--primary)">${escapeHtml(j.html_url || '')}</a> · 状态：${escapeHtml(j.status || 'unknown')}`);
+    if (useCloudEditorProxy()) {
+      setRow('pages', 'warn', 'CloudBase 代理模式：请在 GitHub 仓库 Settings → Pages 确认站点已启用');
     } else {
-      const j = await r.json();
-      setRow('pages', 'warn', `${r.status}: ${escapeHtml(j.message || '')}`);
+      const r = await ghAuth(`/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}/pages`);
+      if (r.status === 404) setRow('pages', 'warn', 'GitHub Pages 尚未启用。仓库 Settings → Pages 中开启');
+      else if (r.ok) {
+        const j = await r.json();
+        setRow('pages', 'ok', `已启用，URL：<a href="${escapeHtml(j.html_url || '')}" target="_blank" style="color:var(--primary)">${escapeHtml(j.html_url || '')}</a> · 状态：${escapeHtml(j.status || 'unknown')}`);
+      } else {
+        const j = await r.json();
+        setRow('pages', 'warn', `${r.status}: ${escapeHtml(j.message || '')}`);
+      }
     }
   } catch (e) {
     setRow('pages', 'warn', '检查失败：' + escapeHtml(e.message));

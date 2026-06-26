@@ -9,6 +9,7 @@
 
 import { CONFIG } from './config.js';
 import {
+  loginWithPassword,
   loginWithToken,
   loginWithDeviceFlow,
   logout,
@@ -18,6 +19,7 @@ import {
   popReturnTo,
   checkPatStatus,
 } from './auth.js';
+import { isCloudbaseEditorConfigured, useCloudEditorProxy } from './api.js';
 import { initTheme, bindThemeToggle, themeToggleHtml } from './theme.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -78,6 +80,7 @@ function showToast(msg, kind = '') {
 }
 
 function renderLogin(host) {
+  const usePassword = isCloudbaseEditorConfigured();
   const tokenUrl = buildTokenCreateUrl();
   host.innerHTML = `
     <div class="admin-page-fullscreen">
@@ -89,6 +92,18 @@ function renderLogin(host) {
             </svg>
           </div>
           <h1>登录创作后台</h1>
+          ${usePassword ? `
+          <p>输入管理密码即可写文章、管理评论与统计。<br>
+          GitHub 写入密钥保存在 CloudBase 云函数，不会进入浏览器。</p>
+          <form id="loginForm" autocomplete="off" style="text-align:left">
+            <label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px">管理密码</label>
+            <div style="position:relative;margin-bottom:14px">
+              <input type="password" id="passwordInput" placeholder="与 COMMENT_ADMIN_SECRET 相同" required autofocus>
+              <button type="button" id="togglePwd" tabindex="-1" class="icon-btn" style="position:absolute;right:4px;top:4px">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          ` : `
           <p>粘贴你的 GitHub Personal Access Token，文章会以 commit 形式直接推到仓库。<br>
           <a href="${tokenUrl}" target="_blank" rel="noopener" style="color:var(--primary)">点这里生成 token →</a></p>
           <form id="loginForm" autocomplete="off" style="text-align:left">
@@ -99,17 +114,28 @@ function renderLogin(host) {
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
+          `}
             <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);margin-bottom:14px;cursor:pointer">
               <input type="checkbox" id="remember" checked> 在此设备保持登录
             </label>
             <button type="submit" class="btn-github" id="btnLogin">验证并登录</button>
+            ${usePassword ? `
+            <button type="button" class="btn-device" id="btnPatLogin">高级：使用 GitHub Token 登录</button>
+            <div id="patLoginBox" class="device-login-box" hidden>
+              <label style="display:block;font-size:12px;color:var(--text-secondary);margin:10px 0 6px">Personal Access Token</label>
+              <input type="password" id="tokenInput" placeholder="ghp_xxx 或 github_pat_xxx" style="width:100%;margin-bottom:8px">
+              <a href="${tokenUrl}" target="_blank" rel="noopener" style="color:var(--primary);font-size:12px">生成 token →</a>
+              <button type="button" class="btn-device" data-pat-submit style="margin-top:10px;width:100%">用 Token 登录</button>
+            </div>
+            ` : `
             <button type="button" class="btn-device" id="btnDeviceLogin">使用 GitHub Device Flow 登录</button>
             <div id="deviceLoginBox" class="device-login-box" hidden></div>
+            `}
             <div id="loginError" style="display:none;margin-top:12px;color:#d9534f;font-size:13px;text-align:center"></div>
           </form>
           <div class="login-warn">
             仅 ${escapeHtml((CONFIG.authorizedUsers || []).join('、') || '已配置的用户')} 可进入后台。<br>
-            token 只保存在当前浏览器，不会上传到任何第三方。<br>
+            ${usePassword ? '密码经 CloudBase 校验，会话 token 仅存本浏览器。' : 'token 只保存在当前浏览器，不会上传到任何第三方。'}<br>
             遇到问题？<a href="diagnose.html" style="color:var(--primary)">打开诊断页</a>
           </div>
           <p style="margin-top:18px"><a href="../" style="color:var(--text-tertiary);font-size:12px">← 返回首页</a></p>
@@ -119,8 +145,8 @@ function renderLogin(host) {
   `;
 
   $('#togglePwd').addEventListener('click', () => {
-    const t = $('#tokenInput');
-    t.type = t.type === 'password' ? 'text' : 'password';
+    const t = $('#passwordInput') || $('#tokenInput');
+    if (t) t.type = t.type === 'password' ? 'text' : 'password';
   });
 
   $('#loginForm').addEventListener('submit', async e => {
@@ -131,7 +157,11 @@ function renderLogin(host) {
     $btn.disabled = true;
     $btn.textContent = '验证中…';
     try {
-      await loginWithToken($('#tokenInput').value, { remember: $('#remember').checked });
+      if (usePassword) {
+        await loginWithPassword($('#passwordInput').value, { remember: $('#remember').checked });
+      } else {
+        await loginWithToken($('#tokenInput').value, { remember: $('#remember').checked });
+      }
       const back = popReturnTo();
       if (back && back !== window.location.href) window.location.href = back;
       else window.location.reload();
@@ -143,40 +173,64 @@ function renderLogin(host) {
     }
   });
 
-  const deviceBtn = $('#btnDeviceLogin');
-  const deviceBox = $('#deviceLoginBox');
-  const deviceEnabled = !!(CONFIG.auth && CONFIG.auth.githubDeviceFlow && CONFIG.auth.githubDeviceFlow.clientId);
-  if (!deviceEnabled) {
-    deviceBtn.disabled = true;
-    deviceBtn.title = '请先在 config.js / 后台设置中配置 auth.githubDeviceFlow.clientId';
-  }
-  deviceBtn.addEventListener('click', async () => {
-    const $err = $('#loginError');
-    $err.style.display = 'none';
-    deviceBtn.disabled = true;
-    deviceBtn.textContent = '等待 GitHub 授权…';
-    try {
-      await loginWithDeviceFlow({
-        remember: $('#remember').checked,
-        onCode: info => {
-          deviceBox.hidden = false;
-          deviceBox.innerHTML = `
+  if (usePassword) {
+    const patBtn = $('#btnPatLogin');
+    const patBox = $('#patLoginBox');
+    patBtn?.addEventListener('click', () => {
+      patBox.hidden = !patBox.hidden;
+    });
+    patBox?.querySelector('button[data-pat-submit]')?.addEventListener('click', async () => {
+      const $err = $('#loginError');
+      const $btn = patBox.querySelector('[data-pat-submit]');
+      $err.style.display = 'none';
+      if ($btn) $btn.disabled = true;
+      try {
+        await loginWithToken($('#tokenInput').value, { remember: $('#remember').checked });
+        const back = popReturnTo();
+        if (back && back !== window.location.href) window.location.href = back;
+        else window.location.reload();
+      } catch (err) {
+        $err.textContent = err.message || String(err);
+        $err.style.display = '';
+        if ($btn) $btn.disabled = false;
+      }
+    });
+  } else {
+    const deviceBtn = $('#btnDeviceLogin');
+    const deviceBox = $('#deviceLoginBox');
+    const deviceEnabled = !!(CONFIG.auth && CONFIG.auth.githubDeviceFlow && CONFIG.auth.githubDeviceFlow.clientId);
+    if (!deviceEnabled) {
+      deviceBtn.disabled = true;
+      deviceBtn.title = '请先在 config.js / 后台设置中配置 auth.githubDeviceFlow.clientId';
+    }
+    deviceBtn.addEventListener('click', async () => {
+      const $err = $('#loginError');
+      $err.style.display = 'none';
+      deviceBtn.disabled = true;
+      deviceBtn.textContent = '等待 GitHub 授权…';
+      try {
+        await loginWithDeviceFlow({
+          remember: $('#remember').checked,
+          onCode: info => {
+            deviceBox.hidden = false;
+            deviceBox.innerHTML = `
             <div>在新页面输入验证码：</div>
             <strong>${escapeHtml(info.user_code)}</strong>
             <a href="${escapeHtml(info.verification_uri)}" target="_blank" rel="noopener">打开 GitHub 授权页面 →</a>
           `;
-        },
-      });
-      const back = popReturnTo();
-      if (back && back !== window.location.href) window.location.href = back;
-      else window.location.reload();
-    } catch (err) {
-      $err.textContent = err.message || String(err);
-      $err.style.display = '';
-      deviceBtn.disabled = !deviceEnabled;
-      deviceBtn.textContent = '使用 GitHub Device Flow 登录';
-    }
-  });
+          },
+        });
+        const back = popReturnTo();
+        if (back && back !== window.location.href) window.location.href = back;
+        else window.location.reload();
+      } catch (err) {
+        $err.textContent = err.message || String(err);
+        $err.style.display = '';
+        deviceBtn.disabled = !deviceEnabled;
+        deviceBtn.textContent = '使用 GitHub Device Flow 登录';
+      }
+    });
+  }
 }
 
 function renderUnauthorized(host) {
