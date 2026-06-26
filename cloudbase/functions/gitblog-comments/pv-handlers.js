@@ -285,8 +285,9 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
     if (!verifyAdminSecret(event)) return jsonErr('无权限', 403);
     const limit = Math.min(Math.max(Number(event.limit) || 200, 1), 200);
     const skip = Math.max(Number(event.skip) || 0, 0);
+    // 与 PV_ADMIN_TOP 一致按 pv 排序；旧数据可能缺少 lastAt 导致按 lastAt 排序查不到
     const res = await db.collection(PV_COLLECTION)
-      .orderBy('lastAt', 'desc')
+      .orderBy('pv', 'desc')
       .skip(skip)
       .limit(limit)
       .get();
