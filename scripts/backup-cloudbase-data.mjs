@@ -69,9 +69,12 @@ async function fetchAllPageviews(cfg, secret, invokeOpts = {}) {
 }
 
 async function main() {
-  const secret = String(process.env.COMMENT_ADMIN_SECRET || '').trim();
+  const secret = String(process.env.COMMENT_ADMIN_SECRET || process.env.COMMENT_ADMIN_SECRET_VAR || '').trim();
   if (!secret) {
     console.error('请设置环境变量 COMMENT_ADMIN_SECRET');
+    console.error('GitHub Actions：需在 job 上声明 environment: github-pages，并把密钥放在');
+    console.error('  Settings → Environments → github-pages → Environment secrets（不是 Variables）');
+    console.error('或放在 Settings → Secrets and variables → Actions → Repository secrets');
     process.exit(1);
   }
 
