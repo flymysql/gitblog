@@ -22,12 +22,7 @@ function xmlEsc(s) {
 /** CloudBase PV beacon 预连接 / 预取（构建期注入 head） */
 export function buildPvBeaconHeadTags(cfgRaw = readFileSync('assets/js/config.js', 'utf8')) {
   if (!getSectionBool(cfgRaw, 'pageviews', 'enabled', true)) return '';
-  const provider = (() => {
-    const m = cfgRaw.match(/pageviews\s*:\s*\{[\s\S]*?provider\s*:\s*"([^"]*)"/);
-    const p = m ? String(m[1]).trim().toLowerCase() : 'cloudbase';
-    return p === 'third-party' ? 'third-party' : 'cloudbase';
-  })();
-  if (provider !== 'cloudbase' || !getSectionBool(cfgRaw, 'cloudbase', 'enabled', true)) return '';
+  if (!getSectionBool(cfgRaw, 'cloudbase', 'enabled', true)) return '';
   const embed = (cfgRaw.match(/embedBaseUrl\s*:\s*"([^"]*)"/) || [])[1]?.trim() || '';
   if (!embed) return '';
   let origin = '';
