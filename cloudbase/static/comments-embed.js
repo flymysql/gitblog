@@ -280,6 +280,13 @@ function postHeight(ready = false) {
       h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
       if (!composeOpen) _embedLockedHeight = h;
     }
+    if (!composeOpen && _commentCount === 0) {
+      if (isSplitListView()) {
+        h = shouldShowPersistentMobileDock() ? 1 : Math.min(h, 56);
+      } else if (isMobileDock() && shouldShowPersistentMobileDock()) {
+        h = 1;
+      }
+    }
     try {
       window.parent.postMessage({
         type: 'gitblog-comments-height',
@@ -1434,6 +1441,7 @@ async function mountListOnly() {
       await hydrateCommentImages(listEl, callApi);
       loadingEl.hidden = true;
       listEl.hidden = !comments.length;
+      commentsRoot.classList.toggle('cb-comments--empty-list', !comments.length);
       postHeight(true);
     } catch (err) {
       loadingEl.innerHTML = `<div class="comments-hint">${escapeHtml(err.message || '加载失败')}</div>`;
@@ -1748,6 +1756,7 @@ async function mount() {
       await hydrateCommentImages(listEl, callApi);
       loadingEl.hidden = true;
       listEl.hidden = !comments.length;
+      commentsRoot.classList.toggle('cb-comments--empty-list', !comments.length);
       postHeight(true);
     } catch (err) {
       loadingEl.innerHTML = `<div class="comments-hint">${escapeHtml(err.message || '加载失败')}</div>`;

@@ -1017,17 +1017,41 @@ const COMMENTS_END_HINT_MORE = '没有更多评论了~';
 const COMMENTS_END_HINT_EMPTY = '暂无评论，来留下一条评论吧~';
 
 function syncCommentsEndHint(targetEl, commentCount) {
-  const hint = targetEl.closest('.comments')?.querySelector('.comments-end-hint');
+  const section = targetEl.closest('.comments');
+  const hint = section?.querySelector('.comments-end-hint');
   if (!hint) return;
   const empty = Number(commentCount) === 0;
   hint.textContent = empty ? COMMENTS_END_HINT_EMPTY : COMMENTS_END_HINT_MORE;
   hint.hidden = false;
+  hint.setAttribute('aria-hidden', 'false');
+  section?.classList.toggle('comments--empty', empty);
 }
 
 function resolveEmbedFrameMinHeight(data, opts = {}) {
   if (Number(data.commentCount) === 0) return 0;
+  if (data.commentCount == null && isMobileCommentDock()) return 0;
   const mobile = isMobileCommentDock();
   return mobile ? 160 : 320;
+}
+
+function resolveEmbedFrameHeight(data, measuredH, opts = {}) {
+  const h = Math.max(0, Number(measuredH) || 0);
+  const count = data?.commentCount;
+  const knownEmpty = count !== null && count !== undefined && Number(count) === 0;
+  if (knownEmpty && isMobileCommentDock()) {
+    return shouldShowPersistentMobileDock(opts) ? 1 : Math.min(h, 56);
+  }
+  const minH = resolveEmbedFrameMinHeight(data, opts);
+  return Math.min(Math.max(h, minH), 2400);
+}
+
+function applyEmbedListFrameHeight(wrap, iframe, measuredH, data, opts = {}) {
+  if (!wrap || !iframe) return;
+  const applied = resolveEmbedFrameHeight(data, measuredH, opts);
+  wrap.dataset.cbEmbedHeight = String(applied);
+  iframe.style.height = `${applied}px`;
+  const empty = Number(data?.commentCount) === 0;
+  wrap.classList.toggle('cb-embed-wrap--empty', empty);
 }
 
 /** 移动端：评论表单底部抽屉（直连模式） */
@@ -1657,11 +1681,8 @@ function mountCloudBaseEmbedSplit(targetEl, path, opts = {}) {
   const onMessage = e => {
     if (e.source === listIframe?.contentWindow && e.data) {
       if (e.data.type === 'gitblog-comments-height') {
-        const h = Number(e.data.height);
-        if (h > 0 && listIframe && !composeOpen) {
-          listWrap.dataset.cbEmbedHeight = String(h);
-          const minH = resolveEmbedFrameMinHeight(e.data, opts);
-          listIframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
+        if (listIframe && !composeOpen) {
+          applyEmbedListFrameHeight(listWrap, listIframe, Number(e.data.height), e.data, opts);
         }
         if (hint && e.data.ready) hint.hidden = true;
         if (e.data.ready && Object.prototype.hasOwnProperty.call(e.data, 'commentCount')) {
@@ -1735,10 +1756,8 @@ function mountCloudBaseEmbed(targetEl, path, opts = {}) {
     if (e.data.type === 'gitblog-comments-height') {
       const h = Number(e.data.height);
       const composeOpen = !!e.data.composeOpen;
-      if (h > 0 && iframe && !composeOpen) {
-        embedWrap.dataset.cbEmbedHeight = String(h);
-        const minH = resolveEmbedFrameMinHeight(e.data, opts);
-        iframe.style.height = `${Math.min(Math.max(h, minH), 2400)}px`;
+      if (iframe && !composeOpen) {
+        applyEmbedListFrameHeight(embedWrap, iframe, h, e.data, opts);
       }
       if (composeOpen) syncEmbedComposePin(embedWrap, true);
       if (hint && e.data.ready) hint.hidden = true;

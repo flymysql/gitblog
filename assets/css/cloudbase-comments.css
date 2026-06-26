@@ -12,7 +12,13 @@
 @media (max-width: 640px) {
   .cb-embed-frame {
     min-height: 0;
-    height: 120px;
+    height: 48px;
+  }
+
+  .cb-embed-wrap--empty .cb-embed-frame,
+  .comments--empty .cb-embed-frame {
+    height: 1px !important;
+    min-height: 0 !important;
   }
 }
 .cb-embed-hint { margin-top: 10px; font-size: 12.5px; }
