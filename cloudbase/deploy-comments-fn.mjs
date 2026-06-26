@@ -57,6 +57,9 @@ if (!secrets.COMMENT_ADMIN_SECRET || secrets.COMMENT_ADMIN_SECRET.includes('请�
   console.error('请在 secrets.env 中设置 COMMENT_ADMIN_SECRET（后台评论管理密钥）');
   process.exit(1);
 }
+if (!secrets.GITHUB_PAT || secrets.GITHUB_PAT.includes('change-me') || secrets.GITHUB_PAT.includes('github_pat_或')) {
+  console.warn('提示：未配置 GITHUB_PAT，后台短密码登录写文章将不可用（评论/PV 仍正常）');
+}
 
 const fn = mergeEnv(rc, secrets);
 const envId = envArg || rc.envId;

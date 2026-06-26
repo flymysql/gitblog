@@ -295,8 +295,29 @@ cloudbase: {
 | `ADMIN_EXPORT` | `adminSecret`, `limit?`, `skip?`, `status?` | 备份导出评论（含 contentHtml，不含邮箱） |
 | `ADMIN_DELETE` | `adminSecret`, `id` | 后台删除评论 |
 | `PV_ADMIN_EXPORT` | `adminSecret`, `limit?`, `skip?` | 备份导出全部页面 PV + 站点统计 |
+| `EDITOR_AUTH` | `adminSecret` | 校验管理密码，返回 24h session + GitHub 用户信息 |
+| `GH_GET_CONTENTS` | `editorSession`, `path` | 读仓库文件（路径白名单） |
+| `GH_PUT_CONTENTS` | `editorSession`, `path`, `contentBase64`, `message`, `sha?` | 写入/更新文件 |
+| `GH_DELETE_CONTENTS` | `editorSession`, `path`, `sha`, `message` | 删除文件 |
+| `GH_LIST_DIR` | `editorSession`, `path` | 列举目录 |
+| `GH_USER` / `GH_GET_REPO` / `GH_GET_BRANCH` / `GH_GET_TREE` | `editorSession`, … | 诊断与运维 |
+
+云函数环境变量（`secrets.env`，勿提交 Git）：
+
+- `COMMENT_ADMIN_SECRET` — 后台短密码（与登录页相同）
+- `GITHUB_PAT` — 有 Contents 写权限的 Fine-grained PAT（仅存服务端）
+- `GITHUB_REPO_OWNER` / `GITHUB_REPO_NAME` / `GITHUB_REPO_BRANCH` — 目标仓库
 
 返回 `{ ok: true, ... }` 或 `{ ok: false, message }`。
+
+### 后台短密码登录写文章
+
+1. `assets/js/config.js` 中 `auth.editorMode` 设为 `"cloudbase"`（默认，CloudBase 启用时生效）
+2. 在 `secrets.env` 配置 `GITHUB_PAT` 与仓库信息，执行 `npm run cloudbase:deploy-comments`
+3. 重新部署静态 embed：`npm run build:embed` 后 `tcb hosting deploy`（含更新后的 `pv-beacon.js`）
+4. 打开 `/admin/`，输入与 `COMMENT_ADMIN_SECRET` 相同的管理密码即可写文章；GitHub 长 token 不再进入浏览器
+
+若需恢复浏览器 PAT 模式，将 `auth.editorMode` 改为 `"pat"`。
 
 ## 11. 每日自动备份
 
