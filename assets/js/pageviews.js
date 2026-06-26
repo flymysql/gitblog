@@ -193,9 +193,18 @@ function readListStatsCache() {
   return { pv: data.pv, comments: data.comments };
 }
 
-function cachedListPv(pvPath) {
+function readBuildStat(el, key) {
+  const raw = el?.dataset?.[key];
+  if (raw === undefined || raw === '') return null;
+  const v = Number(raw);
+  return Number.isFinite(v) && v >= 0 ? Math.floor(v) : null;
+}
+
+function cachedListPv(pvPath, el = null) {
   const path = String(pvPath || '').trim();
   if (!path) return null;
+  const fromBuild = el ? readBuildStat(el, 'buildPv') : null;
+  if (fromBuild != null) return fromBuild;
   const fromArticle = getCachedArticlePv(path);
   if (fromArticle != null) return fromArticle;
   const fromList = readListStatsCache()?.pv?.[path];
@@ -203,9 +212,11 @@ function cachedListPv(pvPath) {
   return null;
 }
 
-function cachedListComments(commentPath) {
+function cachedListComments(commentPath, el = null) {
   const key = String(commentPath || '').trim();
   if (!key) return null;
+  const fromBuild = el ? readBuildStat(el, 'buildCm') : null;
+  if (fromBuild != null) return fromBuild;
   const v = readListStatsCache()?.comments?.[key];
   return v != null ? v : null;
 }
@@ -253,15 +264,15 @@ export function syncArticleListStatsFromCache(root = document) {
   if (!list || list.classList.contains('post-list--giscus')) return;
 
   const showPv = useCloudBase() && pvCfg().showPostViews !== false;
-  const showCm = isCommentsReady();
+  const showCm = isCommentsReady() || !!list.querySelector('.post-list-stats[data-build-cm]');
   if (!showPv && !showCm) return;
 
   list.querySelectorAll('.post-list-stats').forEach(el => {
     if (el.dataset.listStatsDone === '1') return;
     const pvPath = String(el.dataset.pvPath || '').trim();
     const commentPath = String(el.dataset.commentPath || '').trim();
-    const pv = showPv && pvPath ? cachedListPv(pvPath) : null;
-    const cm = showCm && commentPath ? cachedListComments(commentPath) : null;
+    const pv = showPv && pvPath ? cachedListPv(pvPath, el) : null;
+    const cm = showCm && commentPath ? cachedListComments(commentPath, el) : null;
     if (pv == null && cm == null) return;
     applyListStatsToSlot(el, pv, cm, { showPv, showCm }, { finalize: false });
   });
@@ -283,12 +294,12 @@ export async function renderArticleListViews(root = document) {
   if (!list || list.classList.contains('post-list--giscus')) return;
 
   const showPv = useCloudBase() && pvCfg().showPostViews !== false;
-  const showCm = isCommentsReady();
-  if (!showPv && !showCm) return;
-
   syncArticleListStatsFromCache(root);
 
   const slots = [...list.querySelectorAll('.post-list-stats:not([data-list-stats-done="1"])')];
+  const showCm = isCommentsReady() || slots.some(el => el.dataset.buildCm != null && el.dataset.buildCm !== '');
+  if (!showPv && !showCm) return;
+
   if (!slots.length) return;
 
   if (STATE.listStatsTask) {
@@ -307,8 +318,8 @@ export async function renderArticleListViews(root = document) {
     const needCm = new Set();
 
     for (const row of slotMeta) {
-      const pv = showPv && row.pvPath ? cachedListPv(row.pvPath) : null;
-      const cm = showCm && row.commentPath ? cachedListComments(row.commentPath) : null;
+      const pv = showPv && row.pvPath ? cachedListPv(row.pvPath, row.el) : null;
+      const cm = showCm && row.commentPath ? cachedListComments(row.commentPath, row.el) : null;
       applyListStatsToSlot(row.el, pv, cm, { showPv, showCm }, { finalize: false });
 
       if (showPv && row.pvPath && pv == null) {
@@ -323,8 +334,8 @@ export async function renderArticleListViews(root = document) {
       slotMeta.forEach(({ el, pvPath, commentPath }) => {
         applyListStatsToSlot(
           el,
-          showPv && pvPath ? cachedListPv(pvPath) : null,
-          showCm && commentPath ? cachedListComments(commentPath) : null,
+          showPv && pvPath ? cachedListPv(pvPath, el) : null,
+          showCm && commentPath ? cachedListComments(commentPath, el) : null,
           { showPv, showCm },
         );
       });
@@ -353,10 +364,10 @@ export async function renderArticleListViews(root = document) {
 
     for (const { el, pvPath, commentPath } of slotMeta) {
       const pv = showPv && pvPath
-        ? (pvMap[pvPath] ?? cachedListPv(pvPath))
+        ? (pvMap[pvPath] ?? cachedListPv(pvPath, el))
         : null;
       const cm = showCm && commentPath
-        ? (cmMap[commentPath] ?? cachedListComments(commentPath))
+        ? (cmMap[commentPath] ?? cachedListComments(commentPath, el))
         : null;
       applyListStatsToSlot(el, pv, cm, { showPv, showCm });
     }

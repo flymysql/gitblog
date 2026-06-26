@@ -28,6 +28,11 @@ import {
   collectPublicUrls,
 } from './seo-build.mjs';
 import { buildPvBeaconHeadTags } from './pv-beacon-head.mjs';
+import { loadBuildStats } from './cloudbase-build-stats.mjs';
+import {
+  lookupPostCommentCount,
+  lookupPostPv,
+} from './cloudbase-stats-lib.mjs';
 
 // 从 config.js 中提取 site.url / site.title 等（粗暴正则即可，不引入打包器）
 const cfgRaw = readFileSync('assets/js/config.js', 'utf8');
@@ -656,6 +661,7 @@ const PAGEVIEWS_CFG = {
     return m ? m[1] : '阅读';
   })(),
 };
+const { index: BUILD_STATS_INDEX } = await loadBuildStats();
 function safePostUrlKeyDir(p) {
   const slug = String(p.slug || '');
   const k = String(p.urlKey || '').trim();
@@ -690,6 +696,7 @@ for (const p of postEntries) {
     donateCfg: DONATE_CFG,
     pageviewsCfg: PAGEVIEWS_CFG,
     postShellTemplate: POST_SHELL,
+    buildStatsIndex: BUILD_STATS_INDEX,
   });
   writeFileSync(join(dir, 'index.html'), prerendered);
   postShellCount++;
@@ -806,6 +813,7 @@ function injectHomeSeo() {
     pathPrefix: SITE_PATH_PREFIX,
     showSiteStats: SHOW_HOME_STATS,
     siteStatsLabel: SITE_STATS_LABEL,
+    sitePv: SHOW_HOME_STATS ? BUILD_STATS_INDEX.sitePv : null,
   });
   html = html.replace(
     /<section class="hero" id="hero"[^>]*>[\s\S]*?<\/section>/,
@@ -836,6 +844,9 @@ function injectHomeSeo() {
       author: SITE_AUTHOR,
       avatar: SITE_AVATAR,
       postHrefFromEntry: hrefFn,
+      showListStats: PAGEVIEWS_CFG.enabled !== false,
+      listPv: PAGEVIEWS_CFG.showPostViews !== false ? lookupPostPv(BUILD_STATS_INDEX, p) : null,
+      listComments: lookupPostCommentCount(BUILD_STATS_INDEX, p),
     })).join('\n');
     if (visiblePosts.length > latestForHome.length) {
       listHtml += `\n      <li class="load-more-sentinel" id="loadMoreSentinel" aria-hidden="true">
