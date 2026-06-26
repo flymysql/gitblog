@@ -520,6 +520,43 @@ async function handleAdminList(event) {
   return jsonOk({ comments, skip, limit });
 }
 
+function backupCommentRow(row) {
+  return {
+    _id: row._id,
+    path: row.path,
+    nick: row.nick || '访客',
+    avatar: sanitizeAvatar(row.avatar, row.nick || '访客'),
+    contentHtml: String(row.contentHtml || ''),
+    parentId: row.parentId || null,
+    replyToNick: row.replyToNick || null,
+    pageTitle: row.pageTitle || '',
+    pageUrl: row.pageUrl || '',
+    status: row.status || 'visible',
+    createdAt: row.createdAt,
+    createdAtIso: row.createdAtIso,
+    deletedAt: row.deletedAt || null,
+  };
+}
+
+/** 管理端全量导出（备份用，不含 email / ipHash / ua） */
+async function handleAdminExport(event) {
+  if (!verifyAdminSecret(event)) return jsonErr('管理密钥无效', 403);
+  const limit = Math.min(Math.max(Number(event.limit) || 200, 1), 200);
+  const skip = Math.max(Number(event.skip) || 0, 0);
+  const path = String(event.path || '').trim();
+  const status = String(event.status || 'all').trim();
+  const _ = db.command;
+  let query = db.collection(COLLECTION);
+  const where = {};
+  if (path) where.path = path;
+  if (status && status !== 'all') where.status = status;
+  query = query.where(where);
+  const res = await query.orderBy('createdAt', 'desc').skip(skip).limit(limit).get();
+  const rows = res.data || [];
+  const comments = rows.map(backupCommentRow);
+  return jsonOk({ comments, skip, limit, hasMore: rows.length === limit });
+}
+
 async function handleAdminDelete(event) {
   if (!verifyAdminSecret(event)) return jsonErr('管理密钥无效', 403);
   const id = String(event.id || '').trim();
@@ -803,6 +840,7 @@ async function dispatch(event, context) {
   if (action === 'DISCARD_UPLOAD') return await handleDiscardUpload(event, context);
   if (action === 'CLEANUP') return await handleCleanupOrphans();
   if (action === 'ADMIN_LIST') return await handleAdminList(event);
+  if (action === 'ADMIN_EXPORT') return await handleAdminExport(event);
   if (action === 'ADMIN_DELETE') return await handleAdminDelete(event);
   if (action === 'PV_HIT') return await pvApi.handlePvHit(event, context);
   if (action === 'PV_GET') return await pvApi.handlePvGet(event);
@@ -810,6 +848,7 @@ async function dispatch(event, context) {
   if (action === 'PV_SITE') return await pvApi.handlePvSite();
   if (action === 'COMMENT_COUNT_BATCH') return await handleCommentCountBatch(event);
   if (action === 'PV_ADMIN_TOP') return await pvApi.handlePvAdminTop(event);
+  if (action === 'PV_ADMIN_EXPORT') return await pvApi.handlePvAdminExport(event);
   if (action === 'PV_IMPORT') return await pvApi.handlePvImport(event);
   return jsonErr('未知 action');
 }

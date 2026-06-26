@@ -21,7 +21,8 @@
     "tools:pages": "node scripts/generate-tool-pages.mjs",
     "cloudbase:deploy-comments": "node cloudbase/deploy-comments-fn.mjs -e gitbolg-d7gmnsrw46e011706",
     "cloudbase:deploy-embed": "node cloudbase/deploy-static-embed.mjs -e gitbolg-d7gmnsrw46e011706",
-    "import:pageviews": "node scripts/import-pageview-stats.mjs"
+    "import:pageviews": "node scripts/import-pageview-stats.mjs",
+    "backup:cloudbase": "node scripts/backup-cloudbase-data.mjs"
   },
   "devDependencies": {
     "@cloudbase/cli": "^3.5.8",
