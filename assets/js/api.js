@@ -70,7 +70,7 @@ export function clearAuth() {
   sessionStorage.removeItem(SESSION_TOKEN_KEY);
 }
 
-export { isCloudbaseEditorConfigured as isCloudbaseEditorEnabled, useCloudEditorProxy };
+export { isCloudbaseEditorConfigured as isCloudbaseEditorEnabled };
 
 function editorSession() {
   return getToken();
