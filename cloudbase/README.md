@@ -310,7 +310,8 @@ COMMENT_ADMIN_SECRET=xxx npm run backup:cloudbase
 GitHub Actions 工作流 `.github/workflows/backup-cloudbase.yml` 会在 **北京时间 0:00** 执行并 commit。需在仓库 Secrets 配置：
 
 - `COMMENT_ADMIN_SECRET`（必填）
-- `CLOUDBASE_HTTP_URL`（推荐，云函数 HTTP 访问地址）或 `TENCENTCLOUD_SECRETID` + `TENCENTCLOUD_SECRETKEY`
+- `TENCENTCLOUD_SECRETID` + `TENCENTCLOUD_SECRETKEY`（推荐；须与本地 `tcb login` 同一腾讯云账号，CI 走 Node SDK 调用）
+- 或 `CLOUDBASE_HTTP_URL`（云函数 HTTP 网关地址）
 
 首次使用前部署含导出接口的云函数：`npm run cloudbase:deploy-comments`
 
