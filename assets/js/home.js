@@ -118,24 +118,42 @@ function latestPostDate(posts) {
   return latest?.date || '';
 }
 
+function preserveSitePvStatHtml(statsEl) {
+  const slot = statsEl?.querySelector('[data-saobby-slot="site"]');
+  if (!slot) return '';
+  const hasBuild = slot.dataset.buildPv != null && slot.dataset.buildPv !== '';
+  const hasContent = !slot.hidden && String(slot.textContent || '').trim();
+  if (hasBuild || hasContent) return slot.outerHTML;
+  return '';
+}
+
 function renderHero(posts) {
   const hero = $('#hero');
   if (!hero) return;
   hero.hidden = false;
   const tagCount = new Set();
   posts.forEach(p => (p.tags || []).forEach(t => tagCount.add(t)));
+  const siteStatHtml = (CONFIG.pageviews || {}).showHomeStats !== false ? bszSiteStatsHtml() : '';
+
+  if (hero.dataset.shell === 'prerender' && hero.querySelector('.hero-link')) {
+    const statsEl = hero.querySelector('.hero-stats');
+    if (statsEl) {
+      const preservedSite = preserveSitePvStatHtml(statsEl);
+      statsEl.innerHTML = `
+          <div class="stat"><strong>${posts.length}</strong>篇文章</div>
+          <div class="stat"><strong>${tagCount.size}</strong>个标签</div>
+          ${recentUpdateStatHtml(latestPostDate(posts))}
+          ${preservedSite || siteStatHtml}`;
+    }
+    hero.removeAttribute('data-shell');
+    return;
+  }
+
   const statsInner = `
           <div class="stat"><strong>${posts.length}</strong>篇文章</div>
           <div class="stat"><strong>${tagCount.size}</strong>个标签</div>
           ${recentUpdateStatHtml(latestPostDate(posts))}
-          ${(CONFIG.pageviews || {}).showHomeStats !== false ? bszSiteStatsHtml() : ''}`;
-
-  if (hero.dataset.shell === 'prerender' && hero.querySelector('.hero-link')) {
-    const statsEl = hero.querySelector('.hero-stats');
-    if (statsEl) statsEl.innerHTML = statsInner;
-    hero.removeAttribute('data-shell');
-    return;
-  }
+          ${siteStatHtml}`;
 
   // 整块 hero 包一层 <a> 跳转到「关于」页面：支持点击 / 右键新标签 / 中键新窗口
   hero.innerHTML = `
