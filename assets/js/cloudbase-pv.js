@@ -335,7 +335,15 @@ export async function getSiteViewStats() {
   return parsePvData(await callBeacon({ action: 'site' }));
 }
 
-export async function batchGetPageViews(entries = []) {
+export async function batchGetCommentCounts(paths = []) {
+  const list = [...new Set((Array.isArray(paths) ? paths : []).map(s => String(s || '').trim()).filter(Boolean))];
+  if (!list.length) return {};
+  const data = parsePvData(await callBeaconWithRetry({ action: 'comment-counts', paths: list }));
+  return data.counts && typeof data.counts === 'object' ? data.counts : {};
+}
+
+/** 列表阅读数：与文章页相同走 PV_GET（批量接口易返回 0，单篇更可靠） */
+export async function fetchListPageViews(entries = []) {
   const items = [];
   const seen = new Set();
   for (const entry of Array.isArray(entries) ? entries : []) {
@@ -356,15 +364,21 @@ export async function batchGetPageViews(entries = []) {
     });
   }
   if (!items.length) return {};
-  const data = parsePvData(await callBeaconWithRetry({ action: 'batch-get', items }));
-  return data.pages && typeof data.pages === 'object' ? data.pages : {};
-}
 
-export async function batchGetCommentCounts(paths = []) {
-  const list = [...new Set((Array.isArray(paths) ? paths : []).map(s => String(s || '').trim()).filter(Boolean))];
-  if (!list.length) return {};
-  const data = parsePvData(await callBeaconWithRetry({ action: 'comment-counts', paths: list }));
-  return data.counts && typeof data.counts === 'object' ? data.counts : {};
+  await waitForPvBeacon();
+
+  const pages = {};
+  const CONCURRENCY = 8;
+  for (let i = 0; i < items.length; i += CONCURRENCY) {
+    const chunk = items.slice(i, i + CONCURRENCY);
+    await Promise.all(chunk.map(async ({ path, slug }) => {
+      try {
+        const data = await getPageView(path, { slug });
+        pages[path] = pvNumber(data, 'pv');
+      } catch { /* 单条失败不影响其它 */ }
+    }));
+  }
+  return pages;
 }
 
 export async function getAdminTopPages(adminSecret, limit = 20) {
