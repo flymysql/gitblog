@@ -40,7 +40,7 @@ export const CONFIG = {
         href: "tools/"
       },
       {
-        name: "随笔",
+        name: "留言板",
         href: "notes.html"
       },
       {
