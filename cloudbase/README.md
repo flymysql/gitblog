@@ -292,11 +292,31 @@ cloudbase: {
 | `POST` | `path`, `contentHtml`, `nick?`, `email?`, `parentId?` | 发表评论 |
 | `UPLOAD` | `path`, `base64`, `mime`, `fileName?` | 上传评论图片 |
 | `ADMIN_LIST` | `adminSecret`, `limit?`, `skip?`, `path?`, `status?` | 后台列出评论 |
+| `ADMIN_EXPORT` | `adminSecret`, `limit?`, `skip?`, `status?` | 备份导出评论（含 contentHtml，不含邮箱） |
 | `ADMIN_DELETE` | `adminSecret`, `id` | 后台删除评论 |
+| `PV_ADMIN_EXPORT` | `adminSecret`, `limit?`, `skip?` | 备份导出全部页面 PV + 站点统计 |
 
 返回 `{ ok: true, ... }` 或 `{ ok: false, message }`。
 
-## 11. 故障排查
+## 11. 每日自动备份
+
+评论与访问统计可每天自动快照到仓库 `data/cloudbase-backup/`：
+
+```bash
+# 本地手动备份
+COMMENT_ADMIN_SECRET=xxx npm run backup:cloudbase
+```
+
+GitHub Actions 工作流 `.github/workflows/backup-cloudbase.yml` 会在 **北京时间 0:00** 执行并 commit。需在仓库 Secrets 配置：
+
+- `COMMENT_ADMIN_SECRET`（必填）
+- `CLOUDBASE_HTTP_URL`（推荐，云函数 HTTP 访问地址）或 `TENCENTCLOUD_SECRETID` + `TENCENTCLOUD_SECRETKEY`
+
+首次使用前部署含导出接口的云函数：`npm run cloudbase:deploy-comments`
+
+详见 `data/cloudbase-backup/README.md`。
+
+## 12. 故障排查
 
 ### PC 正常、手机/微信报错
 
@@ -308,6 +328,6 @@ cloudbase: {
 
 `embedBaseUrl` 须与 `tcb hosting deploy` 输出的完整域名一致（含 `-数字` 后缀）。
 
-## 12. 费用提示
+## 13. 费用提示
 
 CloudBase 免费体验版有每月资源点限制；个人博客评论量通常足够。详见 [CloudBase 价格文档](https://cloud.tencent.com/document/product/876/75213)。
