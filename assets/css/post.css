@@ -279,6 +279,18 @@
   font-weight: 600;
   margin-bottom: 18px;
 }
+.comments-build-preview-list {
+  margin-bottom: 20px;
+}
+.comments-build-empty {
+  margin: 0 0 20px;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+.comments-build-preview #commentsRoot:not(:empty) ~ .comments-build-preview-list,
+.comments-build-preview #commentsRoot:not(:empty) ~ .comments-build-empty {
+  display: none;
+}
 .comments-hint {
   background: var(--bg-soft);
   border: 1px solid var(--border);
