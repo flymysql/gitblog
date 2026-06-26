@@ -300,7 +300,7 @@ cloudbase: {
 
 ## 11. 每日自动备份
 
-评论与访问统计可每天自动快照到仓库 `data/cloudbase-backup/`：
+评论与访问统计可每天自动快照到仓库 `data/cloudbase-backup/latest.json`（仅保留最新一份）：
 
 ```bash
 # 本地手动备份
