@@ -316,7 +316,7 @@ async function renderDashboardStats(posts) {
   if (!pvList) return;
 
   if (!useCb) {
-    pvList.innerHTML = '<div class="dashboard-pv-empty">文章阅读量由 <a href="https://vercount.one" target="_blank" rel="noopener">Vercount</a> 按页面 URL 统计，请到 Vercount 控制台查看；站点总访问请查看 Saobby 控制面板或「访问数据」页。</div>';
+    pvList.innerHTML = '<div class="dashboard-pv-empty">访问统计未启用。请在站点设置中开启访问计数并配置 CloudBase，或前往 <a href="analytics.html">访问数据</a> 页查看。</div>';
     return;
   }
 

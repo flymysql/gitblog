@@ -59,7 +59,6 @@ const state = {
   selectedSeries: '',
   seriesOrder: '',
   availableSeries: [],
-  counter: { img: '', dashboard: '' }, // 文章独立 saobby 计数器
   docList: [],
   docSearch: '',
   syncScrollLock: false,
@@ -122,7 +121,6 @@ async function loadPost(slug) {
     $('#pinnedToggle').checked = !!data.pinned;
     $('#carouselToggle').checked = !!data.carousel;
     setEditorSeries(data.series || '', data.seriesOrder);
-    setEditorCounter(data.counter || { img: '', dashboard: '' });
     setContent(content);
     document.title = `编辑：${data.title || slug}`;
     renderSummaryPreview();
@@ -290,78 +288,6 @@ function setEditorTags(tags) {
   state.availableTags = uniqueTags([...state.availableTags, ...state.selectedTags]).sort((a, b) => a.localeCompare(b, 'zh-CN'));
   syncTagsInput();
   renderTagPicker();
-}
-
-// ---------- 文章独立计数器（saobby 半自动） ----------
-function setEditorCounter(counter) {
-  state.counter = {
-    img: String((counter && counter.img) || '').trim(),
-    dashboard: String((counter && counter.dashboard) || '').trim(),
-  };
-  renderEditorCounter();
-}
-
-function renderEditorCounter() {
-  const field = $('#counterField');
-  if (!field) return;
-  // 文章阅读数由 Vercount 按页面 URL 统计，编辑器不再配置 per-post 计数器
-  field.hidden = true;
-}
-
-function buildSaobbyCreateUrl() {
-  // saobby 创建页本身没有 query string 配置入口（页面是富表单），
-  // 所以这里只是直跳过去，让用户用默认设置创建。
-  // 之所以经一次拼接，是为后续 saobby 提供更好集成时方便扩展。
-  return 'https://www.saobby.com/create_webcounter';
-}
-
-async function pasteCounterDialog() {
-  // 一个简单的双行输入对话框：让用户把 saobby 给的「图片 URL」和「控制面板 URL」粘进来
-  const cur = state.counter || {};
-  const imgIn = prompt(
-    '把 saobby 给你的「计数器图片 URL」粘到这里：\n（例如：https://www.saobby.com/w/abc123 或 .../webcounter/svg?id=...）',
-    cur.img || ''
-  );
-  if (imgIn == null) return; // 用户取消
-  const img = String(imgIn || '').trim();
-  if (img && !/^https?:\/\//i.test(img)) {
-    alert('图片 URL 看起来不对，请确认是 https:// 开头的完整地址');
-    return;
-  }
-  const dashIn = prompt(
-    '再把 saobby 给你的「控制面板 URL（含 access_token / key）」粘进来：\n（例如：https://www.saobby.com/webcounter_dashboard?access_token=xxx）',
-    cur.dashboard || ''
-  );
-  if (dashIn == null) return;
-  const dashboard = String(dashIn || '').trim();
-  if (dashboard && !/^https?:\/\//i.test(dashboard)) {
-    alert('控制面板 URL 看起来不对，请确认是 https:// 开头的完整地址');
-    return;
-  }
-  setEditorCounter({ img, dashboard });
-  showToast('已记录本文计数器，发布时会写入 frontmatter');
-}
-
-function bindCounterPanel() {
-  const createBtn = $('#counterCreateBtn');
-  const pasteBtn = $('#counterPasteBtn');
-  const clearBtn = $('#counterClearBtn');
-  if (createBtn) {
-    createBtn.addEventListener('click', () => {
-      const w = window.open(buildSaobbyCreateUrl(), '_blank', 'noopener,noreferrer');
-      if (!w) {
-        showToast('浏览器拦截了新窗口，请手动打开 saobby.com 创建', 'error');
-        return;
-      }
-      // 创建完成后用户回到本页面，提示去粘贴 URL
-      showToast('在新窗口中创建计数器后，回来点「粘贴 URL…」把图片 + 控制面板 URL 粘进来');
-    });
-  }
-  if (pasteBtn) pasteBtn.addEventListener('click', pasteCounterDialog);
-  if (clearBtn) clearBtn.addEventListener('click', () => {
-    if (!confirm('清除本文的独立计数器配置？')) return;
-    setEditorCounter({ img: '', dashboard: '' });
-  });
 }
 
 function addEditorTag(tag) {
@@ -739,13 +665,6 @@ async function publish() {
       if (!Number.isNaN(n) && n > 0) data.seriesOrder = n;
     }
   }
-  const counter = state.counter || {};
-  if (counter.img || counter.dashboard) {
-    data.counter = {
-      img: counter.img || '',
-      dashboard: counter.dashboard || '',
-    };
-  }
 
   const md = stringifyFrontmatter(data, content);
   const path = `${CONFIG.paths.posts}/${slug}.md`;
@@ -808,7 +727,6 @@ async function publish() {
       carousel: carousel && !!cover,
       series: data.series,
       seriesOrder: data.seriesOrder,
-      counter: data.counter,
       path: state.loadedPath,
       removeSlug: isRename ? state.loadedSlug : null,
     });
@@ -840,7 +758,7 @@ async function publish() {
   }
 }
 
-async function updateIndex({ slug, title, date, updated, author, summary, tags, cover, draft, pinned, carousel, series, seriesOrder, counter, path, removeSlug }) {
+async function updateIndex({ slug, title, date, updated, author, summary, tags, cover, draft, pinned, carousel, series, seriesOrder, path, removeSlug }) {
   const idx = await readIndex();
   const data = idx ? idx.data : { posts: [] };
   if (!Array.isArray(data.posts)) data.posts = [];
@@ -857,12 +775,6 @@ async function updateIndex({ slug, title, date, updated, author, summary, tags, 
   if (carousel && cover) entry.carousel = true;
   if (series) entry.series = series;
   if (seriesOrder != null && !Number.isNaN(Number(seriesOrder))) entry.seriesOrder = Number(seriesOrder);
-  if (counter && (counter.img || counter.dashboard)) {
-    entry.counter = {
-      img: String(counter.img || ''),
-      dashboard: String(counter.dashboard || ''),
-    };
-  }
   if (pinned && existing >= 0 && data.posts[existing].pinnedOrder) entry.pinnedOrder = data.posts[existing].pinnedOrder;
 
   if (existing >= 0) data.posts[existing] = entry;
@@ -1428,8 +1340,6 @@ function setupEasyMDE() {
   setupDragAndPaste();
   bindTagPicker();
   bindSeriesPicker();
-  bindCounterPanel();
-  renderEditorCounter();
   loadAvailableTags();
   loadAvailableSeries();
   loadDocList();
