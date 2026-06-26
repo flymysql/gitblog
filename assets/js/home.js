@@ -5,7 +5,7 @@
 import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
 import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPathFromPost, postPath, rootPath, thumbUrlFor } from './site.js';
-import { initPageviews, bszSiteStatsHtml, queueArticleListViews, syncArticleListStatsFromCache, mountSitePvSlots } from './pageviews.js';
+import { initPageviews, bszSiteStatsHtml, buildSitePvStatHtml, queueArticleListViews, syncArticleListStatsFromCache, mountSitePvSlots } from './pageviews.js';
 import { preloadPvBeacon } from './cloudbase-pv.js';
 import { commentPathForPost } from './comment-term.js';
 import { setMeta, setJsonLd } from './seo.js';
@@ -123,8 +123,35 @@ function preserveSitePvStatHtml(statsEl) {
   if (!slot) return '';
   const hasBuild = slot.dataset.buildPv != null && slot.dataset.buildPv !== '';
   const hasContent = !slot.hidden && String(slot.textContent || '').trim();
-  if (hasBuild || hasContent) return slot.outerHTML;
-  return '';
+  if (!hasBuild && !hasContent) return '';
+  return slot.outerHTML
+    .replace(/\s*hidden(?:=(?:"[^"]*"|'[^']*'|[^\s>]*))?/gi, '')
+    .replace(/\s*data-pv-site-done="1"/g, '');
+}
+
+function readSitePvFromStats(statsEl) {
+  const slot = statsEl?.querySelector('[data-saobby-slot="site"]');
+  if (!slot) return null;
+  const raw = slot.dataset.buildPv;
+  if (raw != null && raw !== '') {
+    const v = Number(raw);
+    if (Number.isFinite(v) && v >= 0) return Math.floor(v);
+  }
+  const txt = slot.querySelector('.gitblog-pv-num')?.textContent?.trim();
+  if (txt && txt !== '…' && txt !== '—') {
+    const v = Number(String(txt).replace(/,/g, ''));
+    if (Number.isFinite(v) && v >= 0) return Math.floor(v);
+  }
+  return null;
+}
+
+function heroSiteStatHtml(statsEl) {
+  if ((CONFIG.pageviews || {}).showHomeStats === false) return '';
+  const preserved = preserveSitePvStatHtml(statsEl);
+  if (preserved) return preserved;
+  const pv = readSitePvFromStats(statsEl);
+  if (pv != null) return buildSitePvStatHtml(pv);
+  return bszSiteStatsHtml();
 }
 
 function renderHero(posts) {
@@ -133,17 +160,16 @@ function renderHero(posts) {
   hero.hidden = false;
   const tagCount = new Set();
   posts.forEach(p => (p.tags || []).forEach(t => tagCount.add(t)));
-  const siteStatHtml = (CONFIG.pageviews || {}).showHomeStats !== false ? bszSiteStatsHtml() : '';
+  const statsEl = hero.querySelector('.hero-stats');
+  const siteStatHtml = heroSiteStatHtml(statsEl);
 
   if (hero.dataset.shell === 'prerender' && hero.querySelector('.hero-link')) {
-    const statsEl = hero.querySelector('.hero-stats');
     if (statsEl) {
-      const preservedSite = preserveSitePvStatHtml(statsEl);
       statsEl.innerHTML = `
           <div class="stat"><strong>${posts.length}</strong>篇文章</div>
           <div class="stat"><strong>${tagCount.size}</strong>个标签</div>
           ${recentUpdateStatHtml(latestPostDate(posts))}
-          ${preservedSite || siteStatHtml}`;
+          ${siteStatHtml}`;
     }
     hero.removeAttribute('data-shell');
     return;
@@ -176,8 +202,15 @@ function hydratePrerenderHeroStats() {
   const hero = $('#hero');
   if (!hero) return;
   const statsEl = hero.querySelector('.hero-stats');
-  if (!statsEl || statsEl.querySelector('[data-saobby-slot="site"]')) return;
+  if (!statsEl) return;
   if ((CONFIG.pageviews || {}).showHomeStats === false) return;
+
+  const existingSlot = statsEl.querySelector('[data-saobby-slot="site"]');
+  if (existingSlot) {
+    const hasBuild = existingSlot.dataset.buildPv != null && existingSlot.dataset.buildPv !== '';
+    const visible = !existingSlot.hidden && String(existingSlot.textContent || '').trim();
+    if (hasBuild || visible) return;
+  }
 
   let postCount = 0;
   let tagCount = 0;
@@ -194,11 +227,12 @@ function hydratePrerenderHeroStats() {
     }
   });
 
+  const sitePv = readSitePvFromStats(statsEl);
   statsEl.innerHTML = `
     <div class="stat"><strong>${postCount}</strong>篇文章</div>
     <div class="stat"><strong>${tagCount}</strong>个标签</div>
     ${recentText ? `<div class="stat stat-recent"><span class="stat-label">最近更新</span><strong>${escapeHtml(recentText)}</strong></div>` : ''}
-    ${bszSiteStatsHtml()}`;
+    ${sitePv != null ? buildSitePvStatHtml(sitePv) : bszSiteStatsHtml()}`;
 }
 
 /** 签名单行：在可用宽度内通过缩小字号展示全文（无省略号）；再按 .hero-info 总高度设头像正方形 */
