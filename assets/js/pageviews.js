@@ -84,7 +84,10 @@ function useCloudBase() {
 }
 
 function hideAllSitePvSlots(root = document) {
-  root.querySelectorAll('[data-saobby-slot]').forEach(el => { el.hidden = true; });
+  root.querySelectorAll('[data-saobby-slot]').forEach(el => {
+    if (el.dataset.buildPv != null && el.dataset.buildPv !== '') return;
+    el.hidden = true;
+  });
 }
 
 function siteSlotPrefix() {
@@ -96,7 +99,12 @@ function pagePvLabel() {
 }
 
 function injectCloudBaseSiteSlots(root = document) {
-  root.querySelectorAll('[data-saobby-slot="site"]:not([data-pv-site-done="1"])').forEach(el => {
+  root.querySelectorAll('[data-saobby-slot="site"]').forEach(el => {
+    if (el.dataset.pvSiteDone === '1') {
+      const buildPv = readBuildStat(el, 'buildPv');
+      if (buildPv == null || !el.hidden) return;
+      delete el.dataset.pvSiteDone;
+    }
     runWithPageviewPriority(() => renderSitePvSlot(el));
   });
 }
@@ -148,14 +156,25 @@ export function startArticlePageView(meta = {}) {
   return STATE.articlePvTask;
 }
 
-export function bszSiteStatsHtml({ compact = false } = {}) {
+/** 构建期站点 PV：首屏可见，带 data-build-pv 供懒加载刷新 */
+export function buildSitePvStatHtml(pv, { compact = false } = {}) {
   const cfg = pvCfg();
   if (cfg.enabled === false || !useCloudBase()) return '';
   const prefix = siteSlotPrefix();
+  const hasPv = pv != null && Number(pv) >= 0;
+  const pvNum = hasPv ? Math.floor(Number(pv)) : null;
+  const pvText = hasPv ? formatCount(pvNum) : '…';
   if (compact) {
-    return `<span class="saobby-slot saobby-slot-compact" data-saobby-slot="site" data-saobby-suffix="${escapeAttr(prefix)}" hidden></span>`;
+    const buildAttr = hasPv ? ` data-build-pv="${pvNum}"` : '';
+    return `<span class="saobby-slot saobby-slot-compact" data-saobby-slot="site" data-saobby-suffix="${escapeAttr(prefix)}"${buildAttr}><span class="saobby-prefix">${escapeHtml(prefix)}</span><span class="gitblog-pv-num">${escapeHtml(pvText)}</span></span>`;
   }
-  return `<div class="stat saobby-slot saobby-slot-stat" data-saobby-slot="site" data-saobby-prefix="${escapeAttr(prefix)}" hidden></div>`;
+  const buildAttr = hasPv ? ` data-build-pv="${pvNum}"` : '';
+  const hiddenAttr = hasPv ? '' : ' hidden';
+  return `<div class="stat saobby-slot saobby-slot-stat" data-saobby-slot="site" data-saobby-prefix="${escapeAttr(prefix)}"${buildAttr}${hiddenAttr}><strong class="saobby-num gitblog-pv-num">${escapeHtml(pvText)}</strong><span class="saobby-label">${escapeHtml(prefix)}</span></div>`;
+}
+
+export function bszSiteStatsHtml({ compact = false } = {}) {
+  return buildSitePvStatHtml(null, { compact });
 }
 
 export function bszPagePvHtml() {
