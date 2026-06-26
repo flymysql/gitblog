@@ -1433,7 +1433,7 @@ async function mountListOnly() {
         : '';
       await hydrateCommentImages(listEl, callApi);
       loadingEl.hidden = true;
-      listEl.hidden = false;
+      listEl.hidden = !comments.length;
       postHeight(true);
     } catch (err) {
       loadingEl.innerHTML = `<div class="comments-hint">${escapeHtml(err.message || '加载失败')}</div>`;
@@ -1747,7 +1747,7 @@ async function mount() {
         : '';
       await hydrateCommentImages(listEl, callApi);
       loadingEl.hidden = true;
-      listEl.hidden = false;
+      listEl.hidden = !comments.length;
       postHeight(true);
     } catch (err) {
       loadingEl.innerHTML = `<div class="comments-hint">${escapeHtml(err.message || '加载失败')}</div>`;

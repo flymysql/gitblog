@@ -2,8 +2,8 @@
 .cb-embed-frame {
   width: 100%;
   border: 0;
-  min-height: 420px;
-  height: 420px;
+  min-height: 0;
+  height: 140px;
   display: block;
   background: transparent;
   border-radius: 8px;
@@ -11,8 +11,8 @@
 
 @media (max-width: 640px) {
   .cb-embed-frame {
-    min-height: 210px;
-    height: 210px;
+    min-height: 0;
+    height: 120px;
   }
 }
 .cb-embed-hint { margin-top: 10px; font-size: 12.5px; }
