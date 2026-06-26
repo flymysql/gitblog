@@ -121,6 +121,11 @@ function reply(reqId, ok, data) {
   parent.postMessage({ type: 'gitblog-pv-reply', reqId, ok, data }, '*');
 }
 
+function replyGh(reqId, ok, data) {
+  if (!reqId) return;
+  parent.postMessage({ type: 'gitblog-gh-reply', reqId, ok, data }, '*');
+}
+
 window.addEventListener('message', async (e) => {
   const msg = e.data;
   if (!msg || msg.type !== 'gitblog-pv') return;
@@ -158,6 +163,18 @@ window.addEventListener('message', async (e) => {
     reply(reqId, true, data);
   } catch (err) {
     reply(reqId, false, { message: String(err?.message || err) });
+  }
+});
+
+window.addEventListener('message', async (e) => {
+  const msg = e.data;
+  if (!msg || msg.type !== 'gitblog-gh') return;
+  const { reqId, payload } = msg;
+  try {
+    const data = await callPv(payload && typeof payload === 'object' ? payload : {});
+    replyGh(reqId, true, data);
+  } catch (err) {
+    replyGh(reqId, false, { message: String(err?.message || err), code: err?.code });
   }
 });
 
