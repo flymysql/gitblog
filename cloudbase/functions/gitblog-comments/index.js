@@ -400,6 +400,9 @@ const pvApi = createPvHandlers({
   verifyAdminSecret,
 });
 
+const { createGithubHandlers } = require('./github-handlers');
+const ghApi = createGithubHandlers({ jsonOk, jsonErr, verifyAdminSecret });
+
 function escapeHtmlText(s) {
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
@@ -850,6 +853,15 @@ async function dispatch(event, context) {
   if (action === 'PV_ADMIN_TOP') return await pvApi.handlePvAdminTop(event);
   if (action === 'PV_ADMIN_EXPORT') return await pvApi.handlePvAdminExport(event);
   if (action === 'PV_IMPORT') return await pvApi.handlePvImport(event);
+  if (action === 'EDITOR_AUTH') return await ghApi.handleEditorAuth(event, context);
+  if (action === 'GH_USER') return await ghApi.handleGhUser(event);
+  if (action === 'GH_GET_CONTENTS') return await ghApi.handleGhGetContents(event);
+  if (action === 'GH_PUT_CONTENTS') return await ghApi.handleGhPutContents(event);
+  if (action === 'GH_DELETE_CONTENTS') return await ghApi.handleGhDeleteContents(event);
+  if (action === 'GH_LIST_DIR') return await ghApi.handleGhListDir(event);
+  if (action === 'GH_GET_REPO') return await ghApi.handleGhGetRepo(event);
+  if (action === 'GH_GET_BRANCH') return await ghApi.handleGhGetBranch(event);
+  if (action === 'GH_GET_TREE') return await ghApi.handleGhGetTree(event);
   return jsonErr('未知 action');
 }
 

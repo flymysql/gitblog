@@ -5,12 +5,25 @@
 
 import { CONFIG } from './config.js';
 import { getToken } from './auth.js';
-import { readFile, fetchPostMarkdownPublic } from './api.js';
+import { readFile, fetchPostMarkdownPublic, useCloudEditorProxy } from './api.js';
+import { ghGetBranch, ghGetTree } from './cloudbase-github.js';
 
 const IMAGE_EXT = /\.(png|jpe?g|gif|webp|avif|svg|bmp|ico)$/i;
 
 async function gh(path, { method = 'GET', body } = {}) {
   const token = getToken();
+  if (useCloudEditorProxy()) {
+    const session = token;
+    const branchMatch = path.match(/^\/repos\/[^/]+\/[^/]+\/branches\/(.+)$/);
+    if (branchMatch && method === 'GET') {
+      return ghGetBranch(session, decodeURIComponent(branchMatch[1]));
+    }
+    const treeMatch = path.match(/^\/repos\/[^/]+\/[^/]+\/git\/trees\/([^?]+)(\?recursive=1)?$/);
+    if (treeMatch && method === 'GET') {
+      return ghGetTree(session, { treeSha: treeMatch[1], recursive: !!treeMatch[2] });
+    }
+    throw new Error(`CloudBase 代理暂不支持: ${method} ${path}`);
+  }
   const headers = {
     Authorization: 'Bearer ' + token,
     Accept: 'application/vnd.github+json',

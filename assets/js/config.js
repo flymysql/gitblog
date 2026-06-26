@@ -3,7 +3,7 @@
 // 这里都是公开信息，不要把 token 等密钥放进来
 // ============================================================================
 
-export const VERSION = '20260626235000';
+export const VERSION = '20260627010000';
 
 export const CONFIG = {
   repo: {
@@ -69,7 +69,7 @@ export const CONFIG = {
     embedBaseUrl: "https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com",
     embedPage: "comments-embed.html",
     /** 嵌入页静态资源版本；更新 cloudbase/static 后递增，并重新 hosting deploy */
-    embedAssetVersion: "20260626270000",
+    embedAssetVersion: "20260627010000",
     placeholderNick: "访客",
     moderation: false,
     maxLength: 5000,
@@ -105,6 +105,8 @@ export const CONFIG = {
     siteLabel: "人来过"
   },
   auth: {
+    /** cloudbase = 短密码经云函数代理 GitHub；pat = 浏览器直连 GitHub PAT */
+    editorMode: "cloudbase",
     githubDeviceFlow: {
       clientId: "3410e5b91d4202af507e",
       scope: "repo read:user"
