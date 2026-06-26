@@ -10,8 +10,7 @@ import {
   isCloudBasePvEnabled,
   renderSitePvSlot,
   renderPagePvEl,
-  hitPageView,
-  batchGetPageViews,
+  fetchListPageViews,
   batchGetCommentCounts,
   formatCount,
   getCachedArticlePv,
@@ -27,7 +26,6 @@ const STATE = {
   vercountInjected: false,
   articlePvTask: null,
   listStatsTask: null,
-  listStatsRetryTimer: null,
 };
 
 const LIST_STATS_CACHE_KEY = 'gitblog_list_stats_v1';
@@ -306,17 +304,21 @@ function readListStatsCache() {
   return { pv: data.pv, comments: data.comments };
 }
 
-function bestCachedListPv(pvPath) {
+function cachedListPv(pvPath) {
   const path = String(pvPath || '').trim();
   if (!path) return null;
-  const listCache = readListStatsCacheAny();
-  const fromList = listCache?.pv?.[path];
   const fromArticle = getCachedArticlePv(path);
-  if (fromArticle != null && (fromList == null || fromArticle > fromList)) return fromArticle;
-  if (fromList != null && fromList > 0) return fromList;
-  if (fromList === 0 && fromArticle === 0) return 0;
   if (fromArticle != null) return fromArticle;
+  const fromList = readListStatsCache()?.pv?.[path];
+  if (fromList != null && fromList > 0) return fromList;
   return null;
+}
+
+function cachedListComments(commentPath) {
+  const key = String(commentPath || '').trim();
+  if (!key) return null;
+  const v = readListStatsCache()?.comments?.[key];
+  return v != null ? v : null;
 }
 
 function writeListStatsCache(pvMap, commentMap) {
@@ -332,12 +334,18 @@ function writeListStatsCache(pvMap, commentMap) {
 
 function listStatsHtml(pv, comments, { showPv, showCm }) {
   const parts = [];
-  if (showPv) parts.push(`<span class="post-stat-pv" title="阅读">👀 ${escapeHtml(formatCount(pv))}</span>`);
-  if (showCm) parts.push(`<span class="post-stat-cm" title="评论">💬 ${escapeHtml(formatCount(comments))}</span>`);
+  if (showPv) {
+    const pvText = pv == null ? '…' : escapeHtml(formatCount(pv));
+    parts.push(`<span class="post-stat-pv" title="阅读">👀 ${pvText}</span>`);
+  }
+  if (showCm) {
+    const cmText = comments == null ? '…' : escapeHtml(formatCount(comments));
+    parts.push(`<span class="post-stat-cm" title="评论">💬 ${cmText}</span>`);
+  }
   return parts.join(' ');
 }
 
-function updateListStatsSlot(el, pv, comments, opts) {
+function applyListStatsToSlot(el, pv, comments, opts, { finalize = true } = {}) {
   if (!el) return;
   const html = listStatsHtml(pv, comments, opts);
   if (!html) {
@@ -346,15 +354,11 @@ function updateListStatsSlot(el, pv, comments, opts) {
   }
   el.innerHTML = html;
   el.hidden = false;
-}
-
-function applyListStatsToSlot(el, pv, comments, opts, { finalize = true } = {}) {
-  updateListStatsSlot(el, pv, comments, opts);
   if (finalize) el.dataset.listStatsDone = '1';
   else delete el.dataset.listStatsDone;
 }
 
-/** 列表渲染后立刻用缓存（含过期缓存）同步展示，不阻塞网络 */
+/** 列表渲染后：仅展示已确认有效的缓存（不展示无依据的 0） */
 export function syncArticleListStatsFromCache(root = document) {
   const list = root.querySelector ? root.querySelector('#postList') : null;
   if (!list || list.classList.contains('post-list--giscus')) return;
@@ -363,46 +367,26 @@ export function syncArticleListStatsFromCache(root = document) {
   const showCm = isCommentsReady();
   if (!showPv && !showCm) return;
 
-  const cache = readListStatsCacheAny();
-  if (!cache) return;
-
   list.querySelectorAll('.post-list-stats').forEach(el => {
     if (el.dataset.listStatsDone === '1') return;
     const pvPath = String(el.dataset.pvPath || '').trim();
     const commentPath = String(el.dataset.commentPath || '').trim();
-    const cachedPv = showPv && pvPath ? bestCachedListPv(pvPath) : null;
-    const cachedCm = showCm && commentPath && cache.comments[commentPath] != null
-      ? cache.comments[commentPath]
-      : null;
-    const hasPv = !showPv || cachedPv != null;
-    const hasCm = !showCm || cachedCm != null;
-    if (!hasPv && !hasCm) return;
-    applyListStatsToSlot(el, cachedPv ?? 0, cachedCm ?? 0, { showPv, showCm }, { finalize: false });
+    const pv = showPv && pvPath ? cachedListPv(pvPath) : null;
+    const cm = showCm && commentPath ? cachedListComments(commentPath) : null;
+    if (pv == null && cm == null) return;
+    applyListStatsToSlot(el, pv, cm, { showPv, showCm }, { finalize: false });
   });
 }
 
 export function queueArticleListViews(root = document) {
-  if (STATE.listStatsRetryTimer) {
-    clearTimeout(STATE.listStatsRetryTimer);
-    STATE.listStatsRetryTimer = null;
-  }
-  runWithPageviewPriority(() => renderArticleListViews(root).catch(() => {
-    scheduleArticleListViewsRetry(root);
-  }));
-}
-
-function scheduleArticleListViewsRetry(root = document, attempt = 1) {
-  if (attempt > 3 || !useCloudBase()) return;
-  if (STATE.listStatsRetryTimer) clearTimeout(STATE.listStatsRetryTimer);
-  STATE.listStatsRetryTimer = setTimeout(() => {
-    STATE.listStatsRetryTimer = null;
-    root.querySelectorAll('.post-list-stats[data-list-stats-done="1"]').forEach(el => {
-      delete el.dataset.listStatsDone;
-    });
-    runWithPageviewPriority(() => renderArticleListViews(root).catch(() => {
-      scheduleArticleListViewsRetry(root, attempt + 1);
-    }));
-  }, 1200 * attempt);
+  renderArticleListViews(root).catch(() => {
+    setTimeout(() => {
+      root.querySelectorAll('.post-list-stats[data-list-stats-done="1"]').forEach(el => {
+        delete el.dataset.listStatsDone;
+      });
+      renderArticleListViews(root).catch(() => {});
+    }, 2500);
+  });
 }
 
 export async function renderArticleListViews(root = document) {
@@ -423,11 +407,6 @@ export async function renderArticleListViews(root = document) {
   }
 
   const task = (async () => {
-    const cache = readListStatsCache();
-    const staleCache = readListStatsCacheAny();
-    const forceRefresh = !!staleCache?.stale;
-    const needPv = new Map();
-    const needCm = new Set();
     const slotMeta = slots.map(el => ({
       el,
       slug: String(el.dataset.slug || '').trim(),
@@ -435,80 +414,62 @@ export async function renderArticleListViews(root = document) {
       commentPath: String(el.dataset.commentPath || '').trim(),
     }));
 
-    for (const { el, slug, pvPath, commentPath } of slotMeta) {
-      const cachedPv = showPv && pvPath ? bestCachedListPv(pvPath) : null;
-      const cachedCm = showCm && commentPath && cache?.comments ? cache.comments[commentPath] : undefined;
-      const hasFreshCm = !showCm || cachedCm != null;
+    const needPv = [];
+    const needCm = new Set();
 
-      if (cachedPv != null || cachedCm != null) {
-        applyListStatsToSlot(el, cachedPv ?? 0, cachedCm ?? 0, { showPv, showCm }, { finalize: false });
+    for (const row of slotMeta) {
+      const pv = showPv && row.pvPath ? cachedListPv(row.pvPath) : null;
+      const cm = showCm && row.commentPath ? cachedListComments(row.commentPath) : null;
+      applyListStatsToSlot(row.el, pv, cm, { showPv, showCm }, { finalize: false });
+
+      if (showPv && row.pvPath && pv == null) {
+        needPv.push({ path: row.pvPath, slug: row.slug || undefined });
       }
-
-      if (showPv && pvPath) {
-        needPv.set(pvPath, slug);
-      } else if (!forceRefresh && hasFreshCm) {
-        applyListStatsToSlot(el, cachedPv ?? 0, cachedCm ?? 0, { showPv, showCm });
-        continue;
+      if (showCm && row.commentPath && cm == null) {
+        needCm.add(row.commentPath);
       }
-
-      if (showCm && commentPath && (forceRefresh || cachedCm == null)) needCm.add(commentPath);
     }
 
-    const pending = slotMeta.filter(({ el }) => el.dataset.listStatsDone !== '1');
-    if (!pending.length || (!needPv.size && !needCm.size)) return;
-
-    let pvOk = !needPv.size;
-    let cmOk = !needCm.size;
-    let pvMap = {};
-    let cmMap = {};
-
-    try {
-      await waitForPvBeacon();
-    } catch {
+    if (!needPv.length && !needCm.size) {
+      slotMeta.forEach(({ el, pvPath, commentPath }) => {
+        applyListStatsToSlot(
+          el,
+          showPv && pvPath ? cachedListPv(pvPath) : null,
+          showCm && commentPath ? cachedListComments(commentPath) : null,
+          { showPv, showCm },
+        );
+      });
       return;
     }
 
-    const pvEntries = [...needPv.entries()].map(([path, slug]) => (slug ? { path, slug } : { path }));
+    let pvMap = {};
+    let cmMap = {};
+
     const fetches = [];
-    if (needPv.size) {
-      fetches.push(batchGetPageViews(pvEntries).then(data => {
-        pvMap = data || {};
-        pvOk = true;
-      }).catch(() => { pvOk = false; }));
+    if (needPv.length) {
+      fetches.push(fetchListPageViews(needPv).then(data => { pvMap = data || {}; }));
     }
     if (needCm.size) {
-      fetches.push(batchGetCommentCounts([...needCm]).then(data => {
-        cmMap = data || {};
-        cmOk = true;
-      }).catch(() => { cmOk = false; }));
+      fetches.push(
+        waitForPvBeacon()
+          .then(() => batchGetCommentCounts([...needCm]))
+          .then(data => { cmMap = data || {}; })
+          .catch(() => {}),
+      );
     }
     await Promise.all(fetches);
 
-    if (!pvOk && !cmOk) return;
+    if (Object.keys(pvMap).length) writeListStatsCache(pvMap, {});
+    if (Object.keys(cmMap).length) writeListStatsCache({}, cmMap);
 
-    if (pvOk && Object.keys(pvMap).length) writeListStatsCache(pvMap, {});
-    if (cmOk && Object.keys(cmMap).length) writeListStatsCache({}, cmMap);
-
-    const mergedCache = readListStatsCache();
-    for (const { el, pvPath, commentPath } of pending) {
-      const cachedPv = showPv && pvPath ? bestCachedListPv(pvPath) : null;
-      const cachedCm = showCm && commentPath
-        ? (mergedCache?.comments?.[commentPath] ?? readListStatsCacheAny()?.comments?.[commentPath])
-        : null;
+    for (const { el, pvPath, commentPath } of slotMeta) {
       const pv = showPv && pvPath
-        ? (pvOk
-          ? (pvMap[pvPath] ?? mergedCache?.pv?.[pvPath] ?? cachedPv ?? 0)
-          : (cachedPv ?? null))
-        : 0;
+        ? (pvMap[pvPath] ?? cachedListPv(pvPath))
+        : null;
       const cm = showCm && commentPath
-        ? (cmOk
-          ? (cmMap[commentPath] ?? mergedCache?.comments?.[commentPath] ?? cachedCm ?? 0)
-          : (cachedCm ?? null))
-        : 0;
-      if (showPv && pvPath && !pvOk && pv == null) continue;
-      if (showCm && commentPath && !cmOk && cm == null) continue;
-      const finalize = (!showPv || pvOk || pv != null) && (!showCm || cmOk || cm != null);
-      applyListStatsToSlot(el, pv ?? 0, cm ?? 0, { showPv, showCm }, { finalize });
+        ? (cmMap[commentPath] ?? cachedListComments(commentPath))
+        : null;
+      applyListStatsToSlot(el, pv, cm, { showPv, showCm });
     }
   })();
 
