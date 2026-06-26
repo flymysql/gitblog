@@ -1,5 +1,5 @@
 // ============================================================================
-// 随笔页：嵌入评论（CloudBase 或 giscus，与首页「随笔」Tab 共用 notesTerm）
+// 留言板页：嵌入评论（CloudBase 或 giscus，与首页「留言板」Tab 共用 notesTerm）
 // ============================================================================
 
 import { initSite } from './site.js';
@@ -11,8 +11,8 @@ const $ = sel => document.querySelector(sel);
 (async function init() {
   initSite({ active: 'notes.html' });
   setMeta({
-    title: '随笔',
-    description: '开放广场，随手写几句想法。',
+    title: '留言板',
+    description: '欢迎留言，随便聊聊。',
   });
 
   const host = $('#notesGiscusHost');
