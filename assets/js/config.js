@@ -98,24 +98,11 @@ export const CONFIG = {
   },
   pageviews: {
     enabled: true,
-    provider: "cloudbase",
     showHomeStats: true,
     showPostViews: true,
     showFooterStats: true,
     label: "阅读",
-    siteLabel: "人来过",
-    saobby: {
-      site: {
-        img: "https://w.saobby.com/w/ivywp8ie",
-        dashboard: "https://www.saobby.com/webcounter_dashboard?access_token=59nv7dkv",
-        label: "人来过"
-      },
-      extra: []
-    },
-    vercount: {
-      scriptSrc: "",
-      label: "阅读"
-    }
+    siteLabel: "人来过"
   },
   auth: {
     githubDeviceFlow: {
