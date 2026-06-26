@@ -1,20 +1,14 @@
 #!/usr/bin/env node
 /**
  * 从 CloudBase 拉取评论 + 访问统计，写入 data/cloudbase-backup/latest.json
- *
- * 用法：
- *   COMMENT_ADMIN_SECRET=xxx node scripts/backup-cloudbase-data.mjs
- *   COMMENT_ADMIN_SECRET=xxx node scripts/backup-cloudbase-data.mjs --dry
- *
- * 环境变量：
- *   COMMENT_ADMIN_SECRET — 与云函数 COMMENT_ADMIN_SECRET 一致（推荐 GitHub Environment secret）
- *   CLOUDBASE_HTTP_URL — 可选；无 TCB 密钥时 CI 走 HTTP 网关
- *   CLOUDBASE_INVOKE_MODE — 设为 http 可强制走 HTTP
- *   TENCENTCLOUD_SECRETID / TENCENTCLOUD_SECRETKEY — CI 推荐，用于 tcb fn invoke
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { callCloudFunction, readCloudbaseConfig } from './cloudbase-fn-invoke.mjs';
+import {
+  callCloudFunction,
+  callCloudFunctionWithFallback,
+  readCloudbaseConfig,
+} from './cloudbase-fn-invoke.mjs';
 
 const DRY = process.argv.includes('--dry');
 const ROOT = new URL('..', import.meta.url).pathname;
@@ -35,8 +29,9 @@ function resolveAdminSecret() {
 
 function resolveInvokeOpts(cfg) {
   if (process.env.CLOUDBASE_INVOKE_MODE === 'http') return { prefer: 'http' };
+  if (process.env.CLOUDBASE_INVOKE_MODE === 'sdk') return { prefer: 'sdk' };
   if (process.env.TENCENTCLOUD_SECRETID && process.env.TENCENTCLOUD_SECRETKEY) {
-    return { prefer: 'tcb' };
+    return { prefer: 'sdk' };
   }
   if (process.env.GITHUB_ACTIONS === 'true' && (process.env.CLOUDBASE_HTTP_URL || cfg.httpUrl)) {
     return { prefer: 'http' };
@@ -45,11 +40,34 @@ function resolveInvokeOpts(cfg) {
 }
 
 function describeInvokeMode(cfg, invokeOpts) {
+  if (invokeOpts.prefer === 'sdk') {
+    return `Node SDK (${cfg.functionName} @ ${cfg.envId}, region=${cfg.region})`;
+  }
   if (invokeOpts.prefer === 'http') {
     const url = process.env.CLOUDBASE_HTTP_URL || cfg.httpUrl || `https://${cfg.envId}.${cfg.region}.app.tcloudbase.com/${cfg.functionName}`;
     return `HTTP (${url})`;
   }
-  return `tcb fn invoke (${cfg.functionName} @ ${cfg.envId})`;
+  return `tcb fn invoke (${cfg.functionName} @ ${cfg.envId}, region=${cfg.region})`;
+}
+
+function assertActionShape(res, action) {
+  if (!res || typeof res !== 'object' || res.ok !== true) {
+    throw new Error(`${action} 响应无效`);
+  }
+  if (action === 'PV_SITE') {
+    if (!('sitePv' in res) || !('siteUv' in res)) {
+      throw new Error(`PV_SITE 响应缺少 sitePv/siteUv：${JSON.stringify(res).slice(0, 240)}`);
+    }
+  }
+  if (action === 'ADMIN_EXPORT' && !Array.isArray(res.comments)) {
+    throw new Error(`ADMIN_EXPORT 响应缺少 comments 数组：${JSON.stringify(res).slice(0, 240)}`);
+  }
+  if (action === 'PV_ADMIN_EXPORT' && !Array.isArray(res.pages)) {
+    throw new Error(`PV_ADMIN_EXPORT 响应缺少 pages 数组：${JSON.stringify(res).slice(0, 240)}`);
+  }
+  if (action === 'PV_ADMIN_TOP' && !Array.isArray(res.top)) {
+    throw new Error(`PV_ADMIN_TOP 响应缺少 top 数组：${JSON.stringify(res).slice(0, 240)}`);
+  }
 }
 
 async function fetchAllComments(cfg, secret, invokeOpts) {
@@ -63,8 +81,8 @@ async function fetchAllComments(cfg, secret, invokeOpts) {
       limit: PAGE_SIZE,
       skip,
     }, invokeOpts);
-    if (res?.ok === false) throw new Error(res.message || 'ADMIN_EXPORT 失败');
-    const batch = res.comments || [];
+    assertActionShape(res, 'ADMIN_EXPORT');
+    const batch = res.comments;
     items.push(...batch);
     if (!res.hasMore || batch.length < PAGE_SIZE) break;
     skip += PAGE_SIZE;
@@ -83,9 +101,9 @@ async function fetchAllPageviews(cfg, secret, invokeOpts) {
       limit: PAGE_SIZE,
       skip,
     }, invokeOpts);
-    if (res?.ok === false) throw new Error(res.message || 'PV_ADMIN_EXPORT 失败');
+    assertActionShape(res, 'PV_ADMIN_EXPORT');
     if (res.site && !site) site = res.site;
-    const batch = res.pages || [];
+    const batch = res.pages;
     pages.push(...batch);
     if (!res.hasMore || batch.length < PAGE_SIZE) break;
     skip += PAGE_SIZE;
@@ -95,7 +113,7 @@ async function fetchAllPageviews(cfg, secret, invokeOpts) {
 
 async function probePublicPv(cfg, invokeOpts) {
   const res = await callCloudFunction(cfg, { action: 'PV_SITE' }, invokeOpts);
-  if (res?.ok === false) throw new Error(res.message || 'PV_SITE 探测失败');
+  assertActionShape(res, 'PV_SITE');
   return {
     sitePv: Number(res.sitePv) || 0,
     siteUv: Number(res.siteUv) || 0,
@@ -108,27 +126,72 @@ async function probePvAdminTop(cfg, secret, invokeOpts) {
     adminSecret: secret,
     limit: 5,
   }, invokeOpts);
-  if (res?.ok === false) throw new Error(res.message || 'PV_ADMIN_TOP 探测失败');
+  assertActionShape(res, 'PV_ADMIN_TOP');
   return {
     site: res.site || { pv: 0, uv: 0, updatedAt: 0 },
-    top: res.top || [],
+    top: res.top,
   };
+}
+
+function isBackupEmpty(comments, pageviews, probe) {
+  return comments.length === 0
+    && pageviews.pages.length === 0
+    && (probe.sitePv || 0) === 0
+    && (pageviews.site?.pv || 0) === 0;
 }
 
 function failEmptyPageviews(probe, pageviews, topProbe) {
   const lines = [
-    '访问统计备份为空，但线上 PV_SITE 显示有数据（sitePv=%s）。',
+    '访问统计备份为空，但 PV_SITE / PV_ADMIN_TOP 显示线上有数据。',
+    `  PV_SITE sitePv=${probe.sitePv}`,
     '',
     '常见原因：',
-    '1. 云函数未重新部署 — 缺少 PV_ADMIN_EXPORT 或仍是旧版 orderBy(lastAt)，请执行：',
-    '   npm run cloudbase:deploy-comments',
-    '2. COMMENT_ADMIN_SECRET 与云函数环境变量不一致（应放在 GitHub Environment secrets）',
-    '3. CI 调用了错误的 CloudBase 环境或 HTTP 网关地址',
+    '1. CI 的 TENCENTCLOUD_SECRETID/KEY 与本地 tcb login 不是同一腾讯云账号',
+    '2. COMMENT_ADMIN_SECRET 与云函数环境变量不一致',
+    '3. 云函数未重新部署（npm run cloudbase:deploy-comments）',
   ];
   if (topProbe?.top?.length) {
-    lines.push('', `PV_ADMIN_TOP 能读到 ${topProbe.top.length} 条（例如 ${topProbe.top[0]?.path} pv=${topProbe.top[0]?.pv}），说明密钥有效但 PV_ADMIN_EXPORT 需重新部署。`);
+    lines.push('', `PV_ADMIN_TOP 示例：${topProbe.top[0]?.path} pv=${topProbe.top[0]?.pv}`);
   }
-  throw new Error(lines.join('\n').replace('%s', String(probe.sitePv)));
+  throw new Error(lines.join('\n'));
+}
+
+async function retryIfEmpty(cfg, secret, invokeOpts, comments, pageviews, probe) {
+  if (!isBackupEmpty(comments, pageviews, probe)) return { invokeOpts, comments, pageviews, probe };
+
+  console.warn('首次拉取结果全为空，尝试其它调用方式交叉验证…');
+  const { res: siteRes, mode } = await callCloudFunctionWithFallback(cfg, { action: 'PV_SITE' });
+  assertActionShape(siteRes, 'PV_SITE');
+  const retryProbe = {
+    sitePv: Number(siteRes.sitePv) || 0,
+    siteUv: Number(siteRes.siteUv) || 0,
+  };
+
+  if (retryProbe.sitePv === 0 && (siteRes.sitePv || 0) === 0) {
+    const topProbe = await callCloudFunction(cfg, {
+      action: 'PV_ADMIN_TOP',
+      adminSecret: secret,
+      limit: 5,
+    }, { prefer: mode });
+    assertActionShape(topProbe, 'PV_ADMIN_TOP');
+    if ((topProbe.top || []).length === 0) {
+      console.warn(`各调用方式均为空（最后成功模式：${mode}）。若本地有数据，请检查 CI 腾讯云密钥是否对应 envId ${cfg.envId}`);
+      return { invokeOpts: { prefer: mode }, comments, pageviews, probe: retryProbe };
+    }
+    failEmptyPageviews(retryProbe, pageviews, topProbe);
+  }
+
+  console.log(`交叉验证命中数据（mode=${mode}），改用该方式重新拉取…`);
+  const nextOpts = { prefer: mode };
+  const nextProbe = await probePublicPv(cfg, nextOpts);
+  const nextComments = await fetchAllComments(cfg, secret, nextOpts);
+  const nextPageviews = await fetchAllPageviews(cfg, secret, nextOpts);
+  return {
+    invokeOpts: nextOpts,
+    comments: nextComments,
+    pageviews: nextPageviews,
+    probe: nextProbe,
+  };
 }
 
 async function main() {
@@ -137,12 +200,10 @@ async function main() {
     console.error('请设置环境变量 COMMENT_ADMIN_SECRET');
     console.error('GitHub Actions：需在 job 上声明 environment: github-pages，并把密钥放在');
     console.error('  Settings → Environments → github-pages → Environment secrets（不是 Variables）');
-    console.error('或放在 Settings → Secrets and variables → Actions → Repository secrets');
     process.exit(1);
   }
   if (fromVar) {
     console.warn('警告：COMMENT_ADMIN_SECRET 未在 secrets 中配置，当前使用的是 Environment Variable。');
-    console.warn('请将密钥移到 Settings → Environments → github-pages → Environment secrets。');
   }
 
   const cfg = readCloudbaseConfig();
@@ -151,21 +212,25 @@ async function main() {
     process.exit(1);
   }
 
-  const invokeOpts = resolveInvokeOpts(cfg);
+  let invokeOpts = resolveInvokeOpts(cfg);
   console.log(`CloudBase 环境: ${cfg.envId}`);
   console.log(`调用方式: ${describeInvokeMode(cfg, invokeOpts)}`);
 
   console.log('探测 PV_SITE…');
-  const probe = await probePublicPv(cfg, invokeOpts);
+  let probe = await probePublicPv(cfg, invokeOpts);
   console.log(`  站点 PV ${probe.sitePv} / UV ${probe.siteUv}`);
 
   console.log('拉取评论…');
-  const comments = await fetchAllComments(cfg, secret, invokeOpts);
+  let comments = await fetchAllComments(cfg, secret, invokeOpts);
   console.log(`  评论 ${comments.length} 条`);
 
   console.log('拉取访问统计…');
   let pageviews = await fetchAllPageviews(cfg, secret, invokeOpts);
   console.log(`  页面 ${pageviews.pages.length} 条，站点 PV ${pageviews.site.pv} / UV ${pageviews.site.uv}`);
+
+  ({ invokeOpts, comments, pageviews, probe } = await retryIfEmpty(
+    cfg, secret, invokeOpts, comments, pageviews, probe,
+  ));
 
   if (probe.sitePv > 0 && pageviews.pages.length === 0) {
     console.log('导出为空，用 PV_ADMIN_TOP 交叉验证…');
@@ -191,10 +256,8 @@ async function main() {
     date: todayKey(now),
     envId: cfg.envId,
     siteUrl: cfg.siteUrl,
-    comments: {
-      total: comments.length,
-      items: comments,
-    },
+    invokeMode: invokeOpts.prefer || 'auto',
+    comments: { total: comments.length, items: comments },
     pageviews: {
       site: pageviews.site,
       total: pageviews.pages.length,
