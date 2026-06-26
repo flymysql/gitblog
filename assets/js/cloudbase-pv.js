@@ -457,3 +457,54 @@ function escapeHtml(s) {
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
   );
 }
+
+// ---------- 通用云函数调用（经 pv-beacon iframe，如后台 GitHub 代理） ----------
+const FN_REQ_PREFIX = 'cfn_';
+let _fnSeq = 0;
+let _fnPending = new Map();
+let _fnRouterBound = false;
+
+function bindFnReplyRouter() {
+  if (_fnRouterBound) return;
+  _fnRouterBound = true;
+  window.addEventListener('message', (e) => {
+    if (!_iframe || e.source !== _iframe.contentWindow) return;
+    const msg = e.data;
+    if (!msg || typeof msg !== 'object' || msg.type !== 'gitblog-gh-reply' || !msg.reqId) return;
+    const pending = _fnPending.get(msg.reqId);
+    if (!pending) return;
+    _fnPending.delete(msg.reqId);
+    if (msg.ok) pending.resolve(msg.data);
+    else {
+      const err = new Error(msg.data?.message || '云函数调用失败');
+      err.code = msg.data?.code;
+      pending.reject(err);
+    }
+  });
+}
+
+/** 经 embed 域 iframe 调用 gitblog-comments 云函数（与 PV beacon 共用连接） */
+export async function callCloudFunction(payload, { timeoutMs = 90000 } = {}) {
+  if (!isCloudBasePvEnabled()) throw new Error('CloudBase 未启用');
+  bindFnReplyRouter();
+  bindReplyRouter();
+  await ensureBeacon();
+  return new Promise((resolve, reject) => {
+    if (!_iframe?.contentWindow) {
+      reject(new Error('CloudBase beacon 未就绪'));
+      return;
+    }
+    const reqId = `${FN_REQ_PREFIX}${Date.now()}_${++_fnSeq}`;
+    _fnPending.set(reqId, { resolve, reject });
+    _iframe.contentWindow.postMessage({
+      type: 'gitblog-gh',
+      reqId,
+      payload: payload && typeof payload === 'object' ? payload : {},
+    }, '*');
+    setTimeout(() => {
+      if (!_fnPending.has(reqId)) return;
+      _fnPending.delete(reqId);
+      reject(new Error('云函数请求超时'));
+    }, timeoutMs);
+  });
+}
