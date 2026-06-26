@@ -110,7 +110,6 @@ export function isCloudBasePvEnabled() {
   const c = pvCfg();
   const cb = cloudCfg();
   return c.enabled !== false
-    && String(c.provider || '').trim().toLowerCase() === 'cloudbase'
     && cb.enabled
     && String(cb.envId || '').trim()
     && String(cb.embedBaseUrl || '').trim();

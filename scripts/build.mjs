@@ -58,13 +58,13 @@ function getNestedStr(section, key) {
   return m ? m[1] : '';
 }
 
-function getSaobbySiteLabel() {
-  const m = cfgRaw.match(/saobby\s*:\s*\{[\s\S]*?site\s*:\s*\{[\s\S]*?label\s*:\s*"([^"]*)"/);
-  return m ? m[1] : '总访问';
+function getPageviewsSiteLabel() {
+  const m = cfgRaw.match(/pageviews\s*:\s*\{[\s\S]*?siteLabel\s*:\s*"([^"]*)"/);
+  return m ? m[1] : '人来过';
 }
 
 const SHOW_HOME_STATS = getSectionBool('pageviews', 'showHomeStats', true);
-const SAOBBY_SITE_LABEL = getSaobbySiteLabel();
+const SITE_STATS_LABEL = getPageviewsSiteLabel();
 
 const POSTS_DIR = 'posts';
 const INDEX_FILE = 'data/posts.json';
@@ -231,10 +231,6 @@ if (existsSync(POSTS_DIR)) {
       carousel: !!data.carousel,
       series: data.series || undefined,
       seriesOrder: data.seriesOrder != null ? Number(data.seriesOrder) : undefined,
-      counter: (data.counter && typeof data.counter === 'object') ? {
-        img: String(data.counter.img || ''),
-        dashboard: String(data.counter.dashboard || ''),
-      } : undefined,
       path: `${POSTS_DIR}/${f}`,
       content,
     };
@@ -655,18 +651,10 @@ const DONATE_CFG = {
 const PAGEVIEWS_CFG = {
   enabled: getSectionBool('pageviews', 'enabled', true),
   showPostViews: getSectionBool('pageviews', 'showPostViews', true),
-  provider: (() => {
-    const m = cfgRaw.match(/pageviews\s*:\s*\{[\s\S]*?provider\s*:\s*"([^"]*)"/);
-    const p = m ? String(m[1]).trim().toLowerCase() : 'cloudbase';
-    return p === 'third-party' ? 'third-party' : 'cloudbase';
-  })(),
   label: (() => {
     const m = cfgRaw.match(/pageviews\s*:\s*\{[\s\S]*?label\s*:\s*"([^"]*)"/);
-    return m ? m[1] : (getNestedStr('vercount', 'label') || '阅读');
+    return m ? m[1] : '阅读';
   })(),
-  vercount: {
-    label: getNestedStr('vercount', 'label') || '阅读',
-  },
 };
 function safePostUrlKeyDir(p) {
   const slug = String(p.slug || '');
@@ -817,7 +805,7 @@ function injectHomeSeo() {
     recentDate: latestHomePost?.date || '',
     pathPrefix: SITE_PATH_PREFIX,
     showSiteStats: SHOW_HOME_STATS,
-    siteStatsLabel: SAOBBY_SITE_LABEL,
+    siteStatsLabel: SITE_STATS_LABEL,
   });
   html = html.replace(
     /<section class="hero" id="hero"[^>]*>[\s\S]*?<\/section>/,

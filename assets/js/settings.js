@@ -68,9 +68,6 @@ function fillForm(config) {
       value = (config.authorizedUsers || []).join('\n');
     } else if (name === 'site.nav') {
       value = JSON.stringify(config.site.nav || [], null, 2);
-    } else if (name === 'pageviews.saobby.extra') {
-      // 由可视化编辑器渲染，避免在 hidden textarea 里塞出 [object Object] 字符串
-      value = '';
     }
 
     if (el.type === 'checkbox') {
@@ -81,7 +78,6 @@ function fillForm(config) {
   });
   renderNavEditor(config.site.nav || []);
   fillThemeTokens(config.theme && config.theme.tokens);
-  renderSaobbyExtraEditor((config.pageviews && config.pageviews.saobby && config.pageviews.saobby.extra) || []);
 }
 
 function fillThemeTokens(tokens) {
@@ -110,14 +106,6 @@ function readForm() {
         config.site.nav = readVisualNav();
       } catch (e) {
         throw new Error('顶部导航设置错误：' + e.message);
-      }
-      return;
-    }
-    if (name === 'pageviews.saobby.extra') {
-      try {
-        setByPath(config, 'pageviews.saobby.extra', readSaobbyExtra());
-      } catch (e) {
-        throw new Error('saobby 额外计数器设置错误：' + e.message);
       }
       return;
     }
@@ -181,15 +169,11 @@ function normalizeConfig(config) {
   config.seo.baiduPush.site = String(config.seo.baiduPush.site || '').trim();
   config.seo.baiduPush.token = String(config.seo.baiduPush.token || '').trim();
   config.pageviews = config.pageviews || { enabled: true, showHomeStats: true, showPostViews: true, showFooterStats: true };
-  config.pageviews.saobby = config.pageviews.saobby || { site: { img: '', dashboard: '', label: '' }, extra: [] };
-  config.pageviews.saobby.site = config.pageviews.saobby.site || { img: '', dashboard: '', label: '' };
-  if (!Array.isArray(config.pageviews.saobby.extra)) config.pageviews.saobby.extra = [];
-  config.pageviews.vercount = config.pageviews.vercount || { scriptSrc: '', label: '' };
-  const provider = String(config.pageviews.provider || 'cloudbase').trim().toLowerCase();
-  config.pageviews.provider = provider === 'third-party' ? 'third-party' : 'cloudbase';
+  delete config.pageviews.provider;
+  delete config.pageviews.saobby;
+  delete config.pageviews.vercount;
   delete config.pageviews.articleProvider;
   delete config.pageviews.showListPostViews;
-  if (config.pageviews.saobby.article) delete config.pageviews.saobby.article;
   config.share = config.share || { enabled: true, showInPosts: true, showInPages: false, qrcodeOfPage: true };
   config.share.enabled = config.share.enabled !== false;
   config.share.showInPosts = config.share.showInPosts !== false;
@@ -235,21 +219,8 @@ function normalizeConfig(config) {
   config.pageviews.showHomeStats = config.pageviews.showHomeStats !== false;
   config.pageviews.showPostViews = config.pageviews.showPostViews !== false;
   config.pageviews.showFooterStats = config.pageviews.showFooterStats !== false;
-  config.pageviews.label = String(config.pageviews.label || config.pageviews.vercount.label || '阅读').trim() || '阅读';
-  config.pageviews.siteLabel = String(config.pageviews.siteLabel || config.pageviews.saobby.site.label || '人来过').trim() || '人来过';
-  const site = config.pageviews.saobby.site;
-  site.img = String(site.img || '').trim();
-  site.dashboard = String(site.dashboard || '').trim();
-  site.label = String(site.label || '总访问').trim() || '总访问';
-  config.pageviews.vercount.scriptSrc = String(config.pageviews.vercount.scriptSrc || '').trim();
-  config.pageviews.vercount.label = String(config.pageviews.vercount.label || '阅读').trim() || '阅读';
-  config.pageviews.saobby.extra = config.pageviews.saobby.extra
-    .map(it => ({
-      name: String((it && it.name) || '').trim(),
-      img: String((it && it.img) || '').trim(),
-      dashboard: String((it && it.dashboard) || '').trim(),
-    }))
-    .filter(it => it.name || it.img || it.dashboard);
+  config.pageviews.label = String(config.pageviews.label || '阅读').trim() || '阅读';
+  config.pageviews.siteLabel = String(config.pageviews.siteLabel || '人来过').trim() || '人来过';
   config.auth.githubDeviceFlow.clientId = String(config.auth.githubDeviceFlow.clientId || '').trim();
   config.auth.githubDeviceFlow.scope = String(config.auth.githubDeviceFlow.scope || 'repo read:user').trim();
 }
@@ -400,59 +371,6 @@ function readVisualNav() {
   return nav;
 }
 
-function saobbyExtraRowHtml(item = {}, index = 0) {
-  return `
-    <div class="saobby-extra-row" data-index="${index}">
-      <label>名称 <input data-saobby-field="name" value="${escapeHtml(item.name || '')}" placeholder="首页 / 关于 …"></label>
-      <label>图片 URL <input data-saobby-field="img" value="${escapeHtml(item.img || '')}" placeholder="https://www.saobby.com/webcounter/..."></label>
-      <label>控制面板 URL <input data-saobby-field="dashboard" value="${escapeHtml(item.dashboard || '')}" placeholder="https://www.saobby.com/webcounter_dashboard?key=..."></label>
-      <button type="button" class="btn btn-secondary saobby-extra-remove">删除</button>
-    </div>
-  `;
-}
-
-function renderSaobbyExtraEditor(extras) {
-  const host = $('#saobbyExtraEditor');
-  if (!host) return;
-  const list = Array.isArray(extras) ? extras : [];
-  host.innerHTML = list.length
-    ? list.map((it, i) => saobbyExtraRowHtml(it, i)).join('')
-    : '<p class="settings-hint" style="margin:0">暂无额外计数器。点上方「添加计数器」即可新增。</p>';
-}
-
-function readSaobbyExtra() {
-  const host = $('#saobbyExtraEditor');
-  if (!host) return [];
-  const rows = [...host.querySelectorAll('.saobby-extra-row')];
-  return rows.map(row => {
-    const name = row.querySelector('[data-saobby-field="name"]').value.trim();
-    const img = row.querySelector('[data-saobby-field="img"]').value.trim();
-    const dashboard = row.querySelector('[data-saobby-field="dashboard"]').value.trim();
-    return { name, img, dashboard };
-  }).filter(it => it.name || it.img || it.dashboard);
-}
-
-function bindSaobbyEditor() {
-  const host = $('#saobbyExtraEditor');
-  const addBtn = $('#addSaobbyExtra');
-  if (!host || !addBtn) return;
-  addBtn.addEventListener('click', () => {
-    const empty = host.querySelector('p.settings-hint');
-    if (empty) host.innerHTML = '';
-    host.insertAdjacentHTML('beforeend', saobbyExtraRowHtml({}, host.querySelectorAll('.saobby-extra-row').length));
-    setStatus('未保存', 'saving');
-  });
-  host.addEventListener('click', e => {
-    const btn = e.target.closest('.saobby-extra-remove');
-    if (!btn) return;
-    btn.closest('.saobby-extra-row').remove();
-    if (!host.querySelector('.saobby-extra-row')) {
-      host.innerHTML = '<p class="settings-hint" style="margin:0">暂无额外计数器。点上方「添加计数器」即可新增。</p>';
-    }
-    setStatus('未保存', 'saving');
-  });
-}
-
 function bindNavEditor() {
   const host = $('#navEditor');
   const addBtn = $('#addNavItem');
@@ -570,46 +488,14 @@ function settingsContentHtml() {
 
       <section class="settings-card">
         <h3>访问计数（前台展示）</h3>
-        <p class="settings-help">推荐 <b>CloudBase</b>：站点总访问与文章阅读均写入自建数据库，不依赖第三方脚本。也可选 <b>第三方</b>（Saobby 站点图 + Vercount 文章阅读）。</p>
+        <p class="settings-help">站点总访问与文章阅读均写入 CloudBase 数据库，不依赖第三方脚本。需在下方 CloudBase 评论中配置 embedBaseUrl。</p>
         <div class="settings-grid">
-          <label>统计来源
-            <select name="pageviews.provider">
-              <option value="cloudbase">CloudBase（自建）</option>
-              <option value="third-party">第三方（Saobby + Vercount）</option>
-            </select>
-          </label>
           <label class="settings-check"><input type="checkbox" name="pageviews.enabled"> 启用访问计数</label>
           <label class="settings-check"><input type="checkbox" name="pageviews.showHomeStats"> 首页 Hero 显示站点访问</label>
           <label class="settings-check"><input type="checkbox" name="pageviews.showPostViews"> 文章页显示阅读次数</label>
           <label class="settings-check"><input type="checkbox" name="pageviews.showFooterStats"> Footer 显示站点访问</label>
           <label>站点计数前缀 <input name="pageviews.siteLabel" placeholder="人来过"><span class="settings-hint">首页 / Footer 旁的文字</span></label>
           <label>文章阅读前缀 <input name="pageviews.label" placeholder="阅读"><span class="settings-hint">文章 meta 区数字前的文字</span></label>
-        </div>
-      </section>
-
-      <section class="settings-card">
-        <h3>Saobby（第三方 · 站点总访问）</h3>
-        <p class="settings-help">仅在统计来源为「第三方」时使用；CloudBase 模式下可保留配置供历史数据迁移参考。在 <a href="https://www.saobby.com/create_webcounter" target="_blank" rel="noopener">saobby.com</a> 创建计数器后填写下方 URL。</p>
-        <div class="settings-grid">
-          <label class="span-2">图片 URL <input name="pageviews.saobby.site.img" placeholder="https://www.saobby.com/webcounter/svg?id=..."></label>
-          <label class="span-2">控制面板 URL <input name="pageviews.saobby.site.dashboard" placeholder="https://www.saobby.com/webcounter_dashboard?key=..."></label>
-          <label>前缀文字 <input name="pageviews.saobby.site.label" placeholder="总访问"><span class="settings-hint">显示在计数图旁，例如「总访问」</span></label>
-        </div>
-        <div class="settings-row-title" style="margin-top:14px">
-          <span>额外计数器（仅在后台「访问数据」展示）</span>
-          <button type="button" class="btn btn-secondary" id="addSaobbyExtra">添加计数器</button>
-        </div>
-        <div class="saobby-extra-editor" id="saobbyExtraEditor"></div>
-        <textarea name="pageviews.saobby.extra" hidden></textarea>
-        <p class="settings-help">用于跟踪其它落地页的 Saobby 图（例如单独推广的页面）。</p>
-      </section>
-
-      <section class="settings-card">
-        <h3>Vercount（第三方 · 文章阅读）</h3>
-        <p class="settings-help">仅在统计来源为「第三方」时使用。文章页加载官方脚本并显示阅读数；留空脚本地址则使用默认 <code>https://events.vercount.one/js</code>。</p>
-        <div class="settings-grid">
-          <label class="span-2">脚本 URL（可选） <input name="pageviews.vercount.scriptSrc" placeholder="https://events.vercount.one/js"></label>
-          <label>前缀文字 <input name="pageviews.vercount.label" placeholder="阅读"><span class="settings-hint">显示在数字前，例如「阅读」「浏览」</span></label>
         </div>
       </section>
 
@@ -803,7 +689,6 @@ function topActions() {
   ctx.content.innerHTML = settingsContentHtml();
   fillForm(state.current);
   bindNavEditor();
-  bindSaobbyEditor();
   bindThemePanel();
   await loadRemoteConfigSha();
 
