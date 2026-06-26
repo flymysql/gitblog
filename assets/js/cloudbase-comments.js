@@ -1025,8 +1025,8 @@ function syncCommentsEndHint(targetEl, commentCount) {
 }
 
 function resolveEmbedFrameMinHeight(data, opts = {}) {
+  if (Number(data.commentCount) === 0) return 0;
   const mobile = isMobileCommentDock();
-  if (mobile && Number(data.commentCount) === 0) return 48;
   return mobile ? 160 : 320;
 }
 
