@@ -1010,11 +1010,11 @@ function bindMobileHomeSticky() {
       listState = null;
       ul.classList.add('post-list--giscus');
       if (!isCommentsReady('notes')) {
-        ul.innerHTML = `<li class="empty">请先在后台启用 CloudBase 评论并填写 envId。随笔与 <a href="notes.html">随笔页</a> 共用同一条讨论。</li>`;
+        ul.innerHTML = `<li class="empty">请先在后台启用 CloudBase 评论并填写 envId。留言板与 <a href="notes.html">留言板页</a> 共用同一条讨论。</li>`;
       } else {
         ul.innerHTML = `
           <li class="home-giscus-only">
-            <p class="home-notes-lead">这里是一处开放广场，谁都可以随手写几句想法。</p>
+            <p class="home-notes-lead">欢迎留言，随便聊聊。</p>
             <div class="home-notes-giscus" id="homeNotesGiscusRoot"></div>
           </li>`;
         const root = $('#homeNotesGiscusRoot');

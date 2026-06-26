@@ -837,7 +837,7 @@
 }
 .load-more:hover { color: var(--primary); }
 
-/* ---------- 首页「随笔」Tab：仅 giscus ---------- */
+/* ---------- 首页「留言板」Tab ---------- */
 .post-list.post-list--giscus {
   list-style: none;
 }
