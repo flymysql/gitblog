@@ -2,6 +2,12 @@
 import { existsSync } from 'node:fs';
 import { escapeHtml } from './markdown-render.mjs';
 import { thumbPathFor, normalizeLocalImagePath } from './thumbnail-lib.mjs';
+import {
+  commentPathForPost,
+  pvPathForPost,
+  buildListStatsHtml,
+  formatBuildCount,
+} from './cloudbase-stats-lib.mjs';
 
 const LAZY_PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%203%22%2F%3E';
 
@@ -194,10 +200,15 @@ export function buildHeroShell({
   pathPrefix,
   showSiteStats = true,
   siteStatsLabel = '总访问',
+  sitePv = null,
 }) {
   const aboutHref = buildRootPath('post/about/', pathPrefix);
+  const label = escapeHtml(siteStatsLabel);
+  const hasSitePv = sitePv != null && Number(sitePv) >= 0;
   const saobbyStat = showSiteStats
-    ? `<div class="stat saobby-slot saobby-slot-stat" data-saobby-slot="site" data-saobby-prefix="${escapeHtml(siteStatsLabel)}" hidden></div>`
+    ? (hasSitePv
+      ? `<div class="stat saobby-slot saobby-slot-stat" data-saobby-slot="site" data-saobby-prefix="${label}" data-build-pv="${Math.floor(Number(sitePv))}"><strong class="saobby-num gitblog-pv-num">${escapeHtml(formatBuildCount(sitePv))}</strong><span class="saobby-label">${label}</span></div>`
+      : `<div class="stat saobby-slot saobby-slot-stat" data-saobby-slot="site" data-saobby-prefix="${label}" hidden></div>`)
     : '';
   const recentStat = recentDate
     ? `<div class="stat stat-recent"><span class="stat-label">最近更新</span><strong>${escapeHtml(timeAgo(recentDate))}</strong></div>`
@@ -219,32 +230,24 @@ export function buildHeroShell({
     </a>`;
 }
 
-const POST_URL_KEY_RE = /^\d{8}(-\d+)?$/;
-const POST_PATH_SLUGS = new Set(['welcome', 'about']);
-
-function isPostPublicPathKey(seg) {
-  const s = String(seg || '').trim();
-  return POST_URL_KEY_RE.test(s) || POST_PATH_SLUGS.has(s);
-}
-
-function commentPathForPost({ slug, urlKey } = {}) {
-  const k = String(urlKey || '').trim();
-  if (k && isPostPublicPathKey(k)) return k;
-  return String(slug || '').trim();
-}
-
-function pvPathForPost(p) {
-  const urlKey = String(p?.urlKey || '').trim();
-  if (urlKey && /^[a-z0-9-]+$/i.test(urlKey)) return `/post/${urlKey}`;
-  const slug = String(p?.slug || '').trim();
-  return slug ? `/post/${slug}` : '';
-}
-
-export function buildPostItemShell(p, { author, avatar, postHrefFromEntry: hrefFn }) {
+export function buildPostItemShell(p, {
+  author,
+  avatar,
+  postHrefFromEntry: hrefFn,
+  showListStats = true,
+  listPv = null,
+  listComments = null,
+}) {
   const href = hrefFn(p);
   const coverAttrs = p.cover ? progressiveImgAttrs(p.cover, { alt: p.title || '' }) : '';
   const commentPath = commentPathForPost({ slug: p.slug, urlKey: p.urlKey });
   const pvPath = pvPathForPost(p);
+  const statsHtml = showListStats
+    ? buildListStatsHtml(listPv, listComments, { showPv: true, showCm: true })
+    : '';
+  const buildPvAttr = listPv != null && listPv >= 0 ? ` data-build-pv="${Math.floor(Number(listPv))}"` : '';
+  const buildCmAttr = listComments != null && listComments >= 0 ? ` data-build-cm="${Math.floor(Number(listComments))}"` : '';
+  const statsHidden = statsHtml ? '' : ' hidden';
   return `<li class="post-item" data-slug="${escapeHtml(p.slug || '')}">
       <a class="post-content" href="${escapeHtml(href)}">
         <div class="post-author-row">
@@ -255,7 +258,7 @@ export function buildPostItemShell(p, { author, avatar, postHrefFromEntry: hrefF
             <span>${escapeHtml(timeAgo(p.date))}</span>
             ${p.pinned ? '<span class="post-pin">置顶</span>' : ''}
           </div>
-          <span class="post-list-stats" data-slug="${escapeHtml(p.slug || '')}" data-pv-path="${escapeHtml(pvPath)}" data-comment-path="${escapeHtml(commentPath)}" aria-label="阅读与评论" hidden>…</span>
+          <span class="post-list-stats" data-slug="${escapeHtml(p.slug || '')}" data-pv-path="${escapeHtml(pvPath)}" data-comment-path="${escapeHtml(commentPath)}"${buildPvAttr}${buildCmAttr} aria-label="阅读与评论"${statsHidden}>${statsHtml || '…'}</span>
         </div>
         <h3 class="post-title">${escapeHtml(p.title || '无标题')}</h3>
         <p class="post-summary">${escapeHtml(p.summary || '')}</p>
