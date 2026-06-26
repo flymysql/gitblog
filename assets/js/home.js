@@ -6,6 +6,7 @@ import { CONFIG } from './config.js';
 import { fetchIndexPublic } from './api.js';
 import { initSite, escapeHtml, fmtDate, timeAgo, tagHtml, bindLazyImages, LAZY_PLACEHOLDER, postPathFromPost, postPath, rootPath, thumbUrlFor } from './site.js';
 import { initPageviews, bszSiteStatsHtml, queueArticleListViews, syncArticleListStatsFromCache, mountSitePvSlots } from './pageviews.js';
+import { preloadPvBeacon } from './cloudbase-pv.js';
 import { commentPathForPost } from './comment-term.js';
 import { setMeta, setJsonLd } from './seo.js';
 import { isCommentsReady, mountNotesComments } from './comments-embed.js';
@@ -893,6 +894,7 @@ function bindMobileHomeSticky() {
 }
 
 (async function init() {
+  preloadPvBeacon();
   // 避免 hero 与 footer 各有一份站点 Saobby 图（会各请求一次、+2）
   initSite({ active: './', skipDuplicateSitePv: true });
   setMeta({ title: '', description: CONFIG.site.description, type: 'website' });
