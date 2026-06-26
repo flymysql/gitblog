@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@cloudbase/cli": "^3.5.8",
+    "@cloudbase/node-sdk": "^3.18.3",
     "cheerio": "^1.0.0",
     "esbuild": "^0.25.12",
     "marked": "^12.0.2",
