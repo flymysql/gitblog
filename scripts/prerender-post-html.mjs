@@ -5,6 +5,12 @@ import sharp from 'sharp';
 import { existsSync } from 'node:fs';
 import { buildPvBeaconHeadTags } from './pv-beacon-head.mjs';
 import { thumbPathFor, normalizeLocalImagePath } from './thumbnail-lib.mjs';
+import {
+  lookupPostComments,
+  lookupPostPv,
+  formatBuildCount,
+  buildCommentsPreviewSection,
+} from './cloudbase-stats-lib.mjs';
 
 const TAG_PALETTE = [
   { bg: '#FFE8E3', text: '#C44732', border: '#F7C5BA', darkBg: '#3A211D', darkText: '#FFB2A3', darkBorder: '#6F3B32' },
@@ -274,11 +280,14 @@ function buildShareCardHtml({ canonical, title, shareCfg, donateCfg, sitePathPre
   `;
 }
 
-function buildPagePvHtml(pageviewsCfg) {
+function buildPagePvHtml(pageviewsCfg, pv = null) {
   const cfg = pageviewsCfg || {};
   if (cfg.enabled === false || cfg.showPostViews === false) return '';
   const label = String(cfg.label || '阅读').trim() || '阅读';
-  return `<span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">${escapeHtml(label)} </span><span id="gitblog_page_pv">…</span><span class="gitblog-pv-suffix"> 次</span></span>`;
+  const hasPv = pv != null && Number(pv) >= 0;
+  const pvText = hasPv ? formatBuildCount(pv) : '…';
+  const buildAttr = hasPv ? ` data-build-pv="${Math.floor(Number(pv))}"` : '';
+  return `<span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">${escapeHtml(label)} </span><span id="gitblog_page_pv"${buildAttr}>${escapeHtml(pvText)}</span><span class="gitblog-pv-suffix"> 次</span></span>`;
 }
 
 export async function buildArticleInnerHtml({
@@ -291,6 +300,7 @@ export async function buildArticleInnerHtml({
   shareCfg,
   donateCfg,
   pageviewsCfg,
+  buildStatsIndex = null,
 }) {
   const slug = post.slug;
   const title = post.title || fmData.title || '无标题';
@@ -313,6 +323,9 @@ export async function buildArticleInnerHtml({
     : '';
   const share = buildShareCardHtml({ canonical, title, shareCfg, donateCfg, sitePathPrefix });
   const editHref = `${rootHref(sitePathPrefix, 'admin/editor.html')}?slug=${encodeURIComponent(slug)}`;
+  const articlePv = lookupPostPv(buildStatsIndex, post);
+  const comments = lookupPostComments(buildStatsIndex, post);
+  const commentsSection = buildCommentsPreviewSection(comments, { pathPrefix: sitePathPrefix });
 
   return `
     <header class="article-header">
@@ -329,7 +342,7 @@ export async function buildArticleInnerHtml({
             <span>${(content || '').length} 字</span>
             <span class="dot"></span>
             <span class="meta-read-mins">约 ${mins} 分钟</span>
-            ${buildPagePvHtml(pageviewsCfg)}
+            ${buildPagePvHtml(pageviewsCfg, articlePv)}
           </div>
         </div>
         <a class="article-edit" href="${escapeHtml(editHref)}" title="编辑此文">编辑</a>
@@ -338,6 +351,7 @@ export async function buildArticleInnerHtml({
     <div class="article-body">${bodyHtml}</div>
     ${tagFoot}
     ${share}
+    ${commentsSection}
   `.trim();
 }
 
@@ -352,6 +366,7 @@ export async function buildPrerenderedPostHtml({
   donateCfg,
   pageviewsCfg,
   postShellTemplate,
+  buildStatsIndex = null,
 }) {
   const slug = post.slug;
   const title = post.title || fmData.title || '无标题';
@@ -402,6 +417,7 @@ export async function buildPrerenderedPostHtml({
     shareCfg,
     donateCfg,
     pageviewsCfg,
+    buildStatsIndex,
   });
 
   const assets = rootHref(sitePathPrefix, 'assets');

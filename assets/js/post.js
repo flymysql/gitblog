@@ -92,19 +92,45 @@ function renderToc(items) {
   });
 }
 
+function bindBuildCommentsHandoff(wrap) {
+  const preview = wrap?.querySelector('.comments-build-preview-list, .comments-build-empty');
+  if (!preview || preview.dataset.handoffBound === '1') return;
+  preview.dataset.handoffBound = '1';
+  const onMsg = (e) => {
+    if (e.data?.type === 'gitblog-comments-height' && e.data.ready) {
+      if (preview) preview.hidden = true;
+      wrap.classList.remove('comments-build-preview');
+      window.removeEventListener('message', onMsg);
+    }
+  };
+  window.addEventListener('message', onMsg);
+}
+
 function renderCommentsSection(meta, slug) {
   if (getCommentsProvider() === 'none') return;
   const article = $('#article');
-  const wrap = document.createElement('section');
-  wrap.className = 'comments';
-  article.appendChild(wrap);
-
-  const term = commentPathForPost({ slug, urlKey: meta && meta.urlKey });
-  wrap.innerHTML = `
+  let wrap = article.querySelector('.comments');
+  if (!wrap) {
+    wrap = document.createElement('section');
+    wrap.className = 'comments';
+    article.appendChild(wrap);
+    wrap.innerHTML = `
     <div class="comments-title">评论</div>
     <div id="commentsRoot"></div>
     <p class="comments-end-hint" hidden aria-hidden="true"></p>
   `;
+  } else if (!wrap.querySelector('#commentsRoot')) {
+    wrap.insertAdjacentHTML('beforeend', `
+    <div id="commentsRoot"></div>
+    <p class="comments-end-hint" hidden aria-hidden="true"></p>
+  `);
+  }
+
+  if (wrap.classList.contains('comments-build-preview')) {
+    bindBuildCommentsHandoff(wrap);
+  }
+
+  const term = commentPathForPost({ slug, urlKey: meta && meta.urlKey });
   mountComments($('#commentsRoot'), term, {
     pageTitle: meta?.title || document.title,
     pageUrl: location.href,

@@ -409,26 +409,42 @@ function fillSitePvSlot(el, num, label) {
   el.hidden = false;
 }
 
-/** 站点总访问：先只读展示，后台再计数 */
+function readBuildPv(el) {
+  const raw = el?.dataset?.buildPv;
+  if (raw === undefined || raw === '') return null;
+  const v = Number(raw);
+  return Number.isFinite(v) && v >= 0 ? Math.floor(v) : null;
+}
+
+/** 站点总访问：构建期数据先展示，后台再拉最新 */
 export async function renderSitePvSlot(el) {
   if (!el || el.dataset.pvSiteDone === '1') return;
-  el.dataset.pvSiteDone = '1';
   const label = String(pvCfg().siteLabel || '人来过').trim() || '人来过';
+  const buildPv = readBuildPv(el);
+  if (buildPv != null) {
+    fillSitePvSlot(el, formatCount(buildPv), label);
+  }
+  el.dataset.pvSiteDone = '1';
   try {
     const data = await getSiteViewStats();
     fillSitePvSlot(el, formatCount(pvNumber(data, 'sitePv')), label);
   } catch {
-    el.hidden = true;
-    el.dataset.pvSiteDone = '';
-    return;
+    if (buildPv == null) {
+      el.hidden = true;
+      el.dataset.pvSiteDone = '';
+    }
   }
   trackPageView({ path: location.pathname });
 }
 
-/** 文章阅读：缓存先展示 → PV_GET → 后台 PV_HIT 计数 */
+/** 文章阅读：构建期数据 → 缓存 → PV_GET → 后台 PV_HIT 计数 */
 export async function renderPagePvEl(el, { path, slug, title, hit = true } = {}) {
   if (!el) return;
   const p = normalizeClientPath(path || location.pathname);
+  const buildPv = readBuildPv(el);
+  if (buildPv != null) {
+    el.textContent = formatCount(buildPv);
+  }
   const cached = readArticlePvCache(p);
   if (cached != null) {
     el.textContent = formatCount(cached);
@@ -439,7 +455,7 @@ export async function renderPagePvEl(el, { path, slug, title, hit = true } = {})
     el.textContent = num;
     writeArticlePvCache(p, pvNumber(data, 'pv'));
   } catch {
-    if (cached == null) el.textContent = '0';
+    if (cached == null && buildPv == null) el.textContent = '0';
   }
   if (hit) {
     hitPageView({ path: p, slug, title }).then((data) => {
