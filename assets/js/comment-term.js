@@ -1,11 +1,11 @@
 // ============================================================================
-// 评论页标识（path）：文章 urlKey、随笔、工具页等共用
+// 评论页标识（path）：文章 urlKey、留言板、工具页等共用
 // ============================================================================
 
 import { CONFIG } from './config.js';
 import { isPostPublicPathKey } from './site.js';
 
-/** 首页「随笔」与 notes.html 共用的讨论 path */
+/** 首页「留言板」与 notes.html 共用的讨论 path */
 export function notesFeedTerm() {
   const c = CONFIG.cloudbase || {};
   const t = String(c.notesTerm || '').trim();
