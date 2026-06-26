@@ -7,6 +7,7 @@ on:
       - 'posts/**'
       - 'post/**'
       - 'data/posts.json'
+      - 'data/cloudbase-backup/**'
       - 'assets/js/config.js'
       - 'assets/js/post.js'
       - 'assets/js/pageviews.js'
@@ -16,6 +17,7 @@ on:
       - 'scripts/build.mjs'
       - 'scripts/markdown-render.mjs'
       - 'scripts/prerender-post-html.mjs'
+      - 'scripts/cloudbase-*.mjs'
       - 'package.json'
       - 'package-lock.json'
       - 'sw.js'
@@ -36,6 +38,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: github-pages
     concurrency:
       group: build-${{ github.ref }}
       cancel-in-progress: true
@@ -51,57 +54,35 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate sitemap / rss / prerender posts
-        run: npm run build
-
-      - name: Commit if changed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add sitemap.xml rss.xml robots.txt manifest.webmanifest data/posts.json data/search.json assets/og post post.html sw.js assets/dist index.html
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "build: regenerate sitemap / rss [skip ci]"
-            git push
-          fi
-
-  backup:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: github-pages
-    concurrency:
-      group: backup-cloudbase
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Pull CloudBase backup
+      - name: Pull CloudBase backup (for build-time embed)
         env:
           COMMENT_ADMIN_SECRET: ${{ secrets.COMMENT_ADMIN_SECRET }}
           COMMENT_ADMIN_SECRET_VAR: ${{ vars.COMMENT_ADMIN_SECRET }}
           CLOUDBASE_HTTP_URL: ${{ secrets.CLOUDBASE_HTTP_URL }}
           TENCENTCLOUD_SECRETID: ${{ secrets.TENCENTCLOUD_SECRETID }}
           TENCENTCLOUD_SECRETKEY: ${{ secrets.TENCENTCLOUD_SECRETKEY }}
+          CLOUDBASE_BUILD_FETCH: '1'
         run: node scripts/backup-cloudbase-data.mjs
+        continue-on-error: true
 
-      - name: Commit backup if changed
+      - name: Generate sitemap / rss / prerender posts
+        env:
+          COMMENT_ADMIN_SECRET: ${{ secrets.COMMENT_ADMIN_SECRET }}
+          COMMENT_ADMIN_SECRET_VAR: ${{ vars.COMMENT_ADMIN_SECRET }}
+          CLOUDBASE_HTTP_URL: ${{ secrets.CLOUDBASE_HTTP_URL }}
+          TENCENTCLOUD_SECRETID: ${{ secrets.TENCENTCLOUD_SECRETID }}
+          TENCENTCLOUD_SECRETKEY: ${{ secrets.TENCENTCLOUD_SECRETKEY }}
+          CLOUDBASE_BUILD_FETCH: '1'
+        run: npm run build
+
+      - name: Commit if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/cloudbase-backup/
+          git add sitemap.xml rss.xml robots.txt manifest.webmanifest data/posts.json data/search.json data/cloudbase-backup assets/og post post.html sw.js assets/dist index.html
           if git diff --cached --quiet; then
-            echo "No backup changes"
+            echo "No changes to commit"
           else
-            git commit -m "backup: cloudbase comments and pageviews [skip ci]"
+            git commit -m "build: regenerate pages with CloudBase stats [skip ci]"
             git push
           fi
