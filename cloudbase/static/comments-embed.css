@@ -175,6 +175,10 @@ html.cb-embed-compose-only body {
   padding: 0;
 }
 
+.cb-comments--list-only.cb-comments--empty-list {
+  min-height: 0;
+}
+
 .cb-comments--list-only .cb-mobile-compose-trigger {
   margin-left: 0;
   margin-right: 0;
