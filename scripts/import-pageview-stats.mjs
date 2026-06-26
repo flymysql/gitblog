@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 从 Saobby / Vercount 拉取历史访问数据，导入 CloudBase gitblog_pageviews。
+ * 从 Vercount 拉取历史文章阅读量，导入 CloudBase gitblog_pageviews。
  *
  * 用法：
  *   COMMENT_ADMIN_SECRET=xxx node scripts/import-pageview-stats.mjs
@@ -24,10 +24,7 @@ function sleep(ms) {
 }
 
 function readConfig() {
-  const cb = readCloudbaseConfig();
-  const raw = readFileSync('assets/js/config.js', 'utf8');
-  const saobbyImg = (raw.match(/img:\s*["']([^"']*saobby[^"']*)["']/) || [])[1] || '';
-  return { ...cb, saobbyImg };
+  return readCloudbaseConfig();
 }
 
 function loadPosts() {
@@ -50,15 +47,6 @@ function postPublicPath(siteUrl, post) {
   if (slug) paths.push(`/post/${encodeURIComponent(slug)}`);
   paths.push(`/post.html?slug=${encodeURIComponent(slug)}`);
   return [...new Set(paths.map(p => `${siteUrl}${p.startsWith('/') ? p : `/${p}`}`))];
-}
-
-async function fetchSaobbyTotal(imgUrl) {
-  if (!imgUrl) return null;
-  const res = await fetch(imgUrl, { headers: { 'User-Agent': 'gitblog-import/1.0' } });
-  if (!res.ok) throw new Error(`Saobby HTTP ${res.status}`);
-  const svg = await res.text();
-  const m = svg.match(/<text[^>]*>\s*(\d+)\s*<\/text>/i);
-  return m ? Number(m[1]) : null;
 }
 
 async function fetchVercountForUrl(url) {
@@ -100,18 +88,10 @@ async function main() {
 
   console.log(`CloudBase 环境: ${cfg.envId}（导入走 tcb fn invoke，需已 tcb login）`);
 
-  console.log('读取 Saobby 站点总计…');
-  let saobbyTotal = null;
-  try {
-    saobbyTotal = await fetchSaobbyTotal(cfg.saobbyImg);
-    console.log(`  Saobby 站点计数: ${saobbyTotal ?? '未解析'}`);
-  } catch (err) {
-    console.warn(`  Saobby 读取失败: ${err.message}`);
-  }
-
   const posts = loadPosts().filter(p => !p.draft);
   const pages = [];
   let vercountSiteUv = 0;
+  let vercountSitePv = 0;
 
   console.log(`\n从 Vercount 拉取 ${posts.length} 篇文章阅读量（每篇可能 +1 误差）…`);
   for (const post of posts) {
@@ -121,6 +101,7 @@ async function main() {
       try {
         const row = await fetchVercountForUrl(url);
         vercountSiteUv = Math.max(vercountSiteUv, row.siteUv);
+        vercountSitePv = Math.max(vercountSitePv, row.sitePv);
         if (row.pagePv > best.pv) best = { pv: row.pagePv, url, source: 'vercount' };
       } catch (err) {
         console.warn(`  [skip] ${url}: ${err.message}`);
@@ -141,13 +122,13 @@ async function main() {
   }
 
   const site = {
-    pv: saobbyTotal || 0,
+    pv: vercountSitePv || 0,
     uv: vercountSiteUv || 0,
-    source: saobbyTotal ? 'saobby+vercount' : 'vercount',
+    source: 'vercount',
   };
 
   console.log('\n汇总:');
-  console.log(`  站点 PV (Saobby): ${site.pv}`);
+  console.log(`  站点 PV (Vercount): ${site.pv}`);
   console.log(`  站点 UV (Vercount): ${site.uv}`);
   console.log(`  文章条目: ${pages.length}`);
 
@@ -160,7 +141,7 @@ async function main() {
   const result = await callCloudImport(cfg, secret, {
     site,
     pages,
-    source: 'import-saobby-vercount',
+    source: 'import-vercount',
   });
   console.log('完成:', result);
 }
