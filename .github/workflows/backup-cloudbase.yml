@@ -12,6 +12,9 @@ permissions:
 jobs:
   backup:
     runs-on: ubuntu-latest
+    # 密钥配置在 Environment 里时必须声明 environment，否则 secrets.* 为空
+    # 见 Settings → Environments → github-pages → Environment secrets
+    environment: github-pages
     concurrency:
       group: backup-cloudbase
       cancel-in-progress: false
@@ -30,6 +33,7 @@ jobs:
       - name: Pull CloudBase backup
         env:
           COMMENT_ADMIN_SECRET: ${{ secrets.COMMENT_ADMIN_SECRET }}
+          COMMENT_ADMIN_SECRET_VAR: ${{ vars.COMMENT_ADMIN_SECRET }}
           CLOUDBASE_HTTP_URL: ${{ secrets.CLOUDBASE_HTTP_URL }}
           TENCENTCLOUD_SECRETID: ${{ secrets.TENCENTCLOUD_SECRETID }}
           TENCENTCLOUD_SECRETKEY: ${{ secrets.TENCENTCLOUD_SECRETKEY }}
