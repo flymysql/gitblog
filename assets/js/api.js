@@ -1,9 +1,17 @@
 // ============================================================================
 // GitHub API 封装
-// 包含：仓库内容读写、文章索引维护、token 注入
+// 默认经 CloudBase 云函数代理（短密码 session）；auth.editorMode=pat 时直连 GitHub PAT
 // ============================================================================
 
 import { CONFIG } from './config.js';
+import {
+  isCloudbaseEditorConfigured,
+  ghUser,
+  ghGetContents,
+  ghPutContents,
+  ghDeleteContents,
+  ghListDir,
+} from './cloudbase-github.js';
 
 const API_BASE = 'https://api.github.com';
 
@@ -12,6 +20,28 @@ const API_BASE = 'https://api.github.com';
 const TOKEN_KEY = 'gh_oauth_token';
 const SESSION_TOKEN_KEY = 'gh_oauth_token_session';
 const USER_KEY = 'gh_oauth_user';
+const AUTH_MODE_KEY = 'gitblog-auth-mode';
+
+export function getAuthMode() {
+  try {
+    return localStorage.getItem(AUTH_MODE_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+export function setAuthMode(mode) {
+  try {
+    if (mode) localStorage.setItem(AUTH_MODE_KEY, mode);
+    else localStorage.removeItem(AUTH_MODE_KEY);
+  } catch { /* ignore */ }
+}
+
+export function useCloudEditorProxy() {
+  return getAuthMode() === 'cloudbase'
+    && isCloudbaseEditorConfigured()
+    && !!getToken();
+}
 
 export function setToken(token) {
   if (token) localStorage.setItem(TOKEN_KEY, token);
@@ -36,11 +66,18 @@ export function getUser() {
 export function clearAuth() {
   setToken(null);
   setUser(null);
+  setAuthMode('');
   sessionStorage.removeItem(SESSION_TOKEN_KEY);
 }
 
+export { isCloudbaseEditorConfigured as isCloudbaseEditorEnabled, useCloudEditorProxy };
+
+function editorSession() {
+  return getToken();
+}
+
 // ---------- 底层 fetch ----------
-async function ghFetch(path, options = {}) {
+async function ghFetchDirect(path, options = {}) {
   const url = path.startsWith('http') ? path : API_BASE + path;
   const headers = Object.assign({
     Accept: 'application/vnd.github+json',
@@ -69,9 +106,62 @@ async function ghFetch(path, options = {}) {
   return data;
 }
 
+async function ghFetch(path, options = {}) {
+  if (useCloudEditorProxy()) {
+    return ghFetchProxy(path, options);
+  }
+  return ghFetchDirect(path, options);
+}
+
+async function ghFetchProxy(path, options = {}) {
+  const session = editorSession();
+  const method = String(options.method || 'GET').toUpperCase();
+  const repoPrefix = `/repos/${CONFIG.repo.owner}/${CONFIG.repo.name}`;
+
+  if (path === '/user' && method === 'GET') {
+    return ghUser(session);
+  }
+
+  const contentsMatch = path.match(new RegExp(`^${repoPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/contents/(.+?)(?:\\?.*)?$`));
+  if (contentsMatch) {
+    const filePath = decodeURIComponent(contentsMatch[1].split('?')[0]);
+    if (method === 'GET') {
+      const file = await ghGetContents(filePath, session);
+      if (!file) {
+        const err = new Error('Not Found');
+        err.status = 404;
+        throw err;
+      }
+      if (file.isDir) return file.entries;
+      return {
+        sha: file.sha,
+        path: file.path,
+        content: b64EncodeUtf8(file.content),
+      };
+    }
+    if (method === 'PUT') {
+      const body = typeof options.body === 'string' ? JSON.parse(options.body) : options.body;
+      await ghPutContents(filePath, body.content, body.message, session, body.sha);
+      return { committed: true };
+    }
+    if (method === 'DELETE') {
+      const body = typeof options.body === 'string' ? JSON.parse(options.body) : options.body;
+      await ghDeleteContents(filePath, body.sha, body.message, session);
+      return null;
+    }
+  }
+
+  const err = new Error(`CloudBase 代理暂不支持: ${method} ${path}`);
+  err.status = 400;
+  throw err;
+}
+
 // ---------- 当前用户信息 ----------
 export function getCurrentUser() {
-  return ghFetch('/user');
+  if (useCloudEditorProxy()) {
+    return ghUser(editorSession());
+  }
+  return ghFetchDirect('/user');
 }
 
 // ---------- Contents API ----------
@@ -82,6 +172,20 @@ function repoPath(p) {
 
 // 读取文件（返回 { content, sha, path } 或 null）
 export async function readFile(path) {
+  if (useCloudEditorProxy()) {
+    try {
+      const file = await ghGetContents(path, editorSession());
+      if (!file || file.isDir) return null;
+      return {
+        sha: file.sha,
+        path: file.path,
+        content: file.content,
+      };
+    } catch (e) {
+      if (e.status === 404) return null;
+      throw e;
+    }
+  }
   try {
     const data = await ghFetch(
       `${repoPath(path)}?ref=${CONFIG.repo.branch}&t=${Date.now()}`
@@ -100,6 +204,17 @@ export async function readFile(path) {
 
 // 写入或更新文件（commit 一次）
 export async function writeFile(path, content, message, sha) {
+  if (useCloudEditorProxy()) {
+    try {
+      return await ghPutContents(path, b64EncodeUtf8(content), message, editorSession(), sha);
+    } catch (e) {
+      if (e.status === 404) {
+        const hint = `\n可能原因：\n  1) 云函数 GITHUB_PAT 没有 Contents 写权限\n  2) PAT 未授权仓库 ${CONFIG.repo.owner}/${CONFIG.repo.name}\n  3) config.js 分支 (${CONFIG.repo.branch}) 配置错误`;
+        e.message = (e.message || 'Not Found') + hint;
+      }
+      throw e;
+    }
+  }
   const body = {
     message,
     content: b64EncodeUtf8(content),
@@ -121,7 +236,10 @@ export async function writeFile(path, content, message, sha) {
 
 // 删除文件
 export async function deleteFile(path, sha, message) {
-  return ghFetch(repoPath(path), {
+  if (useCloudEditorProxy()) {
+    return ghDeleteContents(path, sha, message, editorSession());
+  }
+  return ghFetchDirect(repoPath(path), {
     method: 'DELETE',
     body: { message, sha, branch: CONFIG.repo.branch },
   });
@@ -129,6 +247,14 @@ export async function deleteFile(path, sha, message) {
 
 // 列举文件夹下文件
 export async function listDir(path) {
+  if (useCloudEditorProxy()) {
+    try {
+      return await ghListDir(path, editorSession());
+    } catch (e) {
+      if (e.status === 404) return [];
+      throw e;
+    }
+  }
   try {
     const data = await ghFetch(
       `${repoPath(path)}?ref=${CONFIG.repo.branch}&t=${Date.now()}`
@@ -305,6 +431,29 @@ export async function uploadImage(blob, suggestedName) {
   const stem = (suggestedName || 'image').replace(/\.[^.]+$/, '').replace(/[^\w\u4e00-\u9fa5\-]/g, '-').slice(0, 24) || 'image';
   const path = `${CONFIG.paths.uploads}/${yyyy}/${mm}/${now.getTime()}-${random}-${stem}.${safeExt}`;
   const b64 = await blobToBase64(working);
+  if (useCloudEditorProxy()) {
+    await ghPutContents(path, b64, `upload: ${path.split('/').pop()}`, editorSession());
+    try {
+      const thumbBlob = await generateThumbBlob(working);
+      if (thumbBlob) {
+        const thumbPath = path.replace(/\.[^.]+$/, '.thumb.webp');
+        await ghPutContents(
+          thumbPath,
+          await blobToBase64(thumbBlob),
+          `upload thumb: ${thumbPath.split('/').pop()}`,
+          editorSession(),
+        );
+      }
+    } catch (e) {
+      console.warn('[uploadImage] thumb upload failed', e);
+    }
+    return {
+      path,
+      optimized: working !== original,
+      originalSize: original.size,
+      finalSize: working.size,
+    };
+  }
   const body = {
     message: `upload: ${path.split('/').pop()}`,
     content: b64,
