@@ -14,16 +14,39 @@ const cfg = {
 let _app = null;
 let _authReady = null;
 
+function waitForGlobal(name, timeoutMs = 15000) {
+  return new Promise((resolve, reject) => {
+    if (typeof globalThis[name] !== 'undefined') {
+      resolve();
+      return;
+    }
+    const deadline = Date.now() + timeoutMs;
+    const tick = () => {
+      if (typeof globalThis[name] !== 'undefined') {
+        resolve();
+        return;
+      }
+      if (Date.now() >= deadline) {
+        reject(new Error('CloudBase SDK 未就绪'));
+        return;
+      }
+      setTimeout(tick, 20);
+    };
+    tick();
+  });
+}
+
 function loadScript(src) {
   return new Promise((resolve, reject) => {
+    const finish = () => waitForGlobal('cloudbase').then(resolve).catch(reject);
     if (document.querySelector(`script[src="${src}"]`)) {
-      resolve();
+      finish();
       return;
     }
     const s = document.createElement('script');
     s.src = src;
     s.async = true;
-    s.onload = () => resolve();
+    s.onload = finish;
     s.onerror = () => reject(new Error(`脚本加载失败: ${src}`));
     document.head.appendChild(s);
   });
