@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-06-27T17:18:20.777Z",
+  "generatedAt": "2026-06-27T17:51:37.737Z",
   "date": "2026-06-28",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
@@ -63,10 +63,10 @@
         "replyToNick": null,
         "pageTitle": "海门回声 | 黑鬼",
         "pageUrl": "https://gitpull.cn/post/20260618/",
-        "status": "visible",
+        "status": "deleted",
         "createdAt": 1782363890848,
         "createdAtIso": "2026-06-25T05:04:50.848Z",
-        "deletedAt": null
+        "deletedAt": 1782581710387
       },
       {
         "_id": "d0f4e3f46a3cb6a800c2013d2826bbc9",
@@ -492,9 +492,9 @@
   },
   "pageviews": {
     "site": {
-      "pv": 4566,
+      "pv": 4580,
       "uv": 223,
-      "updatedAt": 1782579262899
+      "updatedAt": 1782581701785
     },
     "total": 70,
     "pages": [
@@ -796,6 +796,15 @@
         "importedFrom": "vercount"
       },
       {
+        "path": "/post/20260618",
+        "slug": "海门回声-黑鬼",
+        "title": "海门回声 | 黑鬼",
+        "pv": 483,
+        "createdAt": 1782386771939,
+        "lastAt": 1782581701785,
+        "importedFrom": "vercount"
+      },
+      {
         "path": "/post/20181101",
         "slug": "用回valine评论系统valine评论框样式美化-2d5da13e",
         "title": "用回valine评论系统,valine评论框样式美化",
@@ -811,15 +820,6 @@
         "pv": 482,
         "createdAt": 1782386771939,
         "lastAt": 1782386771939,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20260618",
-        "slug": "海门回声-黑鬼",
-        "title": "海门回声 | 黑鬼",
-        "pv": 481,
-        "createdAt": 1782386771939,
-        "lastAt": 1782569451265,
         "importedFrom": "vercount"
       },
       {
@@ -931,6 +931,15 @@
         "importedFrom": "vercount"
       },
       {
+        "path": "/post/20260616",
+        "slug": "海门回声-一个寂静的生日夜晚",
+        "title": "海门回声 | 静谧的生日夜晚",
+        "pv": 470,
+        "createdAt": 1782386686875,
+        "lastAt": 1782581666410,
+        "importedFrom": "vercount"
+      },
+      {
         "path": "/post/20190605-3",
         "slug": "记忆的种子·二-29fe4821",
         "title": "记忆的种子·二",
@@ -940,12 +949,12 @@
         "importedFrom": "vercount"
       },
       {
-        "path": "/post/20260616",
-        "slug": "海门回声-一个寂静的生日夜晚",
-        "title": "海门回声 | 静谧的生日夜晚",
+        "path": "/post/20200101",
+        "slug": "随笔杂谈-15995658",
+        "title": "随笔杂谈",
         "pv": 468,
-        "createdAt": 1782386686875,
-        "lastAt": 1782579262899,
+        "createdAt": 1782386771939,
+        "lastAt": 1782581335643,
         "importedFrom": "vercount"
       },
       {
@@ -962,15 +971,6 @@
         "slug": "生如夏花般绚烂死如秋叶般静美-bcd926d2",
         "title": "生如夏花般绚烂 死如秋叶般静美",
         "pv": 467,
-        "createdAt": 1782386771939,
-        "lastAt": 1782386771939,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20200101",
-        "slug": "随笔杂谈-15995658",
-        "title": "随笔杂谈",
-        "pv": 466,
         "createdAt": 1782386771939,
         "lastAt": 1782386771939,
         "importedFrom": "vercount"
@@ -1003,6 +1003,15 @@
         "importedFrom": "vercount"
       },
       {
+        "path": "/post/20260617",
+        "slug": "qq-farm-assistant-经典农场辅助",
+        "title": "QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具",
+        "pv": 463,
+        "createdAt": 1782386771939,
+        "lastAt": 1782581336623,
+        "importedFrom": "vercount"
+      },
+      {
         "path": "/post/20260615",
         "slug": "用-ai-做好软件项目上下文工程实践指南",
         "title": "用 AI 做好软件项目：上下文工程实践指南",
@@ -1018,15 +1027,6 @@
         "pv": 462,
         "createdAt": 1782386771939,
         "lastAt": 1782386771939,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20260617",
-        "slug": "qq-farm-assistant-经典农场辅助",
-        "title": "QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具",
-        "pv": 461,
-        "createdAt": 1782386771939,
-        "lastAt": 1782542537157,
         "importedFrom": "vercount"
       },
       {
@@ -1057,21 +1057,21 @@
         "importedFrom": "vercount"
       },
       {
+        "path": "/post/about",
+        "slug": "about",
+        "title": "关于小红鸡",
+        "pv": 460,
+        "createdAt": 1782386771939,
+        "lastAt": 1782581308528,
+        "importedFrom": "vercount"
+      },
+      {
         "path": "/post/20260311",
         "slug": "3fs-usrbio-zero-copy",
         "title": "3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的",
         "pv": 460,
         "createdAt": 1782386771939,
         "lastAt": 1782386771939,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/about",
-        "slug": "about",
-        "title": "关于小红鸡",
-        "pv": 459,
-        "createdAt": 1782386771939,
-        "lastAt": 1782465379890,
         "importedFrom": "vercount"
       },
       {
@@ -1105,9 +1105,9 @@
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 101,
+        "pv": 106,
         "createdAt": 1782398407892,
-        "lastAt": 1782554062619,
+        "lastAt": 1782581528869,
         "importedFrom": ""
       },
       {
