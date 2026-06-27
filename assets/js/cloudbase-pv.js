@@ -384,6 +384,10 @@ export async function getAdminTopPages(adminSecret, limit = 20) {
   return callBeacon({ action: 'admin-top', adminSecret, limit });
 }
 
+export async function getAdminDailyStats(adminSecret, { days = 14, date = '' } = {}) {
+  return callBeacon({ action: 'admin-daily', adminSecret, days, date: date || undefined });
+}
+
 export async function importPageViewStats(adminSecret, { site, pages, source } = {}) {
   return callBeacon({
     action: 'import',
