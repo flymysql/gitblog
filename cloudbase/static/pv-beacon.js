@@ -129,7 +129,7 @@ function replyGh(reqId, ok, data) {
 window.addEventListener('message', async (e) => {
   const msg = e.data;
   if (!msg || msg.type !== 'gitblog-pv') return;
-  const { reqId, action, path, slug, title, adminSecret, limit, sessionId, paths, items } = msg;
+  const { reqId, action, path, slug, title, adminSecret, limit, sessionId, paths, items, days, date } = msg;
   try {
     let data;
     const base = { sessionId };
@@ -149,6 +149,8 @@ window.addEventListener('message', async (e) => {
       data = await callPv({ action: 'PV_SITE' });
     } else if (action === 'admin-top') {
       data = await callPv({ action: 'PV_ADMIN_TOP', adminSecret, limit });
+    } else if (action === 'admin-daily') {
+      data = await callPv({ action: 'PV_ADMIN_DAILY', adminSecret, days, date });
     } else if (action === 'import') {
       data = await callPv({
         action: 'PV_IMPORT',

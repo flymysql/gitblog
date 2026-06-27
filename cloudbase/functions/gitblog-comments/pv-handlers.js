@@ -5,9 +5,12 @@ const crypto = require('crypto');
 const PV_COLLECTION = 'gitblog_pageviews';
 const SITE_COLLECTION = 'gitblog_site_stats';
 const PV_RATE_COLLECTION = 'gitblog_pv_rates';
+const PV_DAILY_COLLECTION = 'gitblog_pv_daily';
+const PV_DAILY_MARK_COLLECTION = 'gitblog_pv_daily_mark';
 const SITE_DOC_ID = 'site';
 const PV_RATE_WINDOW_MS = 30 * 1000;
 const PV_PATH_MAX = 240;
+const PV_TZ = 'Asia/Shanghai';
 
 function normalizePvPath(raw) {
   let p = String(raw || '').trim();
@@ -26,7 +29,16 @@ function pathDocId(path) {
 }
 
 function dayKey(ts = Date.now()) {
-  return new Date(ts).toISOString().slice(0, 10);
+  return new Intl.DateTimeFormat('en-CA', { timeZone: PV_TZ }).format(new Date(ts));
+}
+
+function recentDayKeys(days, endTs = Date.now()) {
+  const n = Math.min(Math.max(Number(days) || 14, 1), 90);
+  const keys = [];
+  for (let i = 0; i < n; i += 1) {
+    keys.push(dayKey(endTs - i * 86400000));
+  }
+  return keys;
 }
 
 /** CloudBase doc().get() 对不存在的文档可能返回 { data: [] }，空数组不能当作已存在 */
@@ -46,7 +58,13 @@ function verifyAdminSecret(event, verifyAdminSecretFn) {
 }
 
 async function ensurePvCollections(db) {
-  for (const name of [PV_COLLECTION, SITE_COLLECTION, PV_RATE_COLLECTION]) {
+  for (const name of [
+    PV_COLLECTION,
+    SITE_COLLECTION,
+    PV_RATE_COLLECTION,
+    PV_DAILY_COLLECTION,
+    PV_DAILY_MARK_COLLECTION,
+  ]) {
     try { await db.createCollection(name); } catch { /* exists */ }
   }
 }
@@ -206,6 +224,85 @@ async function incrementPagePv(db, path, { slug = '', title = '', countUv = fals
   return { path: norm, pv: page.pv, sitePv: site.pv, siteUv: site.uv, counted: true };
 }
 
+async function incrementDailyDoc(db, docId, baseFields, incFields) {
+  const _ = db.command;
+  const ref = db.collection(PV_DAILY_COLLECTION).doc(docId);
+  const got = await ref.get().catch(() => null);
+  const updates = {};
+  for (const [key, val] of Object.entries(incFields)) {
+    updates[key] = _.inc(val);
+  }
+  if (docExists(got)) {
+    await ref.update({ ...updates, updatedAt: Date.now() });
+    return;
+  }
+  const init = { ...baseFields, updatedAt: Date.now() };
+  for (const [key, val] of Object.entries(incFields)) init[key] = val;
+  await ref.set(init);
+}
+
+async function markDailyUnique(db, { date, dedupeId, ipHash }) {
+  const siteDailyId = `site_${date}`;
+  const markCol = db.collection(PV_DAILY_MARK_COLLECTION);
+
+  if (dedupeId) {
+    const markId = `uv_${date}_${dedupeId}`;
+    const got = await markCol.doc(markId).get().catch(() => null);
+    if (!docExists(got)) {
+      await markCol.doc(markId).set({ date, dedupeId, markedAt: Date.now() }).catch(() => null);
+      await incrementDailyDoc(
+        db,
+        siteDailyId,
+        { type: 'site', date, pv: 0, uv: 0, ips: 0 },
+        { uv: 1 },
+      );
+    }
+  }
+
+  if (ipHash) {
+    const markId = `ip_${date}_${ipHash}`;
+    const got = await markCol.doc(markId).get().catch(() => null);
+    if (!docExists(got)) {
+      await markCol.doc(markId).set({ date, ipHash, markedAt: Date.now() }).catch(() => null);
+      await incrementDailyDoc(
+        db,
+        siteDailyId,
+        { type: 'site', date, pv: 0, uv: 0, ips: 0 },
+        { ips: 1 },
+      );
+    }
+  }
+}
+
+async function incrementDailyStats(db, path, { slug = '', title = '', dedupeId = '', ipHash = '' } = {}) {
+  const date = dayKey();
+  const norm = normalizePvPath(path);
+  const pHash = pathDocId(norm).slice(3);
+
+  await incrementDailyDoc(
+    db,
+    `site_${date}`,
+    { type: 'site', date, pv: 0, uv: 0, ips: 0 },
+    { pv: 1 },
+  );
+
+  await incrementDailyDoc(
+    db,
+    `page_${date}_${pHash}`,
+    {
+      type: 'page',
+      date,
+      path: norm,
+      slug: String(slug || '').trim(),
+      title: String(title || '').trim(),
+      pv: 0,
+    },
+    { pv: 1 },
+  );
+
+  await markDailyUnique(db, { date, dedupeId, ipHash });
+}
+
 function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
   async function handlePvHit(event, context) {
     const path = normalizePvPath(event.path || event.pagePath || event.url);
@@ -246,6 +343,7 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
       countUv,
     });
     await markHitCounted(db, dedupeId, path);
+    await incrementDailyStats(db, path, { slug, title, dedupeId, ipHash }).catch(() => null);
     return jsonOk(result);
   }
 
@@ -279,6 +377,53 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
     }));
     const site = await getSiteStats(db);
     return jsonOk({ site, top: rows });
+  }
+
+  async function handlePvAdminDaily(event) {
+    if (!verifyAdminSecret(event, verifyAdminSecret)) return jsonErr('无权限', 403);
+    const days = Math.min(Math.max(Number(event.days) || 14, 1), 90);
+    const focusDateRaw = String(event.date || '').trim();
+    const dateKeys = recentDayKeys(days);
+    const focusDate = /^\d{4}-\d{2}-\d{2}$/.test(focusDateRaw) ? focusDateRaw : dateKeys[0];
+
+    const daily = [];
+    for (const date of dateKeys) {
+      const got = await db.collection(PV_DAILY_COLLECTION).doc(`site_${date}`).get().catch(() => null);
+      const row = pickDocRow(got);
+      daily.push({
+        date,
+        pv: Number(row?.pv) || 0,
+        uv: Number(row?.uv) || 0,
+        ips: Number(row?.ips) || 0,
+      });
+    }
+
+    let pageRes = await db.collection(PV_DAILY_COLLECTION)
+      .where({ type: 'page', date: focusDate })
+      .orderBy('pv', 'desc')
+      .limit(100)
+      .get()
+      .catch(() => null);
+
+    let pageRows = pageRes?.data || [];
+    if (!pageRows.length) {
+      pageRes = await db.collection(PV_DAILY_COLLECTION)
+        .where({ type: 'page', date: focusDate })
+        .limit(100)
+        .get()
+        .catch(() => null);
+      pageRows = pageRes?.data || [];
+      pageRows.sort((a, b) => (Number(b.pv) || 0) - (Number(a.pv) || 0));
+    }
+
+    const pages = pageRows.map(r => ({
+      path: r.path,
+      slug: String(r.slug || '').trim(),
+      title: String(r.title || '').trim(),
+      pv: Number(r.pv) || 0,
+    }));
+
+    return jsonOk({ daily, pages, focusDate, timezone: PV_TZ });
   }
 
   async function handlePvAdminExport(event) {
@@ -415,6 +560,7 @@ function createPvHandlers({ db, hashIp, jsonOk, jsonErr, verifyAdminSecret }) {
     handlePvBatchGet,
     handlePvSite,
     handlePvAdminTop,
+    handlePvAdminDaily,
     handlePvAdminExport,
     handlePvImport,
     normalizePvPath,
