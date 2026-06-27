@@ -1140,6 +1140,25 @@ function createMobileDockChrome() {
   return { dock };
 }
 
+function syncMobileDockBodyState(show, dock) {
+  document.body.classList.toggle('cb-has-mobile-dock', show);
+  if (!show) {
+    document.body.style.removeProperty('--cb-mobile-dock-h');
+    return;
+  }
+  const apply = () => {
+    const h = Math.ceil(dock?.getBoundingClientRect().height || 0);
+    if (h > 0) document.body.style.setProperty('--cb-mobile-dock-h', `${h}px`);
+  };
+  apply();
+  requestAnimationFrame(apply);
+}
+
+function clearMobileDockBodyState() {
+  document.body.classList.remove('cb-has-mobile-dock');
+  document.body.style.removeProperty('--cb-mobile-dock-h');
+}
+
 const MOBILE_DOCK_ARTICLE_RATIO = 0.5;
 
 function resolveMobileDockScrollRoot(anchorEl) {
@@ -1206,7 +1225,7 @@ function bindMobileEmbedDock(embedWrap, iframe, opts = {}) {
     if (!persistentDock || !dock) return;
     const show = sectionVisible && !composeOpen;
     dock.hidden = !show;
-    document.body.classList.toggle('cb-has-mobile-dock', show);
+    syncMobileDockBodyState(show, dock);
     postDockState(show);
   };
 
@@ -1266,7 +1285,7 @@ function bindMobileEmbedDock(embedWrap, iframe, opts = {}) {
     io();
     dock?.remove();
     window.removeEventListener('message', onMessage);
-    document.body.classList.remove('cb-has-mobile-dock');
+    clearMobileDockBodyState();
   };
 }
 
@@ -1287,7 +1306,7 @@ function bindMobileDirectDock(root, form, editor, opts = {}) {
     if (!persistentDock || !dock) return;
     const show = sectionVisible && !composeOpen;
     dock.hidden = !show;
-    document.body.classList.toggle('cb-has-mobile-dock', show);
+    syncMobileDockBodyState(show, dock);
   };
 
   const mobileCtrl = createMobileComposeController(root, form, editor, {
@@ -1321,7 +1340,7 @@ function bindMobileDirectDock(root, form, editor, opts = {}) {
       mobileCtrl.cleanup?.();
       io();
       dock?.remove();
-      document.body.classList.remove('cb-has-mobile-dock');
+      clearMobileDockBodyState();
     },
     notifySubmitted: () => {
       composeOpen = false;
@@ -1559,7 +1578,7 @@ function bindMobileEmbedDockSplit(listWrap, opts = {}) {
     if (!persistentDock || !dock) return;
     const show = sectionVisible && !composeOpen;
     dock.hidden = !show;
-    document.body.classList.toggle('cb-has-mobile-dock', show);
+    syncMobileDockBodyState(show, dock);
   };
 
   const io = persistentDock
@@ -1581,7 +1600,7 @@ function bindMobileEmbedDockSplit(listWrap, opts = {}) {
     cleanup: () => {
       io();
       dock?.remove();
-      document.body.classList.remove('cb-has-mobile-dock');
+      clearMobileDockBodyState();
     },
   };
 }
