@@ -851,6 +851,7 @@ async function dispatch(event, context) {
   if (action === 'PV_SITE') return await pvApi.handlePvSite();
   if (action === 'COMMENT_COUNT_BATCH') return await handleCommentCountBatch(event);
   if (action === 'PV_ADMIN_TOP') return await pvApi.handlePvAdminTop(event);
+  if (action === 'PV_ADMIN_DAILY') return await pvApi.handlePvAdminDaily(event);
   if (action === 'PV_ADMIN_EXPORT') return await pvApi.handlePvAdminExport(event);
   if (action === 'PV_IMPORT') return await pvApi.handlePvImport(event);
   if (action === 'EDITOR_AUTH') return await ghApi.handleEditorAuth(event, context);
