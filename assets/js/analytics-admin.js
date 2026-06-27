@@ -6,6 +6,8 @@ import { CONFIG } from './config.js';
 import { mountAdminShell, escapeHtml } from './admin-shell.js';
 import {
   isCloudBasePvEnabled,
+  preloadPvBeacon,
+  waitForPvBeacon,
   getSiteViewStats,
   getAdminTopPages,
   getAdminDailyStats,
@@ -57,11 +59,14 @@ function secretGateHtml() {
   `;
 }
 
-function dailyOverviewHtml({ daily, focusDate }) {
+function dailyOverviewHtml({ daily, focusDate, dailyError = '' }) {
   if (!daily?.length) {
     return `
       <div class="analytics-frame-empty analytics-daily-empty">
-        <p>暂无每日统计数据。云函数部署后产生的新访问会按天汇总。</p>
+        <p>${dailyError
+          ? `每日统计暂不可用：${escapeHtml(dailyError)}。累计数据仍可正常查看。`
+          : '暂无每日统计数据。云函数部署后产生的新访问会按天汇总。'
+        }</p>
       </div>
     `;
   }
@@ -105,7 +110,7 @@ function dailyPagesHtml({ pages, focusDate }) {
   `;
 }
 
-function cloudbaseStatsHtml({ site, top, daily, pages, focusDate }) {
+function cloudbaseStatsHtml({ site, top, daily, pages, focusDate, dailyError = '' }) {
   const siteLabel = String(pvCfg().siteLabel || '人来过').trim() || '人来过';
   const pageLabel = String(pvCfg().label || '阅读').trim() || '阅读';
   return `
@@ -125,7 +130,7 @@ function cloudbaseStatsHtml({ site, top, daily, pages, focusDate }) {
           <p class="settings-hint" style="margin:4px 0 0">近 ${DAILY_DAYS} 天新增：PV、访问人数（去重访客）、不同 IP 数。点击日期查看各文章当日增量。</p>
         </div>
       </div>
-      ${dailyOverviewHtml({ daily, focusDate })}
+      ${dailyOverviewHtml({ daily, focusDate, dailyError })}
 
       <div class="analytics-panel-head" style="margin:24px 0 8px">
         <div>
@@ -180,11 +185,25 @@ function bindDailyDatePickers(ctx, secret, focusDate) {
 }
 
 async function loadCloudBaseAnalytics(ctx, secret, focusDate = '') {
-  const [siteStats, adminData, dailyData] = await Promise.all([
+  await waitForPvBeacon();
+
+  const [siteResult, adminResult, dailyResult] = await Promise.allSettled([
     getSiteViewStats(),
     getAdminTopPages(secret, 50),
     getAdminDailyStats(secret, { days: DAILY_DAYS, date: focusDate || undefined }),
   ]);
+
+  if (siteResult.status === 'rejected' && adminResult.status === 'rejected') {
+    throw siteResult.reason || adminResult.reason;
+  }
+
+  const siteStats = siteResult.status === 'fulfilled' ? siteResult.value : {};
+  const adminData = adminResult.status === 'fulfilled' ? adminResult.value : {};
+  const dailyData = dailyResult.status === 'fulfilled' ? dailyResult.value : {};
+  const dailyError = dailyResult.status === 'rejected'
+    ? String(dailyResult.reason?.message || dailyResult.reason || '加载失败')
+    : '';
+
   const site = adminData.site || { pv: siteStats.sitePv, uv: siteStats.siteUv };
   const top = adminData.top || [];
   const daily = dailyData.daily || [];
@@ -197,6 +216,7 @@ async function loadCloudBaseAnalytics(ctx, secret, focusDate = '') {
     daily,
     pages,
     focusDate: selectedDate,
+    dailyError,
   });
 
   bindDailyDatePickers(ctx, secret, selectedDate);
@@ -222,6 +242,7 @@ function bindSecretGate(ctx) {
     btn.textContent = '验证中…';
     const secret = $('#pvSecretInput').value.trim();
     try {
+      await waitForPvBeacon();
       await verifyAdminSecret(secret);
       await loadCloudBaseAnalytics(ctx, secret);
     } catch (err) {
@@ -266,6 +287,8 @@ async function renderCloudBase(ctx) {
 }
 
 (async function init() {
+  if (isCloudBasePvEnabled()) preloadPvBeacon();
+
   const ctx = await mountAdminShell({
     active: 'analytics',
     title: '访问数据',
