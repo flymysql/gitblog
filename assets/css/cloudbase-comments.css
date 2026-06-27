@@ -897,7 +897,15 @@ body.cb-compose-layer-open.cb-has-mobile-dock .cb-mobile-dock {
 }
 
 body.cb-has-mobile-dock {
-  scroll-padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  --cb-mobile-dock-h: calc(60px + env(safe-area-inset-bottom, 0px));
+  scroll-padding-bottom: var(--cb-mobile-dock-h);
+  padding-bottom: var(--cb-mobile-dock-h);
+}
+
+@media (max-width: 640px) {
+  body.cb-has-mobile-dock:has(#article) .back-to-top {
+    bottom: calc(16px + var(--cb-mobile-dock-h, 60px));
+  }
 }
 
 .cb-mobile-compose-trigger {
