@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generatedAt": "2026-06-27T17:51:37.737Z",
-  "date": "2026-06-28",
+  "generatedAt": "2026-06-28T17:20:14.701Z",
+  "date": "2026-06-29",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
   "invokeMode": "sdk",
@@ -492,9 +492,9 @@
   },
   "pageviews": {
     "site": {
-      "pv": 4580,
+      "pv": 4585,
       "uv": 223,
-      "updatedAt": 1782581701785
+      "updatedAt": 1782652981771
     },
     "total": 70,
     "pages": [
@@ -1105,18 +1105,18 @@
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 106,
+        "pv": 107,
         "createdAt": 1782398407892,
-        "lastAt": 1782581528869,
+        "lastAt": 1782613627588,
         "importedFrom": ""
       },
       {
         "path": "/tools/tool-major.html",
         "slug": "",
         "title": "",
-        "pv": 2,
+        "pv": 6,
         "createdAt": 1782386660084,
-        "lastAt": 1782401935281,
+        "lastAt": 1782652981771,
         "importedFrom": ""
       },
       {
