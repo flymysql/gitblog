@@ -1,13 +1,28 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-01T18:04:01.547Z",
-  "date": "2026-07-02",
+  "generatedAt": "2026-07-02T17:56:58.781Z",
+  "date": "2026-07-03",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
   "invokeMode": "sdk",
   "comments": {
-    "total": 32,
+    "total": 33,
     "items": [
+      {
+        "_id": "d0a5fbd66a45d6d8005208ec759e7593",
+        "path": "20260618",
+        "nick": "躺平路人甲",
+        "avatar": "daddy.webp",
+        "contentHtml": "作者的笔触冷峻而克制，用传闻的层层演变来折射群体无意识的暴力，这种写法比直接控诉更有力量。黑鬼的形象在真假难辨的流言中反而愈发鲜明，令人唏嘘。",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "评论区",
+        "pageUrl": "",
+        "status": "visible",
+        "createdAt": 1782961880612,
+        "createdAtIso": "2026-07-02T03:11:20.612Z",
+        "deletedAt": null
+      },
       {
         "_id": "ae09feb36a3ebe03013386ce7096854a",
         "path": "gitblog-notes-feed",
@@ -492,11 +507,11 @@
   },
   "pageviews": {
     "site": {
-      "pv": 4682,
+      "pv": 4709,
       "uv": 223,
-      "updatedAt": 1782920315826
+      "updatedAt": 1783008916478
     },
-    "total": 75,
+    "total": 76,
     "pages": [
       {
         "path": "/post/20170606",
@@ -541,6 +556,15 @@
         "pv": 512,
         "createdAt": 1782386771939,
         "lastAt": 1782386771939,
+        "importedFrom": "vercount"
+      },
+      {
+        "path": "/post/20260618",
+        "slug": "海门回声-黑鬼",
+        "title": "海门回声 | 黑鬼",
+        "pv": 511,
+        "createdAt": 1782386771939,
+        "lastAt": 1783008916478,
         "importedFrom": "vercount"
       },
       {
@@ -676,15 +700,6 @@
         "pv": 497,
         "createdAt": 1782386771939,
         "lastAt": 1782386771939,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20260618",
-        "slug": "海门回声-黑鬼",
-        "title": "海门回声 | 黑鬼",
-        "pv": 496,
-        "createdAt": 1782386771939,
-        "lastAt": 1782918235990,
         "importedFrom": "vercount"
       },
       {
@@ -1030,6 +1045,15 @@
         "importedFrom": "vercount"
       },
       {
+        "path": "/post/20260415",
+        "slug": "smallpond-source-walkthrough",
+        "title": "Smallpond 源码走读：DuckDB × 3FS × Ray 是如何拼成一台分布式数据处理机的",
+        "pv": 462,
+        "createdAt": 1782386771939,
+        "lastAt": 1782932757565,
+        "importedFrom": "vercount"
+      },
+      {
         "path": "/post/20220312",
         "slug": "推荐系统——推荐引擎的架构-15996742",
         "title": "推荐系统——推荐引擎的架构",
@@ -1045,15 +1069,6 @@
         "pv": 461,
         "createdAt": 1782386771939,
         "lastAt": 1782485687753,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20260415",
-        "slug": "smallpond-source-walkthrough",
-        "title": "Smallpond 源码走读：DuckDB × 3FS × Ray 是如何拼成一台分布式数据处理机的",
-        "pv": 461,
-        "createdAt": 1782386771939,
-        "lastAt": 1782452223201,
         "importedFrom": "vercount"
       },
       {
@@ -1105,9 +1120,9 @@
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 144,
+        "pv": 154,
         "createdAt": 1782398407892,
-        "lastAt": 1782920315826,
+        "lastAt": 1783008853711,
         "importedFrom": ""
       },
       {
@@ -1171,6 +1186,15 @@
         "pv": 1,
         "createdAt": 1782898301329,
         "lastAt": 1782898301329,
+        "importedFrom": ""
+      },
+      {
+        "path": "/tools/tool-timestamp.html",
+        "slug": "",
+        "title": "",
+        "pv": 1,
+        "createdAt": 1782959929190,
+        "lastAt": 1782959929190,
         "importedFrom": ""
       }
     ]
