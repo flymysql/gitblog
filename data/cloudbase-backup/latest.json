@@ -1,13 +1,103 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-04T17:13:44.413Z",
-  "date": "2026-07-05",
+  "generatedAt": "2026-07-05T17:18:21.400Z",
+  "date": "2026-07-06",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
   "invokeMode": "sdk",
   "comments": {
-    "total": 34,
+    "total": 40,
     "items": [
+      {
+        "_id": "516f04746a49d90e0069e8347ce20ac8",
+        "path": "20260616",
+        "nick": "可爱路人甲",
+        "avatar": "badgirl.webp",
+        "contentHtml": "读完这篇《海门回声》，被那种静谧又略带忧伤的氛围深深打动了。二〇〇三年的海岛夏夜，田埂、蝉鸣、生日蛋糕——这些细节写得特别有画面感，仿佛能闻到海风的味道。邻家酒肆的笔触很细腻，把童年记忆和成年后的回望交织在一起，让人忍不住想起自己那些回不去的夏天。期待系列下一篇！",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "海门回声 | 静谧的生日夜晚",
+        "pageUrl": "https://gitpull.cn/post/20260616/",
+        "status": "deleted",
+        "createdAt": 1783224590537,
+        "createdAtIso": "2026-07-05T04:09:50.537Z",
+        "deletedAt": 1783265364747
+      },
+      {
+        "_id": "516f04746a49d8ba0069e2ef487d1d65",
+        "path": "20260617",
+        "nick": "可爱路人甲",
+        "avatar": "badgirl.webp",
+        "contentHtml": "这篇文章让我瞬间回到了大学时代！QQ农场确实是那个年代的社交密码，定闹钟偷菜、帮同学收菜都是满满的回忆。作者把挂机脚本的技术方案讲得很透彻，图像识别判断成熟度这个思路很巧妙，比纯靠定时器靠谱多了。开源项目地址也贴出来了，方便有兴趣的人去学习，赞一个！",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具",
+        "pageUrl": "https://gitpull.cn/post/20260617/",
+        "status": "deleted",
+        "createdAt": 1783224506551,
+        "createdAtIso": "2026-07-05T04:08:26.551Z",
+        "deletedAt": 1783265374107
+      },
+      {
+        "_id": "3acc8db46a49d8620041cf3c0a7bf520",
+        "path": "20260616",
+        "nick": "可爱路人甲",
+        "avatar": "badgirl.webp",
+        "contentHtml": "读完了这篇《海门回声》，被那种静谧又略带忧伤的氛围深深打动。二〇〇三年的海岛夏夜，田埂、蝉鸣、生日蛋糕——这些细节写得特别有画面感，仿佛能闻到海风的味道。邻家酒肆的笔触很细腻，把童年记忆和成年后的回望交织在一起，让人忍不住想起自己那些回不去的夏天。期待系列下一篇！",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "海门回声 | 静谧的生日夜晚",
+        "pageUrl": "https://gitpull.cn/post/20260616/",
+        "status": "deleted",
+        "createdAt": 1783224418505,
+        "createdAtIso": "2026-07-05T04:06:58.505Z",
+        "deletedAt": 1783265371257
+      },
+      {
+        "_id": "3acc8db46a49d8170041cb5042b55493",
+        "path": "20260617",
+        "nick": "可爱路人甲",
+        "avatar": "badgirl.webp",
+        "contentHtml": "哈哈，看到这个工具真是满满的回忆！当年为了偷菜定闹钟半夜爬起来，现在想想真是疯狂。这个一键工具把收菜、种菜、偷菜全自动化了，技术思路很清晰，特别是那个图像识别判断成熟度的方案，比单纯定时靠谱多了。开源精神点赞！",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具",
+        "pageUrl": "https://gitpull.cn/post/20260617/",
+        "status": "deleted",
+        "createdAt": 1783224343518,
+        "createdAtIso": "2026-07-05T04:05:43.518Z",
+        "deletedAt": 1783265382404
+      },
+      {
+        "_id": "516f04746a49d7b40069b552002841d7",
+        "path": "20260618",
+        "nick": "可爱路人甲",
+        "avatar": "badgirl.webp",
+        "contentHtml": "读完这篇文章，心里久久不能平静。黑鬼的故事让我想起每个村庄里那些被边缘化的人——他们活在传闻里，却从未被真正看见。元宵夜那个跟在队伍最后的影子，空着手，没有灯笼，却依然被烟花照亮了一瞬。那一瞬的描写太动人了，他不是凶，不是恶，只是一个人。谢谢作者用这么细腻的笔触，为一个被遗忘的生命留下了印记。",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "评论区",
+        "pageUrl": "",
+        "status": "deleted",
+        "createdAt": 1783224244192,
+        "createdAtIso": "2026-07-05T04:04:04.192Z",
+        "deletedAt": 1783265390419
+      },
+      {
+        "_id": "489876306a49cdf300372e8d4a4d915d",
+        "path": "20260617",
+        "nick": "可爱路人甲",
+        "avatar": "badgirl.webp",
+        "contentHtml": "这篇文章总结得很全面，QQ农场的经典玩法都覆盖到了，满满的回忆！👍",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具",
+        "pageUrl": "https://gitpull.cn/post/20260617/",
+        "status": "deleted",
+        "createdAt": 1783221747244,
+        "createdAtIso": "2026-07-05T03:22:27.244Z",
+        "deletedAt": 1783265398260
+      },
       {
         "_id": "489876306a4936a8002fc1736c237ca4",
         "path": "gitblog-notes-feed",
@@ -522,19 +612,19 @@
   },
   "pageviews": {
     "site": {
-      "pv": 4742,
+      "pv": 4849,
       "uv": 223,
-      "updatedAt": 1783183087720
+      "updatedAt": 1783266909340
     },
-    "total": 79,
+    "total": 80,
     "pages": [
       {
         "path": "/post/20260618",
         "slug": "海门回声-黑鬼",
         "title": "海门回声 | 黑鬼",
-        "pv": 516,
+        "pv": 538,
         "createdAt": 1782386771939,
-        "lastAt": 1783090872862,
+        "lastAt": 1783264392306,
         "importedFrom": "vercount"
       },
       {
@@ -835,6 +925,15 @@
         "importedFrom": "vercount"
       },
       {
+        "path": "/post/20260616",
+        "slug": "海门回声-一个寂静的生日夜晚",
+        "title": "海门回声 | 静谧的生日夜晚",
+        "pv": 483,
+        "createdAt": 1782386686875,
+        "lastAt": 1783264090696,
+        "importedFrom": "vercount"
+      },
+      {
         "path": "/post/20181101",
         "slug": "用回valine评论系统valine评论框样式美化-2d5da13e",
         "title": "用回valine评论系统,valine评论框样式美化",
@@ -871,6 +970,24 @@
         "importedFrom": "vercount"
       },
       {
+        "path": "/post/20260617",
+        "slug": "qq-farm-assistant-经典农场辅助",
+        "title": "QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具",
+        "pv": 479,
+        "createdAt": 1782386771939,
+        "lastAt": 1783264027342,
+        "importedFrom": "vercount"
+      },
+      {
+        "path": "/post/20190605-2",
+        "slug": "记忆的种子·一-c315b081",
+        "title": "记忆的种子·一",
+        "pv": 479,
+        "createdAt": 1782386771939,
+        "lastAt": 1783227946711,
+        "importedFrom": "vercount"
+      },
+      {
         "path": "/post/20181122",
         "slug": "使用腾讯云cdn加速博客-1609338289",
         "title": "使用腾讯云cdn加速博客",
@@ -886,15 +1003,6 @@
         "pv": 478,
         "createdAt": 1782386771939,
         "lastAt": 1782386771939,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20190605-2",
-        "slug": "记忆的种子·一-c315b081",
-        "title": "记忆的种子·一",
-        "pv": 477,
-        "createdAt": 1782386771939,
-        "lastAt": 1782879867178,
         "importedFrom": "vercount"
       },
       {
@@ -925,12 +1033,12 @@
         "importedFrom": "vercount"
       },
       {
-        "path": "/post/20260616",
-        "slug": "海门回声-一个寂静的生日夜晚",
-        "title": "海门回声 | 静谧的生日夜晚",
+        "path": "/post/20190605-3",
+        "slug": "记忆的种子·二-29fe4821",
+        "title": "记忆的种子·二",
         "pv": 474,
-        "createdAt": 1782386686875,
-        "lastAt": 1782918222650,
+        "createdAt": 1782386771939,
+        "lastAt": 1783223841656,
         "importedFrom": "vercount"
       },
       {
@@ -943,12 +1051,12 @@
         "importedFrom": "vercount"
       },
       {
-        "path": "/post/20190605-3",
-        "slug": "记忆的种子·二-29fe4821",
-        "title": "记忆的种子·二",
+        "path": "/post/20190605-4",
+        "slug": "谙风-小城中学-7712d2d6",
+        "title": "谙风 | 小城中学",
         "pv": 473,
         "createdAt": 1782386771939,
-        "lastAt": 1782879916464,
+        "lastAt": 1783224016751,
         "importedFrom": "vercount"
       },
       {
@@ -979,165 +1087,147 @@
         "importedFrom": "vercount"
       },
       {
-        "path": "/post/20190605-4",
-        "slug": "谙风-小城中学-7712d2d6",
-        "title": "谙风 | 小城中学",
-        "pv": 472,
-        "createdAt": 1782386771939,
-        "lastAt": 1782753214622,
-        "importedFrom": "vercount"
-      },
-      {
         "path": "/post/20190605",
         "slug": "生如夏花般绚烂死如秋叶般静美-bcd926d2",
         "title": "生如夏花般绚烂 死如秋叶般静美",
-        "pv": 470,
+        "pv": 471,
         "createdAt": 1782386771939,
-        "lastAt": 1782812315383,
+        "lastAt": 1783223672117,
         "importedFrom": "vercount"
       },
       {
         "path": "/post/20200101",
         "slug": "随笔杂谈-15995658",
         "title": "随笔杂谈",
-        "pv": 469,
+        "pv": 470,
         "createdAt": 1782386771939,
-        "lastAt": 1782795400807,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20260617",
-        "slug": "qq-farm-assistant-经典农场辅助",
-        "title": "QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具",
-        "pv": 467,
-        "createdAt": 1782386771939,
-        "lastAt": 1783183066840,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20220309",
-        "slug": "推荐召回-向量召回之U2I学习总结-15986952",
-        "title": "推荐召回-向量召回之U2I学习总结",
-        "pv": 465,
-        "createdAt": 1782386771939,
-        "lastAt": 1782386771939,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20220310",
-        "slug": "nebula代码走读——从Validator到Executor-15988828",
-        "title": "nebula代码走读——从Validator到Executor",
-        "pv": 464,
-        "createdAt": 1782386771939,
-        "lastAt": 1782386771939,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20220311",
-        "slug": "置顶-nebula-graph-图计算数据库-15993772",
-        "title": "nebula graph 图计算数据库",
-        "pv": 463,
-        "createdAt": 1782386695260,
-        "lastAt": 1782386771939,
+        "lastAt": 1783223629378,
         "importedFrom": "vercount"
       },
       {
         "path": "/post/about",
         "slug": "about",
         "title": "关于小红鸡",
-        "pv": 463,
+        "pv": 466,
         "createdAt": 1782386771939,
-        "lastAt": 1782750222632,
+        "lastAt": 1783263392094,
+        "importedFrom": "vercount"
+      },
+      {
+        "path": "/post/20220309",
+        "slug": "推荐召回-向量召回之U2I学习总结-15986952",
+        "title": "推荐召回-向量召回之U2I学习总结",
+        "pv": 466,
+        "createdAt": 1782386771939,
+        "lastAt": 1783223407184,
         "importedFrom": "vercount"
       },
       {
         "path": "/post/20260615",
         "slug": "用-ai-做好软件项目上下文工程实践指南",
         "title": "用 AI 做好软件项目：上下文工程实践指南",
-        "pv": 462,
+        "pv": 465,
         "createdAt": 1782386771939,
-        "lastAt": 1782465416131,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20260415",
-        "slug": "smallpond-source-walkthrough",
-        "title": "Smallpond 源码走读：DuckDB × 3FS × Ray 是如何拼成一台分布式数据处理机的",
-        "pv": 462,
-        "createdAt": 1782386771939,
-        "lastAt": 1782932757565,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20220312",
-        "slug": "推荐系统——推荐引擎的架构-15996742",
-        "title": "推荐系统——推荐引擎的架构",
-        "pv": 462,
-        "createdAt": 1782386771939,
-        "lastAt": 1782386771939,
+        "lastAt": 1783264199715,
         "importedFrom": "vercount"
       },
       {
         "path": "/post/20260601",
         "slug": "peercache-decentralized-rdma-kv-cache",
         "title": "PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端",
-        "pv": 461,
+        "pv": 465,
         "createdAt": 1782386771939,
-        "lastAt": 1782485687753,
+        "lastAt": 1783264314512,
         "importedFrom": "vercount"
       },
       {
-        "path": "/post/20220313",
-        "slug": "多维数组的索引方案与内存设计-16000038",
-        "title": "多维数组的索引方案与内存设计",
-        "pv": 461,
+        "path": "/post/20220310",
+        "slug": "nebula代码走读——从Validator到Executor-15988828",
+        "title": "nebula代码走读——从Validator到Executor",
+        "pv": 465,
         "createdAt": 1782386771939,
-        "lastAt": 1782386771939,
+        "lastAt": 1783223321239,
+        "importedFrom": "vercount"
+      },
+      {
+        "path": "/post/20220311",
+        "slug": "置顶-nebula-graph-图计算数据库-15993772",
+        "title": "nebula graph 图计算数据库",
+        "pv": 464,
+        "createdAt": 1782386695260,
+        "lastAt": 1783223269618,
+        "importedFrom": "vercount"
+      },
+      {
+        "path": "/post/20260415",
+        "slug": "smallpond-source-walkthrough",
+        "title": "Smallpond 源码走读：DuckDB × 3FS × Ray 是如何拼成一台分布式数据处理机的",
+        "pv": 463,
+        "createdAt": 1782386771939,
+        "lastAt": 1783223011978,
+        "importedFrom": "vercount"
+      },
+      {
+        "path": "/post/20220312",
+        "slug": "推荐系统——推荐引擎的架构-15996742",
+        "title": "推荐系统——推荐引擎的架构",
+        "pv": 463,
+        "createdAt": 1782386771939,
+        "lastAt": 1783223227965,
         "importedFrom": "vercount"
       },
       {
         "path": "/post/20260514",
         "slug": "cpti-love-personality-test-intro",
         "title": "CPTI：手机上就能玩的恋爱人格小测验",
-        "pv": 460,
+        "pv": 462,
         "createdAt": 1782386771939,
-        "lastAt": 1783086696842,
+        "lastAt": 1783228464959,
+        "importedFrom": "vercount"
+      },
+      {
+        "path": "/post/20220313",
+        "slug": "多维数组的索引方案与内存设计-16000038",
+        "title": "多维数组的索引方案与内存设计",
+        "pv": 462,
+        "createdAt": 1782386771939,
+        "lastAt": 1783223157202,
         "importedFrom": "vercount"
       },
       {
         "path": "/post/20260311",
         "slug": "3fs-usrbio-zero-copy",
         "title": "3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的",
-        "pv": 460,
+        "pv": 461,
         "createdAt": 1782386771939,
-        "lastAt": 1782386771939,
+        "lastAt": 1783223054969,
         "importedFrom": "vercount"
       },
       {
         "path": "/post/20260529",
         "slug": "大模型推理的-pd-分离原理动机与-mooncake-的实现",
         "title": "大模型推理的 PD 分离：原理、动机与 Mooncake 的实现",
-        "pv": 458,
+        "pv": 460,
         "createdAt": 1782386771939,
-        "lastAt": 1782444196701,
+        "lastAt": 1783237502090,
         "importedFrom": "vercount"
       },
       {
         "path": "/post/welcome",
         "slug": "welcome",
         "title": "GitBlog：一个带伪后台的博客站点",
-        "pv": 457,
+        "pv": 458,
         "createdAt": 1782386771939,
-        "lastAt": 1782386771939,
+        "lastAt": 1783222839861,
         "importedFrom": "vercount"
       },
       {
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 165,
+        "pv": 195,
         "createdAt": 1782398407892,
-        "lastAt": 1783182993762,
+        "lastAt": 1783266909340,
         "importedFrom": ""
       },
       {
@@ -1168,12 +1258,30 @@
         "importedFrom": ""
       },
       {
+        "path": "/archives.html",
+        "slug": "",
+        "title": "",
+        "pv": 5,
+        "createdAt": 1782892602247,
+        "lastAt": 1783265412604,
+        "importedFrom": ""
+      },
+      {
         "path": "/tools/tool-codec.html",
         "slug": "",
         "title": "",
         "pv": 2,
         "createdAt": 1782683799766,
         "lastAt": 1783159625593,
+        "importedFrom": ""
+      },
+      {
+        "path": "/tools/tool-air-conditioner.html",
+        "slug": "",
+        "title": "",
+        "pv": 2,
+        "createdAt": 1782735289772,
+        "lastAt": 1783202046652,
         "importedFrom": ""
       },
       {
@@ -1192,24 +1300,6 @@
         "pv": 2,
         "createdAt": 1782898301329,
         "lastAt": 1783084740368,
-        "importedFrom": ""
-      },
-      {
-        "path": "/tools/tool-air-conditioner.html",
-        "slug": "",
-        "title": "",
-        "pv": 1,
-        "createdAt": 1782735289772,
-        "lastAt": 1782735289772,
-        "importedFrom": ""
-      },
-      {
-        "path": "/archives.html",
-        "slug": "",
-        "title": "",
-        "pv": 1,
-        "createdAt": 1782892602247,
-        "lastAt": 1782892602247,
         "importedFrom": ""
       },
       {
@@ -1237,6 +1327,15 @@
         "pv": 1,
         "createdAt": 1783115268087,
         "lastAt": 1783115268087,
+        "importedFrom": ""
+      },
+      {
+        "path": "/tools",
+        "slug": "",
+        "title": "",
+        "pv": 1,
+        "createdAt": 1783263390492,
+        "lastAt": 1783263390492,
         "importedFrom": ""
       }
     ]
