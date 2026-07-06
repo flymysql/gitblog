@@ -1,13 +1,178 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-05T17:18:21.400Z",
-  "date": "2026-07-06",
+  "generatedAt": "2026-07-06T18:15:41.961Z",
+  "date": "2026-07-07",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
   "invokeMode": "sdk",
   "comments": {
-    "total": 40,
+    "total": 51,
     "items": [
+      {
+        "_id": "516f04746a4bdbd900a1d4641b56cfa0",
+        "path": "20260618",
+        "nick": "测试用户",
+        "avatar": "netchat-male.webp",
+        "contentHtml": "作者的笔触冷峻而克制，用平静的叙述呈现出沉重的现实与无声的暴力，黑鬼的形象在真假难辨的流言中愈发鲜明，令人读完久久不能平静。",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "海门回声 | 黑鬼",
+        "pageUrl": "https://gitpull.cn/post/20260618/",
+        "status": "visible",
+        "createdAt": 1783356377455,
+        "createdAtIso": "2026-07-06T16:46:17.455Z",
+        "deletedAt": null
+      },
+      {
+        "_id": "3acc8db46a4bc521006869ec528627ef",
+        "path": "20260618",
+        "nick": "测试用户",
+        "avatar": "netchat-male.webp",
+        "contentHtml": "这篇文章让我想起小时候村里也有类似的人，作者用平静的笔触写出了沉重的现实，读完后久久不能平静。",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "海门回声 | 黑鬼",
+        "pageUrl": "https://gitpull.cn/post/20260618/",
+        "status": "visible",
+        "createdAt": 1783350560999,
+        "createdAtIso": "2026-07-06T15:09:20.999Z",
+        "deletedAt": null
+      },
+      {
+        "_id": "516f04746a4bc0fd009f4ad83def3a85",
+        "path": "20260618",
+        "nick": "测试用户",
+        "avatar": "netchat-male.webp",
+        "contentHtml": "自动化测试评论 2026/7/6 22:51:40",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "海门回声 | 黑鬼",
+        "pageUrl": "https://gitpull.cn/post/20260618/",
+        "status": "visible",
+        "createdAt": 1783349501304,
+        "createdAtIso": "2026-07-06T14:51:41.304Z",
+        "deletedAt": null
+      },
+      {
+        "_id": "e50669ab6a4b6ec1016a62530fe6a9d9",
+        "path": "20260618",
+        "nick": "南风过客",
+        "avatar": "simp-male.webp",
+        "contentHtml": "这篇文章写得真好，让人深思。",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "海门回声 | 黑鬼",
+        "pageUrl": "https://gitpull.cn/post/20260618/",
+        "status": "deleted",
+        "createdAt": 1783328449164,
+        "createdAtIso": "2026-07-06T09:00:49.164Z",
+        "deletedAt": 1783328684355
+      },
+      {
+        "_id": "e50669ab6a4b6b6801693cb66d092e48",
+        "path": "20260618",
+        "nick": "南风过客",
+        "avatar": "simp-male.webp",
+        "contentHtml": "这篇文章写得真好，让人深思。",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "海门回声 | 黑鬼",
+        "pageUrl": "https://gitpull.cn/post/20260618/",
+        "status": "deleted",
+        "createdAt": 1783327592448,
+        "createdAtIso": "2026-07-06T08:46:32.448Z",
+        "deletedAt": 1783328687391
+      },
+      {
+        "_id": "3acc8db46a4b688e006029021e360fd0",
+        "path": "20260618",
+        "nick": "南风过客",
+        "avatar": "simp-male.webp",
+        "contentHtml": "这篇文章写得真好，让人深思。",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "海门回声 | 黑鬼",
+        "pageUrl": "https://gitpull.cn/post/20260618/",
+        "status": "deleted",
+        "createdAt": 1783326862646,
+        "createdAtIso": "2026-07-06T08:34:22.646Z",
+        "deletedAt": 1783328689899
+      },
+      {
+        "_id": "516f04746a4b6607009310814c7afd85",
+        "path": "20260618",
+        "nick": "南风过客",
+        "avatar": "simp-male.webp",
+        "contentHtml": "这篇文章写得真好，让人深思。",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "海门回声 | 黑鬼",
+        "pageUrl": "https://gitpull.cn/post/20260618/",
+        "status": "visible",
+        "createdAt": 1783326215008,
+        "createdAtIso": "2026-07-06T08:23:35.008Z",
+        "deletedAt": null
+      },
+      {
+        "_id": "489876306a4b590c004c525f7ecea473",
+        "path": "20190605-3",
+        "nick": "南风过客",
+        "avatar": "simp-male.webp",
+        "contentHtml": "壁炉的暖光，南风岛的旧梦，读着读着就像自己也成了故事里的人。",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "记忆的种子·二",
+        "pageUrl": "https://gitpull.cn/post/20190605-3/",
+        "status": "visible",
+        "createdAt": 1783322892034,
+        "createdAtIso": "2026-07-06T07:28:12.034Z",
+        "deletedAt": null
+      },
+      {
+        "_id": "516f04746a4b4e2b009027c56543600a",
+        "path": "20190605-3",
+        "nick": "随手路人甲",
+        "avatar": "simp-male.webp",
+        "contentHtml": "很喜欢这篇文字，温暖又带着淡淡的惆怅，仿佛也回到了那个南风岛的冬天。",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "记忆的种子·二",
+        "pageUrl": "https://gitpull.cn/post/20190605-3/",
+        "status": "deleted",
+        "createdAt": 1783320107052,
+        "createdAtIso": "2026-07-06T06:41:47.052Z",
+        "deletedAt": 1783328696745
+      },
+      {
+        "_id": "3acc8db46a4b149300589ece288ad9d0",
+        "path": "20190605-2",
+        "nick": "随手路人甲",
+        "avatar": "simp-male.webp",
+        "contentHtml": "这篇小说读来像一场被海雾浸润的梦，挪威峡湾的冷冽与南风岛的温热在你笔下交织成一种独特的时空质感。特别喜欢「记忆的种子」这个意象——林谙的信是那颗种子，而奕在异国海岸边的偶遇则是它发芽的时刻。<br>有几个地方让我反复回味：一是中古店里那两杯咖啡的闲谈，你写得很克制，但那种「似曾相识却想不起来」的钝痛感非常真实——有时候遗忘不是消失，而是记忆换了种方式潜伏。二是坟茔上「海水梦悠悠，君愁我亦愁」的出现，这个呼应太巧妙了，让整篇的结构形成了一个闭环。<br>我想问的是：奕在挪威海边发现林谙的墓碑时，你写她「好像做了一个好久远的梦」——这个梦的意象是重逢还是告别？另外，林谙选择用「时光邮局」在四年后才让信到达，这种延迟的温柔里，你觉得他更希望奕记住他，还是带着这份记忆继续往前走？",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "记忆的种子·一",
+        "pageUrl": "https://gitpull.cn/post/20190605-2/",
+        "status": "deleted",
+        "createdAt": 1783305363329,
+        "createdAtIso": "2026-07-06T02:36:03.329Z",
+        "deletedAt": 1783328701624
+      },
+      {
+        "_id": "3acc8db46a4b1454005897922ec21ec5",
+        "path": "20190605",
+        "nick": "随手路人甲",
+        "avatar": "simp-male.webp",
+        "contentHtml": "读完这篇文章，我感受到一种沉静而深刻的生命体悟。你在葬礼与元宵夜的交织中捕捉到了生命轮回的张力——招魂幡与烟花、坟茔与花生田、啼哭的幼童与已故的老人，这些意象的并置让人想到庄子所说的「方生方死，方死方生」。<br>我想问的是：你提到「生命像一面镜子」，这个比喻很有意思。但镜子只能反射，无法主动创造——你是否认为生命的意义更多在于我们如何「回应」它，而非我们如何「塑造」它？另外，海岛元宵夜的烟花与葬礼的唢呐声在你心中留下的余韵，时隔多年再回看，是更偏向于释然，还是某种难以言说的怅惘？",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "生如夏花般绚烂 死如秋叶般静美",
+        "pageUrl": "https://gitpull.cn/post/20190605/",
+        "status": "visible",
+        "createdAt": 1783305300455,
+        "createdAtIso": "2026-07-06T02:35:00.455Z",
+        "deletedAt": null
+      },
       {
         "_id": "516f04746a49d90e0069e8347ce20ac8",
         "path": "20260616",
@@ -612,19 +777,19 @@
   },
   "pageviews": {
     "site": {
-      "pv": 4849,
+      "pv": 4929,
       "uv": 223,
-      "updatedAt": 1783266909340
+      "updatedAt": 1783356657279
     },
-    "total": 80,
+    "total": 81,
     "pages": [
       {
         "path": "/post/20260618",
         "slug": "海门回声-黑鬼",
         "title": "海门回声 | 黑鬼",
-        "pv": 538,
+        "pv": 572,
         "createdAt": 1782386771939,
-        "lastAt": 1783264392306,
+        "lastAt": 1783356657279,
         "importedFrom": "vercount"
       },
       {
@@ -673,21 +838,21 @@
         "importedFrom": "vercount"
       },
       {
+        "path": "/post/20170612",
+        "slug": "谙风-小城青旅-c54dc801",
+        "title": "谙风 | 小城青旅",
+        "pv": 511,
+        "createdAt": 1782386771939,
+        "lastAt": 1783307279991,
+        "importedFrom": "vercount"
+      },
+      {
         "path": "/post/20170610",
         "slug": "大学生你凭什么创业-560c5cce",
         "title": "大学生，你凭什么创业？",
         "pv": 511,
         "createdAt": 1782386771939,
         "lastAt": 1782386771939,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20170612",
-        "slug": "谙风-小城青旅-c54dc801",
-        "title": "谙风 | 小城青旅",
-        "pv": 510,
-        "createdAt": 1782386771939,
-        "lastAt": 1782753221836,
         "importedFrom": "vercount"
       },
       {
@@ -787,6 +952,15 @@
         "pv": 499,
         "createdAt": 1782386771939,
         "lastAt": 1782386771939,
+        "importedFrom": "vercount"
+      },
+      {
+        "path": "/post/20190605-3",
+        "slug": "记忆的种子·二-29fe4821",
+        "title": "记忆的种子·二",
+        "pv": 498,
+        "createdAt": 1782386771939,
+        "lastAt": 1783324895600,
         "importedFrom": "vercount"
       },
       {
@@ -952,6 +1126,15 @@
         "importedFrom": "vercount"
       },
       {
+        "path": "/post/20190605-2",
+        "slug": "记忆的种子·一-c315b081",
+        "title": "记忆的种子·一",
+        "pv": 481,
+        "createdAt": 1782386771939,
+        "lastAt": 1783305417834,
+        "importedFrom": "vercount"
+      },
+      {
         "path": "/post/20181111",
         "slug": "将公众号文章爬到hexo博客-fb598031",
         "title": "将公众号文章爬到hexo博客",
@@ -976,15 +1159,6 @@
         "pv": 479,
         "createdAt": 1782386771939,
         "lastAt": 1783264027342,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20190605-2",
-        "slug": "记忆的种子·一-c315b081",
-        "title": "记忆的种子·一",
-        "pv": 479,
-        "createdAt": 1782386771939,
-        "lastAt": 1783227946711,
         "importedFrom": "vercount"
       },
       {
@@ -1033,12 +1207,21 @@
         "importedFrom": "vercount"
       },
       {
-        "path": "/post/20190605-3",
-        "slug": "记忆的种子·二-29fe4821",
-        "title": "记忆的种子·二",
+        "path": "/post/20190605",
+        "slug": "生如夏花般绚烂死如秋叶般静美-bcd926d2",
+        "title": "生如夏花般绚烂 死如秋叶般静美",
         "pv": 474,
         "createdAt": 1782386771939,
-        "lastAt": 1783223841656,
+        "lastAt": 1783305350420,
+        "importedFrom": "vercount"
+      },
+      {
+        "path": "/post/20190605-4",
+        "slug": "谙风-小城中学-7712d2d6",
+        "title": "谙风 | 小城中学",
+        "pv": 474,
+        "createdAt": 1782386771939,
+        "lastAt": 1783307281938,
         "importedFrom": "vercount"
       },
       {
@@ -1048,15 +1231,6 @@
         "pv": 474,
         "createdAt": 1782386771939,
         "lastAt": 1782386771939,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20190605-4",
-        "slug": "谙风-小城中学-7712d2d6",
-        "title": "谙风 | 小城中学",
-        "pv": 473,
-        "createdAt": 1782386771939,
-        "lastAt": 1783224016751,
         "importedFrom": "vercount"
       },
       {
@@ -1087,15 +1261,6 @@
         "importedFrom": "vercount"
       },
       {
-        "path": "/post/20190605",
-        "slug": "生如夏花般绚烂死如秋叶般静美-bcd926d2",
-        "title": "生如夏花般绚烂 死如秋叶般静美",
-        "pv": 471,
-        "createdAt": 1782386771939,
-        "lastAt": 1783223672117,
-        "importedFrom": "vercount"
-      },
-      {
         "path": "/post/20200101",
         "slug": "随笔杂谈-15995658",
         "title": "随笔杂谈",
@@ -1108,9 +1273,9 @@
         "path": "/post/about",
         "slug": "about",
         "title": "关于小红鸡",
-        "pv": 466,
+        "pv": 467,
         "createdAt": 1782386771939,
-        "lastAt": 1783263392094,
+        "lastAt": 1783305052205,
         "importedFrom": "vercount"
       },
       {
@@ -1225,9 +1390,9 @@
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 195,
+        "pv": 201,
         "createdAt": 1782398407892,
-        "lastAt": 1783266909340,
+        "lastAt": 1783328707943,
         "importedFrom": ""
       },
       {
@@ -1258,6 +1423,15 @@
         "importedFrom": ""
       },
       {
+        "path": "/tags.html",
+        "slug": "",
+        "title": "",
+        "pv": 5,
+        "createdAt": 1782751848494,
+        "lastAt": 1783307278524,
+        "importedFrom": ""
+      },
+      {
         "path": "/archives.html",
         "slug": "",
         "title": "",
@@ -1267,30 +1441,30 @@
         "importedFrom": ""
       },
       {
+        "path": "/tools/tool-air-conditioner.html",
+        "slug": "",
+        "title": "",
+        "pv": 4,
+        "createdAt": 1782735289772,
+        "lastAt": 1783291703798,
+        "importedFrom": ""
+      },
+      {
+        "path": "/tools",
+        "slug": "",
+        "title": "",
+        "pv": 3,
+        "createdAt": 1783263390492,
+        "lastAt": 1783305050831,
+        "importedFrom": ""
+      },
+      {
         "path": "/tools/tool-codec.html",
         "slug": "",
         "title": "",
         "pv": 2,
         "createdAt": 1782683799766,
         "lastAt": 1783159625593,
-        "importedFrom": ""
-      },
-      {
-        "path": "/tools/tool-air-conditioner.html",
-        "slug": "",
-        "title": "",
-        "pv": 2,
-        "createdAt": 1782735289772,
-        "lastAt": 1783202046652,
-        "importedFrom": ""
-      },
-      {
-        "path": "/tags.html",
-        "slug": "",
-        "title": "",
-        "pv": 2,
-        "createdAt": 1782751848494,
-        "lastAt": 1782753197910,
         "importedFrom": ""
       },
       {
@@ -1330,12 +1504,12 @@
         "importedFrom": ""
       },
       {
-        "path": "/tools",
+        "path": "/tools/tool-age.html",
         "slug": "",
         "title": "",
         "pv": 1,
-        "createdAt": 1783263390492,
-        "lastAt": 1783263390492,
+        "createdAt": 1783278314340,
+        "lastAt": 1783278314340,
         "importedFrom": ""
       }
     ]
