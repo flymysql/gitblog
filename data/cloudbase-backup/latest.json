@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-06T18:15:41.961Z",
-  "date": "2026-07-07",
+  "generatedAt": "2026-07-07T18:05:40.496Z",
+  "date": "2026-07-08",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
   "invokeMode": "sdk",
@@ -18,10 +18,10 @@
         "replyToNick": null,
         "pageTitle": "海门回声 | 黑鬼",
         "pageUrl": "https://gitpull.cn/post/20260618/",
-        "status": "visible",
+        "status": "deleted",
         "createdAt": 1783356377455,
         "createdAtIso": "2026-07-06T16:46:17.455Z",
-        "deletedAt": null
+        "deletedAt": 1783407704840
       },
       {
         "_id": "3acc8db46a4bc521006869ec528627ef",
@@ -33,10 +33,10 @@
         "replyToNick": null,
         "pageTitle": "海门回声 | 黑鬼",
         "pageUrl": "https://gitpull.cn/post/20260618/",
-        "status": "visible",
+        "status": "deleted",
         "createdAt": 1783350560999,
         "createdAtIso": "2026-07-06T15:09:20.999Z",
-        "deletedAt": null
+        "deletedAt": 1783407707804
       },
       {
         "_id": "516f04746a4bc0fd009f4ad83def3a85",
@@ -48,10 +48,10 @@
         "replyToNick": null,
         "pageTitle": "海门回声 | 黑鬼",
         "pageUrl": "https://gitpull.cn/post/20260618/",
-        "status": "visible",
+        "status": "deleted",
         "createdAt": 1783349501304,
         "createdAtIso": "2026-07-06T14:51:41.304Z",
-        "deletedAt": null
+        "deletedAt": 1783407712679
       },
       {
         "_id": "e50669ab6a4b6ec1016a62530fe6a9d9",
@@ -777,9 +777,9 @@
   },
   "pageviews": {
     "site": {
-      "pv": 4929,
+      "pv": 4932,
       "uv": 223,
-      "updatedAt": 1783356657279
+      "updatedAt": 1783444668713
     },
     "total": 81,
     "pages": [
@@ -787,9 +787,9 @@
         "path": "/post/20260618",
         "slug": "海门回声-黑鬼",
         "title": "海门回声 | 黑鬼",
-        "pv": 572,
+        "pv": 574,
         "createdAt": 1782386771939,
-        "lastAt": 1783356657279,
+        "lastAt": 1783444668713,
         "importedFrom": "vercount"
       },
       {
@@ -1390,9 +1390,9 @@
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 201,
+        "pv": 202,
         "createdAt": 1782398407892,
-        "lastAt": 1783328707943,
+        "lastAt": 1783407718419,
         "importedFrom": ""
       },
       {
