@@ -124,7 +124,7 @@ export const CONFIG = {
   },
   theme: {
     default: "auto",
-    preset: "jianshu",
+    preset: "apple",
     allowReaderPresetSwitch: true,
     tokens: {},
     customCss: ""
