@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-08T03:07:02.664Z",
+  "generatedAt": "2026-07-08T03:13:53.607Z",
   "date": "2026-07-08",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
@@ -777,9 +777,9 @@
   },
   "pageviews": {
     "site": {
-      "pv": 4938,
+      "pv": 4943,
       "uv": 223,
-      "updatedAt": 1783454608503
+      "updatedAt": 1783480144997
     },
     "total": 81,
     "pages": [
@@ -787,9 +787,9 @@
         "path": "/post/20260618",
         "slug": "海门回声-黑鬼",
         "title": "海门回声 | 黑鬼",
-        "pv": 574,
+        "pv": 575,
         "createdAt": 1782386771939,
-        "lastAt": 1783444668713,
+        "lastAt": 1783480113428,
         "importedFrom": "vercount"
       },
       {
@@ -1390,18 +1390,18 @@
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 208,
+        "pv": 210,
         "createdAt": 1782398407892,
-        "lastAt": 1783454608503,
+        "lastAt": 1783480144997,
         "importedFrom": ""
       },
       {
         "path": "/series.html",
         "slug": "",
         "title": "",
-        "pv": 11,
+        "pv": 12,
         "createdAt": 1782465476839,
-        "lastAt": 1782918183526,
+        "lastAt": 1783480096219,
         "importedFrom": ""
       },
       {
@@ -1411,6 +1411,15 @@
         "pv": 7,
         "createdAt": 1782386660084,
         "lastAt": 1783063825234,
+        "importedFrom": ""
+      },
+      {
+        "path": "/archives.html",
+        "slug": "",
+        "title": "",
+        "pv": 6,
+        "createdAt": 1782892602247,
+        "lastAt": 1783480094310,
         "importedFrom": ""
       },
       {
@@ -1429,15 +1438,6 @@
         "pv": 5,
         "createdAt": 1782751848494,
         "lastAt": 1783307278524,
-        "importedFrom": ""
-      },
-      {
-        "path": "/archives.html",
-        "slug": "",
-        "title": "",
-        "pv": 5,
-        "createdAt": 1782892602247,
-        "lastAt": 1783265412604,
         "importedFrom": ""
       },
       {
