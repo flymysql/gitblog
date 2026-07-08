@@ -16,14 +16,14 @@
 
 .admin-sidebar {
   background: var(--bg-elev);
-  border-right: 1px solid var(--border);
+  border-right: 1px solid transparent;
   display: flex;
   flex-direction: column;
   position: sticky;
   top: 0;
   height: 100vh;
-  padding: 22px 14px 18px;
-  gap: 8px;
+  padding: 24px 14px 20px;
+  gap: 6px;
 }
 
 .admin-sidebar-top {
@@ -78,9 +78,10 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
-  border-radius: 8px;
+  padding: 11px 14px;
+  border-radius: 10px;
   font-size: 14px;
+  font-weight: 500;
   color: var(--text-secondary);
   background: transparent;
   border: none;
@@ -88,7 +89,8 @@
   width: 100%;
   text-align: left;
   font: inherit;
-  transition: background 0.15s, color 0.15s;
+  letter-spacing: -0.01em;
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .admin-nav-item:hover {
   background: var(--bg-soft);
@@ -143,7 +145,9 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--bg-elev);
+  background: var(--nav-bg);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -179,10 +183,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 10px 4px 4px;
+  padding: 4px 14px 4px 4px;
   border-radius: 999px;
   background: var(--bg-soft);
+  transition: all 0.2s ease;
 }
+.admin-user:hover { background: var(--border); }
 .admin-user-avatar {
   width: 28px;
   height: 28px;
@@ -225,6 +231,10 @@
 
 @media (max-width: 880px) {
   .admin-shell { grid-template-columns: 1fr; }
+  .admin-sidebar {
+    border-radius: 0 20px 20px 0;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 16px 48px rgba(0,0,0,0.2);
+  }
   .admin-sidebar {
     position: fixed;
     top: 0;
@@ -1903,15 +1913,18 @@ html[data-mode="dark"] .studio-foot-btn-ai {
 
 .settings-card {
   background: var(--bg-elev);
-  border-radius: 10px;
-  box-shadow: var(--shadow);
-  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  border: 1px solid var(--border);
+  padding: 24px;
 }
 
 .settings-card h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 14px;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+  color: var(--text-main);
 }
 
 .settings-help {
@@ -2191,9 +2204,14 @@ html[data-mode="dark"] .studio-foot-btn-ai {
 .image-card {
   background: var(--bg-elev);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: var(--shadow);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.image-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
 }
 .image-card img {
   width: 100%;
@@ -2363,27 +2381,30 @@ html[data-mode="dark"] .studio-foot-btn-ai {
   margin-bottom: 16px;
 }
 .dashboard-card {
-  background: var(--bg-secondary);
+  background: var(--bg-elev);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 14px;
+  border-radius: 16px;
+  padding: 22px 18px;
   text-align: center;
-  transition: transform 0.18s, box-shadow 0.18s;
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .dashboard-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
 }
 .dashboard-num {
-  font-size: 26px;
+  font-size: 30px;
   font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--primary);
   line-height: 1.1;
 }
 .dashboard-label {
-  margin-top: 4px;
-  font-size: 12px;
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
   color: var(--text-tertiary);
+  letter-spacing: -0.01em;
 }
 .dashboard-pv {
   background: var(--bg);
