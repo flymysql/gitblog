@@ -7,16 +7,17 @@
 /* ---------- Hero ---------- */
 .hero {
   max-width: var(--content-max);
-  margin: 28px auto 0;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, rgba(234, 111, 90, 0.08), rgba(234, 111, 90, 0.02));
+  margin: 32px auto 0;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(234, 111, 90, 0.06), rgba(234, 111, 90, 0.02), rgba(0, 113, 227, 0.03));
   overflow: hidden;
-  transition: box-shadow 0.2s, transform 0.2s;
+  border: 1px solid var(--border);
+  transition: box-shadow 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
-.hero:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+.hero:hover { box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06); transform: translateY(-2px); }
 
 [data-theme="dark"] .hero {
-  background: linear-gradient(135deg, rgba(234, 111, 90, 0.12), rgba(234, 111, 90, 0.04));
+  background: linear-gradient(135deg, rgba(234, 111, 90, 0.06), rgba(234, 111, 90, 0.02), rgba(41, 151, 255, 0.04));
 }
 
 /* 让整块 hero 可点击跳转到关于页 */
@@ -572,13 +573,14 @@
 .post-item {
   display: flex;
   gap: 22px;
-  padding: 20px 4px;
+  padding: 20px 16px;
   border-bottom: 1px solid var(--border);
-  transition: background 0.15s;
-  border-radius: 8px;
+  transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+  border-radius: 14px;
+  margin: 0 -16px;
 }
 
-.post-item:hover { background: var(--bg-soft); padding-left: 12px; padding-right: 12px; }
+.post-item:hover { background: var(--bg-soft); transform: translateY(-1px); box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
 
 .post-content { flex: 1; min-width: 0; }
 
@@ -742,11 +744,11 @@
 }
 
 .post-thumbnail {
-  width: 160px;
+  width: 168px;
   aspect-ratio: 16 / 10;
   flex-shrink: 0;
   background: var(--bg-soft);
-  border-radius: var(--radius);
+  border-radius: 12px;
   overflow: hidden;
 }
 .post-thumbnail img {

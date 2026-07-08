@@ -14,6 +14,7 @@ const KEY_MODE = 'blog_theme';     // 兼容旧 key：'auto' | 'light' | 'dark'
 const KEY_PRESET = 'blog_preset';
 
 export const PRESETS = [
+  { id: 'apple',     name: 'Apple',     primary: '#0071E3', bg: '#FBFBFD', darkBg: '#000000', tag: 'SF / San Francisco' },
   { id: 'jianshu',   name: '简书暖橘',  primary: '#EA6F5A', bg: '#FFFFFF', darkBg: '#131316', tag: '默认 / 适合写作' },
   { id: 'github',    name: 'GitHub',    primary: '#0969DA', bg: '#FFFFFF', darkBg: '#0D1117', tag: '冷静 / 文档风' },
   { id: 'solarized', name: 'Solarized', primary: '#CB4B16', bg: '#FDF6E3', darkBg: '#002B36', tag: '低对比 / 护眼' },

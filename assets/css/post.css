@@ -7,7 +7,7 @@
 .article-layout {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 36px 24px 80px;
+  padding: 48px 24px 80px;
   display: grid;
   /* minmax(0, 1fr) 而不是 1fr：grid 默认 1fr = minmax(auto, 1fr)，
      超长内容（长链接 / 长公式 / 代码块）会把列撑到视口之外，必须用 minmax(0, ...) 兜底 */
@@ -46,13 +46,13 @@
 .article-tags-top .tag { font-size: 12px; }
 
 .article-title {
-  font-size: 32px;
+  font-size: 36px;
   font-weight: 800;
-  line-height: 1.35;
+  line-height: 1.2;
   color: var(--text-main);
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   word-break: break-word;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .article-author {
@@ -99,8 +99,9 @@
 
 /* ---------- 正文排版 ---------- */
 .article-body {
-  font-size: 16px;
-  line-height: 1.85;
+  font-size: 17px;
+  line-height: 1.75;
+  letter-spacing: -0.003em;
   color: var(--text-main);
   word-break: break-word;
   /* 防止移动端 shrink-to-fit：所有内容必须收在视口内 */
@@ -143,14 +144,15 @@
 .article-body h3,
 .article-body h4 {
   font-weight: 700;
-  line-height: 1.4;
-  margin: 30px 0 14px;
-  scroll-margin-top: calc(var(--nav-height) + 20px);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin: 36px 0 16px;
+  scroll-margin-top: calc(var(--nav-height) + 24px);
 }
-.article-body h1 { font-size: 26px; }
-.article-body h2 { font-size: 22px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-.article-body h3 { font-size: 18px; }
-.article-body h4 { font-size: 16px; }
+.article-body h1 { font-size: 28px; }
+.article-body h2 { font-size: 23px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.article-body h3 { font-size: 19px; }
+.article-body h4 { font-size: 17px; }
 .article-body p { margin: 14px 0; }
 .article-body a { color: var(--primary); border-bottom: 1px solid rgba(234, 111, 90, 0.3); }
 .article-body a:hover { border-bottom-color: var(--primary); }
