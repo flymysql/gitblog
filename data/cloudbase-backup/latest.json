@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-07T18:05:40.496Z",
+  "generatedAt": "2026-07-08T03:07:02.664Z",
   "date": "2026-07-08",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
@@ -777,9 +777,9 @@
   },
   "pageviews": {
     "site": {
-      "pv": 4932,
+      "pv": 4938,
       "uv": 223,
-      "updatedAt": 1783444668713
+      "updatedAt": 1783454608503
     },
     "total": 81,
     "pages": [
@@ -1390,9 +1390,9 @@
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 202,
+        "pv": 208,
         "createdAt": 1782398407892,
-        "lastAt": 1783407718419,
+        "lastAt": 1783454608503,
         "importedFrom": ""
       },
       {
