@@ -20,7 +20,6 @@ import { buildAllThumbnails, thumbPathFor } from './thumbnail-lib.mjs';
 import { majorQuizOgSvg } from './tool-og.mjs';
 import {
   parseSeoFromConfig,
-  buildVerificationMetaHtml,
   buildWebsiteJsonLd,
   ensureIndexNowKeyFile,
   pushIndexNow,
@@ -367,7 +366,7 @@ const searchDocs = [...visiblePosts, ...pages.filter(p => !p.draft)].map(p => {
     tags: p.tags || [],
     date: p.date,
     type: p.page ? 'page' : 'post',
-    text: text.length > 1500 ? text.slice(0, 1500) : text,
+    text: text.length > 500 ? text.slice(0, 500) : text,
   };
 });
 writeFileSync('data/search.json', JSON.stringify({
@@ -462,6 +461,17 @@ const manifest = {
   lang: SITE_LOCALE,
   icons: [
     {
+      src: 'assets/icon-192.png',
+      sizes: '192x192',
+      type: 'image/png',
+    },
+    {
+      src: 'assets/icon-512.png',
+      sizes: '512x512',
+      type: 'image/png',
+      purpose: 'any maskable',
+    },
+    {
       src: 'assets/icon.svg',
       sizes: 'any',
       type: 'image/svg+xml',
@@ -469,13 +479,30 @@ const manifest = {
     },
   ],
 };
+
+// 从 SVG 生成 PWA PNG 图标（iOS/macOS 不支持 SVG 应用图标）
+(async () => {
+  try {
+    await sharp('assets/icon.svg').resize(192, 192).png().toFile('assets/icon-192.png');
+    await sharp('assets/icon.svg').resize(512, 512).png().toFile('assets/icon-512.png');
+    console.log('PWA PNG 图标已生成');
+  } catch (e) {
+    console.warn('PWA PNG 图标生成失败（无 sharp 或 SVG 不存在）:', e.message);
+  }
+})();
+
 writeFileSync('manifest.webmanifest', JSON.stringify(manifest, null, 2) + '\n');
 console.log('manifest.webmanifest 已生成');
 
 // ---------- rss.xml ----------
 function escCdata(s) { return String(s == null ? '' : s).replace(/]]>/g, ']]]]><![CDATA[>'); }
 
-const rssItems = visiblePosts.slice(0, 30).map(p => `    <item>
+const rssItems = visiblePosts.slice(0, 30).map(p => {
+    const fullText = plainTextFor(p.content || '');
+    const coverUrl = p.cover
+      ? (p.cover.startsWith('http') ? p.cover : `${SITE_ORIGIN}${SITE_PATH_PREFIX}/${p.cover.replace(/^\//, '')}`)
+      : '';
+    return `    <item>
       <title>${xmlEsc(p.title)}</title>
       <link>${xmlEsc(postPublicAbsUrl(p))}</link>
       <guid isPermaLink="false">${xmlEsc(p.slug)}</guid>
@@ -483,10 +510,12 @@ const rssItems = visiblePosts.slice(0, 30).map(p => `    <item>
       <author>${xmlEsc(p.author || SITE_AUTHOR)}</author>
       ${(p.tags || []).map(t => `<category>${xmlEsc(t)}</category>`).join('')}
       <description><![CDATA[${escCdata(p.summary || '')}]]></description>
-    </item>`).join('\n');
+      <content:encoded><![CDATA[${escCdata(fullText)}]]></content:encoded>${coverUrl ? `\n      <media:thumbnail url="${xmlEsc(coverUrl)}" />` : ''}
+    </item>`;
+  }).join('\n');
 
 const rss = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
     <title>${xmlEsc(SITE_TITLE)}</title>
     <link>${xmlEsc(baseUrl + '/')}</link>
@@ -618,6 +647,8 @@ function writeRootPostHtmlRedirect(entries) {
     (m) => m.replace(/\?v=[^"'\s>]+/, `?v=${BUILD_VERSION}`),
   );
   html = html.replace(/\n?\s*<script data-post-slug-redirect>[\s\S]*?<\/script>/g, '');
+  // 清理历史累积的 CloudBase beacon 标签，避免重复
+  html = html.replace(/\s*<link rel="(?:dns-prefetch|preconnect|prefetch)" href="[^"]*tcloudbaseapp[^"]*"(?: crossorigin)?(?: as="[^"]*")?>\s*/gi, '\n');
   html = html.replace(
     /(<meta name="referrer" content="no-referrer-when-downgrade">)/,
     (m) => {
@@ -723,13 +754,10 @@ function injectHomeSeo() {
   const homeUrl = baseUrl + '/';
   const homeTitle = SITE_SUBTITLE ? `${SITE_TITLE} · ${SITE_SUBTITLE}` : SITE_TITLE;
   const ogImage = SITE_AVATAR || SITE_LOGO || '';
-  const seo = parseSeoFromConfig(cfgRaw);
-  const verifyMeta = buildVerificationMetaHtml(seo);
   const homeMeta = [
     `<meta name="description" content="${xmlEsc(SITE_DESC || SITE_SUBTITLE || SITE_TITLE)}">`,
     `<meta name="author" content="${xmlEsc(SITE_AUTHOR)}">`,
     `<meta name="robots" content="index, follow">`,
-    verifyMeta,
     `<meta property="og:title" content="${xmlEsc(SITE_TITLE)}">`,
     `<meta property="og:description" content="${xmlEsc(SITE_DESC || SITE_SUBTITLE || '')}">`,
     ogImage ? `<meta property="og:image" content="${xmlEsc(ogImage)}">` : '',
@@ -760,6 +788,9 @@ function injectHomeSeo() {
     logo: SITE_LOGO || SITE_AVATAR || undefined,
   });
   const jsonLd = `<script type="application/ld+json">${JSON.stringify(websiteLd)}</script>\n  <script type="application/ld+json">${JSON.stringify(orgLd)}</script>`;
+
+  // 清理历史累积的 CloudBase beacon 标签，避免重复
+  html = html.replace(/\s*<link rel="(?:dns-prefetch|preconnect|prefetch)" href="[^"]*tcloudbaseapp[^"]*"(?: crossorigin)?(?: as="[^"]*")?>\s*/gi, '\n');
 
   html = html.replace(/<meta name="referrer" content="no-referrer-when-downgrade">/, (m) => {
     const pvHints = buildPvBeaconHeadTags();
