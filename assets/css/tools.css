@@ -18,10 +18,10 @@
   border: 1px solid var(--border);
   border-radius: 24px;
   background:
-    radial-gradient(circle at 20% 0%, rgba(0, 113, 227, 0.12), transparent 40%),
-    radial-gradient(circle at 80% 100%, rgba(0, 113, 227, 0.06), transparent 40%),
+    radial-gradient(circle at 16% 12%, rgba(117, 211, 255, 0.28), transparent 28%),
+    radial-gradient(circle at 92% 0%, rgba(234, 111, 90, 0.16), transparent 30%),
     linear-gradient(135deg, var(--bg-elev), var(--bg-soft));
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
+  box-shadow: var(--shadow);
 }
 
 .tools-hero {
@@ -67,36 +67,34 @@
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 14px;
-  padding: 20px;
+  padding: 18px;
   color: var(--text-main);
   text-decoration: none;
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 18px;
   background: var(--bg-elev);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  box-shadow: var(--shadow);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
 }
 
 .tool-card:hover {
   transform: translateY(-2px);
   border-color: color-mix(in srgb, var(--primary), var(--border) 45%);
-  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-strong);
 }
 
 .tool-icon {
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
   border-radius: 16px;
   color: #fff;
-  background: linear-gradient(135deg, #0071E3, #40A9FF);
+  background: linear-gradient(135deg, #55c9ff, #69a7ff);
   font-size: 24px;
-  box-shadow: 0 4px 12px rgba(0,113,227,0.25);
 }
 .tool-icon.icon-heart {
-  background: linear-gradient(135deg, #FF375F, #FF6482);
-  box-shadow: 0 4px 12px rgba(255,55,95,0.25);
+  background: linear-gradient(135deg, #ff8aa1, #ff5d8f);
 }
 
 .tool-meta {
