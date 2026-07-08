@@ -437,6 +437,8 @@ export async function buildPrerenderedPostHtml({
     `$1\n  ${metaHead}`
   );
 
+  // 清理历史累积的 CloudBase beacon 标签，避免重复
+  html = html.replace(/\s*<link rel="(?:dns-prefetch|preconnect|prefetch)" href="[^"]*tcloudbaseapp[^"]*"(?: crossorigin)?(?: as="[^"]*")?>\s*/gi, '\n');
   const pvHints = buildPvBeaconHeadTags();
   if (pvHints) {
     html = html.replace(

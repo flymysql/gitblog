@@ -32,9 +32,6 @@ export function parseSeoFromConfig(cfgRaw = '') {
     return m[1] === 'true';
   }
   return {
-    baiduSiteVerification: nestedStr('seo', 'baiduSiteVerification'),
-    googleSiteVerification: nestedStr('seo', 'googleSiteVerification'),
-    bingSiteVerification: nestedStr('seo', 'bingSiteVerification'),
     indexNowEnabled: nestedBool(['seo', 'indexNow', 'enabled'], false),
     indexNowKey: nestedStr('seo', 'indexNow', 'key'),
     indexNowPushOnBuild: nestedBool(['seo', 'indexNow', 'pushOnBuild'], true),
@@ -42,17 +39,6 @@ export function parseSeoFromConfig(cfgRaw = '') {
     baiduPushSite: nestedStr('seo', 'baiduPush', 'site'),
     baiduPushToken: nestedStr('seo', 'baiduPush', 'token'),
   };
-}
-
-export function buildVerificationMetaHtml(seo = {}) {
-  const lines = [];
-  const baidu = String(seo.baiduSiteVerification || '').trim();
-  const google = String(seo.googleSiteVerification || '').trim();
-  const bing = String(seo.bingSiteVerification || '').trim();
-  if (baidu) lines.push(`<meta name="baidu-site-verification" content="${xmlEsc(baidu)}">`);
-  if (google) lines.push(`<meta name="google-site-verification" content="${xmlEsc(google)}">`);
-  if (bing) lines.push(`<meta name="msvalidate.01" content="${xmlEsc(bing)}">`);
-  return lines.join('\n  ');
 }
 
 export function buildWebsiteJsonLd({
@@ -163,14 +149,6 @@ function stripUndefined(value) {
     return out;
   }
   return value;
-}
-
-function xmlEsc(s) {
-  return String(s || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 }
 
 export function readConfigRaw() {
