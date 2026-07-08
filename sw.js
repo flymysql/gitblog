@@ -16,6 +16,7 @@ const PRECACHE_ASSETS = [
   'assets/dist/home.min.css?v=20260627010000',
   'assets/dist/post.min.css?v=20260627010000',
   'assets/dist/tools.min.css?v=20260627010000',
+  'assets/dist/admin.min.css?v=20260627010000',
   'assets/dist/home.min.js?v=20260627010000',
   'assets/dist/post.min.js?v=20260627010000',
   'assets/dist/tags.min.js?v=20260627010000',
@@ -23,6 +24,17 @@ const PRECACHE_ASSETS = [
   'assets/dist/series.min.js?v=20260627010000',
   'assets/dist/notes.min.js?v=20260627010000',
   'assets/dist/tools.min.js?v=20260627010000',
+  'assets/dist/tool-age.min.js?v=20260627010000',
+  'assets/dist/tool-fortune.min.js?v=20260627010000',
+  'assets/dist/tool-json.min.js?v=20260627010000',
+  'assets/dist/tool-codec.min.js?v=20260627010000',
+  'assets/dist/tool-timestamp.min.js?v=20260627010000',
+  'assets/dist/tool-regex.min.js?v=20260627010000',
+  'assets/dist/tool-qrcode.min.js?v=20260627010000',
+  'assets/dist/tool-image.min.js?v=20260627010000',
+  'assets/dist/tool-network.min.js?v=20260627010000',
+  'assets/dist/tool-farm-seed.min.js?v=20260627010000',
+  'assets/dist/tool-major.min.js?v=20260627010000',
 ];
 
 // 安装阶段预缓存关键文件，确保彻底离线也能至少打开首页和 offline.html
