@@ -282,13 +282,36 @@ input, textarea {
   font-family: inherit;
   font-size: inherit;
   color: inherit;
-  outline: none;
   border: none;
   background: transparent;
+}
+input:not(:focus-visible):not(:focus), textarea:not(:focus-visible):not(:focus) {
+  outline: none;
 }
 
 ::selection { background: var(--primary); color: #fff; }
 mark { background: var(--highlight); color: var(--text-main); padding: 0 2px; border-radius: 2px; }
+
+/* ---------- 跳过导航（辅助功能） ---------- */
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 200;
+  padding: 10px 18px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 0 0 8px 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+.skip-to-content:focus {
+  top: 0;
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
 
 /* ---------- 顶部导航 ---------- */
 #site-nav {

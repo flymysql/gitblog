@@ -169,6 +169,8 @@ body{padding-top:var(--nav-height)}
   <meta name="theme-color" content="#ea6f5a">
   <link rel="apple-touch-icon" href="assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
     <meta name="author" content="Jimmy">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="小红鸡">
@@ -187,6 +189,7 @@ body{padding-top:var(--nav-height)}
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"小红鸡","url":"https://gitpull.cn/","logo":"/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}</script>
 </head>
 <body>
+  <a href="#main-content" class="skip-to-content">跳到内容</a>
   <div id="site-nav">
     <nav class="nav">
       <div class="nav-inner">
@@ -353,7 +356,7 @@ body{padding-top:var(--nav-height)}
     </div>
   </section>
 
-  <main class="layout">
+  <main class="layout" id="main-content">
     <section>
       <div class="tabs">
         <div class="tab active" data-tab="latest">最新</div>

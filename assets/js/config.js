@@ -82,9 +82,6 @@ export const CONFIG = {
     snippet: ""
   },
   seo: {
-    baiduSiteVerification: "",
-    googleSiteVerification: "",
-    bingSiteVerification: "",
     indexNow: {
       enabled: true,
       key: "4cd0a29d6359468ca640b007fb224b3d",
