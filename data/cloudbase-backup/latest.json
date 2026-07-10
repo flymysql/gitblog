@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-09T18:02:17.573Z",
-  "date": "2026-07-10",
+  "generatedAt": "2026-07-10T17:51:40.177Z",
+  "date": "2026-07-11",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
   "invokeMode": "sdk",
@@ -18,10 +18,10 @@
         "replyToNick": null,
         "pageTitle": "海门回声 | 静谧的生日夜晚",
         "pageUrl": "https://gitpull.cn/post/20260616/",
-        "status": "visible",
+        "status": "deleted",
         "createdAt": 1783528965100,
         "createdAtIso": "2026-07-08T16:42:45.100Z",
-        "deletedAt": null
+        "deletedAt": 1783650554984
       },
       {
         "_id": "793cc0f86a4e7a350044261a4492b86e",
@@ -33,10 +33,10 @@
         "replyToNick": null,
         "pageTitle": "海门回声 | 静谧的生日夜晚",
         "pageUrl": "https://gitpull.cn/post/20260616/",
-        "status": "visible",
+        "status": "deleted",
         "createdAt": 1783527989517,
         "createdAtIso": "2026-07-08T16:26:29.517Z",
-        "deletedAt": null
+        "deletedAt": 1783650557274
       },
       {
         "_id": "5d83e1c36a4e76de00a7abbc0d0a96fb",
@@ -48,10 +48,10 @@
         "replyToNick": null,
         "pageTitle": "海门回声 | 静谧的生日夜晚",
         "pageUrl": "https://gitpull.cn/post/20260616/",
-        "status": "visible",
+        "status": "deleted",
         "createdAt": 1783527134779,
         "createdAtIso": "2026-07-08T16:12:14.779Z",
-        "deletedAt": null
+        "deletedAt": 1783650568444
       },
       {
         "_id": "5d83e1c36a4e5d1c009ea6c24baf4350",
@@ -63,10 +63,10 @@
         "replyToNick": null,
         "pageTitle": "海门回声 | 黑鬼",
         "pageUrl": "https://gitpull.cn/post/20260618/",
-        "status": "visible",
+        "status": "deleted",
         "createdAt": 1783520540442,
         "createdAtIso": "2026-07-08T14:22:20.442Z",
-        "deletedAt": null
+        "deletedAt": 1783650571360
       },
       {
         "_id": "793cc0f86a4e5908003f7d7e4bbe3b3f",
@@ -78,10 +78,10 @@
         "replyToNick": null,
         "pageTitle": "海门回声 | 黑鬼",
         "pageUrl": "https://gitpull.cn/post/20260618/",
-        "status": "visible",
+        "status": "deleted",
         "createdAt": 1783519496646,
         "createdAtIso": "2026-07-08T14:04:56.646Z",
-        "deletedAt": null
+        "deletedAt": 1783650574022
       },
       {
         "_id": "82550e0d6a4e156c000dc18b485269aa",
@@ -93,10 +93,10 @@
         "replyToNick": null,
         "pageTitle": "海门回声 | 黑鬼",
         "pageUrl": "https://gitpull.cn/post/20260618/",
-        "status": "visible",
+        "status": "deleted",
         "createdAt": 1783502188444,
         "createdAtIso": "2026-07-08T09:16:28.444Z",
-        "deletedAt": null
+        "deletedAt": 1783650577973
       },
       {
         "_id": "00dd74516a4e153f00139a0b5dbe58e9",
@@ -108,10 +108,10 @@
         "replyToNick": null,
         "pageTitle": "海门回声 | 黑鬼",
         "pageUrl": "https://gitpull.cn/post/20260618/",
-        "status": "visible",
+        "status": "deleted",
         "createdAt": 1783502143485,
         "createdAtIso": "2026-07-08T09:15:43.485Z",
-        "deletedAt": null
+        "deletedAt": 1783650581284
       },
       {
         "_id": "793cc0f86a4e15050035716512a62259",
@@ -897,9 +897,9 @@
   },
   "pageviews": {
     "site": {
-      "pv": 5014,
+      "pv": 5020,
       "uv": 223,
-      "updatedAt": 1783616191450
+      "updatedAt": 1783670037574
     },
     "total": 81,
     "pages": [
@@ -907,9 +907,9 @@
         "path": "/post/20260618",
         "slug": "海门回声-黑鬼",
         "title": "海门回声 | 黑鬼",
-        "pv": 621,
+        "pv": 623,
         "createdAt": 1782386771939,
-        "lastAt": 1783565825829,
+        "lastAt": 1783670037574,
         "importedFrom": "vercount"
       },
       {
@@ -1510,9 +1510,9 @@
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 218,
+        "pv": 222,
         "createdAt": 1782398407892,
-        "lastAt": 1783616191450,
+        "lastAt": 1783666856960,
         "importedFrom": ""
       },
       {
