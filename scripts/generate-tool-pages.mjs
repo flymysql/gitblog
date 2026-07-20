@@ -15,17 +15,21 @@ const TOOLS_DIR = 'tools';
 
 mkdirSync(TOOLS_DIR, { recursive: true });
 
+/** 旧根路径兼容跳转页：给浏览器用，并明确告诉爬虫勿索引（规范 URL 在 tools/ 下） */
 function writeRedirect(file, target) {
+  const rel = String(target || '').replace(/^\//, '');
+  const abs = SITE_URL ? `${SITE_URL}/${rel}` : `/${rel}`;
   writeFileSync(file, `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0;url=${target}">
-  <link rel="canonical" href="${target}">
+  <meta name="robots" content="noindex, follow">
+  <meta http-equiv="refresh" content="0;url=${abs}">
+  <link rel="canonical" href="${abs}">
   <title>跳转中…</title>
-  <script>location.replace('${target}');</script>
+  <script>location.replace(${JSON.stringify(abs)});</script>
 </head>
-<body><p>正在跳转到 <a href="${target}">新地址</a>…</p></body>
+<body><p>正在跳转到 <a href="${abs}">新地址</a>…</p></body>
 </html>
 `);
 }

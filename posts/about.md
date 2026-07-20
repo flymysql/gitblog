@@ -20,8 +20,8 @@ summary: 关于这个博客和写它的人 —— 一名做系统软件的程序
 
 我是一名已经工作的程序员，一直在做 **系统软件**。这几年方向慢慢挪到了 **大模型推理基础设施** 与 **分布式存储** 上——说白了，就是 LLM 推理系统底下那一摊"数据怎么存、怎么搬、怎么复用"的活。最近在折腾的大致是这些：
 
-- **KV 缓存与零拷贝传输**：HiCache 的 L3 存储后端、RDMA 单边 READ、PD 分离场景下的 KV 复用。我自己写了一个去中心化的 RDMA 零拷贝 KV 缓存后端 [PeerCache](/post.html?slug=peercache-decentralized-rdma-kv-cache)，也专门拆过 [PD 分离与 Mooncake 的实现](/post.html?slug=大模型推理的-pd-分离原理动机与-mooncake-的实现)；
-- **高性能分布式存储 / 数据处理**：研究过 [3FS 是怎么用 USRBIO 把吞吐推到 6.6 TiB/s 的](/post.html?slug=3fs-usrbio-zero-copy)，也走读过 [smallpond（DuckDB × 3FS × Ray）的源码](/post.html?slug=smallpond-source-walkthrough)；
+- **KV 缓存与零拷贝传输**：HiCache 的 L3 存储后端、RDMA 单边 READ、PD 分离场景下的 KV 复用。我自己写了一个去中心化的 RDMA 零拷贝 KV 缓存后端 [PeerCache](/post/20260601/)，也专门拆过 [PD 分离与 Mooncake 的实现](/post/20260529/)；
+- **高性能分布式存储 / 数据处理**：研究过 [3FS 是怎么用 USRBIO 把吞吐推到 6.6 TiB/s 的](/post/20260311/)，也走读过 [smallpond（DuckDB × 3FS × Ray）的源码](/post/20260415/)；
 - **更早一些**，在 **图数据库 / 查询引擎** 上待过：从 Nebula Graph 的源码走读到查询执行的一些理解；也做过 **推荐系统** 的召回与架构。
 
 把这几样串起来，其实是同一条主线：**查询 / 请求的解析与计划、存储层与数据布局、分布式系统里那些老问题（分片、调度、副本、一致性），再加上把每一次数据拷贝都抠掉的执着。**

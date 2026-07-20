@@ -78,6 +78,26 @@ function absolutePublicUrl(url, sitePathPrefix, siteOrigin) {
   return `${origin}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
+/** 预渲染正文：把 post.html?slug= 改成规范 /post/{urlKey}/，避免爬虫跟进客户端跳转页 */
+export function rewriteLegacyPostLinksInHtml(html, resolvePostPath, siteOrigin = '') {
+  if (!html || typeof resolvePostPath !== 'function') return html;
+  const base = String(siteOrigin || 'https://example.com').replace(/\/+$/, '') + '/';
+  const $ = loadHtml(`<div id="__legacy_wrap">${html}</div>`);
+  $('#__legacy_wrap a[href]').each((_, el) => {
+    const href = $(el).attr('href') || '';
+    if (!href || href.startsWith('#')) return;
+    try {
+      const u = new URL(href, base);
+      if (!String(u.pathname || '').endsWith('post.html')) return;
+      const slug = u.searchParams.get('slug');
+      if (!slug) return;
+      const next = resolvePostPath(slug);
+      if (next) $(el).attr('href', next);
+    } catch { /* */ }
+  });
+  return $('#__legacy_wrap').html() || html;
+}
+
 function tagHtml(tag, href, sitePathPrefix) {
   const body = escapeHtml(tag);
   const attrs = `class="tag tag-colored" style="${tagStyle(tag)}"`;
@@ -301,6 +321,7 @@ export async function buildArticleInnerHtml({
   donateCfg,
   pageviewsCfg,
   buildStatsIndex = null,
+  resolvePostPath = null,
 }) {
   const slug = post.slug;
   const title = post.title || fmData.title || '无标题';
@@ -314,6 +335,9 @@ export async function buildArticleInnerHtml({
   const tagsBase = rootHref(sitePathPrefix, 'tags.html');
 
   let bodyHtml = await fixContentAssetUrls(renderMarkdown(content), sitePathPrefix, siteOrigin);
+  if (resolvePostPath) {
+    bodyHtml = rewriteLegacyPostLinksInHtml(bodyHtml, resolvePostPath, siteOrigin);
+  }
   const mins = readingMinutes(content);
   const tagTop = tags.length
     ? `<div class="article-tags-top">${tags.map(t => tagHtml(t, `${tagsBase}#${encodeURIComponent(t)}`, sitePathPrefix)).join('')}</div>`
@@ -367,6 +391,7 @@ export async function buildPrerenderedPostHtml({
   pageviewsCfg,
   postShellTemplate,
   buildStatsIndex = null,
+  resolvePostPath = null,
 }) {
   const slug = post.slug;
   const title = post.title || fmData.title || '无标题';
@@ -418,6 +443,7 @@ export async function buildPrerenderedPostHtml({
     donateCfg,
     pageviewsCfg,
     buildStatsIndex,
+    resolvePostPath,
   });
 
   const assets = rootHref(sitePathPrefix, 'assets');
