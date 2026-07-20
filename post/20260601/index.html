@@ -63,7 +63,7 @@
             <span>2026-06-01</span>
             <span class="dot"></span><span>更新于 2026-06-01</span>
             <span class="dot"></span>
-            <span>11801 字</span>
+            <span>11770 字</span>
             <span class="dot"></span>
             <span class="meta-read-mins">约 16 分钟</span>
             <span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">阅读 </span><span id="gitblog_page_pv" data-build-pv="466">466</span><span class="gitblog-pv-suffix"> 次</span></span>
@@ -77,7 +77,7 @@
 <p><strong>项目地址</strong>：<a href="https://flymysql.github.io/PeerCache/zh/">flymysql.github.io/PeerCache</a></p>
 <p>一句话介绍：一个<strong>去中心化、点对点、RDMA 零拷贝的 SGLang L3（HiCache）存储后端</strong>，专门做<strong>跨请求、跨节点的 KV（前缀）缓存复用</strong>。它提供和 Mooncake Store 类似的复用能力，但<strong>没有中心化的 master 和 metadata 服务</strong>。单卡能吃到裸 <code>ib_read_bw</code> 的 <strong>94%</strong>，整机 8 卡聚合 <strong>413 GB/s（3.3 Tbps）</strong>。</p>
 </blockquote>
-<p>在上一篇 <a href="/post.html?slug=%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86%E7%9A%84-pd-%E5%88%86%E7%A6%BB%E5%8E%9F%E7%90%86%E5%8A%A8%E6%9C%BA%E4%B8%8E-mooncake-%E7%9A%84%E5%AE%9E%E7%8E%B0">《大模型推理的 PD 分离》</a> 里，我把 prefill/decode 分离的来龙去脉和 Mooncake 的实现讲了一遍。这篇接着讲一个我自己动手写的东西：<strong>PeerCache</strong>——一个想把"KV 缓存跨节点复用"这件事做得更轻、更去中心化的 L3 后端。</p>
+<p>在上一篇 <a href="/post/20260529/">《大模型推理的 PD 分离》</a> 里，我把 prefill/decode 分离的来龙去脉和 Mooncake 的实现讲了一遍。这篇接着讲一个我自己动手写的东西：<strong>PeerCache</strong>——一个想把"KV 缓存跨节点复用"这件事做得更轻、更去中心化的 L3 后端。</p>
 <p>不过开头要先纠正一个容易误解的点：<strong>PeerCache 不是 PD 的搬运引擎</strong>，它和 PD 是两件正交的事。下面会专门讲清楚。</p>
 <hr>
 <h2>一、它解决什么问题：跨请求的 KV 前缀复用</h2>

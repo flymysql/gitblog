@@ -346,9 +346,10 @@ function legacyPostLinkBase() {
   return `${window.location.origin}/`;
 }
 
-/** 正文里旧的 post.html?slug= 链接改写成 /post/{slug}/，避免在 /post/当前/ 下相对路径断裂 */
-function rewriteLegacyPostLinks(article) {
+/** 正文里旧的 post.html?slug= 链接改写成规范 /post/{urlKey}/，避免再经 post.html 客户端跳转 */
+function rewriteLegacyPostLinks(article, allPosts = []) {
   const base = legacyPostLinkBase();
+  const bySlug = new Map((allPosts || []).filter(p => p && p.slug).map(p => [p.slug, p]));
   article.querySelectorAll('.article-body a[href]').forEach(a => {
     const href = a.getAttribute('href') || '';
     if (!href || href.startsWith('#')) return;
@@ -356,7 +357,17 @@ function rewriteLegacyPostLinks(article) {
       const u = new URL(href, base);
       if (!String(u.pathname || '').endsWith('post.html')) return;
       const s = u.searchParams.get('slug');
-      if (s) a.setAttribute('href', `${rootPath('post.html')}?slug=${encodeURIComponent(s)}`);
+      if (!s) return;
+      const p = bySlug.get(s);
+      if (p) {
+        a.setAttribute('href', postPathFromPost(p));
+        return;
+      }
+      if (isPostPublicPathKey(s)) {
+        a.setAttribute('href', postPath(s));
+        return;
+      }
+      a.setAttribute('href', `${rootPath('post.html')}?slug=${encodeURIComponent(s)}`);
     } catch { /* */ }
   });
 }
@@ -536,7 +547,7 @@ async function enhancePostArticle(article, { slug, title, tags, allPosts, meta, 
   enhanceHeadings(article);
   enhanceImages(article);
   enhanceLinks(article);
-  rewriteLegacyPostLinks(article);
+  rewriteLegacyPostLinks(article, allPosts);
   enhanceMath(article);
   enhanceMermaid(article);
   bindShareCard(article, { ...(data || {}), slug, title });
@@ -650,7 +661,6 @@ function articlePvMetaFromPage() {
     enhanceHeadings(article);
     enhanceImages(article);
     enhanceLinks(article);
-    rewriteLegacyPostLinks(article);
     enhanceMath(article);
     enhanceMermaid(article);
     bindShareCard(article, { slug: prerenderSlug, title });
@@ -660,6 +670,8 @@ function articlePvMetaFromPage() {
       allPosts = idx.posts || [];
       meta = allPosts.find(p => p.slug === prerenderSlug) || null;
     } catch {}
+
+    rewriteLegacyPostLinks(article, allPosts);
 
     const slug = (meta && meta.slug) || prerenderSlug;
     const tags = (meta && meta.tags) || [];

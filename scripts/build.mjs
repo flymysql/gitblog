@@ -116,6 +116,18 @@ function postPublicAbsUrl(entry) {
   return `${SITE_ORIGIN}${SITE_PATH_PREFIX}/post.html`;
 }
 
+function postPathFromSlugForPrerender(slug, bySlug) {
+  const p = bySlug.get(String(slug || ''));
+  if (!p) return '';
+  const abs = postPublicAbsUrl(p);
+  if (!abs) return '';
+  try {
+    return new URL(abs).pathname;
+  } catch {
+    return '';
+  }
+}
+
 // ---------- 解析 frontmatter ----------
 function coerceScalar(v) {
   if (v == null) return '';
@@ -442,12 +454,20 @@ writeFileSync('sitemap.xml', sitemap);
 console.log('sitemap.xml 已生成（' + urls.length + ' 个 URL）');
 
 // ---------- robots.txt / manifest ----------
+// 旧根路径工具页与 post.html?slug= 仅为兼容跳转，勿让爬虫当作可索引 URL
+const LEGACY_REDIRECT_DISALLOWS = [
+  '/post.html',
+  '/tools.html',
+  '/tool-kit.html',
+  ...TOOL_SITEMAP_PAGES.map(p => `/${basename(p)}`),
+];
 writeFileSync('robots.txt', `User-agent: *
 Allow: /
+${LEGACY_REDIRECT_DISALLOWS.map(p => `Disallow: ${p}`).join('\n')}
 
 Sitemap: ${baseUrl}/sitemap.xml
 `);
-console.log('robots.txt 已生成');
+console.log('robots.txt 已生成（Disallow ' + LEGACY_REDIRECT_DISALLOWS.length + ' 条兼容跳转）');
 
 const manifest = {
   name: SITE_TITLE,
@@ -702,6 +722,8 @@ function safePostUrlKeyDir(p) {
 }
 if (existsSync(POST_ROOT)) rmSync(POST_ROOT, { recursive: true, force: true });
 mkdirSync(POST_ROOT, { recursive: true });
+const postsBySlug = new Map(postEntries.filter(p => p && p.slug).map(p => [p.slug, p]));
+const resolvePostPath = (slug) => postPathFromSlugForPrerender(slug, postsBySlug);
 let postShellCount = 0;
 for (const p of postEntries) {
   const dirKey = safePostUrlKeyDir(p);
@@ -728,6 +750,7 @@ for (const p of postEntries) {
     pageviewsCfg: PAGEVIEWS_CFG,
     postShellTemplate: POST_SHELL,
     buildStatsIndex: BUILD_STATS_INDEX,
+    resolvePostPath,
   });
   writeFileSync(join(dir, 'index.html'), prerendered);
   postShellCount++;
