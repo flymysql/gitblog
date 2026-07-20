@@ -1,4 +1,19 @@
 User-agent: *
 Allow: /
+Disallow: /post.html
+Disallow: /tools.html
+Disallow: /tool-kit.html
+Disallow: /tool-age.html
+Disallow: /tool-fortune.html
+Disallow: /tool-json.html
+Disallow: /tool-codec.html
+Disallow: /tool-timestamp.html
+Disallow: /tool-regex.html
+Disallow: /tool-qrcode.html
+Disallow: /tool-image.html
+Disallow: /tool-network.html
+Disallow: /tool-air-conditioner.html
+Disallow: /tool-farm-seed.html
+Disallow: /tool-major.html
 
 Sitemap: https://gitpull.cn/sitemap.xml

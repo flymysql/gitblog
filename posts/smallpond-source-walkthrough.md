@@ -11,7 +11,7 @@ summary: "Smallpond 是 DeepSeek 开源的轻量级分布式数据处理框架�
 carousel: true
 ---
 
-> 这是「DeepSeek 数据基础设施巡礼」系列的第 2 篇。第 1 篇 [《3FS 的零拷贝之路》](post.html?slug=3fs-usrbio-zero-copy) 讲了底层存储是怎么把吞吐推到 6.6 TiB/s 的；这一篇上一层，看 DeepSeek 是如何在这块底座上搭出"会写 SQL"的分布式数据框架。
+> 这是「DeepSeek 数据基础设施巡礼」系列的第 2 篇。第 1 篇 [《3FS 的零拷贝之路》](/post/20260311/) 讲了底层存储是怎么把吞吐推到 6.6 TiB/s 的；这一篇上一层，看 DeepSeek 是如何在这块底座上搭出"会写 SQL"的分布式数据框架。
 
 Smallpond 是一款轻量级的分布式数据处理框架，定位非常明确——为 **AI 和大数据场景下的大规模数据**（通常在 **10 TB 到 PB 级**）服务。它没有去重新造一个执行引擎、也没有自己写存储，而是把三块成熟零件拼到了一起：
 
@@ -636,4 +636,4 @@ smallpond 给我的整体观感是：它**坚定地选了"轻量"这条路**。�
 - [smallpond GitHub](https://github.com/deepseek-ai/smallpond)
 - [smallpond API 文档](https://github.com/deepseek-ai/smallpond/blob/main/docs/source/api.rst)
 - [smallpond Internals](https://github.com/deepseek-ai/smallpond/blob/main/docs/source/internals.rst)
-- [3FS 的零拷贝之路](post.html?slug=3fs-usrbio-zero-copy) · 本系列上一篇
+- [3FS 的零拷贝之路](/post/20260311/) · 本系列上一篇

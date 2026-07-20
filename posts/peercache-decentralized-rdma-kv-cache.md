@@ -15,7 +15,7 @@ carousel: true
 >
 > 一句话介绍：一个**去中心化、点对点、RDMA 零拷贝的 SGLang L3（HiCache）存储后端**，专门做**跨请求、跨节点的 KV（前缀）缓存复用**。它提供和 Mooncake Store 类似的复用能力，但**没有中心化的 master 和 metadata 服务**。单卡能吃到裸 `ib_read_bw` 的 **94%**，整机 8 卡聚合 **413 GB/s（3.3 Tbps）**。
 
-在上一篇 [《大模型推理的 PD 分离》](/post.html?slug=大模型推理的-pd-分离原理动机与-mooncake-的实现) 里，我把 prefill/decode 分离的来龙去脉和 Mooncake 的实现讲了一遍。这篇接着讲一个我自己动手写的东西：**PeerCache**——一个想把"KV 缓存跨节点复用"这件事做得更轻、更去中心化的 L3 后端。
+在上一篇 [《大模型推理的 PD 分离》](/post/20260529/) 里，我把 prefill/decode 分离的来龙去脉和 Mooncake 的实现讲了一遍。这篇接着讲一个我自己动手写的东西：**PeerCache**——一个想把"KV 缓存跨节点复用"这件事做得更轻、更去中心化的 L3 后端。
 
 不过开头要先纠正一个容易误解的点：**PeerCache 不是 PD 的搬运引擎**，它和 PD 是两件正交的事。下面会专门讲清楚。
 
