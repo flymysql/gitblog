@@ -61,7 +61,7 @@
             <span>2026-05-11</span>
             <span class="dot"></span><span>更新于 2026-06-16</span>
             <span class="dot"></span>
-            <span>2801 字</span>
+            <span>2682 字</span>
             <span class="dot"></span>
             <span class="meta-read-mins">约 4 分钟</span>
             <span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">阅读 </span><span id="gitblog_page_pv" data-build-pv="469">469</span><span class="gitblog-pv-suffix"> 次</span></span>
@@ -77,8 +77,8 @@
 <h2>现在在做什么</h2>
 <p>我是一名已经工作的程序员，一直在做 <strong>系统软件</strong>。这几年方向慢慢挪到了 <strong>大模型推理基础设施</strong> 与 <strong>分布式存储</strong> 上——说白了，就是 LLM 推理系统底下那一摊"数据怎么存、怎么搬、怎么复用"的活。最近在折腾的大致是这些：</p>
 <ul>
-<li><strong>KV 缓存与零拷贝传输</strong>：HiCache 的 L3 存储后端、RDMA 单边 READ、PD 分离场景下的 KV 复用。我自己写了一个去中心化的 RDMA 零拷贝 KV 缓存后端 <a href="/post.html?slug=peercache-decentralized-rdma-kv-cache">PeerCache</a>，也专门拆过 <a href="/post.html?slug=%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86%E7%9A%84-pd-%E5%88%86%E7%A6%BB%E5%8E%9F%E7%90%86%E5%8A%A8%E6%9C%BA%E4%B8%8E-mooncake-%E7%9A%84%E5%AE%9E%E7%8E%B0">PD 分离与 Mooncake 的实现</a>；</li>
-<li><strong>高性能分布式存储 / 数据处理</strong>：研究过 <a href="/post.html?slug=3fs-usrbio-zero-copy">3FS 是怎么用 USRBIO 把吞吐推到 6.6 TiB/s 的</a>，也走读过 <a href="/post.html?slug=smallpond-source-walkthrough">smallpond（DuckDB × 3FS × Ray）的源码</a>；</li>
+<li><strong>KV 缓存与零拷贝传输</strong>：HiCache 的 L3 存储后端、RDMA 单边 READ、PD 分离场景下的 KV 复用。我自己写了一个去中心化的 RDMA 零拷贝 KV 缓存后端 <a href="/post/20260601/">PeerCache</a>，也专门拆过 <a href="/post/20260529/">PD 分离与 Mooncake 的实现</a>；</li>
+<li><strong>高性能分布式存储 / 数据处理</strong>：研究过 <a href="/post/20260311/">3FS 是怎么用 USRBIO 把吞吐推到 6.6 TiB/s 的</a>，也走读过 <a href="/post/20260415/">smallpond（DuckDB × 3FS × Ray）的源码</a>；</li>
 <li><strong>更早一些</strong>，在 <strong>图数据库 / 查询引擎</strong> 上待过：从 Nebula Graph 的源码走读到查询执行的一些理解；也做过 <strong>推荐系统</strong> 的召回与架构。</li>
 </ul>
 <p>把这几样串起来，其实是同一条主线：<strong>查询 / 请求的解析与计划、存储层与数据布局、分布式系统里那些老问题（分片、调度、副本、一致性），再加上把每一次数据拷贝都抠掉的执着。</strong></p>
