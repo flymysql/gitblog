@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-27T17:47:39.711Z",
-  "date": "2026-07-28",
+  "generatedAt": "2026-07-28T17:43:15.864Z",
+  "date": "2026-07-29",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
   "invokeMode": "sdk",
@@ -897,9 +897,9 @@
   },
   "pageviews": {
     "site": {
-      "pv": 5104,
+      "pv": 5106,
       "uv": 223,
-      "updatedAt": 1785111110593
+      "updatedAt": 1785242187519
     },
     "total": 84,
     "pages": [
@@ -1327,6 +1327,15 @@
         "importedFrom": "vercount"
       },
       {
+        "path": "/post/20181214",
+        "slug": "Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4",
+        "title": "Windows下的终端折腾——弃坑msys2，开始用wsl",
+        "pv": 475,
+        "createdAt": 1782386771939,
+        "lastAt": 1785221287322,
+        "importedFrom": "vercount"
+      },
+      {
         "path": "/post/20181206",
         "slug": "12月6日杂谈-5027c817",
         "title": "12月6日杂谈",
@@ -1342,15 +1351,6 @@
         "pv": 474,
         "createdAt": 1782386771939,
         "lastAt": 1783307281938,
-        "importedFrom": "vercount"
-      },
-      {
-        "path": "/post/20181214",
-        "slug": "Windows下的终端折腾——弃坑msys2开始用wsl-d6b124c4",
-        "title": "Windows下的终端折腾——弃坑msys2，开始用wsl",
-        "pv": 474,
-        "createdAt": 1782386771939,
-        "lastAt": 1782386771939,
         "importedFrom": "vercount"
       },
       {
@@ -1510,9 +1510,9 @@
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 240,
+        "pv": 241,
         "createdAt": 1782398407892,
-        "lastAt": 1785040301930,
+        "lastAt": 1785242187519,
         "importedFrom": ""
       },
       {
