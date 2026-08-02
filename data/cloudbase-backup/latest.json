@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-01T17:06:55.642Z",
-  "date": "2026-08-02",
+  "generatedAt": "2026-08-02T17:06:50.455Z",
+  "date": "2026-08-03",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
   "invokeMode": "sdk",
@@ -897,9 +897,9 @@
   },
   "pageviews": {
     "site": {
-      "pv": 5112,
+      "pv": 5115,
       "uv": 223,
-      "updatedAt": 1785576768964
+      "updatedAt": 1785634487440
     },
     "total": 85,
     "pages": [
@@ -1510,9 +1510,9 @@
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 242,
+        "pv": 244,
         "createdAt": 1782398407892,
-        "lastAt": 1785444073792,
+        "lastAt": 1785627615638,
         "importedFrom": ""
       },
       {
@@ -1597,21 +1597,21 @@
         "importedFrom": ""
       },
       {
+        "path": "/tools/tool-qrcode.html",
+        "slug": "",
+        "title": "",
+        "pv": 4,
+        "createdAt": 1783108555050,
+        "lastAt": 1785634487440,
+        "importedFrom": ""
+      },
+      {
         "path": "/tools/tool-codec.html",
         "slug": "",
         "title": "",
         "pv": 3,
         "createdAt": 1782683799766,
         "lastAt": 1785111110593,
-        "importedFrom": ""
-      },
-      {
-        "path": "/tools/tool-qrcode.html",
-        "slug": "",
-        "title": "",
-        "pv": 3,
-        "createdAt": 1783108555050,
-        "lastAt": 1784767350279,
         "importedFrom": ""
       },
       {
