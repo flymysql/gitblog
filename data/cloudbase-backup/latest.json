@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-14T11:04:36.016Z",
+  "generatedAt": "2026-08-14T11:09:09.833Z",
   "date": "2026-08-14",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
@@ -897,11 +897,11 @@
   },
   "pageviews": {
     "site": {
-      "pv": 5212,
+      "pv": 5214,
       "uv": 223,
-      "updatedAt": 1786697846376
+      "updatedAt": 1786705602151
     },
-    "total": 85,
+    "total": 86,
     "pages": [
       {
         "path": "/post/20260618",
@@ -1510,9 +1510,9 @@
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 254,
+        "pv": 255,
         "createdAt": 1782398407892,
-        "lastAt": 1786697846376,
+        "lastAt": 1786705598419,
         "importedFrom": ""
       },
       {
@@ -1666,6 +1666,15 @@
         "pv": 1,
         "createdAt": 1784615313803,
         "lastAt": 1784615313803,
+        "importedFrom": ""
+      },
+      {
+        "path": "/post/20260814",
+        "slug": "dsh-remote-multi-machine-remote-workspace",
+        "title": "dsh-remote——给 DeepSeek Harness 的多机远程工作区",
+        "pv": 1,
+        "createdAt": 1786705602151,
+        "lastAt": 1786705602151,
         "importedFrom": ""
       }
     ]
