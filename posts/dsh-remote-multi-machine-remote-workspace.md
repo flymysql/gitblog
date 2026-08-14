@@ -3,7 +3,8 @@ title: dsh-remote——给 DeepSeek Harness 的多机远程工作区
 date: 2026-08-14
 updated: "2026-08-14T00:00:00.000Z"
 author: Jimmy
-tags: [DeepSeek, DSH, 远程开发, 高效工作, 插件]
+tags: [AI 基础设施, 教程]
+cover: assets/uploads/2026/08/dshremote-picker.svg
 carousel: true
 summary: 一个让 Agent 在多台 SSH 机器上「选目录即工作」的插件：多机管理、双 tab 工作区选择器（本机系统文件夹 or 远程目录）、远程目录本地镜像 + 双向 SFTP 同步，全程不改 harness 核心。
 ---
