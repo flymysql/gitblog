@@ -5,8 +5,18 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Thu, 13 Aug 2026 17:01:25 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 14 Aug 2026 11:04:24 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>dsh-remote——给 DeepSeek Harness 的多机远程工作区</title>
+      <link>https://gitpull.cn/post/20260814/</link>
+      <guid isPermaLink="false">dsh-remote-multi-machine-remote-workspace</guid>
+      <pubDate>Fri, 14 Aug 2026 00:00:00 GMT</pubDate>
+      <author>Jimmy</author>
+      <category>DeepSeek</category><category>DSH</category><category>远程开发</category><category>高效工作</category><category>插件</category>
+      <description><![CDATA[一个让 Agent 在多台 SSH 机器上「选目录即工作」的插件：多机管理、双 tab 工作区选择器（本机系统文件夹 or 远程目录）、远程目录本地镜像 + 双向 SFTP 同步，全程不改 harness 核心。]]></description>
+      <content:encoded><![CDATA[仓库：github.com/flymysql/dsh remote npm：dsh remote（v0.5） 已收录：awesome dsh plugin DeepSeek Harness（DSH）的 Web 界面刻意只监听 （为安全拒绝 ）。这带来一个隐含问题： Agent 的工作做在哪里？ 答案通常是「本地工作区」。但很多人真正的代码和运行环境在 远程机器 上——编译机、测试桩、内网仓库。DSH 本身没有「连远程 + 选远程工作区」的官方能力。 就是来补这块的：它让我把若干台 SSH 机器管起来，然后在原生的「Add workspace」流程里， 要么选本机目录，要么选某台机器的某个远程目录作为工作区 。 核心能力 1. 多台 SSH 机器 设置页就是一个多机 registry：增删改、设「当前」，每台记录 。密码只存在本地（ ），界面回显的是 表示已设，不回明文。 2. 双模式工作区选择器 在 DSH 原生「Add workspace」里， 用 client 半把 directory flow 槽位补齐（ shadow 掉官方 native），弹出一个 双 tab 的对话框： 本机 ：走 系统文件夹选择器 （host 端的原生 ），或直接输入本地路径 → 直接就是普通 DSH 本地工作区（和本地工作区共存）。 远程 ：先选 机器 ，再浏览它的目录（可点进子目录），或直接输入 → 确定后把它 mirror 成本地镜像工作区。 3. 远程工作区 = 本地镜像 + 双向同步 选中的远程目录会被 真实镜像 到本地 ——它是一个 通过的真实目录 ，所以 DSH 原生工作区系统能正常收养它。然后 通过 SFTP 让它和远程保持同步： ：远程 → 本地镜像（拉取） ：本地镜像 → 远程（推送） 于是你（或 Agent）在镜像里的任何 都是真实地对远程项目操作，但用的是 DSH 最普通的本地文件流。 4. 模型工具 / / / / / 当前 还会注入每次系统提示，让 Agent 明确自己的工作根。 安装 装完在 设置 → 远程工作区 加机器，然后点 Add workspace 选本机或远程目录即可。 一点设计与取舍 不改 harness 核心 ： 的「工作区必须是本地 路径」设计我没动，而是让 dsh remote 把远程目录 物化成一个真实本地目录 再交给它收养。这样既完全融入生态，又保持了 harness 的原有安全感（工作区就是真实文件系统路径）。 选工作区是 槽位 ：DSH 的 directory flow 是一个单槽位，所以 dsh remote 以最低优先级占住它，官方 native 会选择器被 shadow；如果换成 browser 组合，它也能 fallback。 密码存本机明文 ：目前按「方便」存本机文件。如果需要更严，可以锁 ACL 或用系统凭据存储——看反馈再考虑。 结尾 想解决的是「Agent 和我的真实执行环境分离」这个最常见痛点。它已经完全发布到 npm，社区列表可见。欢迎试用、踩坑、提 issue。如果大家觉得「远程工作区」值得成为 DSH 一等公民，也可以去官方讨论区反馈，作为佐证。 仓库/安装/文档：https://github.com/flymysql/dsh remote npm：https://www.npmjs.com/package/dsh remote 说明：效果图用了 SVG 占位「 UI 原型」，真实界面以此为准（我这边 headless 无法截图）。]]></content:encoded>
+    </item>
     <item>
       <title>海门回声 | 黑鬼</title>
       <link>https://gitpull.cn/post/20260618/</link>
@@ -325,17 +335,6 @@
       <description><![CDATA[算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。…]]></description>
       <content:encoded><![CDATA[算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。另外，还给定 V 中的一个顶点，称为源。现在我们要计算从源到所有其他各顶点的最短路径长度。这里的长度是指路上各边权之和。这个问题通常称为单源最短路径问题。 Dijkstra算法的解决方案 Dijkstra提出按各顶点与源点v间的路径长度的递增次序，生成到各顶点的最短路径的算法。既先求出长度最短的一条最短路径，再参照它求出长度次短的一条最短路径，依次类推，直到从源点v 到其它各顶点的最短路径全部求出为止。 ¶Dijkstra算法的解题思想 将图G中所有的顶点V分成两个顶点集合S和T。以v为源点已经确定了最短路径的终点并入S集合中，S初始时只含顶点v,T则是尚未确定到源点v最短路径的顶点集合。然后每次从T集合中选择S集合点中到T路径最短的那个点，并加入到集合S中，并把这个点从集合T删除。直到T集合为空为止。 ¶具体步骤 1. 选一顶点v为源点，并视从源点v出发的所有边为到各顶点的最短路径（确定数据结构：因为求的是最短路径，所以①就要用一个记录从源点v到其它各顶点的路径长度数组dist\[\],开始时，dist是源点v到顶点i的直接边长度，即dist中记录的是邻接阵的第v行。②设一个用来记录从源点到其它顶点的路径数组path\[\],path中存放路径上第i个顶点的前驱顶点）。 2. 在上述的最短路径dist\[\]中选一条最短的，并将其终点（即v,k）k加入到集合s中。 3. 调整T中各顶点到源点v的最短路径。 因为当顶点k加入到集合s中后，源点v到T中剩余的其它顶点j就又增加了经过顶点k到达j的路径,这条路径可能要比源点v到j原来的最短的还要短。调整方法是比较dist\[k\]+g\[k,j\]与dist\[j\]，取其中的较小者。 4. 再选出一个到源点v路径长度最小的顶点k,从T中删去后加入S中，再回去到第三步，如此重复，直到集合S中的包含图G的所有顶点。 ¶C++代码 感觉代码还是有点臃肿了 晚点打算再写一个 实现的算法 结合html来制作图形界面 ¶2018 11 24更新 花了一早上写了 版本的，并能够动态演示过程 演示地址 ¶部分javascript代码]]></content:encoded>
       <media:thumbnail url="https://gitpull.cn/assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.webp" />
-    </item>
-    <item>
-      <title>使用腾讯云cdn加速博客</title>
-      <link>https://gitpull.cn/post/20181122/</link>
-      <guid isPermaLink="false">使用腾讯云cdn加速博客-1609338289</guid>
-      <pubDate>Thu, 22 Nov 2018 11:41:45 GMT</pubDate>
-      <author>兰州小红鸡</author>
-      <category>教程</category><category>博客建站</category>
-      <description><![CDATA[最近把博客搬到腾讯云后，使用腾讯云的COS存储 免费50G的存储空间，放个小博客还是够用的 而且，还可以使用免费的CDN加速 国内访问博客速度比放在GitHub上要快多了 申请腾讯…]]></description>
-      <content:encoded><![CDATA[最近把博客搬到腾讯云后，使用腾讯云的COS存储 免费50G的存储空间，放个小博客还是够用的 而且，还可以使用免费的CDN加速 国内访问博客速度比放在GitHub上要快多了 申请腾讯云COS ，每个月有免费的10GB的CDN流量可以使用； 1. 在腾讯云COS控制台中 创建一个bucket; 2. 然后在设置中开启静态网站设置 3. 在自定义域名中设置上自己的域名 配置过程需要等待五分钟，然后上传网站静态文件，就可以访问了 为了能上传到腾讯云需要再安装个插件 安装 在Hexo配置文件（\ config.yml）中配置 : 最后还是一样的 操作 hexo clean hexo g d ok,可以访问了 关于CDN的刷新 每次更新博客内容完后，都要登陆腾讯云后台手动刷新一下CDN 这样未免也太麻烦 所以用腾讯云官方给的api做了个脚本用来每次更新博客内容后，自动刷新CDN 腾讯云cdn官方文档 上面时官方的node.js版本的api 安装（在博客根目录执行） 然后在主题的script文件夹下，创建脚本qcloudcdn.js 官方api文档 穹妹镇楼]]></content:encoded>
-      <media:thumbnail url="https://gitpull.cn/assets/uploads/2026/05/使用腾讯云cdn加速博客-1609338289-01.webp" />
     </item>
   </channel>
 </rss>

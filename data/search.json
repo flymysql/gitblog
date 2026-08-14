@@ -1,7 +1,23 @@
 {
-  "generated": "2026-08-13T17:01:25.736Z",
-  "count": 67,
+  "generated": "2026-08-14T11:04:24.405Z",
+  "count": 68,
   "docs": [
+    {
+      "slug": "dsh-remote-multi-machine-remote-workspace",
+      "urlKey": "20260814",
+      "title": "dsh-remote——给 DeepSeek Harness 的多机远程工作区",
+      "summary": "一个让 Agent 在多台 SSH 机器上「选目录即工作」的插件：多机管理、双 tab 工作区选择器（本机系统文件夹 or 远程目录）、远程目录本地镜像 + 双向 SFTP 同步，全程不改 harness 核心。",
+      "tags": [
+        "DeepSeek",
+        "DSH",
+        "远程开发",
+        "高效工作",
+        "插件"
+      ],
+      "date": "2026-08-14",
+      "type": "post",
+      "text": "仓库：github.com/flymysql/dsh remote npm：dsh remote（v0.5） 已收录：awesome dsh plugin DeepSeek Harness（DSH）的 Web 界面刻意只监听 （为安全拒绝 ）。这带来一个隐含问题： Agent 的工作做在哪里？ 答案通常是「本地工作区」。但很多人真正的代码和运行环境在 远程机器 上——编译机、测试桩、内网仓库。DSH 本身没有「连远程 + 选远程工作区」的官方能力。 就是来补这块的：它让我把若干台 SSH 机器管起来，然后在原生的「Add workspace」流程里， 要么选本机目录，要么选某台机器的某个远程目录作为工作区 。 核心能力 1. 多台 SSH 机器 设置页就是一个多机 registry：增删改、设「当前」，每台记录 。密码只存在本地（ ），界面回显的是 表示已设，不回明文。 2. 双模式工作区选择器 在 DSH 原生「Add workspace」里， 用 client 半把 directory flow 槽位补齐（ shadow 掉官方 native），弹出一个 双 tab 的对话框： 本"
+    },
     {
       "slug": "海门回声-黑鬼",
       "urlKey": "20260618",

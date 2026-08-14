@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <link rel="dns-prefetch" href="https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com">
+  <link rel="preconnect" href="https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com" crossorigin>
+  <link rel="prefetch" href="https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com/pv-beacon.html?env=gitbolg-d7gmnsrw46e011706&amp;region=ap-shanghai&amp;fn=gitblog-comments&amp;v=20260627010000" as="document">
+
+
+<title>dsh-remote——给 DeepSeek Harness 的多机远程工作区 · 小红鸡</title>
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  <link rel="stylesheet" href="/assets/dist/common.min.css?v=20260627010000">
+  <link rel="stylesheet" href="/assets/dist/post.min.css?v=20260627010000">
+  <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ea6f5a">
+  <link rel="icon" href="/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="一个让 Agent 在多台 SSH 机器上「选目录即工作」的插件：多机管理、双 tab 工作区选择器（本机系统文件夹 or 远程目录）、远程目录本地镜像 + 双向 SFTP 同步，全程不改 harness 核心。">
+  <meta name="author" content="Jimmy">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="dsh-remote——给 DeepSeek Harness 的多机远程工作区">
+  <meta property="og:description" content="一个让 Agent 在多台 SSH 机器上「选目录即工作」的插件：多机管理、双 tab 工作区选择器（本机系统文件夹 or 远程目录）、远程目录本地镜像 + 双向 SFTP 同步，全程不改 harness 核心。">
+  <meta property="og:image" content="https://gitpull.cn/assets/og/dsh-remote-multi-machine-remote-workspace.png">
+  <meta property="og:url" content="https://gitpull.cn/post/20260814/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="小红鸡">
+  <meta property="og:locale" content="zh-CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="dsh-remote——给 DeepSeek Harness 的多机远程工作区">
+  <meta name="twitter:description" content="一个让 Agent 在多台 SSH 机器上「选目录即工作」的插件：多机管理、双 tab 工作区选择器（本机系统文件夹 or 远程目录）、远程目录本地镜像 + 双向 SFTP 同步，全程不改 harness 核心。">
+  <meta name="twitter:image" content="https://gitpull.cn/assets/og/dsh-remote-multi-machine-remote-workspace.png">
+  <link rel="canonical" href="https://gitpull.cn/post/20260814/">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="article:published_time" content="2026-08-14">
+  <meta property="article:modified_time" content="2026-08-14T00:00:00.000Z">
+  <meta property="article:author" content="Jimmy">
+  <meta property="article:tag" content="DeepSeek">
+  <meta property="article:tag" content="DSH">
+  <meta property="article:tag" content="远程开发">
+  <meta property="article:tag" content="高效工作">
+  <meta property="article:tag" content="插件">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"dsh-remote——给 DeepSeek Harness 的多机远程工作区","description":"一个让 Agent 在多台 SSH 机器上「选目录即工作」的插件：多机管理、双 tab 工作区选择器（本机系统文件夹 or 远程目录）、远程目录本地镜像 + 双向 SFTP 同步，全程不改 harness 核心。","image":"https://gitpull.cn/assets/og/dsh-remote-multi-machine-remote-workspace.png","datePublished":"2026-08-14","dateModified":"2026-08-14T00:00:00.000Z","author":{"@type":"Person","name":"Jimmy"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260814/","keywords":"DeepSeek,DSH,远程开发,高效工作,插件"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://gitpull.cn/"},{"@type":"ListItem","position":2,"name":"DeepSeek","item":"https://gitpull.cn/tags.html#DeepSeek"},{"@type":"ListItem","position":3,"name":"dsh-remote——给 DeepSeek Harness 的多机远程工作区","item":"https://gitpull.cn/post/20260814/"}]}</script>
+  <meta name="mobile-web-app-capable" content="yes">
+</head>
+<body>
+  <a href="#article" class="skip-to-content">跳到内容</a>
+  <div id="site-nav"></div>
+
+  <main class="article-layout">
+    <article class="article is-prerendered" id="article" data-prerendered="1" data-slug="dsh-remote-multi-machine-remote-workspace" data-url-key="20260814">
+      <header class="article-header">
+      <div class="article-tags-top"><a class="tag tag-colored" style="--tag-bg:#F0E9FF;--tag-text:#6843B5;--tag-border:#D7C6F6;--tag-dark-bg:#271E3F;--tag-dark-text:#C5B2FF;--tag-dark-border:#55427F;" href="/tags.html#DeepSeek">DeepSeek</a><a class="tag tag-colored" style="--tag-bg:#E8F1FF;--tag-text:#1E5AA8;--tag-border:#BFD6FA;--tag-dark-bg:#152842;--tag-dark-text:#9EC8FF;--tag-dark-border:#31537A;" href="/tags.html#DSH">DSH</a><a class="tag tag-colored" style="--tag-bg:#FFE8E3;--tag-text:#C44732;--tag-border:#F7C5BA;--tag-dark-bg:#3A211D;--tag-dark-text:#FFB2A3;--tag-dark-border:#6F3B32;" href="/tags.html#%E8%BF%9C%E7%A8%8B%E5%BC%80%E5%8F%91">远程开发</a><a class="tag tag-colored" style="--tag-bg:#EEF0F3;--tag-text:#4B5563;--tag-border:#D5DAE1;--tag-dark-bg:#252A33;--tag-dark-text:#CBD5E1;--tag-dark-border:#47515F;" href="/tags.html#%E9%AB%98%E6%95%88%E5%B7%A5%E4%BD%9C">高效工作</a><a class="tag tag-colored" style="--tag-bg:#F0E9FF;--tag-text:#6843B5;--tag-border:#D7C6F6;--tag-dark-bg:#271E3F;--tag-dark-text:#C5B2FF;--tag-dark-border:#55427F;" href="/tags.html#%E6%8F%92%E4%BB%B6">插件</a></div>
+      <h1 class="article-title">dsh-remote——给 DeepSeek Harness 的多机远程工作区</h1>
+      <div class="article-author">
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.webp)"></div>
+        <div class="info">
+          <div class="name">Jimmy</div>
+          <div class="meta">
+            <span>2026-08-14</span>
+            <span class="dot"></span><span>更新于 2026-08-14</span>
+            <span class="dot"></span>
+            <span>2600 字</span>
+            <span class="dot"></span>
+            <span class="meta-read-mins">约 3 分钟</span>
+            <span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">阅读 </span><span id="gitblog_page_pv">…</span><span class="gitblog-pv-suffix"> 次</span></span>
+          </div>
+        </div>
+        <a class="article-edit" href="/admin/editor.html?slug=dsh-remote-multi-machine-remote-workspace" title="编辑此文">编辑</a>
+      </div>
+    </header>
+    <div class="article-body"><blockquote>
+<p>仓库：<a href="https://github.com/flymysql/dsh-remote">github.com/flymysql/dsh-remote</a><br>npm：<a href="https://www.npmjs.com/package/dsh-remote">dsh-remote</a>（v0.5）<br>已收录：<a href="https://github.com/awesome-dsh-plugin/awesome-dsh-plugin">awesome-dsh-plugin</a></p>
+</blockquote>
+<p><a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a>（DSH）的 Web 界面刻意只监听 <code>127.0.0.1</code>（为安全拒绝 <code>--host 0.0.0.0</code>）。这带来一个隐含问题：<strong>Agent 的工作做在哪里？</strong></p>
+<p>答案通常是「本地工作区」。但很多人真正的代码和运行环境在<strong>远程机器</strong>上——编译机、测试桩、内网仓库。DSH 本身没有「连远程 + 选远程工作区」的官方能力。</p>
+<p><code>dsh-remote</code> 就是来补这块的：它让我把若干台 SSH 机器管起来，然后在原生的「Add workspace」流程里，<strong>要么选本机目录，要么选某台机器的某个远程目录作为工作区</strong>。</p>
+<hr>
+<h2>核心能力</h2>
+<h3>1. 多台 SSH 机器</h3>
+<p>设置页就是一个多机 registry：增删改、设「当前」，每台记录 <code>host / port / user / 私钥或密码</code>。密码只存在本地（<code>~/.dsh/remote-workspaces/machines.json</code>），界面回显的是 <code>🔒</code> 表示已设，不回明文。</p>
+<p><img src="https://raw.githubusercontent.com/flymysql/dsh-remote/main/docs/ui-settings.svg" alt="设置页——多机 SSH 列表" loading="lazy" decoding="async" data-full-src="https://raw.githubusercontent.com/flymysql/dsh-remote/main/docs/ui-settings.svg" class="progressive-img"></p>
+<h3>2. 双模式工作区选择器</h3>
+<p>在 DSH 原生「Add workspace」里，<code>dsh-remote</code> 用 client 半把 directory-flow 槽位补齐（<code>priority -100</code> shadow 掉官方 native），弹出一个<strong>双 tab</strong> 的对话框：</p>
+<ul>
+<li><strong>本机</strong>：走<strong>系统文件夹选择器</strong>（host 端的原生 <code>directoryPicker</code>），或直接输入本地路径 → 直接就是普通 DSH 本地工作区（和本地工作区共存）。</li>
+<li><strong>远程</strong>：先选<strong>机器</strong>，再浏览它的目录（可点进子目录），或直接输入 <code>/绝对路径</code> → 确定后把它 mirror 成本地镜像工作区。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/flymysql/dsh-remote/main/docs/ui-picker.svg" alt="选工作区——本机 / 远程 双 tab" loading="lazy" decoding="async" data-full-src="https://raw.githubusercontent.com/flymysql/dsh-remote/main/docs/ui-picker.svg" class="progressive-img"></p>
+<h3>3. 远程工作区 = 本地镜像 + 双向同步</h3>
+<p>选中的远程目录会被<strong>真实镜像</strong>到本地 <code>~/.dsh/remote-workspaces/&lt;host&gt;/&lt;basename&gt;-&lt;hash&gt;</code>——它是一个 <strong><code>fs.realpath</code> 通过的真实目录</strong>，所以 DSH 原生工作区系统能正常收养它。然后 <code>dsh-remote</code> 通过 SFTP 让它和远程保持同步：</p>
+<ul>
+<li><code>rw_sync</code>：远程 → 本地镜像（拉取）</li>
+<li><code>rw_push</code>：本地镜像 → 远程（推送）</li>
+</ul>
+<p>于是你（或 Agent）在镜像里的任何 <code>read / write / edit / exec</code> 都是真实地对远程项目操作，但用的是 DSH 最普通的本地文件流。</p>
+<h3>4. 模型工具</h3>
+<ul>
+<li><code>rw_info</code> / <code>rw_connect</code> / <code>rw_pick_workspace</code></li>
+<li><code>rw_list_dir</code> / <code>rw_read_file</code> / <code>rw_exec</code></li>
+<li><code>rw_sync</code> / <code>rw_push</code></li>
+</ul>
+<p>当前 <code>user@host:/path</code> 还会注入每次系统提示，让 Agent 明确自己的工作根。</p>
+<hr>
+<h2>安装</h2>
+<pre><code class="language-bash">dsh plugin add dsh-remote            # 或
+npx --yes @deepseek-ai/dsh plugin --profile web add dsh-remote
+</code></pre>
+<p>装完在 <strong>设置 → 远程工作区</strong> 加机器，然后点 <strong>Add workspace</strong> 选本机或远程目录即可。</p>
+<hr>
+<h2>一点设计与取舍</h2>
+<ul>
+<li><strong>不改 harness 核心</strong>：<code>dsh-workspace</code> 的「工作区必须是本地 <code>fs.realpath</code> 路径」设计我没动，而是让 dsh-remote 把远程目录<strong>物化成一个真实本地目录</strong>再交给它收养。这样既完全融入生态，又保持了 harness 的原有安全感（工作区就是真实文件系统路径）。</li>
+<li><strong>选工作区是 <code>single</code> 槽位</strong>：DSH 的 directory-flow 是一个单槽位，所以 dsh-remote 以最低优先级占住它，官方 native 会选择器被 shadow；如果换成 browser 组合，它也能 fallback。</li>
+<li><strong>密码存本机明文</strong>：目前按「方便」存本机文件。如果需要更严，可以锁 ACL 或用系统凭据存储——看反馈再考虑。</li>
+</ul>
+<hr>
+<h2>结尾</h2>
+<p><code>dsh-remote</code> 想解决的是「Agent 和我的真实执行环境分离」这个最常见痛点。它已经完全发布到 npm，社区列表可见。欢迎试用、踩坑、提 issue。如果大家觉得「远程工作区」值得成为 DSH 一等公民，也可以去官方讨论区反馈，作为佐证。</p>
+<ul>
+<li>仓库/安装/文档：<a href="https://github.com/flymysql/dsh-remote">https://github.com/flymysql/dsh-remote</a></li>
+<li>npm：<a href="https://www.npmjs.com/package/dsh-remote">https://www.npmjs.com/package/dsh-remote</a></li>
+<li>说明：效果图用了 SVG 占位「 UI 原型」，真实界面以此为准（我这边 headless 无法截图）。</li>
+</ul>
+</div>
+    <footer class="article-footer"><div class="article-tags"><a class="tag tag-colored" style="--tag-bg:#F0E9FF;--tag-text:#6843B5;--tag-border:#D7C6F6;--tag-dark-bg:#271E3F;--tag-dark-text:#C5B2FF;--tag-dark-border:#55427F;" href="/tags.html#DeepSeek">DeepSeek</a><a class="tag tag-colored" style="--tag-bg:#E8F1FF;--tag-text:#1E5AA8;--tag-border:#BFD6FA;--tag-dark-bg:#152842;--tag-dark-text:#9EC8FF;--tag-dark-border:#31537A;" href="/tags.html#DSH">DSH</a><a class="tag tag-colored" style="--tag-bg:#FFE8E3;--tag-text:#C44732;--tag-border:#F7C5BA;--tag-dark-bg:#3A211D;--tag-dark-text:#FFB2A3;--tag-dark-border:#6F3B32;" href="/tags.html#%E8%BF%9C%E7%A8%8B%E5%BC%80%E5%8F%91">远程开发</a><a class="tag tag-colored" style="--tag-bg:#EEF0F3;--tag-text:#4B5563;--tag-border:#D5DAE1;--tag-dark-bg:#252A33;--tag-dark-text:#CBD5E1;--tag-dark-border:#47515F;" href="/tags.html#%E9%AB%98%E6%95%88%E5%B7%A5%E4%BD%9C">高效工作</a><a class="tag tag-colored" style="--tag-bg:#F0E9FF;--tag-text:#6843B5;--tag-border:#D7C6F6;--tag-dark-bg:#271E3F;--tag-dark-text:#C5B2FF;--tag-dark-border:#55427F;" href="/tags.html#%E6%8F%92%E4%BB%B6">插件</a></div></footer>
+    
+    <section class="comments comments-build-preview" data-build-comments="1">
+      <div class="comments-title">评论</div>
+      <p class="comments-build-empty">暂无评论，来抢沙发吧。</p>
+      <div id="commentsRoot"></div>
+      <p class="comments-end-hint" hidden aria-hidden="true"></p>
+    </section>
+    </article>
+    <aside class="toc-sidebar" id="tocSidebar" hidden></aside>
+  </main>
+
+  <div id="site-footer"></div>
+  <div id="site-overlays"></div>
+
+  <script type="module" src="/assets/dist/post.min.js?v=20260627010000"></script>
+</body>
+</html>
