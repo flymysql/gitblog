@@ -1,13 +1,28 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-18T16:37:38.550Z",
-  "date": "2026-08-19",
+  "generatedAt": "2026-08-19T16:37:16.263Z",
+  "date": "2026-08-20",
   "envId": "gitbolg-d7gmnsrw46e011706",
   "siteUrl": "https://gitpull.cn",
   "invokeMode": "sdk",
   "comments": {
-    "total": 59,
+    "total": 60,
     "items": [
+      {
+        "_id": "aa01f4f26a85623d00ec0f9576fce5b3",
+        "path": "20260814",
+        "nick": "jimmycppliu",
+        "avatar": "daddy.webp",
+        "contentHtml": "这个工具太实用了！最近正好在 DeepSeek Harness 里做多机调试定位（编译机 + 现网），远程工作区 + 双向同步让 Agent 直接操作真实远程项目，不用来回切机器。rw_exec / rw_sync 这对模型工具是点睛之笔——Agent 的读写都落在镜像里，但实际是远程。<br>几个实际体验的反馈：1. 密码明文存本机（machines.json）建议锁下 ACL 或提示用系统凭据，多人共用机器时更稳；2. 远程目录镜像后的 realpath 设计很妙，完全融入原生工作区生态，不用改 harness 核心——这个取舍很对；3. 希望后续能支持一次连多台机器并行 rw_exec（比如编译机 + 测试机同时跑），现在逐台切稍繁琐。<br>已在用 dsh-remote 作为日常开发工作区，感谢作者！",
+        "parentId": null,
+        "replyToNick": null,
+        "pageTitle": "dsh-remote",
+        "pageUrl": "",
+        "status": "visible",
+        "createdAt": 1787126333621,
+        "createdAtIso": "2026-08-19T07:58:53.621Z",
+        "deletedAt": null
+      },
       {
         "_id": "00dd74516a4e7e05001993c84ce78172",
         "path": "20260616",
@@ -897,9 +912,9 @@
   },
   "pageviews": {
     "site": {
-      "pv": 5305,
+      "pv": 5321,
       "uv": 223,
-      "updatedAt": 1787065230703
+      "updatedAt": 1787155716639
     },
     "total": 86,
     "pages": [
@@ -916,9 +931,9 @@
         "path": "/post/20260617",
         "slug": "qq-farm-assistant-经典农场辅助",
         "title": "QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具",
-        "pv": 565,
+        "pv": 570,
         "createdAt": 1782386771939,
-        "lastAt": 1787065230703,
+        "lastAt": 1787109671623,
         "importedFrom": "vercount"
       },
       {
@@ -1510,9 +1525,18 @@
         "path": "/",
         "slug": "",
         "title": "",
-        "pv": 269,
+        "pv": 270,
         "createdAt": 1782398407892,
-        "lastAt": 1787058264512,
+        "lastAt": 1787155716639,
+        "importedFrom": ""
+      },
+      {
+        "path": "/post/20260814",
+        "slug": "dsh-remote-multi-machine-remote-workspace",
+        "title": "dsh-remote——给 DeepSeek Harness 的多机远程工作区",
+        "pv": 21,
+        "createdAt": 1786705602151,
+        "lastAt": 1787126392889,
         "importedFrom": ""
       },
       {
@@ -1540,15 +1564,6 @@
         "pv": 11,
         "createdAt": 1783182901304,
         "lastAt": 1786948503398,
-        "importedFrom": ""
-      },
-      {
-        "path": "/post/20260814",
-        "slug": "dsh-remote-multi-machine-remote-workspace",
-        "title": "dsh-remote——给 DeepSeek Harness 的多机远程工作区",
-        "pv": 11,
-        "createdAt": 1786705602151,
-        "lastAt": 1787038402550,
         "importedFrom": ""
       },
       {
