@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <link rel="dns-prefetch" href="https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com">
+  <link rel="preconnect" href="https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com" crossorigin>
+  <link rel="prefetch" href="https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com/pv-beacon.html?env=gitbolg-d7gmnsrw46e011706&amp;region=ap-shanghai&amp;fn=gitblog-comments&amp;v=20260627010000" as="document">
+
+
+<title>DSH gitblog 插件端到端验证 · 小红鸡</title>
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+  <link rel="stylesheet" href="/assets/dist/common.min.css?v=20260627010000">
+  <link rel="stylesheet" href="/assets/dist/post.min.css?v=20260627010000">
+  <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ea6f5a">
+  <link rel="icon" href="/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="description" content="验证 DeepSeek Harness 通过 gitblog 插件自动发布：写内容 -&gt; 推 GitHub -&gt; Actions 构建 -&gt; Pages 发布全链路。验证完成后会自动删除。">
+  <meta name="author" content="Jimmy">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="DSH gitblog 插件端到端验证">
+  <meta property="og:description" content="验证 DeepSeek Harness 通过 gitblog 插件自动发布：写内容 -&gt; 推 GitHub -&gt; Actions 构建 -&gt; Pages 发布全链路。验证完成后会自动删除。">
+  <meta property="og:image" content="https://gitpull.cn/assets/og/dsh-gitblog-plugin-e2e-test.png">
+  <meta property="og:url" content="https://gitpull.cn/post/20260821/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="小红鸡">
+  <meta property="og:locale" content="zh-CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DSH gitblog 插件端到端验证">
+  <meta name="twitter:description" content="验证 DeepSeek Harness 通过 gitblog 插件自动发布：写内容 -&gt; 推 GitHub -&gt; Actions 构建 -&gt; Pages 发布全链路。验证完成后会自动删除。">
+  <meta name="twitter:image" content="https://gitpull.cn/assets/og/dsh-gitblog-plugin-e2e-test.png">
+  <link rel="canonical" href="https://gitpull.cn/post/20260821/">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="article:published_time" content="2026-08-21T00:47:41+08:00">
+  <meta property="article:modified_time" content="2026-08-21T00:47:41+08:00">
+  <meta property="article:author" content="Jimmy">
+  <meta property="article:tag" content="测试">
+  <meta property="article:tag" content="DSH">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"DSH gitblog 插件端到端验证","description":"验证 DeepSeek Harness 通过 gitblog 插件自动发布：写内容 -> 推 GitHub -> Actions 构建 -> Pages 发布全链路。验证完成后会自动删除。","image":"https://gitpull.cn/assets/og/dsh-gitblog-plugin-e2e-test.png","datePublished":"2026-08-21T00:47:41+08:00","dateModified":"2026-08-21T00:47:41+08:00","author":{"@type":"Person","name":"Jimmy"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260821/","keywords":"测试,DSH"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://gitpull.cn/"},{"@type":"ListItem","position":2,"name":"测试","item":"https://gitpull.cn/tags.html#%E6%B5%8B%E8%AF%95"},{"@type":"ListItem","position":3,"name":"DSH gitblog 插件端到端验证","item":"https://gitpull.cn/post/20260821/"}]}</script>
+  <meta name="mobile-web-app-capable" content="yes">
+</head>
+<body>
+  <a href="#article" class="skip-to-content">跳到内容</a>
+  <div id="site-nav"></div>
+
+  <main class="article-layout">
+    <article class="article is-prerendered" id="article" data-prerendered="1" data-slug="dsh-gitblog-plugin-e2e-test" data-url-key="20260821">
+      <header class="article-header">
+      <div class="article-tags-top"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E6%B5%8B%E8%AF%95">测试</a><a class="tag tag-colored" style="--tag-bg:#E8F1FF;--tag-text:#1E5AA8;--tag-border:#BFD6FA;--tag-dark-bg:#152842;--tag-dark-text:#9EC8FF;--tag-dark-border:#31537A;" href="/tags.html#DSH">DSH</a></div>
+      <h1 class="article-title">DSH gitblog 插件端到端验证</h1>
+      <div class="article-author">
+        <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.webp)"></div>
+        <div class="info">
+          <div class="name">Jimmy</div>
+          <div class="meta">
+            <span>2026-08-20</span>
+            
+            <span class="dot"></span>
+            <span>198 字</span>
+            <span class="dot"></span>
+            <span class="meta-read-mins">约 1 分钟</span>
+            <span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">阅读 </span><span id="gitblog_page_pv">…</span><span class="gitblog-pv-suffix"> 次</span></span>
+          </div>
+        </div>
+        <a class="article-edit" href="/admin/editor.html?slug=dsh-gitblog-plugin-e2e-test" title="编辑此文">编辑</a>
+      </div>
+    </header>
+    <div class="article-body"><p>这是一篇由 DSH gitblog 发布机制自动生成并提交的验证文章，用于确认「写内容 → 推 GitHub → 构建 → 发布」全链路。验证完成后会被自动删除，不会留在博客上。</p>
+<ul>
+<li>推送方式：GitHub Contents API（与 gitblog 浏览器后台一致）</li>
+<li>构建：push 触发 GitHub Actions build 工作流</li>
+<li>发布：GitHub Pages 自动部署</li>
+</ul>
+</div>
+    <footer class="article-footer"><div class="article-tags"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E6%B5%8B%E8%AF%95">测试</a><a class="tag tag-colored" style="--tag-bg:#E8F1FF;--tag-text:#1E5AA8;--tag-border:#BFD6FA;--tag-dark-bg:#152842;--tag-dark-text:#9EC8FF;--tag-dark-border:#31537A;" href="/tags.html#DSH">DSH</a></div></footer>
+    
+    <section class="comments comments-build-preview" data-build-comments="1">
+      <div class="comments-title">评论</div>
+      <p class="comments-build-empty">暂无评论，来抢沙发吧。</p>
+      <div id="commentsRoot"></div>
+      <p class="comments-end-hint" hidden aria-hidden="true"></p>
+    </section>
+    </article>
+    <aside class="toc-sidebar" id="tocSidebar" hidden></aside>
+  </main>
+
+  <div id="site-footer"></div>
+  <div id="site-overlays"></div>
+
+  <script type="module" src="/assets/dist/post.min.js?v=20260627010000"></script>
+</body>
+</html>
