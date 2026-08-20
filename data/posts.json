@@ -1,6 +1,18 @@
 {
   "posts": [
     {
+      "slug": "dsh-gitblog-plugin-e2e-test",
+      "title": "DSH gitblog 插件端到端验证",
+      "date": "2026-08-21T00:47:41+08:00",
+      "updated": "2026-08-21T00:47:41+08:00",
+      "summary": "验证 DSH 自动发布链路",
+      "tags": [
+        "测试",
+        "DSH"
+      ],
+      "path": "posts/dsh-gitblog-plugin-e2e-test.md"
+    },
+    {
       "slug": "dsh-remote-multi-machine-remote-workspace",
       "title": "dsh-remote——给 DeepSeek Harness 的多机远程工作区",
       "date": "2026-08-14",
