@@ -5,18 +5,8 @@
     <link>https://gitpull.cn/</link>
     <description>桃李春风一杯酒，江湖夜雨十年灯。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Thu, 20 Aug 2026 16:48:40 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 20 Aug 2026 16:54:09 GMT</lastBuildDate>
     <atom:link href="https://gitpull.cn/rss.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>DSH gitblog 插件端到端验证</title>
-      <link>https://gitpull.cn/post/20260821/</link>
-      <guid isPermaLink="false">dsh-gitblog-plugin-e2e-test</guid>
-      <pubDate>Thu, 20 Aug 2026 16:47:41 GMT</pubDate>
-      <author>Jimmy</author>
-      <category>测试</category><category>DSH</category>
-      <description><![CDATA[验证 DeepSeek Harness 通过 gitblog 插件自动发布：写内容 -> 推 GitHub -> Actions 构建 -> Pages 发布全链路。验证完成后会自动删除。]]></description>
-      <content:encoded><![CDATA[这是一篇由 DSH gitblog 发布机制自动生成并提交的验证文章，用于确认「写内容 → 推 GitHub → 构建 → 发布」全链路。验证完成后会被自动删除，不会留在博客上。 推送方式：GitHub Contents API（与 gitblog 浏览器后台一致） 构建：push 触发 GitHub Actions build 工作流 发布：GitHub Pages 自动部署]]></content:encoded>
-    </item>
     <item>
       <title>dsh-remote——给 DeepSeek Harness 的多机远程工作区</title>
       <link>https://gitpull.cn/post/20260814/</link>
@@ -335,6 +325,17 @@
       <description><![CDATA[前几天在掘金上看到一个开源项目(PyUI)在招人，一个基于vue.js的UI库，想着反正页闲着，就硬着头皮加入了（其实我都还没学vue.js) 两天速成了一下，学了点皮毛，就开始撸…]]></description>
       <content:encoded><![CDATA[前几天在掘金上看到一个开源项目(PyUI)在招人，一个基于vue.js的UI库，想着反正页闲着，就硬着头皮加入了（其实我都还没学vue.js) 两天速成了一下，学了点皮毛，就开始撸代码了，组织给我分配的是carousel跑马灯的组件 边学边做，一天半撸完了，效果完全参照iview的跑马灯效果（任务要求） 其实原本只要拿iview的代码过来改一改就好了，但是感觉这样页学不到什么，硬着头皮自己撸了 第一次写vue.js感觉在项目任务的督促下学的还是很快的 ¶carousel组件构成 跑马灯的过渡效果主要用了 组件 我的主要思想是将 插槽内的代码块提取出来，用一个 列表放置在 内，然后实现轮播效果 html部分 ¶js部分 我感觉相对于iview的代码，相同的效果我的代码量已经少了好多，当然可能人家的组件比较稳定吧，我的还没经过比较正规的测试 js部分主要就是一些函数鼠标对轮播图的操作，轮播函数是 和 两个函数主要控制的 相对来说，代码量挺少了哈 ¶css部分 css部分有个小问题就是，当底部指示器的位置设置在外部时，我是从carousel的高度中拿出5%的高度作为底部指示器的空间，然后carousel的高度是向外自适应的，所以carousel1的父节点必须指定高度，而且要和内部轮播代码框的高度一致 12月8日更新 修复了上诉问题 以下为scss代码 放上GitHub地址 [ PyUi ](https://github.com/flymysql/PyUI)]]></content:encoded>
       <media:thumbnail url="https://gitpull.cn/../assets/uploads/2026/06/covers/使用vue.js制作carousel跑马灯组件-456bc465.webp" />
+    </item>
+    <item>
+      <title>Dijkstra单源最短路径算法</title>
+      <link>https://gitpull.cn/post/20181123/</link>
+      <guid isPermaLink="false">Dijkstra单源最短路径算法-15e41f53</guid>
+      <pubDate>Fri, 23 Nov 2018 09:32:33 GMT</pubDate>
+      <author>兰州小红鸡</author>
+      <category>前端</category><category>算法</category><category>C++</category>
+      <description><![CDATA[算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。…]]></description>
+      <content:encoded><![CDATA[算法动态演示地址 今天用c++撸了一遍Dijkstra单源最短路径算法，做个记录,先看下算法的描述 ¶问题描述 给定一个带权有向图 G=(V,E) ，其中每条边的权是一个非负实数。另外，还给定 V 中的一个顶点，称为源。现在我们要计算从源到所有其他各顶点的最短路径长度。这里的长度是指路上各边权之和。这个问题通常称为单源最短路径问题。 Dijkstra算法的解决方案 Dijkstra提出按各顶点与源点v间的路径长度的递增次序，生成到各顶点的最短路径的算法。既先求出长度最短的一条最短路径，再参照它求出长度次短的一条最短路径，依次类推，直到从源点v 到其它各顶点的最短路径全部求出为止。 ¶Dijkstra算法的解题思想 将图G中所有的顶点V分成两个顶点集合S和T。以v为源点已经确定了最短路径的终点并入S集合中，S初始时只含顶点v,T则是尚未确定到源点v最短路径的顶点集合。然后每次从T集合中选择S集合点中到T路径最短的那个点，并加入到集合S中，并把这个点从集合T删除。直到T集合为空为止。 ¶具体步骤 1. 选一顶点v为源点，并视从源点v出发的所有边为到各顶点的最短路径（确定数据结构：因为求的是最短路径，所以①就要用一个记录从源点v到其它各顶点的路径长度数组dist\[\],开始时，dist是源点v到顶点i的直接边长度，即dist中记录的是邻接阵的第v行。②设一个用来记录从源点到其它顶点的路径数组path\[\],path中存放路径上第i个顶点的前驱顶点）。 2. 在上述的最短路径dist\[\]中选一条最短的，并将其终点（即v,k）k加入到集合s中。 3. 调整T中各顶点到源点v的最短路径。 因为当顶点k加入到集合s中后，源点v到T中剩余的其它顶点j就又增加了经过顶点k到达j的路径,这条路径可能要比源点v到j原来的最短的还要短。调整方法是比较dist\[k\]+g\[k,j\]与dist\[j\]，取其中的较小者。 4. 再选出一个到源点v路径长度最小的顶点k,从T中删去后加入S中，再回去到第三步，如此重复，直到集合S中的包含图G的所有顶点。 ¶C++代码 感觉代码还是有点臃肿了 晚点打算再写一个 实现的算法 结合html来制作图形界面 ¶2018 11 24更新 花了一早上写了 版本的，并能够动态演示过程 演示地址 ¶部分javascript代码]]></content:encoded>
+      <media:thumbnail url="https://gitpull.cn/assets/uploads/2026/05/Dijkstra单源最短路径算法-15e41f53-01.webp" />
     </item>
   </channel>
 </rss>
