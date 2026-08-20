@@ -2,103 +2,109 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://gitpull.cn/</loc>
-    <lastmod>2026-08-14T00:00:00.000Z</lastmod>
+    <lastmod>2026-08-20T16:47:41.000Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tags.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/archives.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/series.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/tool-age.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/tool-fortune.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/tool-json.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/tool-codec.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/tool-timestamp.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/tool-regex.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/tool-qrcode.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/tool-image.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/tool-network.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/tool-air-conditioner.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/tool-farm-seed.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://gitpull.cn/tools/tool-major.html</loc>
-    <lastmod>2026-08-20T16:40:20.992Z</lastmod>
+    <lastmod>2026-08-20T16:48:40.152Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://gitpull.cn/post/20260821/</loc>
+    <lastmod>2026-08-20T16:47:41.000Z</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

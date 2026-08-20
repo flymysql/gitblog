@@ -1,7 +1,20 @@
 {
-  "generated": "2026-08-20T16:40:20.992Z",
-  "count": 68,
+  "generated": "2026-08-20T16:48:40.151Z",
+  "count": 69,
   "docs": [
+    {
+      "slug": "dsh-gitblog-plugin-e2e-test",
+      "urlKey": "20260821",
+      "title": "DSH gitblog 插件端到端验证",
+      "summary": "验证 DeepSeek Harness 通过 gitblog 插件自动发布：写内容 -> 推 GitHub -> Actions 构建 -> Pages 发布全链路。验证完成后会自动删除。",
+      "tags": [
+        "测试",
+        "DSH"
+      ],
+      "date": "2026-08-21T00:47:41+08:00",
+      "type": "post",
+      "text": "这是一篇由 DSH gitblog 发布机制自动生成并提交的验证文章，用于确认「写内容 → 推 GitHub → 构建 → 发布」全链路。验证完成后会被自动删除，不会留在博客上。 推送方式：GitHub Contents API（与 gitblog 浏览器后台一致） 构建：push 触发 GitHub Actions build 工作流 发布：GitHub Pages 自动部署"
+    },
     {
       "slug": "dsh-remote-multi-machine-remote-workspace",
       "urlKey": "20260814",
