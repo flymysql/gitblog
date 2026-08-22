@@ -2,53 +2,75 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
 <title>淘宝证书上传 · 问题反馈</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
-.app { max-width: 760px; margin: 0 auto; padding: 32px 20px; }
-h1 { font-size: 24px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
-.sub { color: #94a3b8; font-size: 14px; margin-bottom: 24px; }
-.card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 24px; margin-bottom: 18px; }
+:root { --bg:#0b1120; --card:#131c31; --border:#233046; --text:#e2e8f0; --muted:#8fa3bf; --primary:#3b82f6; --primary-2:#8b5cf6; --green:#34d399; --amber:#fbbf24; --red:#f87171; --radius:16px; --shadow:0 10px 40px rgba(0,0,0,.35); }
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+body::before { content:''; position: fixed; inset: 0; background: radial-gradient(800px 400px at 15% -10%, rgba(59,130,246,.12), transparent 60%), radial-gradient(700px 400px at 85% 110%, rgba(139,92,246,.10), transparent 60%); pointer-events: none; z-index: 0; }
+.app { max-width: 780px; margin: 0 auto; padding: 24px 20px 40px; position: relative; z-index: 1; }
+.nav { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 20px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; }
+.brand img { width: 30px; height: 30px; border-radius: 8px; }
+.nav-links { display: flex; gap: 4px; }
+.nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; padding: 8px 14px; border-radius: 10px; transition: all .2s; }
+.nav-links a:hover { color: var(--text); background: rgba(255,255,255,.06); }
+.nav-links a.active { color: var(--text); background: rgba(59,130,246,.15); }
+.mobile-menu-btn { display: none; background: none; border: 1px solid var(--border); color: var(--text); font-size: 20px; padding: 6px 12px; border-radius: 10px; cursor: pointer; }
+h1 { font-size: clamp(22px, 4vw, 28px); font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #93c5fd, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 18px; box-shadow: var(--shadow); }
 .card h2 { font-size: 16px; margin-bottom: 14px; }
-label { display: block; font-size: 13px; color: #94a3b8; margin: 12px 0 6px; }
-input, textarea, select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #e2e8f0; font-size: 14px; font-family: inherit; }
-textarea { min-height: 120px; resize: vertical; }
-input:focus, textarea:focus { outline: none; border-color: #2563eb; }
+label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
+input, textarea, select { width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; font-family: inherit; transition: border-color .2s; }
+textarea { min-height: 130px; resize: vertical; }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
 .row { display: flex; gap: 12px; }
 .row > div { flex: 1; }
-.submit-btn { width: 100%; padding: 13px; border-radius: 10px; border: none; background: #2563eb; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 18px; }
-.submit-btn:hover { background: #1d4ed8; }
-.submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+.submit-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 18px; box-shadow: 0 6px 20px rgba(59,130,246,.3); transition: all .2s; }
+.submit-btn:hover { transform: translateY(-2px); }
+.submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 .msg { margin-top: 12px; font-size: 14px; min-height: 20px; }
-.msg.ok { color: #4ade80; }
-.msg.err { color: #f87171; }
-.tips { font-size: 13px; color: #94a3b8; line-height: 1.8; margin-top: 12px; }
-.tips code { background: #1e293b; padding: 1px 6px; border-radius: 5px; color: #60a5fa; }
-.nav-links { display: flex; gap: 14px; margin-bottom: 24px; }
-.nav-links a { color: #60a5fa; text-decoration: none; font-size: 14px; padding: 6px 14px; border: 1px solid #334155; border-radius: 8px; }
-.nav-links a:hover { border-color: #2563eb; }
-.nav-links a.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+.msg.ok { color: var(--green); }
+.msg.err { color: var(--red); }
+.tips { font-size: 13px; color: var(--muted); line-height: 1.8; margin-top: 12px; padding: 12px 14px; background: rgba(59,130,246,.06); border-radius: 10px; }
+.tips code { background: rgba(255,255,255,.08); padding: 1px 6px; border-radius: 5px; color: #93c5fd; }
 .status { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; margin-left: 8px; }
-.status-new { background: #7f1d1d; color: #f87171; }
-.status-processing { background: #78350f; color: #fbbf24; }
-.status-done { background: #14532d; color: #4ade80; }
+.status-new { background: rgba(248,113,113,.15); color: var(--red); }
+.status-processing { background: rgba(251,191,36,.15); color: var(--amber); }
+.status-done { background: rgba(52,211,153,.15); color: var(--green); }
 .feedback-list { margin-top: 24px; }
-.feedback-item { background: #0f172a; border: 1px solid #2d3a4e; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
-.feedback-item .meta { font-size: 12px; color: #64748b; margin-bottom: 6px; }
+.feedback-item { background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 12px; }
+.feedback-item .meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
 .feedback-item .content { font-size: 14px; line-height: 1.6; }
-.feedback-item .reply { margin-top: 8px; padding: 8px 12px; background: #14532d33; border-left: 3px solid #4ade80; border-radius: 6px; font-size: 13px; color: #a7f3d0; }
+.feedback-item .reply { margin-top: 10px; padding: 10px 14px; background: rgba(52,211,153,.08); border-left: 3px solid var(--green); border-radius: 8px; font-size: 13px; color: #a7f3d0; }
+@media (max-width: 768px) {
+  .app { padding: 16px; }
+  .nav-links { display: none; position: absolute; top: 56px; left: 16px; right: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 8px; flex-direction: column; z-index: 100; box-shadow: var(--shadow); }
+  .nav-links.open { display: flex; }
+  .nav-links a { padding: 12px 14px; }
+  .mobile-menu-btn { display: block; }
+  .card { padding: 18px; }
+  .row { flex-direction: column; gap: 0; }
+}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="nav-links">
-    <a href="/index.html">🏠 首页</a>
-    <a href="/downloads.html">⬇ 下载中心</a>
-    <a href="/feedback.html" class="active">💬 问题反馈</a>
-    <a href="/admin.html">🔐 后台管理</a>
-  </div>
+  <nav class="nav">
+    <div class="brand"><img src="/favicon.png" alt="logo"> 淘宝证书自动上传</div>
+    <button class="mobile-menu-btn" id="menu-btn" aria-label="菜单">☰</button>
+    <div class="nav-links" id="nav-links">
+      <a href="/index.html">🏠 首页</a>
+      <a href="/downloads.html">⬇ 下载</a>
+      <a href="/feedback.html" class="active">💬 反馈</a>
+      <a href="/admin.html">🔐 后台</a>
+    </div>
+  </nav>
 
   <h1>💬 问题反馈</h1>
   <p class="sub">遇到问题在这里告诉我们，我们会尽快处理回复。反馈可匿名提交，也可留下联系方式方便我们联系你。</p>
@@ -96,6 +118,7 @@ input:focus, textarea:focus { outline: none; border-color: #2563eb; }
 </div>
 
 <script>
+document.getElementById('menu-btn').addEventListener('click', () => document.getElementById('nav-links').classList.toggle('open'));
 const API = 'https://gitbolg-d7gmnsrw46e011706-1256429518.ap-shanghai.app.tcloudbase.com/tcb-admin';
 
 async function submit() {

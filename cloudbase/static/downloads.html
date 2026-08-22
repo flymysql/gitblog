@@ -2,50 +2,84 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
 <title>淘宝证书上传 · 下载中心</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
-.app { max-width: 860px; margin: 0 auto; padding: 32px 20px; }
-h1 { font-size: 24px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
-.sub { color: #94a3b8; font-size: 14px; margin-bottom: 28px; }
-.card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 22px; margin-bottom: 18px; }
-.card h2 { font-size: 16px; margin-bottom: 14px; color: #e2e8f0; }
+:root {
+  --bg: #0b1120; --card: #131c31; --border: #233046; --text: #e2e8f0;
+  --muted: #8fa3bf; --primary: #3b82f6; --primary-2: #8b5cf6;
+  --green: #34d399; --radius: 16px; --shadow: 0 10px 40px rgba(0,0,0,.35);
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+body::before { content:''; position: fixed; inset: 0; background: radial-gradient(800px 400px at 15% -10%, rgba(59,130,246,.12), transparent 60%), radial-gradient(700px 400px at 85% 110%, rgba(139,92,246,.10), transparent 60%); pointer-events: none; z-index: 0; }
+.app { max-width: 900px; margin: 0 auto; padding: 24px 20px 40px; position: relative; z-index: 1; }
+.nav { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 20px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; }
+.brand img { width: 30px; height: 30px; border-radius: 8px; }
+.nav-links { display: flex; gap: 4px; }
+.nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; padding: 8px 14px; border-radius: 10px; transition: all .2s; }
+.nav-links a:hover { color: var(--text); background: rgba(255,255,255,.06); }
+.nav-links a.active { color: var(--text); background: rgba(59,130,246,.15); }
+.mobile-menu-btn { display: none; background: none; border: 1px solid var(--border); color: var(--text); font-size: 20px; padding: 6px 12px; border-radius: 10px; cursor: pointer; }
+h1 { font-size: clamp(22px, 4vw, 28px); font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #93c5fd, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
+.card h2 { font-size: 17px; margin-bottom: 16px; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid #2d3a4e; }
-th { color: #94a3b8; font-weight: 600; font-size: 12px; }
-tr:hover td { background: #243250; }
-.dl-btn { display: inline-block; padding: 7px 20px; border-radius: 8px; background: #2563eb; color: #fff; text-decoration: none; font-size: 13px; font-weight: 600; }
-.dl-btn:hover { background: #1d4ed8; }
-.version-tag { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; background: #14532d; color: #4ade80; font-weight: 600; }
-.empty { color: #64748b; text-align: center; padding: 30px 0; }
-.muted { color: #94a3b8; font-size: 13px; }
-.nav-links { display: flex; gap: 14px; margin-bottom: 24px; }
-.nav-links a { color: #60a5fa; text-decoration: none; font-size: 14px; padding: 6px 14px; border: 1px solid #334155; border-radius: 8px; }
-.nav-links a:hover { border-color: #2563eb; }
-.nav-links a.active { background: #2563eb; color: #fff; border-color: #2563eb; }
-
-.install-steps { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 16px 20px; margin-top: 16px; font-size: 14px; line-height: 2; }
-.install-steps code { background: #1e293b; padding: 2px 8px; border-radius: 6px; color: #60a5fa; font-size: 13px; }
+th, td { text-align: left; padding: 13px 14px; border-bottom: 1px solid rgba(35,48,70,.8); }
+th { color: var(--muted); font-weight: 600; font-size: 12px; }
+tr:hover td { background: rgba(255,255,255,.03); }
+.dl-btn { display: inline-block; padding: 8px 22px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #fff; text-decoration: none; font-size: 13px; font-weight: 600; box-shadow: 0 4px 14px rgba(59,130,246,.3); transition: all .2s; }
+.dl-btn:hover { transform: translateY(-1px); }
+.version-tag { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: 12px; background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.3); color: var(--green); font-weight: 600; }
+.empty { color: var(--muted); text-align: center; padding: 30px 0; }
+.muted { color: var(--muted); font-size: 13px; }
+.latest-wrap { display: flex; gap: 12px; flex-wrap: wrap; }
+.latest-box { flex: 1; min-width: 240px; background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+.latest-box .browser { font-size: 26px; margin-bottom: 6px; }
+.latest-box h4 { font-size: 14px; margin-bottom: 4px; }
+.latest-box .desc { font-size: 12px; color: var(--muted); margin-bottom: 12px; line-height: 1.5; }
+.install-steps { background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-top: 8px; font-size: 14px; line-height: 2.2; }
+.install-steps b { color: var(--text); }
+.install-steps code { background: rgba(255,255,255,.08); padding: 2px 8px; border-radius: 6px; color: #93c5fd; font-size: 13px; }
+.install-steps .muted { color: var(--muted); font-size: 13px; }
+@media (max-width: 768px) {
+  .app { padding: 16px; }
+  .nav-links { display: none; position: absolute; top: 56px; left: 16px; right: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 8px; flex-direction: column; z-index: 100; box-shadow: var(--shadow); }
+  .nav-links.open { display: flex; }
+  .nav-links a { padding: 12px 14px; }
+  .mobile-menu-btn { display: block; }
+  .card { padding: 18px; }
+  .latest-wrap { flex-direction: column; }
+  .latest-box { min-width: 0; }
+  table { font-size: 12px; }
+  th, td { padding: 10px 8px; }
+}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="nav-links">
-    <a href="/index.html">🏠 首页</a>
-    <a href="/downloads.html" class="active">⬇ 下载中心</a>
-    <a href="/feedback.html">💬 问题反馈</a>
-    <a href="/admin.html">🔐 后台管理</a>
-  </div>
-  <h1>📦 淘宝证书自动上传 · 下载中心</h1>
+  <nav class="nav">
+    <div class="brand"><img src="/favicon.png" alt="logo"> 淘宝证书自动上传</div>
+    <button class="mobile-menu-btn" id="menu-btn" aria-label="菜单">☰</button>
+    <div class="nav-links" id="nav-links">
+      <a href="/index.html">🏠 首页</a>
+      <a href="/downloads.html" class="active">⬇ 下载</a>
+      <a href="/feedback.html">💬 反馈</a>
+      <a href="/admin.html">🔐 后台</a>
+    </div>
+  </nav>
+
+  <h1>📦 下载中心</h1>
   <p class="sub">最新插件包下载（无需登录）· 安装前请先移除旧版本插件</p>
 
   <div class="card">
     <h2>🚀 最新版本</h2>
-    <div id="latest-version">
-      <p class="empty">加载中…</p>
-    </div>
+    <div id="latest-version"><p class="empty">加载中…</p></div>
   </div>
 
   <div class="card">
@@ -61,17 +95,15 @@ tr:hover td { background: #243250; }
     <div class="install-steps">
       <b>🟢 360 极速浏览器（推荐，直接拖拽安装）</b><br>
       1. 下载 <b>360 版 .crx</b> 文件到本地<br>
-      2. 打开 360 极速浏览器，地址栏访问 <code>se://extensions/</code>（或 360 安全浏览器 <code>se://extensions/</code>）<br>
+      2. 打开 360 极速浏览器，地址栏访问 <code>se://extensions/</code><br>
       3. 开启右上角 <b>开发者模式</b><br>
-      4. 将下载的 <code>.crx</code> 文件<b>直接拖入</b>浏览器窗口<br>
-      5. 弹出确认框点击「添加」即可完成安装<br>
+      4. 将下载的 <code>.crx</code> 文件<b>直接拖入</b>浏览器窗口，点击「添加」<br>
       <br>
       <b>🔵 Chrome / Edge 浏览器（需解压安装）</b><br>
       1. 下载 <b>Chrome 版 .zip</b> 文件到本地<br>
-      2. 将 zip <b>解压</b>到一个固定文件夹（如 <code>D:\taobao-cert</code>），解压后应能看到 manifest.json<br>
-      3. 打开 Chrome，访问 <code>chrome://extensions/</code>（Edge 访问 <code>edge://extensions/</code>）<br>
-      4. 开启右上角 <b>开发者模式</b><br>
-      5. 点击 <b>「加载已解压的扩展程序」</b>，选择刚才解压的文件夹<br>
+      2. 将 zip <b>解压</b>到固定文件夹（如 <code>D:\taobao-cert</code>），应能看到 manifest.json<br>
+      3. 打开 Chrome 访问 <code>chrome://extensions/</code>（Edge 访问 <code>edge://extensions/</code>）<br>
+      4. 开启 <b>开发者模式</b> → 点 <b>「加载已解压的扩展程序」</b> → 选择解压后的文件夹<br>
       <span class="muted">⚠️ 解压后的文件夹请勿删除或移动，否则插件会失效。</span><br>
       <span class="muted">⚠️ 360 若提示「无法从该网站添加应用」，请确认已开启开发者模式后再拖拽。</span>
     </div>
@@ -80,7 +112,7 @@ tr:hover td { background: #243250; }
 
 <script>
 const API = 'https://gitbolg-d7gmnsrw46e011706-1256429518.ap-shanghai.app.tcloudbase.com/tcb-admin';
-const HOSTING = 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com';
+document.getElementById('menu-btn').addEventListener('click', () => document.getElementById('nav-links').classList.toggle('open'));
 
 async function load() {
   try {
@@ -92,37 +124,32 @@ async function load() {
       document.getElementById('history-body').innerHTML = '<tr><td colspan="4" class="empty">暂无历史版本</td></tr>';
       return;
     }
-    // 按版本分组，最新版本在前
     const byVer = {};
-    files.forEach((f) => {
-      const v = f.version || 'latest';
-      (byVer[v] = byVer[v] || []).push(f);
-    });
+    files.forEach((f) => { const v = f.version || 'latest'; (byVer[v] = byVer[v] || []).push(f); });
     const verKeys = Object.keys(byVer).sort((a, b) => (a === 'latest' ? 1 : b === 'latest' ? -1 : b.localeCompare(a)));
     const latestVer = verKeys[0];
     const latestFiles = byVer[latestVer];
     const chromeFile = latestFiles.find((f) => /chrome|zip/i.test(f.filename) && /\.zip$/i.test(f.filename));
     const crxFile = latestFiles.find((f) => /\.crx$/i.test(f.filename));
     document.getElementById('latest-version').innerHTML = `
-      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px">
         <span class="version-tag">v${latestVer}</span>
         <span class="muted">更新时间 ${fmtTime(latestFiles[0].ts)}</span>
       </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        ${crxFile ? `<div style="flex:1;min-width:240px;background:#0f172a;border:1px solid #2d3a4e;border-radius:10px;padding:16px">
-          <div style="font-weight:600;margin-bottom:6px">🟢 360 极速浏览器</div>
-          <div class="muted" style="margin-bottom:10px">直接拖拽安装 .crx<br>${crxFile.size ? (crxFile.size/1024).toFixed(0)+' KB' : ''}</div>
+      <div class="latest-wrap">
+        ${crxFile ? `<div class="latest-box">
+          <div class="browser">🟢</div><h4>360 极速浏览器</h4>
+          <div class="desc">直接拖拽安装 .crx<br>${crxFile.size ? (crxFile.size/1024).toFixed(0)+' KB' : ''}</div>
           <a class="dl-btn" href="${crxFile.url}" download>⬇ 下载 360 版</a>
         </div>` : ''}
-        ${chromeFile ? `<div style="flex:1;min-width:240px;background:#0f172a;border:1px solid #2d3a4e;border-radius:10px;padding:16px">
-          <div style="font-weight:600;margin-bottom:6px">🔵 Chrome / Edge</div>
-          <div class="muted" style="margin-bottom:10px">下载 zip 后解压加载<br>${chromeFile.size ? (chromeFile.size/1024).toFixed(0)+' KB' : ''}</div>
+        ${chromeFile ? `<div class="latest-box">
+          <div class="browser">🔵</div><h4>Chrome / Edge</h4>
+          <div class="desc">下载 zip 后解压加载<br>${chromeFile.size ? (chromeFile.size/1024).toFixed(0)+' KB' : ''}</div>
           <a class="dl-btn" href="${chromeFile.url}" download>⬇ 下载 Chrome 版</a>
         </div>` : ''}
       </div>
-      ${latestFiles[0].note ? `<p class="muted" style="margin-top:10px">${latestFiles[0].note}</p>` : ''}`;
+      ${latestFiles[0].note ? `<p class="muted" style="margin-top:12px">${latestFiles[0].note}</p>` : ''}`;
 
-    // 历史版本（去掉最新版）
     const historyFiles = files.filter((f) => (f.version || 'latest') !== latestVer);
     document.getElementById('history-body').innerHTML = historyFiles.map((f) => `
       <tr>
@@ -135,10 +162,7 @@ async function load() {
     document.getElementById('latest-version').innerHTML = `<p class="empty">加载失败：${e.message}</p>`;
   }
 }
-function fmtTime(ts) {
-  if (!ts) return '-';
-  return new Date(ts).toLocaleString('zh-CN', { hour12: false });
-}
+function fmtTime(ts) { if (!ts) return '-'; return new Date(ts).toLocaleString('zh-CN', { hour12: false }); }
 load();
 </script>
 </body>
