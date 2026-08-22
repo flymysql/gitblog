@@ -1,70 +1,70 @@
 {
- "envId": "gitbolg-d7gmnsrw46e011706",
- "functionRoot": "./functions",
- "hosting": {
-  "root": "./static",
-  "ignore": []
- },
- "functions": [
-  {
-   "name": "gitblog-comments",
-   "timeout": 15,
-   "runtime": "Nodejs18.15",
-   "memorySize": 256,
-   "handler": "index.main",
-   "installDependency": true,
-   "envVariables": {
-    "COMMENT_MODERATION": "0",
-    "COMMENT_SALT": "change-me-in-console",
-    "COMMENT_ORPHAN_IMAGE_MIN_AGE_MS": "86400000",
-    "ALLOWED_ORIGINS": "https://gitpull.cn,https://www.gitpull.cn",
-    "REPLY_NOTIFY_ENABLED": "1",
-    "COMMENT_NOTIFY_ENABLED": "1",
-    "COMMENT_NOTIFY_EMAIL": "jimmycppliu@tencent.com",
-    "COMMENT_ADMIN_SECRET": "change-me-in-console",
-    "GITHUB_PAT": "change-me-in-console",
-    "GITHUB_REPO_OWNER": "flymysql",
-    "GITHUB_REPO_NAME": "gitblog",
-    "GITHUB_REPO_BRANCH": "main",
-    "SMTP_HOST": "smtp.qq.com",
-    "SMTP_PORT": "465",
-    "SMTP_USER": "237199972@qq.com",
-    "SMTP_PASS": "",
-    "SMTP_FROM": "237199972@qq.com",
-    "SITE_URL": "https://gitpull.cn"
-   },
-   "triggers": [
+  "envId": "gitbolg-d7gmnsrw46e011706",
+  "functionRoot": "./functions",
+  "hosting": {
+    "root": "./static",
+    "ignore": []
+  },
+  "functions": [
     {
-     "name": "commentImageCleanup",
-     "type": "timer",
-     "config": "0 0 4 * * * *"
+      "name": "gitblog-comments",
+      "timeout": 15,
+      "runtime": "Nodejs18.15",
+      "memorySize": 256,
+      "handler": "index.main",
+      "installDependency": true,
+      "envVariables": {
+        "COMMENT_MODERATION": "0",
+        "COMMENT_SALT": "change-me-in-console",
+        "COMMENT_ORPHAN_IMAGE_MIN_AGE_MS": "86400000",
+        "ALLOWED_ORIGINS": "https://gitpull.cn,https://www.gitpull.cn",
+        "REPLY_NOTIFY_ENABLED": "1",
+        "COMMENT_NOTIFY_ENABLED": "1",
+        "COMMENT_NOTIFY_EMAIL": "jimmycppliu@tencent.com",
+        "COMMENT_ADMIN_SECRET": "change-me-in-console",
+        "GITHUB_PAT": "change-me-in-console",
+        "GITHUB_REPO_OWNER": "flymysql",
+        "GITHUB_REPO_NAME": "gitblog",
+        "GITHUB_REPO_BRANCH": "main",
+        "SMTP_HOST": "smtp.qq.com",
+        "SMTP_PORT": "465",
+        "SMTP_USER": "237199972@qq.com",
+        "SMTP_PASS": "",
+        "SMTP_FROM": "237199972@qq.com",
+        "SITE_URL": "https://gitpull.cn"
+      },
+      "triggers": [
+        {
+          "name": "commentImageCleanup",
+          "type": "timer",
+          "config": "0 0 4 * * * *"
+        }
+      ]
+    },
+    {
+      "name": "tcb-log-upload",
+      "timeout": 20,
+      "runtime": "Nodejs16.13",
+      "memorySize": 256,
+      "handler": "index.main",
+      "installDependency": true,
+      "envVariables": {
+        "UPLOAD_TOKEN": ""
+      }
+    },
+    {
+      "name": "tcb-admin",
+      "timeout": 20,
+      "runtime": "Nodejs16.13",
+      "memorySize": 256,
+      "handler": "index.main",
+      "installDependency": true,
+      "envVariables": {
+        "ADMIN_USER": "admin",
+        "ADMIN_PASS": "",
+        "REPORT_TOKEN": "",
+        "TOKEN_SECRET": ""
+      }
     }
-   ]
-  },
-  {
-   "name": "tcb-log-upload",
-   "timeout": 20,
-   "runtime": "Nodejs16.13",
-   "memorySize": 256,
-   "handler": "index.main",
-   "installDependency": true,
-   "envVariables": {
-    "UPLOAD_TOKEN": ""
-   }
-  },
-  {
-   "name": "tcb-admin",
-   "timeout": 20,
-   "runtime": "Nodejs16.13",
-   "memorySize": 256,
-   "handler": "index.main",
-   "installDependency": true,
-   "envVariables": {
-    "ADMIN_USER": "admin",
-    "ADMIN_PASS": "",
-    "REPORT_TOKEN": "",
-    "TOKEN_SECRET": ""
-   }
-  }
- ]
+  ]
 }

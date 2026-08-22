@@ -6,6 +6,7 @@ node_modules/
 .vscode/
 .env
 cloudbase/secrets.env
+cloudbase/.env.private
 cloudbase/.cloudbaserc.deploy.json
 cloudbase/.deploy-static/
 
