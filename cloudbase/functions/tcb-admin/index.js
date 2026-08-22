@@ -466,6 +466,17 @@ exports.main = async (event, context) => {
       }
     }
 
+    // 公开白名单（免登录，供插件内容脚本拉取）
+    if (method === 'GET' && (path.includes('/public-whitelist') || action === 'public-whitelist')) {
+      try {
+        await ensureCollections();
+        const rows = await db.collection(COLL_WHITELIST).limit(500).get();
+        return httpResponse(200, jsonOk({ list: (rows.data || []).map((r) => r.shopName) }), origin);
+      } catch (e) {
+        return httpResponse(200, jsonOk({ list: [], hint: e.message }), origin);
+      }
+    }
+
     // 提交用户反馈（公开，免登录）
     if (method === 'POST' && action === 'feedback-submit') {
       await ensureCollections();
