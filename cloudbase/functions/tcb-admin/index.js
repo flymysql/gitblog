@@ -10,7 +10,8 @@
  *  - GET  /logs         列出已上传的日志包
  *  - GET  /builds       列出最新发包
  *  - GET/POST /whitelist 白名单管理（在线增删查）
- *  - GET  /heartbeat    插件心跳（记录在线状态）
+ *  - POST /heartbeat    插件心跳（记录在线状态，按店铺 upsert）
+ *  - POST /alert        异常上报（触发邮件告警）
  *
  * 数据模型（CloudBase 数据库）：
  *  - collection tcb_stats       统计事件（每条：type/shopName/certXxx/ts）
@@ -50,6 +51,64 @@ const COLL_HEART = 'tcb_heartbeats';
 const COLL_WHITELIST = 'tcb_whitelist';
 const COLL_LOG_FILES = 'tcb_log_files';
 const COLL_FEEDBACK = 'tcb_feedback';
+
+// —— 邮件告警（异常通知） ——
+const SMTP_HOST = String(process.env.SMTP_HOST || '').trim();
+const SMTP_PORT = Number(process.env.SMTP_PORT) || 465;
+const SMTP_USER = String(process.env.SMTP_USER || '').trim();
+const SMTP_PASS = String(process.env.SMTP_PASS || '').trim();
+const SMTP_FROM = String(process.env.SMTP_FROM || SMTP_USER).trim();
+const ALERT_EMAIL = String(process.env.ALERT_EMAIL || '').trim(); // 告警接收邮箱
+const ALERT_COOLDOWN_MS = 5 * 60 * 1000; // 同一店铺同类异常 5 分钟冷却
+
+let alertCooldown = new Map(); // key -> lastAlertAt
+
+function emailEnabled() {
+  return !!(SMTP_HOST && SMTP_USER && ALERT_EMAIL);
+}
+
+async function sendAlertEmail(subject, html) {
+  if (!emailEnabled()) return { ok: false, error: '邮件未配置' };
+  try {
+    const nodemailer = require('nodemailer');
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_PORT === 465,
+      auth: { user: SMTP_USER, pass: SMTP_PASS },
+    });
+    await transporter.sendMail({
+      from: `"淘宝证书插件" <${SMTP_FROM}>`,
+      to: ALERT_EMAIL,
+      subject,
+      html,
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error('邮件发送失败:', e.message);
+    return { ok: false, error: e.message };
+  }
+}
+
+/** 触发异常告警（带冷却，避免告警风暴） */
+async function triggerAlert(shopName, reason, detail) {
+  const key = `${shopName || '未知'}|${reason || 'unknown'}`;
+  const last = alertCooldown.get(key) || 0;
+  if (now() - last < ALERT_COOLDOWN_MS) return { ok: true, throttled: true };
+  alertCooldown.set(key, now());
+
+  const shop = String(shopName || '未知店铺');
+  const subject = `⚠️ [淘宝证书] ${shop} 异常: ${reason || '未知'}`;
+  const html = `
+    <h3>淘宝证书插件异常告警</h3>
+    <p><b>店铺:</b> ${shop}</p>
+    <p><b>异常类型:</b> ${reason || '未知'}</p>
+    <p><b>详情:</b> ${String(detail || '').slice(0, 500)}</p>
+    <p><b>时间:</b> ${new Date().toLocaleString('zh-CN')}</p>
+    <p><a href="https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com/admin.html">前往后台查看 →</a></p>
+  `;
+  return await sendAlertEmail(subject, html);
+}
 
 const LOG_PREFIX = 'tcb-logs/';
 const BUILD_PREFIX = 'tcb-builds/';
@@ -222,6 +281,18 @@ async function handleReport(events, origin) {
 async function handleStats() {
   const shops = await db.collection(COLL_SHOPS).orderBy('lastActiveAt', 'desc').limit(100).get();
   const events = await db.collection(COLL_STATS).orderBy('ts', 'desc').limit(500).get();
+  // 在线状态（心跳）：最近 5 分钟内有心跳视为在线
+  const ONLINE_WINDOW_MS = 5 * 60 * 1000;
+  const hearts = await db.collection(COLL_HEART).limit(200).get().catch(() => null);
+  const heartMap = {};
+  (hearts && hearts.data || []).forEach((h) => {
+    heartMap[h.shopName] = {
+      online: now() - (h.ts || 0) < ONLINE_WINDOW_MS,
+      lastSeen: h.ts || 0,
+      version: h.version || '',
+      status: h.status || '',
+    };
+  });
 
   let totalUploaded = 0, totalSkipped = 0, totalFailed = 0, totalOk = 0, totalErr = 0;
   (shops.data || []).forEach((s) => {
@@ -285,6 +356,8 @@ async function handleStats() {
   return jsonOk({
     shops: shops.data || [],
     shopsDetailed,
+    heartbeats: heartMap,
+    onlineCount: Object.values(heartMap).filter((h) => h.online).length,
     recent: (events.data || []).slice(0, 100),
     buckets,
     daily,
@@ -457,10 +530,32 @@ exports.main = async (event, context) => {
       return httpResponse(r.ok ? 200 : 400, r, origin);
     }
 
-    // 心跳（插件在线状态）
+    // 心跳（插件在线状态，按店铺 upsert）
     if (method === 'POST' && (path.endsWith('/heartbeat') || action === 'heartbeat')) {
-      await db.collection(COLL_HEART).add({ ...body, ts: now() }).catch(() => null);
+      await ensureCollections();
+      const shop = String(body.shopName || '未知店铺').slice(0, 100);
+      const ts = now();
+      const version = String(body.version || '').slice(0, 30);
+      const status = String(body.status || 'idle').slice(0, 30);
+      try {
+        const exist = await db.collection(COLL_HEART).where({ shopName: shop }).get();
+        if (exist.data && exist.data.length) {
+          await db.collection(COLL_HEART).doc(exist.data[0]._id).update({ ts, version, status, updatedAt: ts });
+        } else {
+          await db.collection(COLL_HEART).add({ shopName: shop, ts, version, status, updatedAt: ts });
+        }
+      } catch (e) { /* 心跳失败不阻断 */ }
       return httpResponse(200, jsonOk(), origin);
+    }
+
+    // 异常告警上报（插件检测到异常时调用，云函数发邮件）
+    if (method === 'POST' && (path.endsWith('/alert') || action === 'alert')) {
+      const token = event.headers?.['x-admin-token'] || event.headers?.['X-Admin-Token'] || '';
+      if (REPORT_TOKEN && token !== REPORT_TOKEN) {
+        return httpResponse(403, jsonErr('上报令牌无效'), origin);
+      }
+      const r = await triggerAlert(body.shopName, body.reason, body.detail);
+      return httpResponse(r.ok ? 200 : 500, r, origin);
     }
 
     // 公开发包列表（无需登录，供下载页使用；只暴露已发布的 build 元数据）

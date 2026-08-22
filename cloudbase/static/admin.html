@@ -144,7 +144,7 @@ a:hover { text-decoration: underline; }
 
   <div id="tab-shops" class="panel tab-panel">
     <h3>各店铺证书上传情况（含分阶段）</h3>
-    <table><thead><tr><th>店铺</th><th>累计上传</th><th>1天</th><th>7天</th><th>30天</th><th>跳过</th><th>失败</th><th>正常/异常订单</th><th>最后活跃</th></tr></thead>
+    <table><thead><tr><th>店铺(在线)</th><th>累计上传</th><th>1天</th><th>7天</th><th>30天</th><th>跳过</th><th>失败</th><th>正常/异常订单</th><th>版本</th><th>最后活跃</th></tr></thead>
     <tbody id="shops-body"></tbody></table>
     <div class="msg" id="shops-msg"></div>
   </div>
@@ -249,7 +249,7 @@ async function loadStats() {
     // 分阶段柱状图 + 每日趋势图
     renderBucketChart(d.buckets || []);
     renderDailyChart(d.daily || []);
-    renderShops(d.shopsDetailed || d.shops || []);
+    renderShops(d.shopsDetailed || d.shops || [], d.heartbeats || {}, d.onlineCount || 0);
     renderEvents(d.recent || []);
   } catch (e) { /* 登录过期已处理 */ }
 }
@@ -330,22 +330,36 @@ function fmtTime(ts) {
   return d.toLocaleString('zh-CN', { hour12: false });
 }
 
-function renderShops(shops) {
+function renderShops(shops, heartbeats, onlineCount) {
   const tb = document.getElementById('shops-body');
   tb.innerHTML = '';
-  if (!shops.length) { tb.innerHTML = '<tr><td colspan="9" class="empty">暂无店铺数据</td></tr>'; return; }
+  if (!shops.length) { tb.innerHTML = '<tr><td colspan="10" class="empty">暂无店铺数据</td></tr>'; return; }
+  // 在线统计角标
+  const badge = document.getElementById('online-badge');
+  if (badge && onlineCount !== undefined) {
+    badge.textContent = `${onlineCount} 台在线`;
+    badge.style.background = onlineCount > 0 ? 'rgba(52,211,153,.15)' : 'rgba(248,113,113,.15)';
+    badge.style.color = onlineCount > 0 ? '#34d399' : '#f87171';
+  }
   shops.forEach((s) => {
     const b = s.buckets || [];
     const b1 = (b.find((x) => x.days === 1) || {}).uploaded || 0;
     const b7 = (b.find((x) => x.days === 7) || {}).uploaded || 0;
     const b30 = (b.find((x) => x.days === 30) || {}).uploaded || 0;
+    const hb = heartbeats ? heartbeats[s.shopName] : null;
+    const online = !!(hb && hb.online);
+    const onlineHtml = `<span style="display:inline-flex;align-items:center;gap:5px">
+      <span style="width:8px;height:8px;border-radius:50%;background:${online ? '#34d399' : '#64748b'};display:inline-block;box-shadow:${online ? '0 0 6px #34d399' : 'none'}"></span>
+      <span style="color:${online ? '#34d399' : '#64748b'};font-size:12px">${online ? '在线' : '离线'}</span>
+    </span>`;
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${s.shopName || '-'}</td>
+    tr.innerHTML = `<td>${onlineHtml} ${s.shopName || '-'}</td>
       <td style="color:#60a5fa;font-weight:600">${s.certUploaded || 0}</td>
       <td>${b1}</td><td>${b7}</td><td>${b30}</td>
       <td>${s.certSkipped || 0}</td>
       <td style="color:${(s.certFailed||0)>0?'#f87171':'#94a3b8'}">${s.certFailed || 0}</td>
       <td><span style="color:#4ade80">${s.orderOk || 0}</span> / <span style="color:${(s.orderError||0)>0?'#fbbf24':'#94a3b8'}">${s.orderError || 0}</span></td>
+      <td>${hb && hb.version ? 'v' + hb.version : '-'}</td>
       <td>${fmtTime(s.lastActiveAt)}</td>`;
     tb.appendChild(tr);
   });
