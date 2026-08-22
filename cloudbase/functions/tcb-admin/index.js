@@ -31,10 +31,17 @@ const _ = db.command;
 const ENV_ID = String(process.env.TCB_ENV_ID || '').trim() || 'gitbolg-d7gmnsrw46e011706';
 const STORAGE_BUCKET_ID = `6769-${ENV_ID}-1256429518`;
 
-// 后台管理员账号（环境变量配置；默认 admin / 请在控制台修改）
+// 后台管理员账号（必须从 CloudBase 控制台环境变量配置，不提供弱密码兜底）
 const ADMIN_USER = String(process.env.ADMIN_USER || 'admin').trim();
-const ADMIN_PASS = String(process.env.ADMIN_PASS || 'CHANGE_ME').trim();
-const REPORT_TOKEN = String(process.env.REPORT_TOKEN || 'CHANGE_ME').trim();
+const ADMIN_PASS = String(process.env.ADMIN_PASS || '').trim();
+const REPORT_TOKEN = String(process.env.REPORT_TOKEN || '').trim();
+const TOKEN_SECRET = String(process.env.TOKEN_SECRET || '').trim();
+
+// 未配置管理员密码时拒绝启动（防止部署后无密码/弱密码暴露）
+if (!ADMIN_PASS) {
+  console.error('❌ 未配置 ADMIN_PASS 环境变量，云函数拒绝启动。请在 CloudBase 控制台配置后再部署。');
+  throw new Error('ADMIN_PASS 未配置');
+}
 
 const COLL_STATS = 'tcb_stats';
 const COLL_SHOPS = 'tcb_shops';
@@ -88,8 +95,7 @@ function parseBody(event) {
 }
 
 // 登录 token —— 无状态签名 token（HMAC-SHA256），不依赖内存/数据库，
-// 云函数冷启动或多实例下会话不丢失
-const TOKEN_SECRET = String(process.env.TOKEN_SECRET || ADMIN_PASS || 'tcb-admin-secret').trim();
+// 云函数冷启动或多实例下会话不丢失；密钥来自环境变量（无弱密码兜底）
 const TOKEN_TTL_MS = 12 * 60 * 60 * 1000; // 12h
 function signToken(payload) {
   return sha256(payload + ':' + TOKEN_SECRET);

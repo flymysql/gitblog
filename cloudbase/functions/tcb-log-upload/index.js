@@ -62,7 +62,7 @@ function isHttpEvent(event) {
 }
 
 function checkToken(event) {
-  if (!UPLOAD_TOKEN) return true; // 未配置令牌则放行（部署时建议配置）
+  if (!UPLOAD_TOKEN) return false; // 未配置令牌则拒绝上传（安全：不允许无凭证写入）
   const token =
     event.headers?.['x-upload-token'] ||
     event.headers?.['X-Upload-Token'] ||
