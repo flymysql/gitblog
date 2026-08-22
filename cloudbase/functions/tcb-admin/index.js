@@ -328,7 +328,16 @@ async function handleWhitelist(action, body) {
 async function handleLogs(action) {
   const COLL = COLL_LOG_FILES;
   if (action === 'list') {
-    const rows = await db.collection(COLL).orderBy('ts', 'desc').limit(100).get();
+    // 只显示日志包（kind=log 或无 kind），排除 build(安装包)
+    let rows;
+    try {
+      rows = await db.collection(COLL).where({ kind: _.in(['log', null]) }).orderBy('ts', 'desc').limit(100).get();
+    } catch (e) {
+      // 部分环境不支持 null 匹配,回退为全量再过滤
+      rows = await db.collection(COLL).orderBy('ts', 'desc').limit(200).get();
+      const filtered = { data: (rows.data || []).filter((f) => f.kind !== 'build') };
+      rows = filtered;
+    }
     return jsonOk({ files: rows.data || [] });
   }
   if (action === 'builds') {

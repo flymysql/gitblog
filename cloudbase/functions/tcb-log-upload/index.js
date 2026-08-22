@@ -188,9 +188,9 @@ exports.main = async (event, context) => {
         const isBuild = targetPrefix === BUILD_PREFIX;
         // 记录到数据库（供下载页/后台列表展示）
         let dbRecord = null;
-        if (isBuild) {
-          try {
-            const db = app.database();
+        try {
+          const db = app.database();
+          if (isBuild) {
             const version = String(event.queryStringParameters?.version || '').trim();
             const note = String(event.queryStringParameters?.note || '').trim();
             await db.collection('tcb_log_files').add({
@@ -205,8 +205,18 @@ exports.main = async (event, context) => {
               url,
             }).catch(() => null);
             dbRecord = { version, note };
-          } catch (e) { /* 记录失败不阻断上传 */ }
-        }
+          } else {
+            // 日志包：kind=log
+            await db.collection('tcb_log_files').add({
+              kind: 'log',
+              filename,
+              cloudPath,
+              size: content.length,
+              ts: Date.now(),
+              url,
+            }).catch(() => null);
+          }
+        } catch (e) { /* 记录失败不阻断上传 */ }
         return httpResponse(200, jsonOk({
           filename,
           cloudPath,
