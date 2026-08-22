@@ -196,6 +196,24 @@ document.getElementById('fb-submit').addEventListener('click', submit);
 document.getElementById('fb-content').addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submit();
 });
+// 从 URL 参数预填（插件反馈入口带 shop/version）
+(function prefillFromUrl() {
+  try {
+    const qs = new URLSearchParams(location.search);
+    const shop = qs.get('shop');
+    const version = qs.get('version');
+    const type = qs.get('type');
+    if (shop) document.getElementById('fb-shop').value = shop;
+    if (version) document.getElementById('fb-version').value = version;
+    if (type) {
+      const sel = document.getElementById('fb-type');
+      if ([...sel.options].some((o) => o.value === type)) sel.value = type;
+    }
+    if (shop) {
+      document.querySelector('.sub').textContent = `店铺「${shop}」遇到问题？请详细描述，我们会尽快处理。`;
+    }
+  } catch (e) { /* ignore */ }
+})();
 loadPublic();
 </script>
 </body>
