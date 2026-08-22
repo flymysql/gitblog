@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>淘宝证书上传 · 后台管理</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+.app { max-width: 1200px; margin: 0 auto; padding: 24px; }
+h1 { font-size: 22px; margin-bottom: 4px; }
+.sub { color: #94a3b8; font-size: 13px; margin-bottom: 20px; }
+
+/* 登录 */
+.login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.login-card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 32px; width: 340px; box-shadow: 0 10px 40px rgba(0,0,0,.4); }
+.login-card h2 { margin-bottom: 20px; font-size: 18px; }
+.login-card input { width: 100%; padding: 10px 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #e2e8f0; font-size: 14px; }
+.login-card button { width: 100%; padding: 11px; border-radius: 8px; border: none; background: #2563eb; color: #fff; font-size: 15px; cursor: pointer; }
+.login-card button:hover { background: #1d4ed8; }
+.login-err { color: #f87171; font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+/* 顶部 */
+.topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.topbar h1 { display: flex; align-items: center; gap: 10px; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; background: #1e3a5f; color: #60a5fa; }
+.logout-btn { background: none; border: 1px solid #475569; color: #94a3b8; padding: 6px 14px; border-radius: 8px; cursor: pointer; }
+.logout-btn:hover { color: #f87171; border-color: #f87171; }
+
+/* 统计卡 */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.stat-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 18px; }
+.stat-card .num { font-size: 28px; font-weight: 700; color: #60a5fa; }
+.stat-card .label { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+.stat-card.green .num { color: #4ade80; }
+.stat-card.red .num { color: #f87171; }
+.stat-card.amber .num { color: #fbbf24; }
+
+/* 标签页 */
+.tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.tab-btn { padding: 8px 18px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #94a3b8; cursor: pointer; font-size: 14px; }
+.tab-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+
+/* 表格 */
+.panel { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; }
+.panel h3 { margin-bottom: 14px; font-size: 16px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #2d3a4e; }
+th { color: #94a3b8; font-weight: 600; font-size: 12px; }
+tr:hover td { background: #243250; }
+a { color: #60a5fa; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; }
+.tag-ok { background: #14532d; color: #4ade80; }
+.tag-err { background: #7f1d1d; color: #f87171; }
+.tag-warn { background: #78350f; color: #fbbf24; }
+
+/* 白名单操作 */
+.wl-form { display: flex; gap: 10px; margin-bottom: 14px; }
+.wl-form input { flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #e2e8f0; font-size: 14px; }
+.wl-form button { padding: 9px 18px; border-radius: 8px; border: none; background: #2563eb; color: #fff; cursor: pointer; }
+.mini-btn { padding: 4px 10px; border-radius: 6px; border: 1px solid #475569; background: none; color: #94a3b8; cursor: pointer; font-size: 12px; }
+.mini-btn:hover { color: #f87171; border-color: #f87171; }
+
+.empty { color: #64748b; font-size: 13px; padding: 20px 0; text-align: center; }
+.msg { color: #4ade80; font-size: 13px; margin-top: 8px; min-height: 18px; }
+.msg.err { color: #f87171; }
+.refresh-hint { color: #64748b; font-size: 12px; margin-left: 8px; }
+</style>
+</head>
+<body>
+
+<!-- 登录 -->
+<div id="login-view" class="login-wrap">
+  <div class="login-card">
+    <h2>🔐 后台管理登录</h2>
+    <input id="login-user" placeholder="账号" value="admin">
+    <input id="login-pass" type="password" placeholder="密码">
+    <button id="login-btn">登 录</button>
+    <div id="login-err" class="login-err"></div>
+  </div>
+</div>
+
+<!-- 主面板 -->
+<div id="main-view" class="app" style="display:none">
+  <div class="topbar">
+    <h1>📊 淘宝证书上传 · 云端后台 <span class="badge" id="online-badge">在线</span></h1>
+    <button class="logout-btn" id="logout-btn">退出登录</button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="num" id="st-uploaded">0</div><div class="label">证书上传</div></div>
+    <div class="stat-card green"><div class="num" id="st-skipped">0</div><div class="label">已存在跳过</div></div>
+    <div class="stat-card red"><div class="num" id="st-failed">0</div><div class="label">证书失败</div></div>
+    <div class="stat-card green"><div class="num" id="st-ok">0</div><div class="label">正常订单</div></div>
+    <div class="stat-card amber"><div class="num" id="st-err">0</div><div class="label">异常订单</div></div>
+    <div class="stat-card"><div class="num" id="st-shops">0</div><div class="label">店铺数</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="shops">🏪 店铺统计</button>
+    <button class="tab-btn" data-tab="events">📋 最近事件</button>
+    <button class="tab-btn" data-tab="logs">📦 异常日志</button>
+    <button class="tab-btn" data-tab="whitelist">✅ 白名单管理</button>
+    <button class="tab-btn" data-tab="builds">🚀 最新发包</button>
+  </div>
+
+  <div id="tab-shops" class="panel tab-panel">
+    <h3>各店铺证书上传情况</h3>
+    <table><thead><tr><th>店铺</th><th>上传证书</th><th>跳过</th><th>失败</th><th>正常订单</th><th>异常订单</th><th>最后活跃</th></tr></thead>
+    <tbody id="shops-body"></tbody></table>
+    <div class="msg" id="shops-msg"></div>
+  </div>
+
+  <div id="tab-events" class="panel tab-panel" style="display:none">
+    <h3>最近事件 <span class="refresh-hint">每 15 秒自动刷新</span></h3>
+    <table><thead><tr><th>时间</th><th>店铺</th><th>类型</th><th>证书</th><th>状态</th><th>备注</th></tr></thead>
+    <tbody id="events-body"></tbody></table>
+  </div>
+
+  <div id="tab-logs" class="panel tab-panel" style="display:none">
+    <h3>异常日志包（上传后自动收录）</h3>
+    <table><thead><tr><th>时间</th><th>文件名</th><th>大小</th><th>操作</th></tr></thead>
+    <tbody id="logs-body"></tbody></table>
+    <div class="msg" id="logs-msg"></div>
+  </div>
+
+  <div id="tab-whitelist" class="panel tab-panel" style="display:none">
+    <h3>店铺白名单管理</h3>
+    <div class="wl-form">
+      <input id="wl-input" placeholder="输入店铺名">
+      <button id="wl-add-btn">添加</button>
+    </div>
+    <table><thead><tr><th>店铺名</th><th>操作</th></tr></thead>
+    <tbody id="wl-body"></tbody></table>
+    <div class="msg" id="wl-msg"></div>
+  </div>
+
+  <div id="tab-builds" class="panel tab-panel" style="display:none">
+    <h3>最新发包下载</h3>
+    <table><thead><tr><th>时间</th><th>文件名</th><th>操作</th></tr></thead>
+    <tbody id="builds-body"></tbody></table>
+    <div class="msg" id="builds-msg"></div>
+  </div>
+</div>
+
+<script>
+const API = 'https://gitbolg-d7gmnsrw46e011706-1256429518.ap-shanghai.app.tcloudbase.com/tcb-admin';
+let token = localStorage.getItem('tcbAdminToken') || '';
+let refreshTimer = null;
+
+async function api(path, opts = {}) {
+  const headers = { ...(opts.headers || {}) };
+  if (token) headers['X-Admin-Token'] = token;
+  const resp = await fetch(API + path, { ...opts, headers });
+  const data = await resp.json().catch(() => ({}));
+  if (resp.status === 401 || data.code === 401) {
+    showLogin();
+    throw new Error('登录过期');
+  }
+  return data;
+}
+
+function showLogin() {
+  token = '';
+  localStorage.removeItem('tcbAdminToken');
+  document.getElementById('login-view').style.display = 'flex';
+  document.getElementById('main-view').style.display = 'none';
+  stopRefresh();
+}
+
+function showMain() {
+  document.getElementById('login-view').style.display = 'none';
+  document.getElementById('main-view').style.display = 'block';
+  startRefresh();
+  loadStats();
+  loadWhitelist();
+  loadLogs();
+  loadBuilds();
+}
+
+function startRefresh() {
+  stopRefresh();
+  refreshTimer = setInterval(() => { loadStats(); loadEvents(); }, 15000);
+}
+function stopRefresh() {
+  if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; }
+}
+
+async function loadStats() {
+  try {
+    const d = await api('/stats');
+    if (!d.ok) return;
+    document.getElementById('st-uploaded').textContent = d.totals.uploaded;
+    document.getElementById('st-skipped').textContent = d.totals.skipped;
+    document.getElementById('st-failed').textContent = d.totals.failed;
+    document.getElementById('st-ok').textContent = d.totals.orderOk;
+    document.getElementById('st-err').textContent = d.totals.orderError;
+    document.getElementById('st-shops').textContent = d.totals.shopCount;
+    renderShops(d.shops || []);
+    renderEvents(d.recent || []);
+  } catch (e) { /* 登录过期已处理 */ }
+}
+
+function fmtTime(ts) {
+  if (!ts) return '-';
+  const d = new Date(ts);
+  return d.toLocaleString('zh-CN', { hour12: false });
+}
+
+function renderShops(shops) {
+  const tb = document.getElementById('shops-body');
+  tb.innerHTML = '';
+  if (!shops.length) { tb.innerHTML = '<tr><td colspan="7" class="empty">暂无店铺数据</td></tr>'; return; }
+  shops.forEach((s) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${s.shopName || '-'}</td>
+      <td style="color:#60a5fa;font-weight:600">${s.certUploaded || 0}</td>
+      <td>${s.certSkipped || 0}</td>
+      <td style="color:${(s.certFailed||0)>0?'#f87171':'#94a3b8'}">${s.certFailed || 0}</td>
+      <td style="color:#4ade80">${s.orderOk || 0}</td>
+      <td style="color:${(s.orderError||0)>0?'#fbbf24':'#94a3b8'}">${s.orderError || 0}</td>
+      <td>${fmtTime(s.lastActiveAt)}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function renderEvents(events) {
+  const tb = document.getElementById('events-body');
+  tb.innerHTML = '';
+  if (!events.length) { tb.innerHTML = '<tr><td colspan="6" class="empty">暂无事件</td></tr>'; return; }
+  events.slice(0, 100).forEach((e) => {
+    const tr = document.createElement('tr');
+    const ok = e.type === 'ship_done' && !e.noCertButtons && !e.error;
+    const tag = ok ? '<span class="tag tag-ok">正常</span>'
+      : (e.type === 'ship_error' ? '<span class="tag tag-err">异常</span>' : '<span class="tag tag-warn">跳过</span>');
+    const note = e.error ? e.error.slice(0, 60) : (e.noCertButtons ? '无证书按钮' : `${e.certTotal || 0}个证书`);
+    tr.innerHTML = `<td>${fmtTime(e.ts)}</td><td>${e.shopName || '-'}</td><td>${e.type}</td>
+      <td>上传${e.certUploaded||0} 跳${e.certSkipped||0} 败${e.certFailed||0}</td>
+      <td>${tag}</td><td title="${e.shipUrl || ''}">${note}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+async function loadWhitelist() {
+  try {
+    const d = await api('/whitelist?action=whitelist-get');
+    if (!d.ok) return;
+    const tb = document.getElementById('wl-body');
+    tb.innerHTML = '';
+    if (!d.list.length) { tb.innerHTML = '<tr><td colspan="2" class="empty">暂无白名单店铺</td></tr>'; return; }
+    d.list.forEach((name) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${name}</td><td><button class="mini-btn" data-wl="${name}">移除</button></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('[data-wl]').forEach((btn) => {
+      btn.addEventListener('click', () => removeWhitelist(btn.dataset.wl));
+    });
+  } catch (e) { /* ignore */ }
+}
+
+async function addWhitelist() {
+  const name = document.getElementById('wl-input').value.trim();
+  const msg = document.getElementById('wl-msg');
+  if (!name) { msg.textContent = '请输入店铺名'; msg.className = 'msg err'; return; }
+  const d = await api('/whitelist?action=whitelist-add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shopName: name }) });
+  msg.textContent = d.ok ? `已添加：${d.added}` : (d.message || '添加失败');
+  msg.className = d.ok ? 'msg' : 'msg err';
+  if (d.ok) { document.getElementById('wl-input').value = ''; loadWhitelist(); }
+}
+
+async function removeWhitelist(name) {
+  const msg = document.getElementById('wl-msg');
+  const d = await api('/whitelist?action=whitelist-remove', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shopName: name }) });
+  msg.textContent = d.ok ? `已移除：${d.removed}` : (d.message || '移除失败');
+  msg.className = d.ok ? 'msg' : 'msg err';
+  if (d.ok) loadWhitelist();
+}
+
+async function loadLogs() {
+  try {
+    const d = await api('/logs?action=logs');
+    if (!d.ok) return;
+    renderFiles('logs-body', d.files || [], 'logs-msg');
+  } catch (e) { /* ignore */ }
+}
+
+async function loadBuilds() {
+  try {
+    const d = await api('/builds?action=builds');
+    if (!d.ok) return;
+    renderFiles('builds-body', d.files || [], 'builds-msg');
+  } catch (e) { /* ignore */ }
+}
+
+function renderFiles(tbodyId, files, msgId) {
+  const tb = document.getElementById(tbodyId);
+  tb.innerHTML = '';
+  if (!files.length) { tb.innerHTML = '<tr><td colspan="4" class="empty">暂无文件</td></tr>'; return; }
+  files.forEach((f) => {
+    const tr = document.createElement('tr');
+    const url = f.url || '#';
+    const size = f.size ? (f.size / 1024).toFixed(1) + ' KB' : '-';
+    tr.innerHTML = `<td>${fmtTime(f.ts)}</td><td>${f.filename || f.cloudPath || '-'}</td><td>${size}</td>
+      <td>${url !== '#' ? `<a href="${url}" target="_blank" download>下载</a>` : '-'}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// 登录
+document.getElementById('login-btn').addEventListener('click', async () => {
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-err');
+  err.textContent = '';
+  try {
+    const resp = await fetch(API + '/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user, pass }),
+    });
+    const d = await resp.json();
+    if (d.ok && d.token) {
+      token = d.token;
+      localStorage.setItem('tcbAdminToken', token);
+      showMain();
+    } else {
+      err.textContent = d.message || '登录失败';
+    }
+  } catch (e) {
+    err.textContent = '网络错误：' + e.message;
+  }
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => showLogin());
+document.getElementById('login-pass').addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('login-btn').click(); });
+document.getElementById('wl-add-btn').addEventListener('click', addWhitelist);
+document.getElementById('wl-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') addWhitelist(); });
+
+// 标签页切换
+document.querySelectorAll('.tab-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach((p) => (p.style.display = 'none'));
+    document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
+  });
+});
+
+// 初始化
+(async () => {
+  if (token) {
+    try {
+      const d = await api('/stats');
+      if (d.ok) { showMain(); return; }
+    } catch (e) { /* 过期则显示登录 */ }
+  }
+  showLogin();
+})();
+</script>
+</body>
+</html>

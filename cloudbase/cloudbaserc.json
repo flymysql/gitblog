@@ -51,6 +51,19 @@
    "envVariables": {
     "UPLOAD_TOKEN": "CHANGE_ME"
    }
+  },
+  {
+   "name": "tcb-admin",
+   "timeout": 20,
+   "runtime": "Nodejs16.13",
+   "memorySize": 256,
+   "handler": "index.main",
+   "installDependency": true,
+   "envVariables": {
+    "ADMIN_USER": "admin",
+    "ADMIN_PASS": "CHANGE_ME",
+    "REPORT_TOKEN": "CHANGE_ME"
+   }
   }
  ]
 }
