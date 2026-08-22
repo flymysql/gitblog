@@ -2,7 +2,10 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
 <title>淘宝证书上传 · 后台管理</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -66,6 +69,20 @@ a:hover { text-decoration: underline; }
 .msg { color: #4ade80; font-size: 13px; margin-top: 8px; min-height: 18px; }
 .msg.err { color: #f87171; }
 .refresh-hint { color: #64748b; font-size: 12px; margin-left: 8px; }
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .app { padding: 14px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card { padding: 14px; }
+  .stat-card .num { font-size: 22px; }
+  .panel { padding: 14px; overflow-x: auto; }
+  table { font-size: 12px; min-width: 560px; }
+  th, td { padding: 8px 8px; }
+  .topbar h1 { font-size: 17px; }
+  .tabs { gap: 6px; }
+  .tab-btn { padding: 7px 12px; font-size: 12px; }
+  .login-card { width: 90%; padding: 24px; }
+}
 </style>
 </head>
 <body>

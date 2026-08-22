@@ -2,164 +2,238 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="description" content="淘宝发货证书自动上传插件 - 自动识别待发货订单，批量生成证书图片并上传，支持多店铺、持续监控、云端统计">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
 <title>淘宝证书自动上传 · 官网首页</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
-.container { max-width: 1060px; margin: 0 auto; padding: 0 20px; }
+:root {
+  --bg: #0b1120;
+  --card: #131c31;
+  --card2: #0f172a;
+  --border: #233046;
+  --text: #e2e8f0;
+  --muted: #8fa3bf;
+  --primary: #3b82f6;
+  --primary-2: #8b5cf6;
+  --green: #34d399;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --radius: 16px;
+  --shadow: 0 10px 40px rgba(0,0,0,.35);
+}
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+.container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
 
-/* 顶部导航 */
-.nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid #1e293b; }
-.nav-brand { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; }
-.nav-links { display: flex; gap: 8px; }
-.nav-links a { color: #94a3b8; text-decoration: none; font-size: 14px; padding: 7px 16px; border-radius: 8px; }
-.nav-links a:hover { color: #60a5fa; background: #1e293b; }
+/* 背景光效 */
+body::before { content:''; position: fixed; inset: 0; background:
+  radial-gradient(800px 400px at 15% -10%, rgba(59,130,246,.12), transparent 60%),
+  radial-gradient(700px 400px at 85% 110%, rgba(139,92,246,.10), transparent 60%);
+  pointer-events: none; z-index: 0; }
+.container { position: relative; z-index: 1; }
+
+/* 导航 */
+.nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; }
+.brand img { width: 30px; height: 30px; border-radius: 8px; }
+.nav-links { display: flex; gap: 4px; }
+.nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; padding: 8px 14px; border-radius: 10px; transition: all .2s; }
+.nav-links a:hover { color: var(--text); background: rgba(255,255,255,.06); }
+.nav-links a.active { color: var(--text); background: rgba(59,130,246,.15); }
+.mobile-menu-btn { display: none; background: none; border: 1px solid var(--border); color: var(--text); font-size: 20px; padding: 6px 12px; border-radius: 10px; cursor: pointer; }
 
 /* Hero */
-.hero { text-align: center; padding: 60px 0 44px; }
-.hero h1 { font-size: 38px; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 14px; }
-.hero p { font-size: 17px; color: #94a3b8; max-width: 640px; margin: 0 auto 28px; line-height: 1.7; }
-.hero-badge { display: inline-block; padding: 4px 14px; border-radius: 999px; background: #14532d; color: #4ade80; font-size: 13px; margin-bottom: 16px; }
+.hero { text-align: center; padding: 64px 0 48px; }
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.3); color: var(--green); font-size: 13px; margin-bottom: 20px; }
+.hero-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.4 } }
+.hero h1 { font-size: clamp(28px, 5vw, 44px); font-weight: 800; line-height: 1.2; margin-bottom: 16px; background: linear-gradient(135deg, #93c5fd, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p { font-size: clamp(15px, 2.5vw, 17px); color: var(--muted); max-width: 620px; margin: 0 auto 30px; line-height: 1.8; }
+.hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 30px; border-radius: 12px; font-size: 15px; font-weight: 600; text-decoration: none; transition: all .2s; cursor: pointer; border: none; }
+.btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #fff; box-shadow: 0 6px 24px rgba(59,130,246,.35); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(59,130,246,.45); }
+.btn-ghost { background: rgba(255,255,255,.06); color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { background: rgba(255,255,255,.1); }
+.hero-stats { display: flex; gap: 32px; justify-content: center; margin-top: 36px; flex-wrap: wrap; }
+.hero-stat { text-align: center; }
+.hero-stat .num { font-size: 24px; font-weight: 700; color: var(--text); }
+.hero-stat .lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
-/* 三大入口 */
-.entry-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 44px; }
-.entry-card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 24px; text-align: center; text-decoration: none; color: inherit; transition: all .2s; }
-.entry-card:hover { border-color: #2563eb; transform: translateY(-3px); box-shadow: 0 10px 30px rgba(37,99,235,.15); }
-.entry-card .icon { font-size: 34px; margin-bottom: 12px; }
+/* 入口卡片 */
+.entry-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 48px; }
+.entry-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 22px; text-align: center; text-decoration: none; color: inherit; transition: all .25s; position: relative; overflow: hidden; }
+.entry-card::before { content:''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary), var(--primary-2)); opacity: 0; transition: opacity .25s; }
+.entry-card:hover { transform: translateY(-4px); border-color: rgba(59,130,246,.4); box-shadow: var(--shadow); }
+.entry-card:hover::before { opacity: 1; }
+.entry-card .icon { font-size: 36px; margin-bottom: 12px; }
 .entry-card h3 { font-size: 16px; margin-bottom: 6px; }
-.entry-card p { font-size: 13px; color: #94a3b8; line-height: 1.5; }
-.entry-card .go { display: inline-block; margin-top: 12px; padding: 6px 18px; border-radius: 8px; background: #2563eb; color: #fff; font-size: 13px; font-weight: 600; }
+.entry-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.entry-card .go { display: inline-flex; align-items: center; gap: 4px; margin-top: 14px; padding: 7px 20px; border-radius: 10px; background: rgba(59,130,246,.15); color: #93c5fd; font-size: 13px; font-weight: 600; transition: all .2s; }
+.entry-card:hover .go { background: var(--primary); color: #fff; }
 
-/* 功能特性 */
-.section { margin-bottom: 44px; }
-.section-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
-.feature { background: #1e293b; border: 1px solid #2d3a4e; border-radius: 12px; padding: 18px; }
-.feature .f-icon { font-size: 24px; margin-bottom: 8px; }
+/* 区块 */
+.section { margin-bottom: 48px; }
+.section-title { font-size: clamp(20px, 3vw, 24px); font-weight: 700; margin-bottom: 22px; display: flex; align-items: center; gap: 10px; }
+.section-title::after { content:''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+/* 特性 */
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.feature { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; transition: all .2s; }
+.feature:hover { border-color: rgba(59,130,246,.3); transform: translateY(-2px); }
+.feature .f-icon { font-size: 26px; margin-bottom: 10px; }
 .feature h4 { font-size: 14px; margin-bottom: 6px; }
-.feature p { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+.feature p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
-/* 使用流程 */
-.steps { counter-reset: step; }
-.step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid #1e293b; }
+/* 步骤 */
+.step { display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid rgba(35,48,70,.6); }
 .step:last-child { border-bottom: none; }
-.step-num { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: #2563eb; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.step-num { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; box-shadow: 0 4px 12px rgba(59,130,246,.3); }
 .step h4 { font-size: 15px; margin-bottom: 4px; }
-.step p { font-size: 13px; color: #94a3b8; line-height: 1.6; }
-.step code { background: #1e293b; padding: 1px 7px; border-radius: 5px; color: #60a5fa; font-size: 12px; }
+.step p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.step code { background: rgba(255,255,255,.08); padding: 2px 7px; border-radius: 5px; color: #93c5fd; font-size: 12px; }
 
-/* 下载区 */
+/* 下载 */
 .download-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.dl-card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 22px; text-align: center; }
-.dl-card .browser { font-size: 28px; margin-bottom: 8px; }
+.dl-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; text-align: center; transition: all .2s; }
+.dl-card:hover { border-color: rgba(59,130,246,.4); box-shadow: var(--shadow); }
+.dl-card .browser { font-size: 32px; margin-bottom: 8px; }
 .dl-card h3 { font-size: 15px; margin-bottom: 6px; }
-.dl-card p { font-size: 13px; color: #94a3b8; margin-bottom: 14px; line-height: 1.5; }
-.dl-btn { display: inline-block; padding: 11px 30px; border-radius: 10px; background: #2563eb; color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; }
-.dl-btn:hover { background: #1d4ed8; }
-.version-tag { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; background: #14532d; color: #4ade80; font-weight: 600; margin-bottom: 10px; }
+.dl-card p { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+.version-tag { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: 12px; background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.3); color: var(--green); font-weight: 600; margin-bottom: 12px; }
+.dl-btn { display: inline-block; padding: 12px 32px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #fff; text-decoration: none; font-size: 15px; font-weight: 700; box-shadow: 0 6px 20px rgba(59,130,246,.3); transition: all .2s; }
+.dl-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(59,130,246,.4); }
+.dl-meta { font-size: 12px; color: var(--muted); margin-top: 10px; }
+.more-link { text-align: center; margin-top: 16px; }
+.more-link a { color: #93c5fd; font-size: 14px; text-decoration: none; }
+.more-link a:hover { text-decoration: underline; }
 
 /* 安装说明 */
-.install-steps { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 24px 28px; font-size: 14px; line-height: 2.1; }
-.install-steps b { color: #e2e8f0; }
-.install-steps code { background: #0f172a; padding: 2px 8px; border-radius: 6px; color: #60a5fa; font-size: 13px; }
-.install-steps .muted { color: #94a3b8; font-size: 13px; }
+.install-steps { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 30px; font-size: 14px; line-height: 2.2; }
+.install-steps b { color: var(--text); }
+.install-steps code { background: rgba(255,255,255,.08); padding: 2px 8px; border-radius: 6px; color: #93c5fd; font-size: 13px; }
+.install-steps .muted { color: var(--muted); font-size: 13px; }
+.install-steps .divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+/* FAQ */
+.faq-item { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; margin-bottom: 12px; }
+.faq-item h4 { font-size: 14px; margin-bottom: 8px; display: flex; gap: 8px; align-items: center; }
+.faq-item h4 .q { color: var(--primary); }
+.faq-item p { font-size: 13px; color: var(--muted); line-height: 1.7; }
 
 /* 底部 */
-.footer { text-align: center; padding: 30px 0 40px; color: #64748b; font-size: 13px; border-top: 1px solid #1e293b; margin-top: 20px; }
+.footer { text-align: center; padding: 28px 0 36px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); }
+.footer a { color: #93c5fd; text-decoration: none; }
 
-.card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 22px; margin-bottom: 18px; }
-.card h2 { font-size: 16px; margin-bottom: 14px; }
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid #2d3a4e; }
-th { color: #94a3b8; font-weight: 600; font-size: 12px; }
-tr:hover td { background: #243250; }
-.empty { color: #64748b; text-align: center; padding: 30px 0; }
-.muted { color: #94a3b8; }
-
-@media (max-width: 760px) {
-  .entry-grid, .download-grid { grid-template-columns: 1fr; }
-  .hero h1 { font-size: 28px; }
+/* 移动端 */
+@media (max-width: 768px) {
+  .container { padding: 0 16px; }
+  .nav { padding: 12px 0; }
+  .nav-links { display: none; position: absolute; top: 60px; left: 16px; right: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 8px; flex-direction: column; z-index: 100; box-shadow: var(--shadow); }
+  .nav-links.open { display: flex; }
+  .nav-links a { padding: 12px 14px; }
+  .mobile-menu-btn { display: block; }
+  .hero { padding: 40px 0 32px; }
+  .hero-actions .btn { flex: 1; justify-content: center; }
+  .entry-grid { grid-template-columns: 1fr; gap: 12px; }
+  .download-grid { grid-template-columns: 1fr; }
+  .feature-grid { grid-template-columns: 1fr 1fr; }
+  .install-steps { padding: 20px; font-size: 13px; }
+  .hero-stats { gap: 20px; }
+}
+@media (max-width: 480px) {
+  .feature-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
-
-<!-- 导航 -->
 <div class="container">
+  <!-- 导航 -->
   <nav class="nav">
-    <div class="nav-brand">📦 淘宝证书自动上传</div>
-    <div class="nav-links">
-      <a href="/index.html">🏠 首页</a>
-      <a href="/downloads.html">⬇ 下载中心</a>
+    <div class="brand"><img src="/favicon.png" alt="logo"> 淘宝证书自动上传</div>
+    <button class="mobile-menu-btn" id="menu-btn" aria-label="菜单">☰</button>
+    <div class="nav-links" id="nav-links">
+      <a href="/index.html" class="active">🏠 首页</a>
+      <a href="/downloads.html">⬇ 下载</a>
       <a href="/feedback.html">💬 反馈</a>
-      <a href="/admin.html">🔐 后台管理</a>
+      <a href="/admin.html">🔐 后台</a>
     </div>
   </nav>
 
   <!-- Hero -->
   <header class="hero">
-    <span class="hero-badge">🟢 v<span id="hero-version">1.2.6</span> 已发布</span>
-    <h1>淘宝发货证书 · 自动上传</h1>
-    <p>自动识别待发货订单，批量生成证书图片并上传，支持多店铺、持续监控、云端统计。告别手动一个个上传证书的繁琐工作。</p>
-    <a class="dl-btn" href="#download" style="font-size:17px;padding:14px 40px">⬇ 立即下载</a>
+    <div class="hero-badge"><span class="dot"></span> v<span id="hero-version">1.2.6</span> 已发布 · 云端管理已上线</div>
+    <h1>淘宝发货证书<br>自动上传</h1>
+    <p>自动识别待发货订单，批量生成证书图片并上传。支持多店铺、持续监控、云端统计，告别手动上传的繁琐。</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#download">⬇ 立即下载</a>
+      <a class="btn btn-ghost" href="/feedback.html">💬 遇到问题</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num" id="st-downloads">—</div><div class="lbl">累计上传证书</div></div>
+      <div class="hero-stat"><div class="num" id="st-shops">—</div><div class="lbl">接入店铺</div></div>
+      <div class="hero-stat"><div class="num" id="st-saved">—</div><div class="lbl">节省时间</div></div>
+    </div>
   </header>
 
-  <!-- 三大入口 -->
+  <!-- 入口 -->
   <div class="entry-grid">
     <a class="entry-card" href="/downloads.html">
       <div class="icon">⬇️</div>
       <h3>下载安装</h3>
-      <p>支持 360 极速浏览器直接拖拽安装，Chrome/Edge 解压加载</p>
+      <p>360 极速浏览器直接拖拽安装，Chrome/Edge 解压加载</p>
       <span class="go">去下载 →</span>
     </a>
     <a class="entry-card" href="/feedback.html">
       <div class="icon">💬</div>
       <h3>问题反馈</h3>
-      <p>遇到问题告诉我们，可附日志包，我们会尽快处理回复</p>
+      <p>遇到问题告诉我们，可附日志包，尽快处理回复</p>
       <span class="go">去反馈 →</span>
     </a>
     <a class="entry-card" href="/admin.html">
       <div class="icon">🔐</div>
       <h3>后台管理</h3>
-      <p>实时查看各店铺证书上传统计、异常日志、白名单管理</p>
+      <p>实时查看各店铺证书统计、异常日志、白名单管理</p>
       <span class="go">进后台 →</span>
     </a>
   </div>
 
-  <!-- 功能特性 -->
+  <!-- 功能 -->
   <div class="section">
     <h2 class="section-title">✨ 核心功能</h2>
     <div class="feature-grid">
       <div class="feature"><div class="f-icon">🤖</div><h4>全自动上传</h4><p>自动扫描待发货订单，逐个打开并上传证书，无需人工干预</p></div>
       <div class="feature"><div class="f-icon">📸</div><h4>自动生成证书图</h4><p>白底黑字标准样式，编号自动递增，检测机构自动选择</p></div>
       <div class="feature"><div class="f-icon">🏪</div><h4>多店铺支持</h4><p>云端白名单管理，新增店铺后台一键配置，实时生效</p></div>
-      <div class="feature"><div class="f-icon">👁️</div><h4>持续监控</h4><p>自动刷新待发货列表，新订单到达自动处理，可设注入延迟</p></div>
-      <div class="feature"><div class="f-icon">📊</div><h4>云端统计</h4><p>后台实时查看各店铺上传量、正常/异常订单、趋势图表</p></div>
-      <div class="feature"><div class="f-icon">📦</div><h4>异常日志上报</h4><p>异常自动打包现场日志上传云端，方便远程定位问题</p></div>
+      <div class="feature"><div class="f-icon">👁️</div><h4>持续监控</h4><p>自动刷新待发货列表，新订单到达自动处理，可设延迟</p></div>
+      <div class="feature"><div class="f-icon">📊</div><h4>云端统计</h4><p>后台实时查看各店铺上传量、正常/异常、趋势图表</p></div>
+      <div class="feature"><div class="f-icon">📦</div><h4>异常日志上报</h4><p>异常自动打包现场日志上传云端，远程定位问题</p></div>
     </div>
   </div>
 
-  <!-- 使用流程 -->
+  <!-- 流程 -->
   <div class="section">
     <h2 class="section-title">📖 使用流程</h2>
-    <div class="steps">
-      <div class="step"><div class="step-num">1</div><div><h4>安装插件</h4><p>根据你的浏览器选择下载方式（360 拖拽 / Chrome 解压），安装后在扩展栏出现「📦」图标</p></div></div>
-      <div class="step"><div class="step-num">2</div><div><h4>打开卖家中心</h4><p>访问 <code>https://myseller.taobao.com/home.htm/trade-platform/tp/sold</code>，登录淘宝卖家账号</p></div></div>
-      <div class="step"><div class="step-num">3</div><div><h4>点击「自动生成证书」</h4><p>已卖出页顶部的 Tab 会多出一个「自动生成证书」入口，点击后扫描待发货订单</p></div></div>
-      <div class="step"><div class="step-num">4</div><div><h4>确认并监控</h4><p>确认订单数量和注入延迟后启动，插件逐个上传证书并持续监控新订单</p></div></div>
-      <div class="step"><div class="step-num">5</div><div><h4>查看云端统计</h4><p>管理员可在后台查看各店铺实时统计、异常日志，管理白名单</p></div></div>
-    </div>
+    <div class="step"><div class="step-num">1</div><div><h4>安装插件</h4><p>按浏览器选择下载方式，安装后在扩展栏出现「📦」图标</p></div></div>
+    <div class="step"><div class="step-num">2</div><div><h4>打开卖家中心</h4><p>访问 <code>myseller.taobao.com</code> 已卖出页，登录淘宝卖家账号</p></div></div>
+    <div class="step"><div class="step-num">3</div><div><h4>点击「自动生成证书」</h4><p>页面 Tab 多出「自动生成证书」入口，点击后扫描待发货订单</p></div></div>
+    <div class="step"><div class="step-num">4</div><div><h4>确认并监控</h4><p>确认订单数量和注入延迟后启动，插件逐个上传并持续监控</p></div></div>
+    <div class="step"><div class="step-num">5</div><div><h4>查看云端统计</h4><p>管理员在后台查看各店铺实时统计、异常日志、管理白名单</p></div></div>
   </div>
 
   <!-- 下载 -->
   <div class="section" id="download">
     <h2 class="section-title">🚀 下载安装</h2>
-    <div class="download-grid" id="download-grid">
+    <div class="download-grid">
       <div class="dl-card">
         <div class="browser">🟢</div>
         <h3>360 极速浏览器</h3>
-        <p>直接拖拽 .crx 文件安装，最简单</p>
+        <p>直接拖拽 .crx 文件安装，最简单快捷</p>
         <div id="dl-360"><span class="version-tag">加载中…</span></div>
       </div>
       <div class="dl-card">
@@ -169,7 +243,7 @@ tr:hover td { background: #243250; }
         <div id="dl-chrome"><span class="version-tag">加载中…</span></div>
       </div>
     </div>
-    <p style="text-align:center;margin-top:14px"><a href="/downloads.html" style="color:#60a5fa;font-size:14px">查看全部历史版本 →</a></p>
+    <div class="more-link"><a href="/downloads.html">查看全部历史版本 →</a></div>
   </div>
 
   <!-- 安装说明 -->
@@ -178,43 +252,43 @@ tr:hover td { background: #243250; }
     <div class="install-steps">
       <b>🟢 360 极速浏览器（推荐，直接拖拽安装）</b><br>
       1. 下载 <b>360 版 .crx</b> 文件到本地<br>
-      2. 打开 360 极速浏览器，地址栏访问 <code>se://extensions/</code><br>
+      2. 打开 360 浏览器，地址栏访问 <code>se://extensions/</code><br>
       3. 开启右上角 <b>开发者模式</b><br>
-      4. 将下载的 <code>.crx</code> 文件<b>直接拖入</b>浏览器窗口，点击「添加」<br>
-      <br>
+      4. 将 <code>.crx</code> 文件<b>直接拖入</b>浏览器窗口，点击「添加」<br>
+      <div class="divider"></div>
       <b>🔵 Chrome / Edge 浏览器（需解压安装）</b><br>
       1. 下载 <b>Chrome 版 .zip</b> 文件到本地<br>
-      2. 将 zip <b>解压</b>到固定文件夹（如 <code>D:\taobao-cert</code>），解压后应能看到 manifest.json<br>
+      2. 将 zip <b>解压</b>到固定文件夹（如 <code>D:\taobao-cert</code>），应能看到 manifest.json<br>
       3. 打开 Chrome 访问 <code>chrome://extensions/</code>（Edge 访问 <code>edge://extensions/</code>）<br>
-      4. 开启右上角 <b>开发者模式</b><br>
-      5. 点击 <b>「加载已解压的扩展程序」</b>，选择解压后的文件夹<br>
+      4. 开启 <b>开发者模式</b> → 点 <b>「加载已解压的扩展程序」</b> → 选择解压后的文件夹<br>
+      <div class="divider"></div>
       <span class="muted">⚠️ 解压后的文件夹请勿删除或移动，否则插件会失效。</span><br>
       <span class="muted">⚠️ 360 若提示「无法从该网站添加应用」，请确认已开启开发者模式后再拖拽。</span>
     </div>
   </div>
 
-  <!-- 常见问题 -->
+  <!-- FAQ -->
   <div class="section">
     <h2 class="section-title">❓ 常见问题</h2>
-    <div class="card">
-      <h4 style="margin-bottom:8px">Q：为什么上传失败/刷不出来订单？</h4>
-      <p class="muted" style="font-size:13px;line-height:1.8">可能原因：页面 DOM 结构变化、网络波动、或历史脏记录。可在后台「清理异常记录」后重新扫描，或导出日志包反馈给我们。</p>
-      <h4 style="margin:14px 0 8px">Q：如何添加新店铺？</h4>
-      <p class="muted" style="font-size:13px;line-height:1.8">管理员在后台「白名单管理」添加店铺名即可，插件实时生效，无需重新安装。</p>
-      <h4 style="margin:14px 0 8px">Q：证书编号是怎么生成的？</h4>
-      <p class="muted" style="font-size:13px;line-height:1.8">按「前缀 + 随机数字 + 自增序号」生成，序号跨订单连续递增，样式为白底黑字标准检测证书格式。</p>
-      <h4 style="margin:14px 0 8px">Q：遇到问题怎么反馈最快？</h4>
-      <p class="muted" style="font-size:13px;line-height:1.8">到「问题反馈」页描述操作步骤和现象，并附上插件弹窗里「导出日志包」生成的 zip 文件信息，我们能快速定位。</p>
-    </div>
+    <div class="faq-item"><h4><span class="q">Q1</span> 为什么上传失败/刷不出来订单？</h4><p>可能原因：页面 DOM 结构变化、网络波动、或历史脏记录。可在后台「清理异常记录」后重新扫描，或导出日志包反馈给我们。</p></div>
+    <div class="faq-item"><h4><span class="q">Q2</span> 如何添加新店铺？</h4><p>管理员在后台「白名单管理」添加店铺名即可，插件实时生效，无需重新安装。</p></div>
+    <div class="faq-item"><h4><span class="q">Q3</span> 证书编号是怎么生成的？</h4><p>按「前缀 + 随机数字 + 自增序号」生成，序号跨订单连续递增，样式为白底黑字标准检测证书格式。</p></div>
+    <div class="faq-item"><h4><span class="q">Q4</span> 遇到问题怎么反馈最快？</h4><p>到「问题反馈」页描述操作步骤和现象，并附上插件弹窗里「导出日志包」生成的 zip 文件信息，我们能快速定位。</p></div>
   </div>
 
   <footer class="footer">
-    淘宝证书自动上传 · 云端管理平台 · 遇到问题欢迎到 <a href="/feedback.html" style="color:#60a5fa">反馈中心</a> 留言
+    📦 淘宝证书自动上传 · 云端管理平台<br>
+    遇到问题欢迎到 <a href="/feedback.html">反馈中心</a> 留言
   </footer>
 </div>
 
 <script>
 const API = 'https://gitbolg-d7gmnsrw46e011706-1256429518.ap-shanghai.app.tcloudbase.com/tcb-admin';
+
+// 移动端菜单
+document.getElementById('menu-btn').addEventListener('click', () => {
+  document.getElementById('nav-links').classList.toggle('open');
+});
 
 async function loadBuilds() {
   try {
@@ -227,22 +301,15 @@ async function loadBuilds() {
       return;
     }
     const byVer = {};
-    files.forEach((f) => {
-      const v = f.version || 'latest';
-      (byVer[v] = byVer[v] || []).push(f);
-    });
+    files.forEach((f) => { const v = f.version || 'latest'; (byVer[v] = byVer[v] || []).push(f); });
     const verKeys = Object.keys(byVer).sort((a, b) => (a === 'latest' ? 1 : b === 'latest' ? -1 : b.localeCompare(a)));
     const latest = byVer[verKeys[0]];
-    const crx = latest.find((f) => /\.crx$/i.test(f.filename));
-    const chrome = latest.find((f) => /\.zip$/i.test(f.filename));
     const ver = verKeys[0];
     document.getElementById('hero-version').textContent = ver;
-    if (crx) {
-      document.getElementById('dl-360').innerHTML = `<span class="version-tag">v${ver}</span><div style="margin-bottom:12px"></div><a class="dl-btn" href="${crx.url}" download>⬇ 下载 360 版</a><p class="muted" style="font-size:12px;margin-top:8px">${crx.size ? (crx.size/1024).toFixed(0)+' KB' : ''} · 拖拽安装</p>`;
-    }
-    if (chrome) {
-      document.getElementById('dl-chrome').innerHTML = `<span class="version-tag">v${ver}</span><div style="margin-bottom:12px"></div><a class="dl-btn" href="${chrome.url}" download>⬇ 下载 Chrome 版</a><p class="muted" style="font-size:12px;margin-top:8px">${chrome.size ? (chrome.size/1024).toFixed(0)+' KB' : ''} · 解压加载</p>`;
-    }
+    const crx = latest.find((f) => /\.crx$/i.test(f.filename));
+    const chrome = latest.find((f) => /\.zip$/i.test(f.filename));
+    if (crx) document.getElementById('dl-360').innerHTML = `<span class="version-tag">v${ver}</span><div style="margin-bottom:12px"></div><a class="dl-btn" href="${crx.url}" download>⬇ 下载 360 版</a><div class="dl-meta">${crx.size ? (crx.size/1024).toFixed(0)+' KB' : ''} · 拖拽安装</div>`;
+    if (chrome) document.getElementById('dl-chrome').innerHTML = `<span class="version-tag">v${ver}</span><div style="margin-bottom:12px"></div><a class="dl-btn" href="${chrome.url}" download>⬇ 下载 Chrome 版</a><div class="dl-meta">${chrome.size ? (chrome.size/1024).toFixed(0)+' KB' : ''} · 解压加载</div>`;
   } catch (e) {
     document.getElementById('dl-360').innerHTML = '<span class="version-tag">加载失败</span>';
     document.getElementById('dl-chrome').innerHTML = '<span class="version-tag">加载失败</span>';
