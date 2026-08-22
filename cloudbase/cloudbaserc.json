@@ -62,7 +62,8 @@
    "envVariables": {
     "ADMIN_USER": "admin",
     "ADMIN_PASS": "CHANGE_ME",
-    "REPORT_TOKEN": "CHANGE_ME"
+    "REPORT_TOKEN": "CHANGE_ME",
+    "TOKEN_SECRET": "CHANGE_ME-tcb-secret"
    }
   }
  ]
