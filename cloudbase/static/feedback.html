@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>淘宝证书上传 · 问题反馈</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+.app { max-width: 760px; margin: 0 auto; padding: 32px 20px; }
+h1 { font-size: 24px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.sub { color: #94a3b8; font-size: 14px; margin-bottom: 24px; }
+.card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 24px; margin-bottom: 18px; }
+.card h2 { font-size: 16px; margin-bottom: 14px; }
+label { display: block; font-size: 13px; color: #94a3b8; margin: 12px 0 6px; }
+input, textarea, select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #e2e8f0; font-size: 14px; font-family: inherit; }
+textarea { min-height: 120px; resize: vertical; }
+input:focus, textarea:focus { outline: none; border-color: #2563eb; }
+.row { display: flex; gap: 12px; }
+.row > div { flex: 1; }
+.submit-btn { width: 100%; padding: 13px; border-radius: 10px; border: none; background: #2563eb; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 18px; }
+.submit-btn:hover { background: #1d4ed8; }
+.submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+.msg { margin-top: 12px; font-size: 14px; min-height: 20px; }
+.msg.ok { color: #4ade80; }
+.msg.err { color: #f87171; }
+.tips { font-size: 13px; color: #94a3b8; line-height: 1.8; margin-top: 12px; }
+.tips code { background: #1e293b; padding: 1px 6px; border-radius: 5px; color: #60a5fa; }
+.nav-links { display: flex; gap: 14px; margin-bottom: 24px; }
+.nav-links a { color: #60a5fa; text-decoration: none; font-size: 14px; padding: 6px 14px; border: 1px solid #334155; border-radius: 8px; }
+.nav-links a:hover { border-color: #2563eb; }
+.nav-links a.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+.status { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; margin-left: 8px; }
+.status-new { background: #7f1d1d; color: #f87171; }
+.status-processing { background: #78350f; color: #fbbf24; }
+.status-done { background: #14532d; color: #4ade80; }
+.feedback-list { margin-top: 24px; }
+.feedback-item { background: #0f172a; border: 1px solid #2d3a4e; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+.feedback-item .meta { font-size: 12px; color: #64748b; margin-bottom: 6px; }
+.feedback-item .content { font-size: 14px; line-height: 1.6; }
+.feedback-item .reply { margin-top: 8px; padding: 8px 12px; background: #14532d33; border-left: 3px solid #4ade80; border-radius: 6px; font-size: 13px; color: #a7f3d0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="nav-links">
+    <a href="/downloads.html">⬇ 下载中心</a>
+    <a href="/feedback.html" class="active">💬 问题反馈</a>
+  </div>
+
+  <h1>💬 问题反馈</h1>
+  <p class="sub">遇到问题在这里告诉我们，我们会尽快处理回复。反馈可匿名提交，也可留下联系方式方便我们联系你。</p>
+
+  <div class="card">
+    <h2>提交反馈</h2>
+    <div class="row">
+      <div>
+        <label>遇到的问题分类</label>
+        <select id="fb-type">
+          <option value="bug">🐞 功能异常/Bug</option>
+          <option value="upload">📤 证书上传失败</option>
+          <option value="suggestion">💡 建议/改进</option>
+          <option value="other">📋 其他</option>
+        </select>
+      </div>
+      <div>
+        <label>插件版本（可选）</label>
+        <input id="fb-version" placeholder="如 1.2.6">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>店铺名（可选）</label>
+        <input id="fb-shop" placeholder="哪个店铺出现的问题">
+      </div>
+      <div>
+        <label>联系方式（可选，QQ/微信/手机）</label>
+        <input id="fb-contact" placeholder="方便我们联系你">
+      </div>
+    </div>
+    <label>问题描述 *</label>
+    <textarea id="fb-content" placeholder="请详细描述你遇到的问题：\n1. 操作步骤（先做了什么，后做了什么）\n2. 出现什么现象（报错内容、卡在哪一步）\n3. 订单/证书数量大概多少"></textarea>
+    <button class="submit-btn" id="fb-submit">提 交 反 馈</button>
+    <div class="msg" id="fb-msg"></div>
+    <div class="tips">
+      💡 <b>小提示</b>：如果遇到证书上传失败等异常，可以打开插件弹窗 → 点「📦 导出日志包」，把导出的 zip 文件内容一并描述给我们，能大幅加快定位速度。
+    </div>
+  </div>
+
+  <div class="card feedback-list">
+    <h2>最近反馈（仅展示已回复的）</h2>
+    <div id="fb-list"><p class="sub">加载中…</p></div>
+  </div>
+</div>
+
+<script>
+const API = 'https://gitbolg-d7gmnsrw46e011706-1256429518.ap-shanghai.app.tcloudbase.com/tcb-admin';
+
+async function submit() {
+  const btn = document.getElementById('fb-submit');
+  const msg = document.getElementById('fb-msg');
+  const content = document.getElementById('fb-content').value.trim();
+  if (content.length < 2) {
+    msg.textContent = '请填写问题描述（至少 2 个字）';
+    msg.className = 'msg err';
+    return;
+  }
+  btn.disabled = true;
+  msg.textContent = '提交中…';
+  msg.className = 'msg';
+  try {
+    const resp = await fetch(API + '/feedback?action=feedback-submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: document.getElementById('fb-type').value,
+        version: document.getElementById('fb-version').value.trim(),
+        shop: document.getElementById('fb-shop').value.trim(),
+        contact: document.getElementById('fb-contact').value.trim(),
+        content,
+      }),
+    });
+    const d = await resp.json();
+    if (d.ok) {
+      msg.textContent = '✅ 反馈已提交，感谢你的反馈！我们会尽快处理。';
+      msg.className = 'msg ok';
+      document.getElementById('fb-content').value = '';
+      document.getElementById('fb-contact').value = '';
+      loadPublic();
+    } else {
+      msg.textContent = d.message || '提交失败，请稍后重试';
+      msg.className = 'msg err';
+    }
+  } catch (e) {
+    msg.textContent = '网络错误：' + e.message;
+    msg.className = 'msg err';
+  }
+  btn.disabled = false;
+}
+
+async function loadPublic() {
+  try {
+    const resp = await fetch(API + '/feedback?action=feedback-public');
+    const d = await resp.json();
+    const list = (d.feedback || []).filter((f) => f.replied && f.public);
+    const el = document.getElementById('fb-list');
+    if (!list.length) {
+      el.innerHTML = '<p class="sub">暂无已回复的反馈</p>';
+      return;
+    }
+    el.innerHTML = list.map((f) => `
+      <div class="feedback-item">
+        <div class="meta">${fmt(f.ts)} · ${f.type || '反馈'}${f.version ? ' · v' + f.version : ''}</div>
+        <div class="content">${escapeHtml(f.content)}</div>
+        <div class="reply">👨‍💻 官方回复：${escapeHtml(f.replied)}</div>
+      </div>`).join('');
+  } catch (e) {
+    document.getElementById('fb-list').innerHTML = '<p class="sub">加载失败</p>';
+  }
+}
+
+function fmt(ts) {
+  if (!ts) return '';
+  return new Date(ts).toLocaleString('zh-CN', { hour12: false });
+}
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+document.getElementById('fb-submit').addEventListener('click', submit);
+document.getElementById('fb-content').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submit();
+});
+loadPublic();
+</script>
+</body>
+</html>

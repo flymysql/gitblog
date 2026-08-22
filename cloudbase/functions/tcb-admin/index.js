@@ -42,6 +42,7 @@ const COLL_USERS = 'tcb_admin_users';
 const COLL_HEART = 'tcb_heartbeats';
 const COLL_WHITELIST = 'tcb_whitelist';
 const COLL_LOG_FILES = 'tcb_log_files';
+const COLL_FEEDBACK = 'tcb_feedback';
 
 const LOG_PREFIX = 'tcb-logs/';
 const BUILD_PREFIX = 'tcb-builds/';
@@ -129,7 +130,7 @@ function loginAdmin(body) {
 
 // —— 数据库工具 ——
 async function ensureCollections() {
-  const names = [COLL_STATS, COLL_SHOPS, COLL_USERS, COLL_HEART, COLL_WHITELIST, COLL_LOG_FILES];
+  const names = [COLL_STATS, COLL_SHOPS, COLL_USERS, COLL_HEART, COLL_WHITELIST, COLL_LOG_FILES, COLL_FEEDBACK];
   for (const name of names) {
     try {
       await db.createCollection(name);
@@ -337,6 +338,80 @@ async function handleLogs(action) {
   return jsonErr('未知日志操作');
 }
 
+// —— 用户反馈 ——
+// 提交反馈（公开，免登录；带简单频率限制）
+async function submitFeedback(body, ip) {
+  const content = String(body.content || '').trim();
+  const contact = String(body.contact || '').trim().slice(0, 100);
+  const version = String(body.version || '').slice(0, 40);
+  const shop = String(body.shop || '').slice(0, 100);
+  if (!content) return jsonErr('反馈内容不能为空');
+  if (content.length < 2) return jsonErr('反馈内容太短');
+  if (content.length > 2000) return jsonErr('反馈内容过长（最多 2000 字）');
+
+  // 频率限制：同一 IP 1 分钟内最多 3 条
+  const ipHash = sha256(String(ip || '') + ':tcb-feedback');
+  const minAgo = now() - 60 * 1000;
+  const recent = await db.collection(COLL_FEEDBACK).where({ ipHash, ts: _.gt(minAgo) }).get().catch(() => null);
+  if (recent && recent.data && recent.data.length >= 3) {
+    return jsonErr('提交过于频繁，请 1 分钟后再试', 429);
+  }
+
+  const doc = {
+    content,
+    contact,
+    version,
+    shop,
+    ipHash,
+    ts: now(),
+    date: new Date().toISOString().slice(0, 10),
+    status: 'new', // new | processing | done
+    replied: '',
+  };
+  await db.collection(COLL_FEEDBACK).add(doc);
+  return jsonOk({ id: doc._id || '', submitted: true });
+}
+
+// 反馈列表（后台登录后查看）
+async function listFeedback(publicOnly) {
+  const rows = await db.collection(COLL_FEEDBACK).orderBy('ts', 'desc').limit(200).get();
+  const mapped = (rows.data || []).map((f) => ({
+    id: f._id,
+    content: f.content,
+    contact: f.contact || '',
+    version: f.version || '',
+    shop: f.shop || '',
+    type: f.type || '',
+    ts: f.ts,
+    status: f.status || 'new',
+    replied: f.replied || '',
+    public: !!f.public,
+  }));
+  if (publicOnly) {
+    return jsonOk({ feedback: mapped.filter((f) => f.replied && f.public) });
+  }
+  return jsonOk({ feedback: mapped });
+}
+
+// 反馈状态更新（后台：标记处理中/已完成、回复）
+async function updateFeedback(body) {
+  const id = String(body.id || '').trim();
+  if (!id) return jsonErr('缺少反馈 id');
+  const patch = {};
+  if (body.status) patch.status = String(body.status).slice(0, 20);
+  if (body.replied !== undefined) patch.replied = String(body.replied).slice(0, 500);
+  // 回复后默认公开展示（可在后台取消勾选 public=false）
+  if (body.public !== undefined) patch.public = !!body.public;
+  else if (body.replied !== undefined && body.replied.trim()) patch.public = true;
+  if (!Object.keys(patch).length) return jsonErr('无更新内容');
+  try {
+    await db.collection(COLL_FEEDBACK).doc(id).update({ ...patch, updatedAt: now() });
+    return jsonOk({ updated: id });
+  } catch (e) {
+    return jsonErr('更新失败: ' + e.message);
+  }
+}
+
 exports.main = async (event, context) => {
   const origin = event.headers?.origin || event.headers?.Origin || '';
 
@@ -391,6 +466,21 @@ exports.main = async (event, context) => {
       }
     }
 
+    // 提交用户反馈（公开，免登录）
+    if (method === 'POST' && action === 'feedback-submit') {
+      await ensureCollections();
+      const ip = event.headers?.['x-forwarded-for'] || event.headers?.['X-Forwarded-For'] || (event.clientIP || '') || '';
+      const r = await submitFeedback(body, ip);
+      return httpResponse(r.ok ? 200 : (r.code || 400), r, origin);
+    }
+
+    // 公开已回复反馈列表（免登录，只暴露 replied+public）
+    if (method === 'GET' && action === 'feedback-public') {
+      await ensureCollections();
+      const r = await listFeedback(true);
+      return httpResponse(200, r, origin);
+    }
+
     // 以下需要后台登录
     if (!checkAdmin(event)) {
       return httpResponse(401, jsonErr('未登录或会话过期', 401), origin);
@@ -416,6 +506,17 @@ exports.main = async (event, context) => {
     if (path.includes('/builds') || action === 'builds') {
       const r = await handleLogs('builds');
       return httpResponse(200, r, origin);
+    }
+    // 反馈列表 / 状态更新
+    if (path.includes('/feedback') || action === 'feedback-list' || action === 'feedback-update') {
+      if (method === 'GET') {
+        const r = await listFeedback();
+        return httpResponse(200, r, origin);
+      }
+      if (method === 'POST') {
+        const r = await updateFeedback(body);
+        return httpResponse(r.ok ? 200 : 400, r, origin);
+      }
     }
 
     return httpResponse(404, jsonErr('未知接口: ' + path), origin);

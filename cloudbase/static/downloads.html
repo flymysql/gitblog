@@ -21,12 +21,21 @@ tr:hover td { background: #243250; }
 .version-tag { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; background: #14532d; color: #4ade80; font-weight: 600; }
 .empty { color: #64748b; text-align: center; padding: 30px 0; }
 .muted { color: #94a3b8; font-size: 13px; }
+.nav-links { display: flex; gap: 14px; margin-bottom: 24px; }
+.nav-links a { color: #60a5fa; text-decoration: none; font-size: 14px; padding: 6px 14px; border: 1px solid #334155; border-radius: 8px; }
+.nav-links a:hover { border-color: #2563eb; }
+.nav-links a.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+
 .install-steps { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 16px 20px; margin-top: 16px; font-size: 14px; line-height: 2; }
 .install-steps code { background: #1e293b; padding: 2px 8px; border-radius: 6px; color: #60a5fa; font-size: 13px; }
 </style>
 </head>
 <body>
 <div class="app">
+  <div class="nav-links">
+    <a href="/downloads.html" class="active">⬇ 下载中心</a>
+    <a href="/feedback.html">💬 问题反馈</a>
+  </div>
   <h1>📦 淘宝证书自动上传 · 下载中心</h1>
   <p class="sub">最新插件包下载（无需登录）· 安装前请先移除旧版本插件</p>
 
