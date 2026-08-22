@@ -158,12 +158,13 @@ exports.main = async (event, context) => {
     const action = String(event.queryStringParameters?.action || event.queryStringParameters?.Action || '').toLowerCase();
 
     // 上传日志包 / 发包
-    if (method === 'POST' && (path.endsWith('/upload') || action === 'upload')) {
+    if (method === 'POST' && (path.endsWith('/upload') || action === 'upload' || action === 'upload-build')) {
       if (!bodyBuffer || !bodyBuffer.length) {
         return httpResponse(400, jsonErr('请求体为空'), origin);
       }
       const contentType = event.headers?.['content-type'] || event.headers?.['Content-Type'] || '';
-      const targetPrefix = (path.includes('builds') || action === 'upload-build') ? BUILD_PREFIX : LOG_PREFIX;
+      const isBuild = action === 'upload-build' || path.includes('builds');
+      const targetPrefix = isBuild ? BUILD_PREFIX : LOG_PREFIX;
 
       // 尝试 multipart 解析；失败则按裸二进制处理
       let filename = safeName((event.queryStringParameters?.filename) || `tcb-log-${Date.now()}.zip`);
@@ -184,6 +185,28 @@ exports.main = async (event, context) => {
       try {
         const res = await uploadToStorage(cloudPath, content);
         const url = await getTempUrl(cloudPath);
+        const isBuild = targetPrefix === BUILD_PREFIX;
+        // 记录到数据库（供下载页/后台列表展示）
+        let dbRecord = null;
+        if (isBuild) {
+          try {
+            const db = app.database();
+            const version = String(event.queryStringParameters?.version || '').trim();
+            const note = String(event.queryStringParameters?.note || '').trim();
+            await db.collection('tcb_log_files').add({
+              kind: 'build',
+              filename,
+              cloudPath,
+              size: content.length,
+              ts: Date.now(),
+              version: version || '',
+              note: note || '',
+              published: true,
+              url,
+            }).catch(() => null);
+            dbRecord = { version, note };
+          } catch (e) { /* 记录失败不阻断上传 */ }
+        }
         return httpResponse(200, jsonOk({
           filename,
           cloudPath,
@@ -191,6 +214,7 @@ exports.main = async (event, context) => {
           sha256: crypto.createHash('sha256').update(content).digest('hex').slice(0, 16),
           fileID: res.fileID,
           url,
+          ...(dbRecord || {}),
         }), origin);
       } catch (err) {
         console.error('上传失败:', err);
