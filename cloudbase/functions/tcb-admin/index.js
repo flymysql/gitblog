@@ -86,19 +86,35 @@ function parseBody(event) {
   }
 }
 
-// 登录 token（内存 + 时间戳；云函数冷启动会重置，但后台会话短可接受）
-let adminTokens = new Map(); // token -> expiry
+// 登录 token —— 无状态签名 token（HMAC-SHA256），不依赖内存/数据库，
+// 云函数冷启动或多实例下会话不丢失
+const TOKEN_SECRET = String(process.env.TOKEN_SECRET || ADMIN_PASS || 'tcb-admin-secret').trim();
+const TOKEN_TTL_MS = 12 * 60 * 60 * 1000; // 12h
+function signToken(payload) {
+  return sha256(payload + ':' + TOKEN_SECRET);
+}
 function makeToken() {
-  return crypto.randomBytes(24).toString('hex');
+  const payload = `${now()}.${crypto.randomBytes(12).toString('hex')}`;
+  return `${payload}.${signToken(payload)}`;
 }
 function checkAdmin(event) {
   const token = event.headers?.['x-admin-token'] || event.headers?.['X-Admin-Token'] || '';
   if (!token) return false;
-  const exp = adminTokens.get(token);
-  if (!exp || exp < now()) {
-    adminTokens.delete(token);
-    return false;
-  }
+  const parts = token.split('.');
+  if (parts.length !== 3) return false;
+  const payload = parts.slice(0, 2).join('.');
+  const sig = parts[2];
+  const expected = signToken(payload);
+  // 恒定时间比较
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+  if (diff !== 0) return false;
+  // 过期校验
+  const ts = Number(parts[0]);
+  if (!Number.isFinite(ts) || now() - ts > TOKEN_TTL_MS) return false;
   return true;
 }
 function loginAdmin(body) {
@@ -106,8 +122,7 @@ function loginAdmin(body) {
   const pass = String(body.pass || '').trim();
   if (user === ADMIN_USER && sha256(pass) === sha256(ADMIN_PASS)) {
     const token = makeToken();
-    adminTokens.set(token, now() + 12 * 60 * 60 * 1000); // 12h
-    return { ok: true, token, expiresIn: 12 * 3600 };
+    return { ok: true, token, expiresIn: Math.floor(TOKEN_TTL_MS / 1000) };
   }
   return { ok: false, message: '账号或密码错误', code: 401 };
 }
@@ -123,15 +138,27 @@ async function ensureCollections() {
 }
 
 // 上报统计：写入 tcb_stats + 聚合到 tcb_shops
+// history 事件带 orderKey，按 orderKey 去重（同一订单不重复累计）
 async function handleReport(events, origin) {
   const list = Array.isArray(events) ? events : (events && events.events ? events.events : [events]);
   if (!list.length) return jsonErr('事件列表为空');
 
   const added = [];
+  let deduped = 0;
   for (const ev of list) {
     const type = String(ev.type || 'ship_done');
     const shop = String(ev.shopName || '未知店铺').slice(0, 100);
     const ts = Number(ev.ts) || now();
+    const orderKey = ev.orderKey ? String(ev.orderKey).slice(0, 200) : '';
+
+    // 历史补报去重：有 orderKey 时查重
+    if (orderKey) {
+      const exist = await db.collection(COLL_STATS).where({ orderKey }).get().catch(() => null);
+      if (exist && exist.data && exist.data.length) {
+        deduped += 1;
+        continue;
+      }
+    }
 
     // 写事件
     const doc = {
@@ -147,7 +174,9 @@ async function handleReport(events, origin) {
       shipUrl: String(ev.shipUrl || '').slice(0, 300),
       ts,
       date: new Date(ts).toISOString().slice(0, 10),
+      history: !!ev.history,
     };
+    if (orderKey) doc.orderKey = orderKey;
     await db.collection(COLL_STATS).add(doc).catch(() => null);
     added.push(doc);
 
@@ -179,7 +208,7 @@ async function handleReport(events, origin) {
       }
     } catch (e) { /* 聚合失败不阻断 */ }
   }
-  return jsonOk({ added: added.length });
+  return jsonOk({ added: added.length, deduped });
 }
 
 // 汇总统计
@@ -195,9 +224,63 @@ async function handleStats() {
     totalOk += s.orderOk || 0;
     totalErr += s.orderError || 0;
   });
+
+  // 分阶段统计（最近1天/7天/30天/全部）+ 每日趋势（近30天柱状数据）
+  const nowTs = now();
+  const DAY = 24 * 60 * 60 * 1000;
+  const buckets = [1, 7, 30].map((days) => {
+    const cutoff = nowTs - days * DAY;
+    const evs = (events.data || []).filter((e) => Number(e.ts) >= cutoff);
+    return {
+      days,
+      uploaded: evs.reduce((s, e) => s + (Number(e.certUploaded) || 0), 0),
+      skipped: evs.reduce((s, e) => s + (Number(e.certSkipped) || 0), 0),
+      failed: evs.reduce((s, e) => s + (Number(e.certFailed) || 0), 0),
+      orderOk: evs.filter((e) => e.orderOk).length,
+      orderError: evs.filter((e) => e.type === 'ship_error' || (!e.orderOk && e.type === 'ship_done')).length,
+    };
+  });
+
+  // 每日趋势（近 30 天，按天聚合上传量）
+  const dailyMap = {};
+  (events.data || []).forEach((e) => {
+    const d = new Date(Number(e.ts)).toISOString().slice(0, 10);
+    if (!dailyMap[d]) dailyMap[d] = { date: d, uploaded: 0, skipped: 0, failed: 0, orderOk: 0, orderError: 0 };
+    dailyMap[d].uploaded += Number(e.certUploaded) || 0;
+    dailyMap[d].skipped += Number(e.certSkipped) || 0;
+    dailyMap[d].failed += Number(e.certFailed) || 0;
+    if (e.orderOk) dailyMap[d].orderOk += 1;
+    if (e.type === 'ship_error' || (!e.orderOk && e.type === 'ship_done')) dailyMap[d].orderError += 1;
+  });
+  const daily = Object.values(dailyMap).sort((a, b) => (a.date < b.date ? -1 : 1)).slice(-30);
+
+  // 分店铺分阶段
+  const shopsDetailed = (shops.data || []).map((s) => {
+    const shopEvents = (events.data || []).filter((e) => e.shopName === s.shopName);
+    const bucketed = [1, 7, 30].map((days) => {
+      const cutoff = nowTs - days * DAY;
+      const evs = shopEvents.filter((e) => Number(e.ts) >= cutoff);
+      return {
+        days,
+        uploaded: evs.reduce((x, e) => x + (Number(e.certUploaded) || 0), 0),
+        failed: evs.reduce((x, e) => x + (Number(e.certFailed) || 0), 0),
+      };
+    });
+    return { ...s, buckets: bucketed };
+  });
+
+  // 节省时间估算：平均每个证书 1 分钟人工操作
+  const SAVE_MIN_PER_CERT = 1;
+  const savedMinutes = totalUploaded * SAVE_MIN_PER_CERT;
+  const savedHours = Math.floor(savedMinutes / 60);
+  const savedMinRemain = Math.round(savedMinutes % 60);
+
   return jsonOk({
     shops: shops.data || [],
+    shopsDetailed,
     recent: (events.data || []).slice(0, 100),
+    buckets,
+    daily,
     totals: {
       uploaded: totalUploaded,
       skipped: totalSkipped,
@@ -205,6 +288,13 @@ async function handleStats() {
       orderOk: totalOk,
       orderError: totalErr,
       shopCount: (shops.data || []).length,
+    },
+    savedTime: {
+      minutes: savedMinutes,
+      hours: savedHours,
+      remainMin: savedMinRemain,
+      text: savedHours > 0 ? `${savedHours} 小时 ${savedMinRemain} 分` : `${savedMinRemain} 分钟`,
+      perCertMinutes: SAVE_MIN_PER_CERT,
     },
   });
 }
@@ -281,6 +371,24 @@ exports.main = async (event, context) => {
     if (method === 'POST' && (path.endsWith('/heartbeat') || action === 'heartbeat')) {
       await db.collection(COLL_HEART).add({ ...body, ts: now() }).catch(() => null);
       return httpResponse(200, jsonOk(), origin);
+    }
+
+    // 公开发包列表（无需登录，供下载页使用；只暴露已发布的 build 元数据）
+    if (method === 'GET' && (path.includes('/public-builds') || action === 'public-builds')) {
+      try {
+        const rows = await db.collection(COLL_LOG_FILES).where({ kind: 'build', published: true }).orderBy('ts', 'desc').limit(50).get();
+        const files = (rows.data || []).map((f) => ({
+          filename: f.filename || f.cloudPath || '',
+          version: f.version || '',
+          ts: f.ts,
+          size: f.size || 0,
+          url: f.url || '',
+          note: f.note || '',
+        }));
+        return httpResponse(200, jsonOk({ files }), origin);
+      } catch (e) {
+        return httpResponse(200, jsonOk({ files: [], hint: e.message }), origin);
+      }
     }
 
     // 以下需要后台登录

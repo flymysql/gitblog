@@ -89,12 +89,31 @@ a:hover { text-decoration: underline; }
   </div>
 
   <div class="stats-grid">
-    <div class="stat-card"><div class="num" id="st-uploaded">0</div><div class="label">证书上传</div></div>
+    <div class="stat-card"><div class="num" id="st-uploaded">0</div><div class="label">证书上传(累计)</div></div>
     <div class="stat-card green"><div class="num" id="st-skipped">0</div><div class="label">已存在跳过</div></div>
     <div class="stat-card red"><div class="num" id="st-failed">0</div><div class="label">证书失败</div></div>
     <div class="stat-card green"><div class="num" id="st-ok">0</div><div class="label">正常订单</div></div>
     <div class="stat-card amber"><div class="num" id="st-err">0</div><div class="label">异常订单</div></div>
     <div class="stat-card"><div class="num" id="st-shops">0</div><div class="label">店铺数</div></div>
+  </div>
+
+  <!-- 节省时间 + 分阶段统计 -->
+  <div class="panel" style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <h3 style="margin-bottom:0">⏱️ 系统节省时间</h3>
+      <span class="badge" id="saved-time" style="font-size:16px;padding:6px 16px">0</span>
+      <span class="sub" style="margin:0">按平均每证书 1 分钟人工操作估算</span>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:20px">
+    <h3>📈 分阶段上传量（最近 1 天 / 7 天 / 30 天）</h3>
+    <div id="bucket-chart" style="height:220px"></div>
+  </div>
+
+  <div class="panel" style="margin-bottom:20px">
+    <h3>📊 每日上传趋势（近 30 天）</h3>
+    <div id="daily-chart" style="height:220px"></div>
   </div>
 
   <div class="tabs">
@@ -106,8 +125,8 @@ a:hover { text-decoration: underline; }
   </div>
 
   <div id="tab-shops" class="panel tab-panel">
-    <h3>各店铺证书上传情况</h3>
-    <table><thead><tr><th>店铺</th><th>上传证书</th><th>跳过</th><th>失败</th><th>正常订单</th><th>异常订单</th><th>最后活跃</th></tr></thead>
+    <h3>各店铺证书上传情况（含分阶段）</h3>
+    <table><thead><tr><th>店铺</th><th>累计上传</th><th>1天</th><th>7天</th><th>30天</th><th>跳过</th><th>失败</th><th>正常/异常订单</th><th>最后活跃</th></tr></thead>
     <tbody id="shops-body"></tbody></table>
     <div class="msg" id="shops-msg"></div>
   </div>
@@ -197,9 +216,86 @@ async function loadStats() {
     document.getElementById('st-ok').textContent = d.totals.orderOk;
     document.getElementById('st-err').textContent = d.totals.orderError;
     document.getElementById('st-shops').textContent = d.totals.shopCount;
-    renderShops(d.shops || []);
+    // 节省时间
+    if (d.savedTime) {
+      document.getElementById('saved-time').textContent = `已节省 ${d.savedTime.text}`;
+    }
+    // 分阶段柱状图 + 每日趋势图
+    renderBucketChart(d.buckets || []);
+    renderDailyChart(d.daily || []);
+    renderShops(d.shopsDetailed || d.shops || []);
     renderEvents(d.recent || []);
   } catch (e) { /* 登录过期已处理 */ }
+}
+
+function renderBucketChart(buckets) {
+  const el = document.getElementById('bucket-chart');
+  if (!buckets.length) { el.innerHTML = '<p class="empty">暂无数据</p>'; return; }
+  const labels = buckets.map((b) => `近${b.days}天`);
+  const values = buckets.map((b) => b.uploaded);
+  const max = Math.max(...values, 1);
+  const barW = 90, gap = 40;
+  const W = buckets.length * (barW + gap) + 40, H = 200;
+  const innerH = 150;
+  let bars = '';
+  values.forEach((v, i) => {
+    const h = Math.max(4, (v / max) * innerH);
+    const x = 20 + i * (barW + gap);
+    const y = H - 30 - h;
+    bars += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="6" fill="url(#g1)"></rect>
+      <text x="${x + barW/2}" y="${y - 8}" text-anchor="middle" fill="#60a5fa" font-size="14" font-weight="700">${v}</text>
+      <text x="${x + barW/2}" y="${H - 10}" text-anchor="middle" fill="#94a3b8" font-size="12">${labels[i]}</text>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px">
+    <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient></defs>
+    <line x1="20" y1="${H-30}" x2="${W-20}" y2="${H-30}" stroke="#334155" stroke-width="1"/>
+    ${bars}
+  </svg>`;
+}
+
+function renderDailyChart(daily) {
+  const el = document.getElementById('daily-chart');
+  if (!daily.length) { el.innerHTML = '<p class="empty">暂无数据</p>'; return; }
+  const W = 760, H = 200, padL = 36, padB = 26, padT = 12;
+  const innerW = W - padL - 12, innerH = H - padT - padB;
+  const max = Math.max(...daily.map((d) => d.uploaded), 1);
+  const step = daily.length > 1 ? innerW / (daily.length - 1) : innerW;
+  // 折线 + 面积
+  let line = '', area = '', dots = '';
+  daily.forEach((d, i) => {
+    const x = padL + i * step;
+    const y = padT + innerH - (d.uploaded / max) * innerH;
+    line += `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)} `;
+    area += `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)} `;
+    dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="#3b82f6"></circle>`;
+    if (i % Math.max(1, Math.floor(daily.length / 10)) === 0 || i === daily.length - 1) {
+      el.parentNode; // noop
+    }
+  });
+  area += `L${(padL + (daily.length - 1) * step).toFixed(1)},${(padT + innerH).toFixed(1)} L${padL},${(padT + innerH).toFixed(1)} Z`;
+  // x 轴标签(稀疏显示)
+  let xlabels = '';
+  const labelEvery = Math.max(1, Math.ceil(daily.length / 8));
+  daily.forEach((d, i) => {
+    if (i % labelEvery === 0 || i === daily.length - 1) {
+      const x = padL + i * step;
+      xlabels += `<text x="${x}" y="${H-8}" text-anchor="middle" fill="#94a3b8" font-size="10">${d.date.slice(5)}</text>`;
+    }
+  });
+  // y 轴刻度
+  let ylabels = '';
+  for (let i = 0; i <= 4; i++) {
+    const v = Math.round((max / 4) * i);
+    const y = padT + innerH - (i / 4) * innerH;
+    ylabels += `<text x="${padL-6}" y="${y+4}" text-anchor="end" fill="#64748b" font-size="10">${v}</text>`;
+  }
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%">
+    <path d="${area}" fill="rgba(59,130,246,0.15)"></path>
+    <path d="${line}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round"></path>
+    ${dots}${xlabels}${ylabels}
+  </svg>`;
 }
 
 function fmtTime(ts) {
@@ -211,15 +307,19 @@ function fmtTime(ts) {
 function renderShops(shops) {
   const tb = document.getElementById('shops-body');
   tb.innerHTML = '';
-  if (!shops.length) { tb.innerHTML = '<tr><td colspan="7" class="empty">暂无店铺数据</td></tr>'; return; }
+  if (!shops.length) { tb.innerHTML = '<tr><td colspan="9" class="empty">暂无店铺数据</td></tr>'; return; }
   shops.forEach((s) => {
+    const b = s.buckets || [];
+    const b1 = (b.find((x) => x.days === 1) || {}).uploaded || 0;
+    const b7 = (b.find((x) => x.days === 7) || {}).uploaded || 0;
+    const b30 = (b.find((x) => x.days === 30) || {}).uploaded || 0;
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${s.shopName || '-'}</td>
       <td style="color:#60a5fa;font-weight:600">${s.certUploaded || 0}</td>
+      <td>${b1}</td><td>${b7}</td><td>${b30}</td>
       <td>${s.certSkipped || 0}</td>
       <td style="color:${(s.certFailed||0)>0?'#f87171':'#94a3b8'}">${s.certFailed || 0}</td>
-      <td style="color:#4ade80">${s.orderOk || 0}</td>
-      <td style="color:${(s.orderError||0)>0?'#fbbf24':'#94a3b8'}">${s.orderError || 0}</td>
+      <td><span style="color:#4ade80">${s.orderOk || 0}</span> / <span style="color:${(s.orderError||0)>0?'#fbbf24':'#94a3b8'}">${s.orderError || 0}</span></td>
       <td>${fmtTime(s.lastActiveAt)}</td>`;
     tb.appendChild(tr);
   });
