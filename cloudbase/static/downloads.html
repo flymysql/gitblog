@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>淘宝证书上传 · 下载中心</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+.app { max-width: 860px; margin: 0 auto; padding: 32px 20px; }
+h1 { font-size: 24px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.sub { color: #94a3b8; font-size: 14px; margin-bottom: 28px; }
+.card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 22px; margin-bottom: 18px; }
+.card h2 { font-size: 16px; margin-bottom: 14px; color: #e2e8f0; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid #2d3a4e; }
+th { color: #94a3b8; font-weight: 600; font-size: 12px; }
+tr:hover td { background: #243250; }
+.dl-btn { display: inline-block; padding: 7px 20px; border-radius: 8px; background: #2563eb; color: #fff; text-decoration: none; font-size: 13px; font-weight: 600; }
+.dl-btn:hover { background: #1d4ed8; }
+.version-tag { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; background: #14532d; color: #4ade80; font-weight: 600; }
+.empty { color: #64748b; text-align: center; padding: 30px 0; }
+.muted { color: #94a3b8; font-size: 13px; }
+.install-steps { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 16px 20px; margin-top: 16px; font-size: 14px; line-height: 2; }
+.install-steps code { background: #1e293b; padding: 2px 8px; border-radius: 6px; color: #60a5fa; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>📦 淘宝证书自动上传 · 下载中心</h1>
+  <p class="sub">最新插件包下载（无需登录）· 安装前请先移除旧版本插件</p>
+
+  <div class="card">
+    <h2>🚀 最新版本</h2>
+    <div id="latest-version">
+      <p class="empty">加载中…</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📚 历史版本</h2>
+    <table>
+      <thead><tr><th>版本</th><th>更新时间</th><th>大小</th><th>操作</th></tr></thead>
+      <tbody id="history-body"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>📖 安装说明</h2>
+    <div class="install-steps">
+      1. 下载 <b>.crx</b> 文件到本地<br>
+      2. 打开 Chrome，访问 <code>chrome://extensions/</code><br>
+      3. 开启右上角 <b>开发者模式</b><br>
+      4. 将 <code>.crx</code> 文件<b>拖入</b>浏览器窗口即可安装<br>
+      5. 或先解压 <code>.crx</code>（改后缀 .zip），点「加载已解压的扩展程序」<br>
+      <span class="muted">⚠️ 若提示「无法从该网站添加应用」，请下载后改为拖拽安装。</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://gitbolg-d7gmnsrw46e011706-1256429518.ap-shanghai.app.tcloudbase.com/tcb-admin';
+const HOSTING = 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com';
+
+async function load() {
+  try {
+    const resp = await fetch(API + '/public-builds');
+    const d = await resp.json();
+    const files = (d.files || []).filter((f) => f.filename && f.url);
+    if (!files.length) {
+      document.getElementById('latest-version').innerHTML = '<p class="empty">暂无已发布版本</p>';
+      document.getElementById('history-body').innerHTML = '<tr><td colspan="4" class="empty">暂无历史版本</td></tr>';
+      return;
+    }
+    const [latest, ...rest] = files;
+    document.getElementById('latest-version').innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span class="version-tag">v${latest.version || '最新'}</span>
+        <span>${latest.filename}</span>
+        <span class="muted">${latest.size ? (latest.size/1024).toFixed(0) + ' KB' : ''} · ${fmtTime(latest.ts)}</span>
+        <a class="dl-btn" href="${latest.url}" download>⬇ 下载最新版</a>
+      </div>
+      ${latest.note ? `<p class="muted" style="margin-top:10px">${latest.note}</p>` : ''}`;
+
+    document.getElementById('history-body').innerHTML = rest.map((f) => `
+      <tr>
+        <td><span class="version-tag">v${f.version || '—'}</span> ${f.filename}</td>
+        <td>${fmtTime(f.ts)}</td>
+        <td>${f.size ? (f.size/1024).toFixed(0) + ' KB' : '-'}</td>
+        <td><a class="dl-btn" href="${f.url}" download>下载</a></td>
+      </tr>`).join('') || '<tr><td colspan="4" class="empty">暂无历史版本</td></tr>';
+  } catch (e) {
+    document.getElementById('latest-version').innerHTML = `<p class="empty">加载失败：${e.message}</p>`;
+  }
+}
+function fmtTime(ts) {
+  if (!ts) return '-';
+  return new Date(ts).toLocaleString('zh-CN', { hour12: false });
+}
+load();
+</script>
+</body>
+</html>
