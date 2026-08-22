@@ -122,6 +122,7 @@ a:hover { text-decoration: underline; }
     <button class="tab-btn" data-tab="logs">📦 异常日志</button>
     <button class="tab-btn" data-tab="whitelist">✅ 白名单管理</button>
     <button class="tab-btn" data-tab="builds">🚀 最新发包</button>
+    <button class="tab-btn" data-tab="feedback">💬 用户反馈</button>
   </div>
 
   <div id="tab-shops" class="panel tab-panel">
@@ -161,6 +162,13 @@ a:hover { text-decoration: underline; }
     <tbody id="builds-body"></tbody></table>
     <div class="msg" id="builds-msg"></div>
   </div>
+
+  <div id="tab-feedback" class="panel tab-panel" style="display:none">
+    <h3>用户反馈 <span class="badge" id="fb-count">0</span></h3>
+    <table><thead><tr><th>时间</th><th>类型</th><th>店铺/版本</th><th>内容</th><th>状态</th><th>回复</th><th>操作</th></tr></thead>
+    <tbody id="fb-body"></tbody></table>
+    <div class="msg" id="fb-msg"></div>
+  </div>
 </div>
 
 <script>
@@ -196,6 +204,7 @@ function showMain() {
   loadWhitelist();
   loadLogs();
   loadBuilds();
+  loadFeedback();
 }
 
 function startRefresh() {
@@ -392,6 +401,53 @@ async function loadBuilds() {
     if (!d.ok) return;
     renderFiles('builds-body', d.files || [], 'builds-msg');
   } catch (e) { /* ignore */ }
+}
+
+async function loadFeedback() {
+  try {
+    const d = await api('/feedback?action=feedback-list');
+    if (!d.ok) return;
+    const list = d.feedback || [];
+    document.getElementById('fb-count').textContent = list.filter((f) => f.status === 'new').length + ' 新';
+    const tb = document.getElementById('fb-body');
+    tb.innerHTML = '';
+    if (!list.length) { tb.innerHTML = '<tr><td colspan="7" class="empty">暂无反馈</td></tr>'; return; }
+    const statusMap = { new: ['新', 'tag-err'], processing: ['处理中', 'tag-warn'], done: ['已处理', 'tag-ok'] };
+    list.forEach((f) => {
+      const [slabel, scls] = statusMap[f.status] || [f.status, 'tag-warn'];
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${fmtTime(f.ts)}</td>
+        <td>${f.type || '-'}</td>
+        <td>${escapeHtml(f.shop || '')}${f.version ? '<br>v' + escapeHtml(f.version) : ''}</td>
+        <td title="${escapeHtml(f.contact)}" style="max-width:260px">${escapeHtml(f.content).slice(0, 80)}</td>
+        <td><span class="tag ${scls}">${slabel}</span></td>
+        <td style="max-width:200px">${f.replied ? escapeHtml(f.replied).slice(0, 50) : '<span class="sub">未回复</span>'}</td>
+        <td><button class="mini-btn" data-fb-id="${f.id}" data-fb-content="${escapeHtml(f.content).slice(0, 60)}">回复</button></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('[data-fb-id]').forEach((btn) => {
+      btn.addEventListener('click', () => openReply(btn.dataset.fbId, btn.dataset.fbContent));
+    });
+  } catch (e) { /* ignore */ }
+}
+
+function openReply(id, contentHint) {
+  const reply = prompt('输入回复内容（留空则仅改状态）：\n\n反馈内容：' + contentHint, '');
+  if (reply === null) return;
+  const status = reply.trim() ? 'done' : (prompt('标记状态：1=已处理 2=处理中 3=新，默认已处理', '1') === '2' ? 'processing' : 'new');
+  api('/feedback?action=feedback-update', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, replied: reply.trim(), status }),
+  }).then((d) => {
+    const msg = document.getElementById('fb-msg');
+    msg.textContent = d.ok ? '已更新' : (d.message || '更新失败');
+    msg.className = d.ok ? 'msg' : 'msg err';
+    if (d.ok) loadFeedback();
+  });
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 function renderFiles(tbodyId, files, msgId) {
