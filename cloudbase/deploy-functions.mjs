@@ -79,6 +79,13 @@ function main() {
         ADMIN_PASS: secrets.ADMIN_PASS,
         TOKEN_SECRET: secrets.TOKEN_SECRET || secrets.ADMIN_PASS,
         REPORT_TOKEN: secrets.REPORT_TOKEN || secrets.ADMIN_PASS,
+        // 邮件告警
+        SMTP_HOST: secrets.SMTP_HOST || env.SMTP_HOST || '',
+        SMTP_PORT: secrets.SMTP_PORT || env.SMTP_PORT || '465',
+        SMTP_USER: secrets.SMTP_USER || env.SMTP_USER || '',
+        SMTP_PASS: secrets.SMTP_PASS || env.SMTP_PASS || '',
+        SMTP_FROM: secrets.SMTP_FROM || env.SMTP_FROM || '',
+        ALERT_EMAIL: secrets.ALERT_EMAIL || env.ALERT_EMAIL || '',
       });
     }
     if (fn.name === 'tcb-log-upload') {
