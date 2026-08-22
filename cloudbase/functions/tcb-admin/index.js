@@ -481,6 +481,42 @@ exports.main = async (event, context) => {
       }
     }
 
+    // 最新版本信息（供插件自动更新检查；返回最新版本号 + 各浏览器包 URL）
+    if (method === 'GET' && (path.includes('/public-latest') || action === 'public-latest')) {
+      try {
+        const rows = await db.collection(COLL_LOG_FILES).where({ kind: 'build', published: true }).orderBy('ts', 'desc').limit(50).get();
+        const files = (rows.data || []);
+        // 按版本分组，取版本号最大的一组
+        const byVer = {};
+        files.forEach((f) => {
+          const v = String(f.version || '').trim() || '0';
+          (byVer[v] = byVer[v] || []).push(f);
+        });
+        const versionList = Object.keys(byVer).sort((a, b) => {
+          // 语义化版本比较
+          const pa = a.split('.').map((n) => parseInt(n, 10) || 0);
+          const pb = b.split('.').map((n) => parseInt(n, 10) || 0);
+          for (let i = 0; i < 3; i++) {
+            const da = pa[i] || 0, db2 = pb[i] || 0;
+            if (da !== db2) return db2 - da;
+          }
+          return 0;
+        });
+        const latestVer = versionList[0] || '';
+        const latestFiles = byVer[latestVer] || [];
+        const chromeFile = latestFiles.find((f) => /\.zip$/i.test(f.filename || ''));
+        const crxFile = latestFiles.find((f) => /\.crx$/i.test(f.filename || ''));
+        return httpResponse(200, jsonOk({
+          latestVersion: latestVer,
+          latestTs: latestFiles[0] ? latestFiles[0].ts : 0,
+          chrome: chromeFile ? { filename: chromeFile.filename, url: chromeFile.url, size: chromeFile.size, ts: chromeFile.ts } : null,
+          crx: crxFile ? { filename: crxFile.filename, url: crxFile.url, size: crxFile.size, ts: crxFile.ts } : null,
+        }), origin);
+      } catch (e) {
+        return httpResponse(200, jsonOk({ latestVersion: '', chrome: null, crx: null, hint: e.message }), origin);
+      }
+    }
+
     // 公开白名单（免登录，供插件内容脚本拉取）
     if (method === 'GET' && (path.includes('/public-whitelist') || action === 'public-whitelist')) {
       try {
