@@ -186,7 +186,7 @@ body::before { content:''; position: fixed; inset: 0; background:
     <a class="entry-card" href="/downloads.html">
       <div class="icon">⬇️</div>
       <h3>下载安装</h3>
-      <p>360 极速浏览器直接拖拽安装，Chrome/Edge 解压加载</p>
+      <p>zip 安装包，解压后加载，Chrome / Edge / 360 通用</p>
       <span class="go">去下载 →</span>
     </a>
     <a class="entry-card" href="/feedback.html">
@@ -230,17 +230,11 @@ body::before { content:''; position: fixed; inset: 0; background:
   <div class="section" id="download">
     <h2 class="section-title">🚀 下载安装</h2>
     <div class="download-grid">
-      <div class="dl-card">
-        <div class="browser">🟢</div>
-        <h3>360 极速浏览器</h3>
-        <p>直接拖拽 .crx 文件安装，最简单快捷</p>
-        <div id="dl-360"><span class="version-tag">加载中…</span></div>
-      </div>
-      <div class="dl-card">
-        <div class="browser">🔵</div>
-        <h3>Chrome / Edge</h3>
-        <p>下载 zip 解压后，加载已解压的扩展程序</p>
-        <div id="dl-chrome"><span class="version-tag">加载中…</span></div>
+      <div class="dl-card" style="grid-column:1/-1;max-width:480px;margin:0 auto">
+        <div class="browser">📦</div>
+        <h3>淘宝证书自动上传 v<span id="dl-ver">1.3.1</span></h3>
+        <p>zip 安装包 · Chrome / Edge / 360 通用，解压后加载即可</p>
+        <div id="dl-zip"><span class="version-tag">加载中…</span></div>
       </div>
     </div>
     <div class="more-link"><a href="/downloads.html">查看全部历史版本 →</a></div>
@@ -250,20 +244,12 @@ body::before { content:''; position: fixed; inset: 0; background:
   <div class="section">
     <h2 class="section-title">🛠️ 安装说明</h2>
     <div class="install-steps">
-      <b>🟢 360 极速浏览器（推荐，直接拖拽安装）</b><br>
-      1. 下载 <b>360 版 .crx</b> 文件到本地<br>
-      2. 打开 360 浏览器，地址栏访问 <code>se://extensions/</code><br>
-      3. 开启右上角 <b>开发者模式</b><br>
-      4. 将 <code>.crx</code> 文件<b>直接拖入</b>浏览器窗口，点击「添加」<br>
-      <div class="divider"></div>
-      <b>🔵 Chrome / Edge 浏览器（需解压安装）</b><br>
-      1. 下载 <b>Chrome 版 .zip</b> 文件到本地<br>
-      2. 将 zip <b>解压</b>到固定文件夹（如 <code>D:\taobao-cert</code>），应能看到 manifest.json<br>
-      3. 打开 Chrome 访问 <code>chrome://extensions/</code>（Edge 访问 <code>edge://extensions/</code>）<br>
-      4. 开启 <b>开发者模式</b> → 点 <b>「加载已解压的扩展程序」</b> → 选择解压后的文件夹<br>
-      <div class="divider"></div>
-      <span class="muted">⚠️ 解压后的文件夹请勿删除或移动，否则插件会失效。</span><br>
-      <span class="muted">⚠️ 360 若提示「无法从该网站添加应用」，请确认已开启开发者模式后再拖拽。</span>
+      <b>📦 解压安装（Chrome / Edge / 360 通用）</b><br>
+      1. 下载 <b>.zip</b> 安装包<br>
+      2. 将 zip <b>解压</b>到固定文件夹（如 <code>D:\taobao-cert</code>），解压后应能看到 <code>manifest.json</code><br>
+      3. 打开浏览器扩展管理页：Chrome <code>chrome://extensions/</code> · Edge <code>edge://extensions/</code> · 360 <code>se://extensions/</code><br>
+      4. 开启 <b>「开发者模式」</b> → 点 <b>「加载已解压的扩展程序」</b> → 选择解压后的文件夹<br>
+      <span class="muted">⚠️ 解压后的文件夹请勿删除或移动，否则插件会失效。</span>
     </div>
   </div>
 
@@ -296,8 +282,7 @@ async function loadBuilds() {
     const d = await resp.json();
     const files = (d.files || []).filter((f) => f.filename && f.url);
     if (!files.length) {
-      document.getElementById('dl-360').innerHTML = '<span class="version-tag">暂无</span>';
-      document.getElementById('dl-chrome').innerHTML = '<span class="version-tag">暂无</span>';
+      document.getElementById('dl-zip').innerHTML = '<span class="version-tag">暂无</span>';
       return;
     }
     const byVer = {};
@@ -306,13 +291,16 @@ async function loadBuilds() {
     const latest = byVer[verKeys[0]];
     const ver = verKeys[0];
     document.getElementById('hero-version').textContent = ver;
-    const crx = latest.find((f) => /\.crx$/i.test(f.filename));
-    const chrome = latest.find((f) => /\.zip$/i.test(f.filename));
-    if (crx) document.getElementById('dl-360').innerHTML = `<span class="version-tag">v${ver}</span><div style="margin-bottom:12px"></div><a class="dl-btn" href="${crx.url}" download>⬇ 下载 360 版</a><div class="dl-meta">${crx.size ? (crx.size/1024).toFixed(0)+' KB' : ''} · 拖拽安装</div>`;
-    if (chrome) document.getElementById('dl-chrome').innerHTML = `<span class="version-tag">v${ver}</span><div style="margin-bottom:12px"></div><a class="dl-btn" href="${chrome.url}" download>⬇ 下载 Chrome 版</a><div class="dl-meta">${chrome.size ? (chrome.size/1024).toFixed(0)+' KB' : ''} · 解压加载</div>`;
+    document.getElementById('dl-ver').textContent = ver;
+    const zip = latest.find((f) => /\.zip$/i.test(f.filename));
+    const zipEl = document.getElementById('dl-zip');
+    if (zip) {
+      zipEl.innerHTML = `<span class="version-tag">v${ver}</span><div style="margin-bottom:14px"></div><a class="dl-btn" href="${zip.url}" download>⬇ 下载安装包</a><div class="dl-meta">${zip.size ? (zip.size/1024).toFixed(0)+' KB' : ''} · 解压加载</div>`;
+    } else {
+      zipEl.innerHTML = '<span class="version-tag">暂无</span>';
+    }
   } catch (e) {
-    document.getElementById('dl-360').innerHTML = '<span class="version-tag">加载失败</span>';
-    document.getElementById('dl-chrome').innerHTML = '<span class="version-tag">加载失败</span>';
+    document.getElementById('dl-zip').innerHTML = '<span class="version-tag">加载失败</span>';
   }
 }
 loadBuilds();
