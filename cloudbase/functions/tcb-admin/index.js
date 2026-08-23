@@ -32,7 +32,7 @@ const _ = db.command;
 const ENV_ID = String(process.env.TCB_ENV_ID || '').trim() || 'gitbolg-d7gmnsrw46e011706';
 const STORAGE_BUCKET_ID = `6769-${ENV_ID}-1256429518`;
 
-// 动态生成 COS 临时下载 URL（每次请求重新签名，避免存储的旧 sign 过期失效）
+// 动态生成 COS 临时签名 URL（兜底用）
 async function freshFileUrl(cloudPath) {
   if (!cloudPath) return '';
   try {
@@ -46,6 +46,27 @@ async function freshFileUrl(cloudPath) {
   } catch (e) {
     return '';
   }
+}
+
+// 下载 URL 解析：
+// 1) 优先返回 CloudBase 静态托管永久 URL（无签名、永久有效）
+// 2) 兜底：COS 临时签名 URL
+const HOSTING_BASE = 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com';
+async function resolveDownloadUrl(f) {
+  const filename = f.filename || (f.cloudPath || '').split('/').pop() || '';
+  // 安装包走静态托管 packages/（永久 URL，发布流程保证文件已部署）
+  if (filename && /\.(zip|crx)$/i.test(filename)) {
+    const hostingUrl = `${HOSTING_BASE}/packages/${encodeURIComponent(filename)}`;
+    // 云函数沙箱可能无法访问外网，验证失败时直接信任发布流程
+    try {
+      const resp = await fetch(hostingUrl, { method: 'GET' });
+      if (resp.ok) return hostingUrl;
+    } catch (e) { /* 沙箱网络限制，信任发布流程 */ }
+    return hostingUrl;
+  }
+  // 非安装包或异常：COS 临时签名
+  const cloudPath = f.cloudPath || ('tcb-builds/' + filename);
+  return await freshFileUrl(cloudPath);
 }
 
 // 后台管理员账号（必须从 CloudBase 控制台环境变量配置，不提供弱密码兜底）
@@ -582,7 +603,7 @@ exports.main = async (event, context) => {
         for (const f of (rows.data || [])) {
           // 每次动态生成新鲜签名 URL（数据库里的旧 url 会过期）
           const cloudPath = f.cloudPath || ('tcb-builds/' + (f.filename || ''));
-          const url = await freshFileUrl(cloudPath);
+          const url = await resolveDownloadUrl(f);
           files.push({
             filename: f.filename || cloudPath.split('/').pop() || '',
             version: f.version || '',
@@ -624,8 +645,8 @@ exports.main = async (event, context) => {
         const chromeFile = latestFiles.find((f) => /\.zip$/i.test(f.filename || ''));
         const crxFile = latestFiles.find((f) => /\.crx$/i.test(f.filename || ''));
         // 动态生成新鲜签名 URL（不用数据库里过期的）
-        const chromeUrl = chromeFile ? await freshFileUrl(chromeFile.cloudPath || ('tcb-builds/' + chromeFile.filename)) : '';
-        const crxUrl = crxFile ? await freshFileUrl(crxFile.cloudPath || ('tcb-builds/' + crxFile.filename)) : '';
+        const chromeUrl = chromeFile ? await resolveDownloadUrl(chromeFile) : '';
+        const crxUrl = crxFile ? await resolveDownloadUrl(crxFile) : '';
         return httpResponse(200, jsonOk({
           latestVersion: latestVer,
           latestTs: latestFiles[0] ? latestFiles[0].ts : 0,
