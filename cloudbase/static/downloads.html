@@ -93,11 +93,12 @@ tr:hover td { background: rgba(255,255,255,.03); }
   <div class="card">
     <h2>📖 安装说明</h2>
     <div class="install-steps">
-      <b>🟢 360 极速浏览器（推荐，直接拖拽安装）</b><br>
-      1. 下载 <b>360 版 .crx</b> 文件到本地<br>
+      <b>🟢 360 极速浏览器（推荐 zip 解压安装）</b><br>
+      1. 下载 <b>.zip</b> 安装包，<b>解压</b>到固定文件夹（如 <code>D:\taobao-cert</code>），应能看到 manifest.json<br>
       2. 打开 360 极速浏览器，地址栏访问 <code>se://extensions/</code><br>
       3. 开启右上角 <b>开发者模式</b><br>
-      4. 将下载的 <code>.crx</code> 文件<b>直接拖入</b>浏览器窗口，点击「添加」<br>
+      4. 点击 <b>「加载已解压的扩展程序」</b>，选择刚才解压的文件夹<br>
+      5. 部分 360 版本支持直接<b>拖拽 .crx</b>安装；若提示「程序包无效」，请改用 zip 解压方式（上面步骤）<br>
       <br>
       <b>🔵 Chrome / Edge 浏览器（需解压安装）</b><br>
       1. 下载 <b>Chrome 版 .zip</b> 文件到本地<br>
@@ -139,8 +140,8 @@ async function load() {
       <div class="latest-wrap">
         ${crxFile ? `<div class="latest-box">
           <div class="browser">🟢</div><h4>360 极速浏览器</h4>
-          <div class="desc">直接拖拽安装 .crx<br>${crxFile.size ? (crxFile.size/1024).toFixed(0)+' KB' : ''}</div>
-          <a class="dl-btn" href="${crxFile.url}" download>⬇ 下载 360 版</a>
+          <div class="desc">推荐下载 zip 解压后加载（所有浏览器通用）<br>或拖拽 .crx（部分 360 版本可用）</div>
+          <a class="dl-btn" href="${chromeFile ? chromeFile.url : crxFile.url}" download>⬇ 下载安装包</a>
         </div>` : ''}
         ${chromeFile ? `<div class="latest-box">
           <div class="browser">🔵</div><h4>Chrome / Edge</h4>
