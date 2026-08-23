@@ -32,6 +32,22 @@ const _ = db.command;
 const ENV_ID = String(process.env.TCB_ENV_ID || '').trim() || 'gitbolg-d7gmnsrw46e011706';
 const STORAGE_BUCKET_ID = `6769-${ENV_ID}-1256429518`;
 
+// 动态生成 COS 临时下载 URL（每次请求重新签名，避免存储的旧 sign 过期失效）
+async function freshFileUrl(cloudPath) {
+  if (!cloudPath) return '';
+  try {
+    const fileId = `cloud://${ENV_ID}.${STORAGE_BUCKET_ID}/${cloudPath}`;
+    const res = await app.getTempFileURL({ fileList: [fileId] });
+    const item = res.fileList && res.fileList[0];
+    if (item && item.code === 'SUCCESS') {
+      return item.download_url || item.tempFileURL || '';
+    }
+    return '';
+  } catch (e) {
+    return '';
+  }
+}
+
 // 后台管理员账号（必须从 CloudBase 控制台环境变量配置，不提供弱密码兜底）
 const ADMIN_USER = String(process.env.ADMIN_USER || 'admin').trim();
 const ADMIN_PASS = String(process.env.ADMIN_PASS || '').trim();
@@ -562,14 +578,20 @@ exports.main = async (event, context) => {
     if (method === 'GET' && (path.includes('/public-builds') || action === 'public-builds')) {
       try {
         const rows = await db.collection(COLL_LOG_FILES).where({ kind: 'build', published: true }).orderBy('ts', 'desc').limit(50).get();
-        const files = (rows.data || []).map((f) => ({
-          filename: f.filename || f.cloudPath || '',
-          version: f.version || '',
-          ts: f.ts,
-          size: f.size || 0,
-          url: f.url || '',
-          note: f.note || '',
-        }));
+        const files = [];
+        for (const f of (rows.data || [])) {
+          // 每次动态生成新鲜签名 URL（数据库里的旧 url 会过期）
+          const cloudPath = f.cloudPath || ('tcb-builds/' + (f.filename || ''));
+          const url = await freshFileUrl(cloudPath);
+          files.push({
+            filename: f.filename || cloudPath.split('/').pop() || '',
+            version: f.version || '',
+            ts: f.ts,
+            size: f.size || 0,
+            url,
+            note: f.note || '',
+          });
+        }
         return httpResponse(200, jsonOk({ files }), origin);
       } catch (e) {
         return httpResponse(200, jsonOk({ files: [], hint: e.message }), origin);
@@ -601,11 +623,14 @@ exports.main = async (event, context) => {
         const latestFiles = byVer[latestVer] || [];
         const chromeFile = latestFiles.find((f) => /\.zip$/i.test(f.filename || ''));
         const crxFile = latestFiles.find((f) => /\.crx$/i.test(f.filename || ''));
+        // 动态生成新鲜签名 URL（不用数据库里过期的）
+        const chromeUrl = chromeFile ? await freshFileUrl(chromeFile.cloudPath || ('tcb-builds/' + chromeFile.filename)) : '';
+        const crxUrl = crxFile ? await freshFileUrl(crxFile.cloudPath || ('tcb-builds/' + crxFile.filename)) : '';
         return httpResponse(200, jsonOk({
           latestVersion: latestVer,
           latestTs: latestFiles[0] ? latestFiles[0].ts : 0,
-          chrome: chromeFile ? { filename: chromeFile.filename, url: chromeFile.url, size: chromeFile.size, ts: chromeFile.ts } : null,
-          crx: crxFile ? { filename: crxFile.filename, url: crxFile.url, size: crxFile.size, ts: crxFile.ts } : null,
+          chrome: chromeFile ? { filename: chromeFile.filename, url: chromeUrl, size: chromeFile.size, ts: chromeFile.ts } : null,
+          crx: crxFile ? { filename: crxFile.filename, url: crxUrl, size: crxFile.size, ts: crxFile.ts } : null,
         }), origin);
       } catch (e) {
         return httpResponse(200, jsonOk({ latestVersion: '', chrome: null, crx: null, hint: e.message }), origin);
