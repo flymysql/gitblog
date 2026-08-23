@@ -55,17 +55,38 @@ async function main() {
     fs.cpSync(src, path.join(pkgDir, item), { recursive: true });
   }
   run(`cd ${pkgDir} && zip -r ../taobao-cert-uploader-v${version}-chrome.zip . > /dev/null`, pkgDir);
-  // 生成无签名 crx
+  // 生成签名 CRX3（用备份私钥；无私钥则退回无签名，仅 Chrome 解压加载可用）
   const zipBuf = fs.readFileSync(path.join(DIST, `taobao-cert-uploader-v${version}-chrome.zip`));
-  const crx = Buffer.concat([Buffer.from('Cr24'), Buffer.from([2,0,0,0,0,0,0,0]), zipBuf]);
-  fs.writeFileSync(path.join(DIST, `taobao-cert-uploader-v${version}-360.crx`), crx);
+  const keyPath = process.env.TCB_SIGN_KEY || path.join(ROOT, '..', 'tcb-keys', 'taobao-cert-sign-key.pem');
+  const crxOut = path.join(DIST, `taobao-cert-uploader-v${version}-360-signed.crx`);
+  if (fs.existsSync(keyPath)) {
+    try {
+      const vm = await import('node:vm');
+      const { webcrypto } = await import('node:crypto');
+      const sandbox = { crypto: webcrypto, TextEncoder, Uint8Array, console };
+      const crxPackSrc = fs.readFileSync(path.join(ROOT, 'utils', 'crx-pack.js'), 'utf8');
+      vm.runInNewContext(crxPackSrc, sandbox);
+      const pem = fs.readFileSync(keyPath, 'utf8');
+      const crx = await sandbox.TCBCrxPack.packCrx3(new Uint8Array(zipBuf), pem);
+      fs.writeFileSync(crxOut, Buffer.from(crx));
+      console.log('   已生成签名 CRX3:', path.basename(crxOut));
+    } catch (e) {
+      console.warn('   ⚠️ CRX3 签名失败(退回无签名):', e.message);
+      const crx = Buffer.concat([Buffer.from('Cr24'), Buffer.from([2,0,0,0,0,0,0,0]), zipBuf]);
+      fs.writeFileSync(crxOut, crx);
+    }
+  } else {
+    console.warn('   ⚠️ 未找到签名私钥，生成无签名 CRX（仅 360 拖拽可能被拒，建议配置 TCB_SIGN_KEY）');
+    const crx = Buffer.concat([Buffer.from('Cr24'), Buffer.from([2,0,0,0,0,0,0,0]), zipBuf]);
+    fs.writeFileSync(crxOut, crx);
+  }
   console.log('   打包完成:', fs.readdirSync(DIST).filter((f) => f.endsWith('.zip') || f.endsWith('.crx')).join(', '));
 
   // 2. 上传 COS
   console.log('2/4 上传 COS...');
   const files = [
     path.join(DIST, `taobao-cert-uploader-v${version}-chrome.zip`),
-    path.join(DIST, `taobao-cert-uploader-v${version}-360.crx`),
+    crxOut,
   ];
   for (const f of files) {
     const name = path.basename(f);
