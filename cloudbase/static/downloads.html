@@ -93,22 +93,20 @@ tr:hover td { background: rgba(255,255,255,.03); }
   <div class="card">
     <h2>📖 安装说明</h2>
     <div class="install-steps">
-      <b>🟢 360 极速浏览器（推荐 zip 解压安装）</b><br>
-      1. 下载 <b>.zip</b> 安装包，<b>解压</b>到固定文件夹（如 <code>D:\taobao-cert</code>），应能看到 manifest.json<br>
-      2. 打开 360 极速浏览器，地址栏访问 <code>se://extensions/</code><br>
-      3. 开启右上角 <b>开发者模式</b><br>
-      4. 点击 <b>「加载已解压的扩展程序」</b>，选择刚才解压的文件夹<br>
-      5. 部分 360 版本支持直接<b>拖拽 .crx</b>安装；若提示「程序包无效」，请改用 zip 解压方式（上面步骤）<br>
-      <br>
-      <b>🔵 Chrome / Edge 浏览器（需解压安装）</b><br>
-      1. 下载 <b>Chrome 版 .zip</b> 文件到本地<br>
-      2. 将 zip <b>解压</b>到固定文件夹（如 <code>D:\taobao-cert</code>），应能看到 manifest.json<br>
-      3. 打开 Chrome 访问 <code>chrome://extensions/</code>（Edge 访问 <code>edge://extensions/</code>）<br>
-      4. 开启 <b>开发者模式</b> → 点 <b>「加载已解压的扩展程序」</b> → 选择解压后的文件夹<br>
-      <span class="muted">⚠️ 解压后的文件夹请勿删除或移动，否则插件会失效。</span><br>
-      <span class="muted">⚠️ 360 若提示「无法从该网站添加应用」，请确认已开启开发者模式后再拖拽。</span>
+      <b>📦 解压安装（Chrome / Edge / 360 通用）</b><br>
+      1. 下载 <b>.zip</b> 安装包<br>
+      2. 将 zip <b>解压</b>到固定文件夹（如 <code>D:\taobao-cert</code> 或 <code>~/taobao-cert</code>），解压后应能看到 <code>manifest.json</code><br>
+      3. 打开你的浏览器扩展管理页：<br>
+      &nbsp;&nbsp;· Chrome：<code>chrome://extensions/</code><br>
+      &nbsp;&nbsp;· Edge：<code>edge://extensions/</code><br>
+      &nbsp;&nbsp;· 360：<code>se://extensions/</code><br>
+      4. 开启右上角 <b>「开发者模式」</b><br>
+      5. 点击 <b>「加载已解压的扩展程序」</b>，选择刚才解压的文件夹<br>
+      6. 确认列表出现「淘宝发货证书自动上传」<br>
+      <span class="muted">⚠️ 解压后的文件夹请勿删除或移动，否则插件会失效。</span>
     </div>
   </div>
+
 </div>
 
 <script>
@@ -130,26 +128,19 @@ async function load() {
     const verKeys = Object.keys(byVer).sort((a, b) => (a === 'latest' ? 1 : b === 'latest' ? -1 : b.localeCompare(a)));
     const latestVer = verKeys[0];
     const latestFiles = byVer[latestVer];
-    const chromeFile = latestFiles.find((f) => /chrome|zip/i.test(f.filename) && /\.zip$/i.test(f.filename));
-    const crxFile = latestFiles.find((f) => /\.crx$/i.test(f.filename));
+    const zipFile = latestFiles.find((f) => /\.zip$/i.test(f.filename));
     document.getElementById('latest-version').innerHTML = `
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px">
         <span class="version-tag">v${latestVer}</span>
         <span class="muted">更新时间 ${fmtTime(latestFiles[0].ts)}</span>
       </div>
-      <div class="latest-wrap">
-        ${crxFile ? `<div class="latest-box">
-          <div class="browser">🟢</div><h4>360 极速浏览器</h4>
-          <div class="desc">推荐下载 zip 解压后加载（所有浏览器通用）<br>或拖拽 .crx（部分 360 版本可用）</div>
-          <a class="dl-btn" href="${chromeFile ? chromeFile.url : crxFile.url}" download>⬇ 下载安装包</a>
-        </div>` : ''}
-        ${chromeFile ? `<div class="latest-box">
-          <div class="browser">🔵</div><h4>Chrome / Edge</h4>
-          <div class="desc">下载 zip 后解压加载<br>${chromeFile.size ? (chromeFile.size/1024).toFixed(0)+' KB' : ''}</div>
-          <a class="dl-btn" href="${chromeFile.url}" download>⬇ 下载 Chrome 版</a>
-        </div>` : ''}
-      </div>
-      ${latestFiles[0].note ? `<p class="muted" style="margin-top:12px">${latestFiles[0].note}</p>` : ''}`;
+      ${zipFile ? `<div style="text-align:center;padding:20px 0">
+        <div style="font-size:40px;margin-bottom:10px">📦</div>
+        <h4 style="margin-bottom:6px">淘宝证书自动上传 v${latestVer}</h4>
+        <p class="muted" style="margin-bottom:16px">${zipFile.size ? (zipFile.size/1024).toFixed(0) + ' KB' : ''} · zip 安装包(所有浏览器通用)</p>
+        <a class="dl-btn" href="${zipFile.url}" download style="font-size:16px;padding:13px 36px">⬇ 下载安装包</a>
+      </div>` : '<p class="empty">暂无安装包</p>'}
+      ${latestFiles[0].note ? `<p class="muted" style="margin-top:12px;text-align:center">${latestFiles[0].note}</p>` : ''}`;
 
     const historyFiles = files.filter((f) => (f.version || 'latest') !== latestVer);
     document.getElementById('history-body').innerHTML = historyFiles.map((f) => `

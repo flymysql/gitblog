@@ -601,7 +601,8 @@ exports.main = async (event, context) => {
         const rows = await db.collection(COLL_LOG_FILES).where({ kind: 'build', published: true }).orderBy('ts', 'desc').limit(50).get();
         const files = [];
         for (const f of (rows.data || [])) {
-          // 每次动态生成新鲜签名 URL（数据库里的旧 url 会过期）
+          // 只暴露 zip(解压安装,通用无兼容问题);crx 不再对外
+          if (!/\.zip$/i.test(f.filename || '')) continue;
           const cloudPath = f.cloudPath || ('tcb-builds/' + (f.filename || ''));
           const url = await resolveDownloadUrl(f);
           files.push({
@@ -643,15 +644,13 @@ exports.main = async (event, context) => {
         const latestVer = versionList[0] || '';
         const latestFiles = byVer[latestVer] || [];
         const chromeFile = latestFiles.find((f) => /\.zip$/i.test(f.filename || ''));
-        const crxFile = latestFiles.find((f) => /\.crx$/i.test(f.filename || ''));
-        // 动态生成新鲜签名 URL（不用数据库里过期的）
+        // 只提供 zip(解压安装);crx 不再对外
         const chromeUrl = chromeFile ? await resolveDownloadUrl(chromeFile) : '';
-        const crxUrl = crxFile ? await resolveDownloadUrl(crxFile) : '';
         return httpResponse(200, jsonOk({
           latestVersion: latestVer,
           latestTs: latestFiles[0] ? latestFiles[0].ts : 0,
           chrome: chromeFile ? { filename: chromeFile.filename, url: chromeUrl, size: chromeFile.size, ts: chromeFile.ts } : null,
-          crx: crxFile ? { filename: crxFile.filename, url: crxUrl, size: crxFile.size, ts: crxFile.ts } : null,
+          crx: null,
         }), origin);
       } catch (e) {
         return httpResponse(200, jsonOk({ latestVersion: '', chrome: null, crx: null, hint: e.message }), origin);
