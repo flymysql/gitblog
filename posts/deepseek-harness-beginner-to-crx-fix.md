@@ -237,17 +237,6 @@ node cloudbase/publish-extension.mjs --version 1.4.0
 
 ---
 
-## 附：顺手修掉的两个博客构建脚本坑
-
-这两个不在需求里，是 AI 为了能验证自己的改动而被迫发现的：
-
-- **Windows 上读不到本地统计数据**：代码用 `new URL('..', import.meta.url).pathname` 取项目根目录，在 Windows 上会得到 `/D:/work/blog/` 这种带前导斜杠的路径，`existsSync` 恒为 false → 本地构建**静默丢掉全站 PV 和评论数据**。改用 `fileURLToPath`。
-- **同一天多篇文章的网址会随机器变化**：决定 `YYYYMMDD-2`、`-3` 顺序的排序用了 `localeCompare`，它的结果跟**系统语言**有关（中文按拼音、英文按码点），同一份代码在不同机器上会把已有文章的网址互换。改成码点比较后，实测旧文章 URL 变化数为 0。
-
-> 一条经验：**凡是"排序 + 生成 ID/URL"的地方，都要警惕 locale、时区、文件系统返回顺序这三件事。**
-
----
-
 > 全文最重要的一句：让 AI 明确告诉你 —— **哪些它验证过了，哪些它只是在猜。**
 >
 > 图片来源：DSH Desktop 官网（[dshdesktop.cn](https://dshdesktop.cn)）与项目仓库截图、[DeepSeek Harness 官方文档](https://deepseek-harness.github.io/deepseek-harness/guide/providers)截图；DeepSeek 开放平台界面截图引自公开图文教程（[腾讯云社区](https://cloud.tencent.com/developer/article/2727785)）。
