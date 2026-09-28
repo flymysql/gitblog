@@ -19,11 +19,11 @@
   <link rel="icon" href="/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="description" content="给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key，再用 6 轮 prompt 让 AI 把浏览器插件的三个用户抱怨查到底——包括「新版从头到尾就没装上过」这个字节级真凶。">
+  <meta name="description" content="给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key（注册/充值/取 Key 全流程截图），再附上 10 条可以直接抄的 prompt（读懂 / 拆假设 / 找证据 / 修+自检 / 打包 / 交代边界），最后用一个真实案例证明这套打法能查到「新版从头到尾就没装上过」的字节级真凶。">
   <meta name="author" content="Jimmy">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件">
-  <meta property="og:description" content="给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key，再用 6 轮 prompt 让 AI 把浏览器插件的三个用户抱怨查到底——包括「新版从头到尾就没装上过」这个字节级真凶。">
+  <meta property="og:description" content="给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key（注册/充值/取 Key 全流程截图），再附上 10 条可以直接抄的 prompt（读懂 / 拆假设 / 找证据 / 修+自检 / 打包 / 交代边界），最后用一个真实案例证明这套打法能查到「新版从头到尾就没装上过」的字节级真凶。">
   <meta property="og:image" content="https://gitpull.cn/assets/uploads/2026/06/covers/deepseek-harness-beginner-to-crx-fix.webp">
   <meta property="og:url" content="https://gitpull.cn/post/20260925/">
   <meta property="og:type" content="article">
@@ -31,17 +31,17 @@
   <meta property="og:locale" content="zh-CN">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件">
-  <meta name="twitter:description" content="给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key，再用 6 轮 prompt 让 AI 把浏览器插件的三个用户抱怨查到底——包括「新版从头到尾就没装上过」这个字节级真凶。">
+  <meta name="twitter:description" content="给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key（注册/充值/取 Key 全流程截图），再附上 10 条可以直接抄的 prompt（读懂 / 拆假设 / 找证据 / 修+自检 / 打包 / 交代边界），最后用一个真实案例证明这套打法能查到「新版从头到尾就没装上过」的字节级真凶。">
   <meta name="twitter:image" content="https://gitpull.cn/assets/uploads/2026/06/covers/deepseek-harness-beginner-to-crx-fix.webp">
   <link rel="canonical" href="https://gitpull.cn/post/20260925/">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="article:published_time" content="2026-09-25T22:30:00+08:00">
-  <meta property="article:modified_time" content="2026-09-28T11:40:00+08:00">
+  <meta property="article:modified_time" content="2026-09-28T15:20:00+08:00">
   <meta property="article:author" content="Jimmy">
   <meta property="article:tag" content="教程">
   <meta property="article:tag" content="AI 基础设施">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件","description":"给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key，再用 6 轮 prompt 让 AI 把浏览器插件的三个用户抱怨查到底——包括「新版从头到尾就没装上过」这个字节级真凶。","image":"https://gitpull.cn/assets/uploads/2026/06/covers/deepseek-harness-beginner-to-crx-fix.webp","datePublished":"2026-09-25T22:30:00+08:00","dateModified":"2026-09-28T11:40:00+08:00","author":{"@type":"Person","name":"Jimmy"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260925/","keywords":"教程,AI 基础设施"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件","description":"给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key（注册/充值/取 Key 全流程截图），再附上 10 条可以直接抄的 prompt（读懂 / 拆假设 / 找证据 / 修+自检 / 打包 / 交代边界），最后用一个真实案例证明这套打法能查到「新版从头到尾就没装上过」的字节级真凶。","image":"https://gitpull.cn/assets/uploads/2026/06/covers/deepseek-harness-beginner-to-crx-fix.webp","datePublished":"2026-09-25T22:30:00+08:00","dateModified":"2026-09-28T15:20:00+08:00","author":{"@type":"Person","name":"Jimmy"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260925/","keywords":"教程,AI 基础设施"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://gitpull.cn/"},{"@type":"ListItem","position":2,"name":"教程","item":"https://gitpull.cn/tags.html#%E6%95%99%E7%A8%8B"},{"@type":"ListItem","position":3,"name":"从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件","item":"https://gitpull.cn/post/20260925/"}]}</script>
   <meta name="mobile-web-app-capable" content="yes">
 </head>
@@ -62,7 +62,7 @@
             <span>2026-09-25</span>
             <span class="dot"></span><span>更新于 2026-09-28</span>
             <span class="dot"></span>
-            <span>7036 字</span>
+            <span>6505 字</span>
             <span class="dot"></span>
             <span class="meta-read-mins">约 10 分钟</span>
             <span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">阅读 </span><span id="gitblog_page_pv">…</span><span class="gitblog-pv-suffix"> 次</span></span>
@@ -79,34 +79,39 @@
 <hr>
 <h1>一、装 DSH（5 分钟）</h1>
 <p><strong>它是什么</strong>：跑在你自己电脑上的 AI 助手。能读你指定的文件夹、能自己跑命令、动手前会问你。聊天机器人给你答案，它给你结果。</p>
-<p><strong>下载</strong>：打开 <a href="https://github.com/anywhere-labs/dsh-desktop/releases">https://github.com/anywhere-labs/dsh-desktop/releases</a>，在最新版（写本文时 v2.0.15）的 Assets 里按系统选：</p>
+<p>分两条路，小白走第一条：</p>
 <table>
 <thead>
 <tr>
-<th>你的系统</th>
-<th>下哪个文件</th>
+<th></th>
+<th>是什么</th>
+<th>适合谁</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Windows 64 位</td>
-<td><code>DSH-Desktop-2.0.15-x64-Setup.exe</code></td>
+<td><strong>DSH Desktop</strong>（推荐）</td>
+<td>社区维护的桌面客户端，<strong>一键安装包，不需要命令行和 Node.js</strong></td>
+<td>绝大多数人</td>
 </tr>
 <tr>
-<td>macOS（Intel / Apple 芯片都行）</td>
-<td><code>DSH.Desktop-2.0.15-universal.dmg</code></td>
-</tr>
-<tr>
-<td>Linux</td>
-<td><code>...-amd64.deb</code> 或 <code>...-x86_64.appimage</code></td>
+<td>官方 Harness</td>
+<td><a href="https://github.com/deepseek-ai/deepseek-harness">deepseek-ai/deepseek-harness</a> 源码 / CLI</td>
+<td>开发者</td>
 </tr>
 </tbody></table>
-<p>安装包 200~500 MB 是正常的（自带运行时，不用另装 Node.js）。装完双击打开即可。</p>
+<p>打开官网 <strong><a href="https://dshdesktop.cn">https://dshdesktop.cn</a></strong>，点「<strong>为 Windows 下载</strong>」或「<strong>为 macOS 下载</strong>」：</p>
+<p><img src="/assets/uploads/2026/09/dsh-site-download.thumb.webp" alt="DSH Desktop 官网：一键下载（为 Windows / 为 macOS 下载）" width="1440" height="1050" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-site-download.webp" data-thumb="/assets/uploads/2026/09/dsh-site-download.thumb.webp" class="progressive-img"></p>
+<blockquote>
+<p>说明一下：<strong>DSH Desktop 是社区独立维护的开源项目，不是 DeepSeek 官方产品</strong>（官网自己也标了这句话）。想用官方版本就走上面那条 CLI 路线。旁边那个「下载 Next 版」是更新更快的分支，小白先用普通版。</p>
+</blockquote>
+<p>装完双击打开，就是这个样子：</p>
+<p><img src="/assets/uploads/2026/09/dsh-desktop-chat.thumb.webp" alt="DSH Desktop 真实界面：左边工作区与会话，右边对话区，底部能看到模型和 token 用量" width="1600" height="1094" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-desktop-chat.webp" data-thumb="/assets/uploads/2026/09/dsh-desktop-chat.thumb.webp" class="progressive-img"></p>
+<p>安装包 200~500 MB 是正常的（自带运行时，不用另装 Node.js）。</p>
 <ul>
 <li>Windows 弹「Windows 已保护你的电脑」→ <strong>更多信息 → 仍要运行</strong></li>
 <li>macOS 提示无法验证开发者 → <strong>系统设置 → 隐私与安全性 → 仍要打开</strong></li>
 </ul>
 <h2>第一次打开：只认这三个地方</h2>
-<p><img src="/assets/uploads/2026/09/dsh-guide-02-ui.thumb.webp" alt="DSH 界面：选择工作区 / 输入框 / 设置" width="1872" height="936" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-02-ui.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-02-ui.thumb.webp" class="progressive-img"></p>
 <ol>
 <li><strong>① 左下「选择工作区」</strong> —— 选一个文件夹（比如放插件、放代码的那个目录）。
 <strong>没选之前输入框是灰的、点不动，这不是坏了</strong> —— 这是新手最容易卡住的地方。它只看得到你选中的那个文件夹。</li>
@@ -118,19 +123,20 @@
 </blockquote>
 <hr>
 <h1>二、配模型：注册 → 充值 → 取 Key（5 分钟）</h1>
-<p><img src="/assets/uploads/2026/09/dsh-guide-04-key.thumb.webp" alt="DeepSeek 开放平台：注册 → 充值 → 取 Key" width="1872" height="570" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-04-key.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-04-key.thumb.webp" class="progressive-img"></p>
-<p>从 <a href="https://platform.deepseek.com/">https://platform.deepseek.com/</a> 开始（注意：<strong>和聊天版 <code>chat.deepseek.com</code> 不是一个站</strong>，只有开放平台里才有 API Key）：</p>
-<ol>
-<li><strong>注册登录</strong>：手机号 / 邮箱收验证码</li>
-<li><strong>充值</strong>：左侧「充值」，选金额，支付宝 / 微信扫码 —— <strong>第一次充 ¥20 就够用很久</strong></li>
-<li><strong>创建 API Key</strong>：打开 <a href="https://platform.deepseek.com/api_keys">https://platform.deepseek.com/api_keys</a> → 创建 → 起个名字（比如 <code>dsh</code>）</li>
-</ol>
+<p>从 <a href="https://platform.deepseek.com/">https://platform.deepseek.com/</a> 开始（注意：<strong>和聊天版 <code>chat.deepseek.com</code> 不是一个站</strong>，只有开放平台里才有 API Key）。</p>
+<p><strong>第 1 步｜注册登录</strong>：手机号收验证码，或者微信扫码。</p>
+<p><img src="/assets/uploads/2026/09/ds-platform-login.thumb.webp" alt="DeepSeek 开放平台登录页" width="1600" height="653" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/ds-platform-login.webp" data-thumb="/assets/uploads/2026/09/ds-platform-login.thumb.webp" class="progressive-img"></p>
+<p><strong>第 2 步｜充值</strong>：左侧「充值」→ 选金额 → 支付宝 / 微信扫码。<strong>第一次充 ¥20 就够用很久。</strong></p>
+<p><img src="/assets/uploads/2026/09/ds-platform-recharge.thumb.webp" alt="充值页：选金额后用支付宝或微信支付" width="1600" height="653" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/ds-platform-recharge.webp" data-thumb="/assets/uploads/2026/09/ds-platform-recharge.thumb.webp" class="progressive-img"></p>
+<p><strong>第 3 步｜创建 API Key</strong>：左侧「API keys」→ 点右上角「创建 API key」。</p>
+<p><img src="/assets/uploads/2026/09/ds-platform-apikeys.thumb.webp" alt="API keys 页：右上角就是「创建 API key」" width="1268" height="486" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/ds-platform-apikeys.webp" data-thumb="/assets/uploads/2026/09/ds-platform-apikeys.thumb.webp" class="progressive-img"></p>
+<p>创建出来的那串 <code>sk-…</code> <strong>只显示这一次</strong>，立刻点「复制」：</p>
+<p><img src="/assets/uploads/2026/09/ds-platform-createkey.thumb.webp" alt="创建 API key 弹窗：出于安全原因，之后无法再次查看" width="1268" height="486" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/ds-platform-createkey.webp" data-thumb="/assets/uploads/2026/09/ds-platform-createkey.thumb.webp" class="progressive-img"></p>
 <blockquote>
-<p>⚠️ 创建出来的那串 <code>sk-…</code> <strong>只显示这一次</strong>，立刻复制。它是你的钱包，<strong>不要发给别人、不要粘进代码或 GitHub</strong>（GitHub 上有机器人 7×24 扫这种字符串，几分钟就能刷爆）。泄露了立刻去 API keys 页删掉重建。</p>
+<p>⚠️ 它是你的钱包，<strong>不要发给别人、不要粘进代码或 GitHub</strong>（GitHub 上有机器人 7×24 扫这种字符串，几分钟就能刷爆）。泄露了立刻去 API keys 页删掉重建。</p>
 </blockquote>
-<p>然后回到 DSH：</p>
-<p><img src="/assets/uploads/2026/09/dsh-guide-03-models.thumb.webp" alt="配置模型：4 步" width="1872" height="356" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-03-models.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-03-models.thumb.webp" class="progressive-img"></p>
-<p><strong>设置 → 模型 → DeepSeek 卡片粘 Key → 保存</strong>。立即生效，不用重启；密钥只写不读（页面上只显示脱敏结果）。</p>
+<p><strong>第 4 步｜粘进 DSH</strong>：<strong>设置 → 模型 → DeepSeek 卡片粘 Key → 保存</strong>。立即生效，不用重启；密钥只写不读（页面上只显示脱敏结果）。</p>
+<p><img src="/assets/uploads/2026/09/dsh-models-settings.thumb.webp" alt="DSH 设置 → 模型：DeepSeek 卡片、API 密钥输入框、保存按钮" width="1400" height="758" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-models-settings.webp" data-thumb="/assets/uploads/2026/09/dsh-models-settings.thumb.webp" class="progressive-img"></p>
 <p><strong>花多少钱？</strong>（官方价，元 / 百万 tokens）</p>
 <table>
 <thead>
@@ -167,116 +173,86 @@
 </blockquote>
 <p>报错对照：<code>401</code> = Key 不对（检查空格）；<code>Insufficient Balance</code> = 该充值了；<code>MISSING_CREDENTIAL</code> = 回设置里重新保存一次。</p>
 <hr>
-<h1>三、怎么"用嘴"让 AI 干完一整件活</h1>
-<p><img src="/assets/uploads/2026/09/dsh-guide-05-prompt.thumb.webp" alt="把活拆成 6 轮" width="1872" height="620" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-05-prompt.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-05-prompt.thumb.webp" class="progressive-img"></p>
-<p>四条心法：</p>
+<h1>三、直接抄的 prompt</h1>
+<p><img src="/assets/uploads/2026/09/dsh-guide-05-prompt.thumb.webp" alt="把活拆成 6 步" width="1872" height="620" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-05-prompt.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-05-prompt.thumb.webp" class="progressive-img"></p>
+<p><strong>核心只有一句：一次只让它做一件事。</strong> 别一句话交代完——"帮我看看这个插件哪里有问题，然后修好再打包给我"是新手最常犯的错，它要么瞎改，要么反问你十个问题。</p>
+<p>下面 10 条按 6 步排好，把 <code>[方括号]</code> 里的内容换成你自己的就行。</p>
+<h2>第 1 步｜读懂（只读，不许改）</h2>
+<blockquote>
+<p>我完全不懂这个文件。请：</p>
 <ol>
-<li><strong>一次只让它做一件事</strong>：先读懂 → 再定位 → 再修 → 再打包 → 再验证。别一句话全交代完。</li>
-<li><strong>把它逼到"证据"上</strong>：文件 + 行号 + 可复现命令，缺一不可。</li>
-<li><strong>让它写脚本自证</strong>：能跑的检查 &gt; 口头保证。</li>
-<li><strong>让它交代边界</strong>：哪些验证过、哪些只是猜。</li>
+<li>先告诉我它是什么格式（注意 <code>[文件名]</code> 不是普通 zip，前面有一段头部）；</li>
+<li>解包 / 展开到 <code>[unpacked/]</code> 目录；</li>
+<li>列出完整文件树，每个文件用一句话说明用途；</li>
+<li>画一张「用户操作 → 哪个文件在处理 → 调用了什么」的主流程图。</li>
 </ol>
-<h2>真实案例：三句抱怨 → 四类问题</h2>
-<p>用户原话（客服转来的，一字未改）：</p>
+<p>全程只读，不要修改任何文件。</p>
+</blockquote>
+<blockquote>
+<p>用大白话给我讲一遍 <code>[这个项目/这个脚本]</code> 是干什么的、数据是怎么流动的。假设我是一个完全不懂编程的人，不要贴大段代码。</p>
+</blockquote>
+<h2>第 2 步｜把抱怨拆成能验证的假设</h2>
+<blockquote>
+<p>用户原话是：「<code>[把抱怨原封不动粘进来]</code>」</p>
+<p>请把它拆成 <strong>3 条可以用代码或命令验证的技术假设</strong>，每条写清楚：
+① 假设是什么；② 如果是真的，应该在哪个文件、哪一段代码里看到证据；③ 用什么命令或脚本能证实或推翻它。</p>
+<p>现在先不要下结论，只列假设和验证方法。</p>
+</blockquote>
+<p><strong>这一步是全文收益最高的一步</strong>：它把"感觉驱动"的 debug 变成三道有明确判定标准的判断题。</p>
+<h2>第 3 步｜让它写脚本自证</h2>
+<blockquote>
+<p>请写一个 Node 脚本 <code>[verify-xxx.mjs]</code>：输入 <code>[一个文件]</code>，输出 ① <code>[版本号/头部长度]</code> ② <code>[解析出的关键字段]</code> ③ <code>[校验结果]</code>。</p>
+<p>然后分别跑这几个文件，把结果做成一张对照表。</p>
+<p>不要只说"看起来没问题"——我要能自己复现的输出。</p>
+</blockquote>
+<blockquote>
+<p>你的每条结论都要附<strong>文件名 + 行号 + 可复现的命令或日志</strong>。说不清楚的地方直接写"这里我不确定"，不要猜。</p>
+</blockquote>
+<p><strong>这两条是本方法论的命根子</strong>：能跑的检查 &gt; 口头保证。</p>
+<h2>第 4 步｜修 + 自检</h2>
+<blockquote>
+<p>针对这个 bug，<strong>先给我修复方案</strong>（改哪个文件、为什么、怎么验证），我确认之后再动代码。</p>
+</blockquote>
+<blockquote>
+<p>修完之后，每改一处都在同一轮里配一个<strong>不依赖浏览器、不依赖网络</strong>的测试用例；如果能把刚才那种"错误写法"写成必须失败的反例，就更好。</p>
+</blockquote>
+<blockquote>
+<p>这个做法有没有更简单或更稳妥的方案？如果有，列出 2 个替代方案和取舍。</p>
+</blockquote>
+<blockquote>
+<p>用 <code>[插件/项目]</code> 自己的打包代码，不要在脚本里另写一份实现——两份实现必然会分叉。</p>
+</blockquote>
+<h2>第 5 步｜打包 + 发布前门禁</h2>
+<blockquote>
+<p>给我一个命令行打包脚本 <code>[tools/pack.mjs]</code>：</p>
+<ol>
+<li>产出 <code>[新安装包]</code>；</li>
+<li><strong>复用现有代码</strong>，不要另写一份打包逻辑；</li>
+<li>打完自动解包、对每个 js 做语法检查、做 <code>[签名/哈希]</code> 校验；</li>
+<li>密钥只从仓库外面读，<strong>绝不进安装包</strong>；</li>
+<li>任何一步失败就直接退出，<strong>不要"降级继续"</strong>。</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>顺便告诉我：这个包要怎么验证"用户能装上"，给一条我能自己跑的命令。</p>
+</blockquote>
+<h2>第 6 步｜让它交代边界（每轮都该问）</h2>
+<blockquote>
+<p>请明确列出：哪些结论是你<strong>真的验证过</strong>的（附命令和输出），哪些只是代码推理、还没在真实环境里验证过。</p>
+</blockquote>
+<blockquote>
+<p>给我一份收尾报告：① 每个问题对应"改了哪个文件、第几行"；② 哪些验证过、哪些没有；③ 用户升级要注意什么；④ 还有什么风险没排除。</p>
+</blockquote>
+<p><strong>最后这一问最重要。</strong> 一个靠谱的 AI 会告诉你"我验证到哪一步了"；如果它拍着胸脯说"全部修好、保证没问题"，反而要警惕。</p>
+<hr>
+<h1>四、这套 prompt 跑出来的结果</h1>
+<p>开头那句抱怨是客服转来的原话：</p>
 <blockquote>
 <p>明 上次那个新版他们说用不了 还有旧版也出一些问题 证书上传不成功，或者跳过之后第二遍再上传识别不到原来上传失败的好像</p>
 </blockquote>
-<p>素材就是两个文件：用户手上的 <code>淘宝证书自动上传2.0.crx</code>，和下载页上发布的 <code>taobao-cert-uploader-v1.3.1-360-signed-v2.crx</code>。</p>
-<h3>第 1 轮｜读懂（只读，不许改）</h3>
-<blockquote>
-<p>把 <code>淘宝证书自动上传2.0.crx</code> 解包到 <code>unpacked/</code>（注意 crx 不是普通 zip，前面有一段头部），列出完整文件树并说明每个文件干什么，再画一张"用户操作 → 哪个文件在处理"的主流程图。不要修改任何东西。</p>
-</blockquote>
-<p>结果：一个 22 个文件的插件结构。顺带发现一个可疑点——文件名写着「2.0」，<code>manifest.json</code> 里的版本号其实是 <strong>1.2.5</strong>。</p>
-<h3>第 2 轮｜把抱怨拆成可验证的假设</h3>
-<blockquote>
-<p>把上面那句抱怨拆成 <strong>3 条可以用代码或命令验证的技术假设</strong>，每条写清楚：假设是什么、在哪段代码能看到证据、用什么方法证实或推翻。先不要下结论。</p>
-</blockquote>
-<p>它给出三条（后来全部命中）：</p>
-<table>
-<thead>
-<tr>
-<th>#</th>
-<th>假设</th>
-<th>怎么验证</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>"用不了"可能是<strong>安装包本身装不上</strong>，而不是功能有问题</td>
-<td>解析 crx 文件头 + 按 Chrome 规则验签</td>
-</tr>
-<tr>
-<td>2</td>
-<td>"上传不成功"是页面上找不到元素，或按钮点不动却没报错</td>
-<td>查选择器是否写死、点确定前有没有校验</td>
-</tr>
-<tr>
-<td>3</td>
-<td>"第二遍识别不到"是失败的单被误标成"已完成"，之后永久跳过</td>
-<td>查完成记录的写入条件与过滤逻辑</td>
-</tr>
-</tbody></table>
-<h3>第 3 轮｜找证据（这一轮直接破案）</h3>
-<blockquote>
-<p>写一个 Node 脚本解析 crx 文件头、按 Chromium 的规则验签（注意签名载荷的长度定义），然后跑这几个包，把结果做成对照表。</p>
-</blockquote>
+<p>素材就是两个文件：用户手上的 <code>淘宝证书自动上传2.0.crx</code>，和下载页上发布的 <code>taobao-cert-uploader-v1.3.1-360-signed-v2.crx</code>。<strong>全程没打开过淘宝，也没登录过卖家账号</strong>——只读代码 + 写脚本自证。</p>
 <p><img src="/assets/uploads/2026/09/dsh-guide-06-bytes.thumb.webp" alt="新版用不了的字节级真凶" width="1872" height="427" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-06-bytes.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-06-bytes.thumb.webp" class="progressive-img"></p>
 <p><img src="/assets/uploads/2026/09/dsh-guide-07-verify.thumb.webp" alt="四个安装包的验签结果" width="1872" height="565" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-07-verify.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-07-verify.thumb.webp" class="progressive-img"></p>
-<p>顺着线索回发布脚本一看，凶手自己招了：</p>
-<pre><code class="language-js">// 旧版发布脚本里"签名失败就降级"的兜底
-const crx = Buffer.concat([Buffer.from('Cr24'), Buffer.from([2,0,0,0,0,0,0,0]), zipBuf]);
-// → CRX version=2 + 长度全 0 的伪头部，Chrome 第一步校验就拒绝
-</code></pre>
-<p>第二个包更冤：它想修，注释还写着「参考 chromium 源码」，但把长度取错了——</p>
-<pre><code class="language-js">// ❌ 错的：用了整个 CrxFileHeader 的长度（581）
-new DataView(size.buffer).setUint32(0, placeholderHeader.length, true);
-
-// ✅ 对的：用 signed_header_data 自己的长度（18）
-new DataView(size.buffer).setUint32(0, signedData.length, true);
-</code></pre>
-<h3>第 4 轮｜修 + 自检</h3>
-<blockquote>
-<p>修上面三处，每改一处都在同一轮里配一个<strong>不依赖浏览器、不依赖淘宝</strong>的测试用例。</p>
-</blockquote>
-<ul>
-<li><strong>跳过不重试</strong> → 完成判定收敛成一个函数：</li>
-</ul>
-<pre><code class="language-js">function tcbIsCompletedShipRecord(record) {
-  if (Number(record.certFailed) &gt; 0) return false;           // 有失败 → 必须重试
-  if (record.skipReason === 'heartbeat-timeout') return false;
-  if (record.noCertButtons) return false;                    // "没扫到按钮" ≠ "没有证书"
-  return record.certUploaded &gt; 0 || record.certSkipped &gt; 0;  // 至少成功一个才算完成
-}
-</code></pre>
-<ul>
-<li><strong>上传不成功</strong> → 上传控件加 4 级兜底选择器；证书编号填入后<strong>回读校验</strong>；注入图片后检查 <code>input.files</code>；点「确定」前<strong>等按钮变成可点击</strong>，一直是禁用就直接报清楚缺了哪一项（证书编号为空 / 检测机构未选择）</li>
-<li><strong>新版装不上</strong> → 修正签名载荷 + 打包时自检，验不过就抛错；发布脚本删掉"伪格式兜底"，改成直接失败退出</li>
-</ul>
-<p>自检跑出来是这样（17 项全过，其中两条是这么写的）：</p>
-<pre><code class="language-text">✅ 正解：LE32(len(signed_header_data)) + signed_header_data + archive → 验签通过
-✅ ❌ 1.3.1 的错误写法：LE32(整个 header 长度) → 验签失败（Chrome 拒绝安装）
-</code></pre>
-<p><strong>把踩过的坑写成"必须失败"的用例</strong>——以后谁手贱改回去，一跑测试就红了。</p>
-<h3>第 5 轮｜打包 + 发布前门禁</h3>
-<blockquote>
-<p>给我 <code>tools/pack.mjs</code>：打出 zip 和签名 crx；<strong>复用插件自己的打包代码</strong>，不要在脚本里另写一份；打完自动解包、对所有 js 做语法检查、验签；私钥只从仓库外读、<strong>绝不进安装包</strong>；任何一步失败就直接退出，不要"降级继续"。</p>
-</blockquote>
-<pre><code class="language-text">✅ taobao-cert-uploader-v1.4.0-chrome.zip (87613 bytes)
-✅ taobao-cert-uploader-v1.4.0-360-signed.crx (88206 bytes, 扩展ID jkmkapiplbcmnoghdphbbcbfebjdlbib)
-🔎 ✅ PASS  version=3 签名=有效 ｜ 解包成功，14 个 js 语法检查通过
-</code></pre>
-<h3>第 6 轮｜让它交代边界</h3>
-<blockquote>
-<p>列出：哪些结论是真机验证过的、哪些只是代码推理；用户升级要注意什么；还有什么风险没排除。</p>
-</blockquote>
-<p>这一轮它给出三个我没注意到、但必须转达给用户的点：</p>
-<ol>
-<li><strong>升级前先卸载旧版</strong>。两个安装包的签名私钥不同 → 扩展 ID 不同 → 浏览器眼里是<strong>两个不同的插件</strong>，会同时往页面里注入按钮、互相打架；而且新插件的本地记录（已完成订单、证书自增序号）是空的。</li>
-<li><strong>私钥不该随包分发</strong>。旧版把签名私钥 <code>export-key.dat</code> 打进了 CRX 发给所有人——等于把公章复印给每个用户。</li>
-<li><strong>诚实交代</strong>：上传那三处加固只到「代码推理 + 单元自检」，<strong>没在真实淘宝卖家页面上跑过端到端</strong>（要登录卖家账号 + 真实订单）。所以发布后要先小批量试，出问题用插件自带的「📦 导出日志包」把现场发回来。</li>
-</ol>
-<hr>
-<h1>四、结果</h1>
 <table>
 <thead>
 <tr>
@@ -329,7 +305,7 @@ new DataView(size.buffer).setUint32(0, signedData.length, true);
 </ol>
 <p><strong>让 AI 干活</strong></p>
 <ol start="10">
-<li>分轮次：读懂 → 定位 → 修 → 打包 → 验证</li>
+<li>一次只让它做一件事，分 6 步推进</li>
 <li>要证据（文件 + 行号 + 可复现命令），不要"我觉得"</li>
 <li>要自检脚本，不要"我改好了"</li>
 <li>要它自己说清楚"哪些没验证过"</li>
@@ -355,6 +331,7 @@ new DataView(size.buffer).setUint32(0, signedData.length, true);
 <hr>
 <blockquote>
 <p>全文最重要的一句：让 AI 明确告诉你 —— <strong>哪些它验证过了，哪些它只是在猜。</strong></p>
+<p>图片来源：DSH Desktop 官网（<a href="https://dshdesktop.cn">dshdesktop.cn</a>）与项目仓库截图、<a href="https://deepseek-harness.github.io/deepseek-harness/guide/providers">DeepSeek Harness 官方文档</a>截图；DeepSeek 开放平台界面截图引自公开图文教程（<a href="https://cloud.tencent.com/developer/article/2727785">腾讯云社区</a>）。</p>
 </blockquote>
 </div>
     <footer class="article-footer"><div class="article-tags"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E6%95%99%E7%A8%8B">教程</a><a class="tag tag-colored" style="--tag-bg:#E6FAFA;--tag-text:#167A7F;--tag-border:#B8E7E8;--tag-dark-bg:#123638;--tag-dark-text:#8EE2E5;--tag-dark-border:#2B6E72;" href="/tags.html#AI%20%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD">AI 基础设施</a></div></footer>
