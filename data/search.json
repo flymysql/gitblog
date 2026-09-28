@@ -1,12 +1,12 @@
 {
-  "generated": "2026-09-28T03:53:15.715Z",
+  "generated": "2026-09-28T03:56:26.505Z",
   "count": 69,
   "docs": [
     {
       "slug": "deepseek-harness-beginner-to-crx-fix",
       "urlKey": "20260925",
       "title": "从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件",
-      "summary": "给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key（注册/充值/取 Key 全流程截图），再附上 10 条可以直接抄的 prompt（读懂 / 拆假设 / 找证据 / 修+自检 / 打包 / 交代边界），最后用一个真实案例证明这套打法能查到「新版从头到尾就没装上过」的字节级真凶。",
+      "summary": "给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key（注册/充值/取 Key 全流程截图），再附上一段可以直接复制使用的 prompt 模板。",
       "tags": [
         "教程",
         "AI 基础设施"
