@@ -4,7 +4,7 @@
       "slug": "deepseek-harness-beginner-to-crx-fix",
       "title": "从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件",
       "date": "2026-09-25T22:30:00+08:00",
-      "updated": "2026-09-25T22:30:00+08:00",
+      "updated": "2026-09-28T11:30:00+08:00",
       "author": "Jimmy",
       "summary": "一篇写给\"完全没用过 AI 编程工具\"的人的实操教程。前半部分是 DeepSeek Harness 的下载安装、DeepSeek 开放平台注册充值拿 Key；后半部分是一次真实交付：把淘宝证书上传插件的三个用户抱怨，一步步逼到\"新版根本装不上\"的字节级真凶，修好、重新签名打包，并用一个 80 行的校验脚本证明新包能装、旧包不能装。",
       "tags": [
