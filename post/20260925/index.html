@@ -19,11 +19,11 @@
   <link rel="icon" href="/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="description" content="一篇写给&quot;完全没用过 AI 编程工具&quot;的人的实操教程。前半部分是 DeepSeek Harness 的下载安装、DeepSeek 开放平台注册充值拿 Key；后半部分是一次真实交付：把淘宝证书上传插件的三个用户抱怨，一步步逼到&quot;新版根本装不上&quot;的字节级真凶，修好、重新签名打包，并用一个 80 行的校验脚本证明新包能装、旧包不能装。">
+  <meta name="description" content="给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key，再用 6 轮 prompt 让 AI 把浏览器插件的三个用户抱怨查到底——包括「新版从头到尾就没装上过」这个字节级真凶。">
   <meta name="author" content="Jimmy">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件">
-  <meta property="og:description" content="一篇写给&quot;完全没用过 AI 编程工具&quot;的人的实操教程。前半部分是 DeepSeek Harness 的下载安装、DeepSeek 开放平台注册充值拿 Key；后半部分是一次真实交付：把淘宝证书上传插件的三个用户抱怨，一步步逼到&quot;新版根本装不上&quot;的字节级真凶，修好、重新签名打包，并用一个 80 行的校验脚本证明新包能装、旧包不能装。">
+  <meta property="og:description" content="给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key，再用 6 轮 prompt 让 AI 把浏览器插件的三个用户抱怨查到底——包括「新版从头到尾就没装上过」这个字节级真凶。">
   <meta property="og:image" content="https://gitpull.cn/assets/uploads/2026/06/covers/deepseek-harness-beginner-to-crx-fix.webp">
   <meta property="og:url" content="https://gitpull.cn/post/20260925/">
   <meta property="og:type" content="article">
@@ -31,17 +31,17 @@
   <meta property="og:locale" content="zh-CN">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件">
-  <meta name="twitter:description" content="一篇写给&quot;完全没用过 AI 编程工具&quot;的人的实操教程。前半部分是 DeepSeek Harness 的下载安装、DeepSeek 开放平台注册充值拿 Key；后半部分是一次真实交付：把淘宝证书上传插件的三个用户抱怨，一步步逼到&quot;新版根本装不上&quot;的字节级真凶，修好、重新签名打包，并用一个 80 行的校验脚本证明新包能装、旧包不能装。">
+  <meta name="twitter:description" content="给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key，再用 6 轮 prompt 让 AI 把浏览器插件的三个用户抱怨查到底——包括「新版从头到尾就没装上过」这个字节级真凶。">
   <meta name="twitter:image" content="https://gitpull.cn/assets/uploads/2026/06/covers/deepseek-harness-beginner-to-crx-fix.webp">
   <link rel="canonical" href="https://gitpull.cn/post/20260925/">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="article:published_time" content="2026-09-25T22:30:00+08:00">
-  <meta property="article:modified_time" content="2026-09-28T11:30:00+08:00">
+  <meta property="article:modified_time" content="2026-09-28T11:40:00+08:00">
   <meta property="article:author" content="Jimmy">
   <meta property="article:tag" content="教程">
   <meta property="article:tag" content="AI 基础设施">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件","description":"一篇写给\"完全没用过 AI 编程工具\"的人的实操教程。前半部分是 DeepSeek Harness 的下载安装、DeepSeek 开放平台注册充值拿 Key；后半部分是一次真实交付：把淘宝证书上传插件的三个用户抱怨，一步步逼到\"新版根本装不上\"的字节级真凶，修好、重新签名打包，并用一个 80 行的校验脚本证明新包能装、旧包不能装。","image":"https://gitpull.cn/assets/uploads/2026/06/covers/deepseek-harness-beginner-to-crx-fix.webp","datePublished":"2026-09-25T22:30:00+08:00","dateModified":"2026-09-28T11:30:00+08:00","author":{"@type":"Person","name":"Jimmy"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260925/","keywords":"教程,AI 基础设施"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件","description":"给完全没用过 AI 编程工具的人：5 分钟装好 DeepSeek Harness、5 分钟配好 DeepSeek API Key，再用 6 轮 prompt 让 AI 把浏览器插件的三个用户抱怨查到底——包括「新版从头到尾就没装上过」这个字节级真凶。","image":"https://gitpull.cn/assets/uploads/2026/06/covers/deepseek-harness-beginner-to-crx-fix.webp","datePublished":"2026-09-25T22:30:00+08:00","dateModified":"2026-09-28T11:40:00+08:00","author":{"@type":"Person","name":"Jimmy"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260925/","keywords":"教程,AI 基础设施"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://gitpull.cn/"},{"@type":"ListItem","position":2,"name":"教程","item":"https://gitpull.cn/tags.html#%E6%95%99%E7%A8%8B"},{"@type":"ListItem","position":3,"name":"从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件","item":"https://gitpull.cn/post/20260925/"}]}</script>
   <meta name="mobile-web-app-capable" content="yes">
 </head>
@@ -62,9 +62,9 @@
             <span>2026-09-25</span>
             <span class="dot"></span><span>更新于 2026-09-28</span>
             <span class="dot"></span>
-            <span>16412 字</span>
+            <span>7289 字</span>
             <span class="dot"></span>
-            <span class="meta-read-mins">约 23 分钟</span>
+            <span class="meta-read-mins">约 10 分钟</span>
             <span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">阅读 </span><span id="gitblog_page_pv">…</span><span class="gitblog-pv-suffix"> 次</span></span>
           </div>
         </div>
@@ -72,36 +72,19 @@
       </div>
     </header>
     <div class="article-body"><blockquote>
-<p><strong>一句话</strong>：这篇写给<strong>完全没用过 AI 编程工具</strong>的人。
-前半段教你把 DeepSeek Harness 装起来、把 DeepSeek 的 API Key 配好；
-后半段是一次真实交付——用这个工具把「淘宝证书自动上传」插件的三个用户抱怨，一路挖到字节级的真凶，修好并重新打包发布。</p>
-<p>官方资料：<a href="https://deepseek-harness.github.io/deepseek-harness/guide/quickstart">DeepSeek Harness 文档</a> · <a href="https://api-docs.deepseek.com/zh-cn/">DeepSeek API 文档</a> · <a href="https://platform.deepseek.com/">开放平台</a></p>
+<p>写给<strong>完全没用过 AI 编程工具</strong>的人。全程不需要会写代码，你只要会提问、会看结论。</p>
+<p>官方资料：<a href="https://deepseek-harness.github.io/deepseek-harness/guide/quickstart">DSH 文档</a> · <a href="https://api-docs.deepseek.com/zh-cn/">DeepSeek API 文档</a> · <a href="https://platform.deepseek.com/">开放平台</a></p>
 </blockquote>
+<p><img src="/assets/uploads/2026/09/dsh-guide-01-flow.thumb.webp" alt="三步走：装上 DSH → 配好 Key → 让它替你干活" width="1872" height="424" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-01-flow.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-01-flow.thumb.webp" class="progressive-img"></p>
 <hr>
-<h1>第一部分：把 DeepSeek Harness 装上</h1>
-<h2>它到底是什么</h2>
-<p>DeepSeek Harness（简称 <strong>DSH</strong>）不是一个"聊天网页"，而是一个<strong>跑在你自己电脑上的 AI 助手</strong>。区别在这三点：</p>
-<ol>
-<li><strong>它能碰你的文件</strong>：你把它指到一个文件夹（比如 <code>C:\Users\你\Downloads</code>），它可以自己读里面的文件、改里面的代码、新建文件。</li>
-<li><strong>它能跑命令</strong>：需要解压、需要计算哈希、需要装依赖，它自己敲命令，然后把输出读回来看。</li>
-<li><strong>它会问你</strong>：要删文件、要联网、要执行有风险的操作时，它会停下来先征求你同意。</li>
-</ol>
-<p>一句话：<strong>聊天机器人给你答案，Harness 给你结果。</strong></p>
-<blockquote>
-<p>如果你只想"问问题"，用网页版 DeepSeek 就够了。装 Harness 的意义是——<strong>你有一堆"烂摊子"要处理</strong>（比如一个不知道谁写的插件、一堆日志、一个报错的脚本），你想让 AI 自己动手干完。</p>
-</blockquote>
-<h2>下载安装（Windows / macOS）</h2>
-<p>有两种用法，小白选第一种：</p>
-<h3>方式 A：桌面版安装包（推荐）</h3>
-<p>打开 Releases 页面：</p>
-<pre><code class="language-text">https://github.com/anywhere-labs/dsh-desktop/releases
-</code></pre>
-<p>在最新一版（写本文时是 <code>v2.0.15</code>）的 Assets 里按系统选：</p>
+<h1>一、装 DSH（5 分钟）</h1>
+<p><strong>它是什么</strong>：跑在你自己电脑上的 AI 助手。能读你指定的文件夹、能自己跑命令、动手前会问你。聊天机器人给你答案，它给你结果。</p>
+<p><strong>下载</strong>：打开 <a href="https://github.com/anywhere-labs/dsh-desktop/releases">https://github.com/anywhere-labs/dsh-desktop/releases</a>，在最新版（写本文时 v2.0.15）的 Assets 里按系统选：</p>
 <table>
 <thead>
 <tr>
 <th>你的系统</th>
-<th>下载哪个文件</th>
+<th>下哪个文件</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -113,578 +96,265 @@
 <td><code>DSH.Desktop-2.0.15-universal.dmg</code></td>
 </tr>
 <tr>
-<td>Linux (Debian/Ubuntu)</td>
-<td><code>DSH-Desktop-2.0.15-amd64.deb</code></td>
-</tr>
-<tr>
-<td>Linux (其他)</td>
-<td><code>DSH-Desktop-2.0.15-x86_64.appimage</code></td>
+<td>Linux</td>
+<td><code>...-amd64.deb</code> 或 <code>...-x86_64.appimage</code></td>
 </tr>
 </tbody></table>
-<p>页面里还有一条 <strong>DSH NEXT</strong> 系列（<code>DSH-NEXT-2.0.15-next-...</code>），是同一套东西的"下一代"分支，功能更新更快、可能更折腾，小白先用标准版 <code>DSH-Desktop</code>。</p>
-<p>安装包不小（Windows 版约 260 MB，macOS 版约 500 MB），这是正常的——里面自带了一整套运行时，不需要你再装 Node.js、Python 之类的东西。</p>
-<p>安装过程就是普通的"下一步"：</p>
-<ol>
-<li><strong>Windows</strong>：双击 <code>...-Setup.exe</code>。如果弹「Windows 已保护你的电脑」，点<strong>更多信息 → 仍要运行</strong>（这是自签名安装包的正常提示，不是病毒警告）。</li>
-<li><strong>macOS</strong>：打开 <code>.dmg</code>，把图标拖进「应用程序」。第一次打开如果提示"无法验证开发者"，去<strong>系统设置 → 隐私与安全性</strong>，在下面点<strong>仍要打开</strong>。</li>
-</ol>
-<h3>方式 B：从官方源码跑（进阶，先跳过）</h3>
-<p>官方仓库是 <a href="https://github.com/deepseek-ai/deepseek-harness"><code>deepseek-ai/deepseek-harness</code></a>，按照它的 <code>README.zh.md</code> 里的步骤装依赖、启动 <code>dsh</code>，浏览器打开它打印的地址就是 Web UI。这条路需要你会用命令行，本文不展开。</p>
-<h2>第一次打开：三个概念必须先搞懂</h2>
-<p>很多人第一次用会被卡住，就卡在下面这三个词上，其实很简单：</p>
-<h3>1. 工作区（Workspace）——"AI 能看见哪个文件夹"</h3>
-<p><strong>打开之后第一件事：点「选择工作区」，选一个文件夹。</strong></p>
-<p>这是新手最容易懵的地方：<strong>没选工作区之前，下面的输入框是灰的、点不动</strong>。不是软件坏了。</p>
-<p>怎么选？原则是**"让 AI 只看它该看的"**：</p>
+<p>安装包 200~500 MB 是正常的（自带运行时，不用另装 Node.js）。装完双击打开即可。</p>
 <ul>
-<li>要让它修插件 → 就选放插件的那个目录（或者更上层一点，比如 <code>D:\work</code>）</li>
-<li>别一上来就选 <code>C:\</code>（整个硬盘），那样它每次列文件都要翻半天，而且风险更大</li>
+<li>Windows 弹「Windows 已保护你的电脑」→ <strong>更多信息 → 仍要运行</strong></li>
+<li>macOS 提示无法验证开发者 → <strong>系统设置 → 隐私与安全性 → 仍要打开</strong></li>
 </ul>
-<h3>2. 会话（Session）——"一段对话 = 一个任务"</h3>
-<p>一个会话里你和 AI 的上下文是连续的，它会记得你前面说过什么。<strong>新任务开新会话</strong>，不要让"修插件"和"改简历"挤在一起，否则它会把两件事的信息搅在一起。</p>
-<h3>3. 权限审批（Approval）——"它要动手之前会问你"</h3>
-<p>AI 要读文件、改文件、跑命令时，会弹一个确认框告诉你它准备做什么。<strong>看清楚再点同意</strong>——这是你和 AI 之间的安全阀。</p>
-<p>从零开始的第一句话，推荐就发这一句（真的可以复制粘贴）：</p>
-<blockquote>
-<p>你好，我是第一次用。请先用一句话告诉我你是谁、能做什么，然后把这个工作区里的文件和目录结构列出来，用中文解释每个文件大概是干什么的。不要修改任何文件。</p>
-</blockquote>
-<p>这句话同时做到三件事：确认工具通了、确认它看得见你的文件、<strong>明确禁止它动手</strong>（先只读，最安全）。</p>
-<h2>配置模型：填一个 Key 就完事</h2>
-<p>DSH 本身不含模型，它要连到 DeepSeek 的 API 才能思考。配置只有一步：</p>
+<h2>第一次打开：只认这三个地方</h2>
+<p><img src="/assets/uploads/2026/09/dsh-guide-02-ui.thumb.webp" alt="DSH 界面：选择工作区 / 输入框 / 设置" width="1872" height="936" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-02-ui.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-02-ui.thumb.webp" class="progressive-img"></p>
 <ol>
-<li>打开 <strong>设置（Settings）→ 模型（Models）</strong></li>
-<li>找到 <strong>DeepSeek</strong> 卡片，把 API 密钥粘进去，<strong>保存</strong></li>
+<li><strong>① 左下「选择工作区」</strong> —— 选一个文件夹（比如放插件、放代码的那个目录）。
+<strong>没选之前输入框是灰的、点不动，这不是坏了</strong> —— 这是新手最容易卡住的地方。它只看得到你选中的那个文件夹。</li>
+<li><strong>② 输入框</strong> —— 选中工作区后才能输入。新任务的第一次提问，建议永远加一句 <code>先不要修改任何文件</code>。</li>
+<li><strong>⚙ 设置 → 模型</strong> —— 填 API Key（下一节）。</li>
 </ol>
-<p><strong>不用重启</strong>，下一次请求就生效。</p>
-<p>几个细节值得知道（都来自<a href="https://deepseek-harness.github.io/deepseek-harness/guide/providers">官方配置文档</a>）：</p>
-<ul>
-<li><strong>密钥是只写的</strong>。保存之后界面上只会显示脱敏后的描述，永远不会再给你看明文；密钥实际存在 <code>$DSH_HOME/.credentials.yaml</code>，配置文件里只留一个引用。这比很多工具把 Key 明文写在配置里要靠谱。</li>
-<li><strong>想手动改配置</strong>：设置页顶部有「打开配置文件」，编辑的就是 <code>$DSH_HOME/settings.yaml</code>（Windows 上就是 <code>C:\Users\你的用户名\.dsh\settings.yaml</code>）。改完存盘即生效。</li>
-<li><strong>要接公司网关 / 自建服务</strong>：设置 → 模型 → <strong>添加自定义提供方</strong>，填 Provider ID、基础 URL、API 协议（<code>openai-completions</code> / <code>openai-responses</code> / <code>anthropic-messages</code> 三选一，必须和网关实际用的一致）、密钥，以及至少一个模型。</li>
-<li>填错 Key 的典型报错就是 <strong><code>MISSING_CREDENTIAL</code></strong>；模型名写错是 <strong><code>UNKNOWN_MODEL</code></strong>。</li>
-</ul>
-<p>配好之后，随手验证一句（别省这一步）：</p>
 <blockquote>
-<p>请回答：1+1 等于几？只回答数字。</p>
+<p>一个小习惯：<strong>一个任务开一个新会话</strong>，别把改插件和写周报混在一起。</p>
 </blockquote>
-<p>秒回说明通了。如果转圈半天或者报错，先回设置页检查 Key 有没有多余空格、余额是不是 0。</p>
 <hr>
-<h1>第二部分：注册 DeepSeek、充值、拿 API Key</h1>
-<p>这一步看着琐碎，但它是<strong>唯一没法让 AI 代劳</strong>的一步（要你本人实名、要你付钱）。走一遍，五分钟。</p>
-<h2>1. 注册</h2>
-<p>浏览器打开：</p>
-<pre><code class="language-text">https://platform.deepseek.com/
-</code></pre>
-<p>（这是「开放平台」，和网页版聊天入口 <code>chat.deepseek.com</code> 是两个站，别搞混——<strong>只有开放平台里才有 API Key</strong>。）</p>
-<p>按页面提示用<strong>手机号或邮箱</strong>注册、登录。国内手机号直接收验证码即可。</p>
-<h2>2. 充值（不充值的话，第一次调用就报余额不足）</h2>
-<p>登录后进平台左侧菜单里的<strong>充值 / 费用</strong>相关页面（DeepSeek 的页面改版比较勤，认"充值""余额""Top up"这几个字就行）：</p>
+<h1>二、配模型：注册 → 充值 → 取 Key（5 分钟）</h1>
+<p><img src="/assets/uploads/2026/09/dsh-guide-04-key.thumb.webp" alt="DeepSeek 开放平台：注册 → 充值 → 取 Key" width="1872" height="570" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-04-key.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-04-key.thumb.webp" class="progressive-img"></p>
+<p>从 <a href="https://platform.deepseek.com/">https://platform.deepseek.com/</a> 开始（注意：<strong>和聊天版 <code>chat.deepseek.com</code> 不是一个站</strong>，只有开放平台里才有 API Key）：</p>
 <ol>
-<li>点<strong>充值</strong></li>
-<li>选金额。<strong>建议第一次充 ¥20</strong>（理由在下面）</li>
-<li>支付宝 / 微信扫码付款</li>
-<li>回到首页确认<strong>余额</strong>已经变了</li>
+<li><strong>注册登录</strong>：手机号 / 邮箱收验证码</li>
+<li><strong>充值</strong>：左侧「充值」，选金额，支付宝 / 微信扫码 —— <strong>第一次充 ¥20 就够用很久</strong></li>
+<li><strong>创建 API Key</strong>：打开 <a href="https://platform.deepseek.com/api_keys">https://platform.deepseek.com/api_keys</a> → 创建 → 起个名字（比如 <code>dsh</code>）</li>
 </ol>
-<p>充值规则有一条容易忽略的：<strong>赠送余额优先于充值余额被扣减</strong>。如果你之前领过赠送额度，会先花赠送的。</p>
-<h2>3. 创建 API Key（<strong>这一步的Key只显示一次</strong>）</h2>
-<p>打开：</p>
-<pre><code class="language-text">https://platform.deepseek.com/api_keys
-</code></pre>
-<ol>
-<li>点「创建 API Key」</li>
-<li>名字随便起，<strong>建议按用途起</strong>，比如 <code>dsh-desktop</code></li>
-<li>创建后<strong>立刻复制</strong>——<strong>这串 <code>sk-</code> 开头的字符串只会显示这一次</strong>，关掉就再也看不到了（丢了只能删了重建）</li>
-</ol>
-<h2>4. Key 的正确用法和红线</h2>
-<p><strong>红线只有一条：API Key 等于你的钱包。</strong> 谁拿到都能花你的钱。</p>
-<ul>
-<li>✅ 粘进 DSH 的设置页（它只写不读，安全）</li>
-<li>✅ 需要放到环境变量时，写到本机环境变量里</li>
-<li>❌ <strong>绝对不要</strong>粘到聊天窗口里发给别人</li>
-<li>❌ <strong>绝对不要</strong>写进代码 / 提交到 GitHub（GitHub 上有机器人 7×24 扫 <code>sk-</code> 开头的字符串，几分钟内就能被刷爆）</li>
-</ul>
 <blockquote>
-<p>万一泄露了：马上去 <code>platform.deepseek.com/api_keys</code> 把它<strong>删掉</strong>，再建一个新的。</p>
+<p>⚠️ 创建出来的那串 <code>sk-…</code> <strong>只显示这一次</strong>，立刻复制。它是你的钱包，<strong>不要发给别人、不要粘进代码或 GitHub</strong>（GitHub 上有机器人 7×24 扫这种字符串，几分钟就能刷爆）。泄露了立刻去 API keys 页删掉重建。</p>
 </blockquote>
-<h2>5. 大概要花多少钱？（这是最关键的一问）</h2>
-<p>DeepSeek 是按 token 计费的（token ≈ 半个到一个汉字）。官方价格表（<a href="https://api-docs.deepseek.com/zh-cn/quick_start/pricing">模型 &amp; 价格</a>，单位：元 / 百万 tokens）：</p>
+<p>然后回到 DSH：</p>
+<p><img src="/assets/uploads/2026/09/dsh-guide-03-models.thumb.webp" alt="配置模型：4 步" width="1872" height="356" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-03-models.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-03-models.thumb.webp" class="progressive-img"></p>
+<p><strong>设置 → 模型 → DeepSeek 卡片粘 Key → 保存</strong>。立即生效，不用重启；密钥只写不读（页面上只显示脱敏结果）。</p>
+<p><strong>花多少钱？</strong>（官方价，元 / 百万 tokens）</p>
 <table>
 <thead>
 <tr>
 <th>模型</th>
-<th>输入（缓存命中）</th>
 <th>输入（未命中）</th>
 <th>输出</th>
 </tr>
 </thead>
 <tbody><tr>
 <td><code>deepseek-flash</code> 空闲时段</td>
-<td>0.02</td>
 <td><strong>1</strong></td>
 <td><strong>4</strong></td>
 </tr>
 <tr>
 <td><code>deepseek-flash</code> 高峰时段</td>
-<td>0.04</td>
 <td>2</td>
 <td>8</td>
 </tr>
 <tr>
 <td><code>deepseek-v4-pro</code> 空闲时段</td>
-<td>0.15</td>
 <td>4.5</td>
 <td>13.5</td>
 </tr>
-<tr>
-<td><code>deepseek-v4-pro</code> 高峰时段</td>
-<td>0.30</td>
-<td>9.0</td>
-<td>27.0</td>
-</tr>
 </tbody></table>
-<p><strong>两个官方的小细节，直接帮你省钱：</strong></p>
-<ol>
-<li><strong>空闲时段的价格是高峰时段的一半</strong>。北京时间<strong>周一至周五 9:00–12:00、14:00–18:00 是高峰</strong>（不含法定节假日）；其余时间、包括周末和节假日全天，都是空闲价。</li>
-<li><strong><code>deepseek-flash</code> 便宜到可以忽略</strong>。它上下文 1M、一次最多输出 384K，做本文这种"读代码 + 改代码"的活完全够用，<strong>新手默认就用它</strong>。要看更长的推理、更难的算法再换 <code>deepseek-v4-pro</code>。</li>
-</ol>
-<p>那么本文这一整套活（解包两个安装包、读几千行 JS、写脚本、改代码、打包、验证）大概多少钱？</p>
 <ul>
-<li>输入大概几十万到一两百万 token（代码反复被读、且有缓存命中）</li>
-<li>输出大概几万到十几万 token</li>
+<li>北京时间<strong>周一至周五 9:00–12:00、14:00–18:00 是高峰</strong>（不含法定节假日），其余时间<strong>半价</strong></li>
+<li>新手默认用 <code>deepseek-flash</code>：上下文 1M，做「读代码 + 改代码」完全够</li>
+<li>本文这一整套活（解包、读几千行 JS、写脚本、改代码、打包、验证），<strong>成本在几块钱量级</strong></li>
 </ul>
-<p>按 <code>deepseek-flash</code> 空闲时段算，<strong>总成本在几块钱人民币量级，一般不超过 ¥5</strong>。所以：</p>
+<p>配好后先验证一句，别省这一步：</p>
 <blockquote>
-<p><strong>第一次充 ¥20 是够用很久的</strong>。别一上来充几百。</p>
+<p>请回答：1+1 等于几？只回答数字。</p>
 </blockquote>
-<h2>6. 常见报错对照</h2>
-<table>
-<thead>
-<tr>
-<th>报错</th>
-<th>意思</th>
-<th>怎么办</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>401 Unauthorized</code></td>
-<td>Key 不对</td>
-<td>检查有没有多余空格 / 是不是复制少了字符 / 是不是已删除</td>
-</tr>
-<tr>
-<td><code>Insufficient Balance</code></td>
-<td>余额不足</td>
-<td>去充值页充钱</td>
-</tr>
-<tr>
-<td><code>MISSING_CREDENTIAL</code></td>
-<td>DSH 没拿到 Key</td>
-<td>回设置 → 模型，重新保存一次</td>
-</tr>
-<tr>
-<td><code>UNKNOWN_MODEL</code></td>
-<td>模型名不对</td>
-<td>用 <code>deepseek-flash</code> 或 <code>deepseek-v4-pro</code></td>
-</tr>
-<tr>
-<td>一直转圈没反应</td>
-<td>网络 / 代理问题</td>
-<td>看官方<a href="https://deepseek-harness.github.io/deepseek-harness/guide/network-proxy">网络代理</a>一节</td>
-</tr>
-</tbody></table>
-<p>配好之后，你就可以用下面这套方法，让 AI 替你干活了。</p>
+<p>报错对照：<code>401</code> = Key 不对（检查空格）；<code>Insufficient Balance</code> = 该充值了；<code>MISSING_CREDENTIAL</code> = 回设置里重新保存一次。</p>
 <hr>
-<h1>第三部分：怎么"用嘴"让 AI 干完一整件活</h1>
-<p>这一部分是全文最值钱的部分。<strong>会写 prompt 的人，和不会写的人，拿到的东西差十倍。</strong></p>
-<h2>先记四条心法（比任何 prompt 模板都重要）</h2>
-<p><strong>① 一次只让它做一件事，先"读懂"，再"动手"。</strong></p>
-<p>新手最常犯的错是一句话把什么都交代了：</p>
-<blockquote>
-<p>❌ "帮我看看这个插件哪里有问题，然后修好，再打包给我。"</p>
-</blockquote>
-<p>它要么瞎改一通，要么先反问你十个问题。正确做法是<strong>分轮次</strong>：先看懂，再定位，再修，再打包，再验证。每一轮你都能检查它的结论对不对，错了就当场纠。</p>
-<p><strong>② 把"感觉"翻译成"可验证的事实"。</strong></p>
-<p>"上传失败"是感觉，"上传失败"不是需求。你要逼它给出<strong>事实</strong>：是哪个文件第几行、什么条件触发、有没有命令输出或日志能证明。本文全部结论都附了"文件 + 行号 + 可复现命令"。</p>
-<p><strong>③ 让它写脚本自证，而不是嘴上保证。</strong></p>
-<p>它说"我修好了"没有意义，它写一个 <code>verify-crx.mjs</code> 跑出来 <code>✅ PASS</code> 才有意义。<strong>能跑的检查 &gt; 口头保证</strong>。这也是后面能一眼看出"他们以为修好了其实没修好"的原因。</p>
-<p><strong>④ 让它自己交代"哪些验证过、哪些没验证过"。</strong></p>
-<p>最后一轮一定要问这句：</p>
-<blockquote>
-<p>请明确列出：哪些结论是你真的验证过的（附命令和输出），哪些只是代码推理、还没在真实环境里验证过。</p>
-</blockquote>
-<p>没有这句，AI 很容易把"我觉得应该是"讲成"就是"。本文下面那张结论表里，<strong>上传相关改动我标了"真机待验证"</strong>，就是因为这一问。</p>
+<h1>三、怎么"用嘴"让 AI 干完一整件活</h1>
+<p><img src="/assets/uploads/2026/09/dsh-guide-05-prompt.thumb.webp" alt="把活拆成 6 轮" width="1872" height="620" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-05-prompt.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-05-prompt.thumb.webp" class="progressive-img"></p>
+<p>四条心法：</p>
+<ol>
+<li><strong>一次只让它做一件事</strong>：先读懂 → 再定位 → 再修 → 再打包 → 再验证。别一句话全交代完。</li>
+<li><strong>把它逼到"证据"上</strong>：文件 + 行号 + 可复现命令，缺一不可。</li>
+<li><strong>让它写脚本自证</strong>：能跑的检查 &gt; 口头保证。</li>
+<li><strong>让它交代边界</strong>：哪些验证过、哪些只是猜。</li>
+</ol>
 <h2>真实案例：三句抱怨 → 四类问题</h2>
-<h3>起点：需求和素材</h3>
-<p>用户（客服转来的原话，一个字没改）：</p>
+<p>用户原话（客服转来的，一字未改）：</p>
 <blockquote>
 <p>明 上次那个新版他们说用不了 还有旧版也出一些问题 证书上传不成功，或者跳过之后第二遍再上传识别不到原来上传失败的好像</p>
 </blockquote>
-<p>素材是两个文件：</p>
-<pre><code class="language-text">C:\Users\jimmycppliu\Downloads\淘宝证书自动上传2.0.crx      ← 用户手上的"旧版"
-&lt;站点下载目录&gt;\taobao-cert-uploader-v1.3.1-360-signed-v2.crx ← 对外发布的"新版"
-</code></pre>
-<h3>第 1 轮：让它读懂这个 crx（不修改任何东西）</h3>
+<p>素材就是两个文件：用户手上的 <code>淘宝证书自动上传2.0.crx</code>，和下载页上发布的 <code>taobao-cert-uploader-v1.3.1-360-signed-v2.crx</code>。</p>
+<h3>第 1 轮｜读懂（只读，不许改）</h3>
 <blockquote>
-<p>这个目录里有一个浏览器扩展包 <code>淘宝证书自动上传2.0.crx</code>。请：</p>
-<ol>
-<li>先判断它是什么格式（注意：crx 不是普通的 zip，前面有一段头部，直接解压会失败），把它解包到 <code>unpacked/</code> 目录；</li>
-<li>列出完整的文件树和每个文件的大小；</li>
-<li>画一张"用户操作 → 哪个文件在处理 → 调用了什么"的主流程图；</li>
-<li>告诉我这个扩展一共几个版本、manifest 里的版本号是多少、涉及哪些淘宝域名。
-全程只读，不要改任何东西。</li>
-</ol>
+<p>把 <code>淘宝证书自动上传2.0.crx</code> 解包到 <code>unpacked/</code>（注意 crx 不是普通 zip，前面有一段头部），列出完整文件树并说明每个文件干什么，再画一张"用户操作 → 哪个文件在处理"的主流程图。不要修改任何东西。</p>
 </blockquote>
-<p><strong>这一步的价值</strong>：把"一个不知道谁写的 54KB 二进制包"变成"22 个文件、我能看懂的结构"。</p>
-<p>顺便它就能发现第一个<strong>不合常理的地方</strong>：文件名写着「2.0」，但 <code>manifest.json</code> 里的 <code>version</code> 是 <strong>1.2.5</strong>。</p>
-<p>代码里的文件名模板也是写死的：</p>
-<pre><code class="language-js">filename: `淘宝证书自动上传2.0-${suffix}.crx`,
-</code></pre>
-<p>也就是说，<strong>"2.0"只是产品名，不是版本号</strong>。这件事后面影响很大。</p>
-<h3>第 2 轮：把模糊抱怨拆成可验证的假设</h3>
+<p>结果：一个 22 个文件的插件结构。顺带发现一个可疑点——文件名写着「2.0」，<code>manifest.json</code> 里的版本号其实是 <strong>1.2.5</strong>。</p>
+<h3>第 2 轮｜把抱怨拆成可验证的假设</h3>
 <blockquote>
-<p>用户的原话是：「上次那个新版他们说用不了 还有旧版也出一些问题 证书上传不成功，或者跳过之后第二遍再上传识别不到原来上传失败的好像」</p>
-<p>请把这句话拆成 <strong>3 条独立的、可以用代码或命令验证的技术假设</strong>，每条都要说清楚：</p>
-<ul>
-<li>假设是什么</li>
-<li>如果是真的，应该能在哪个文件的哪一段代码里看到证据</li>
-<li>用什么方法能证实或推翻它</li>
-</ul>
-<p>现在先不要下结论，只列假设和验证方法。</p>
+<p>把上面那句抱怨拆成 <strong>3 条可以用代码或命令验证的技术假设</strong>，每条写清楚：假设是什么、在哪段代码能看到证据、用什么方法证实或推翻。先不要下结论。</p>
 </blockquote>
-<p>它给出的三条（后来全部被证实）：</p>
+<p>它给出三条（后来全部命中）：</p>
 <table>
 <thead>
 <tr>
 <th>#</th>
 <th>假设</th>
-<th>验证方法</th>
+<th>怎么验证</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>1</td>
-<td>"新版用不了" = 安装包本身有问题（不是功能问题）</td>
-<td>解析两个 crx 的文件头，看能不能通过 Chrome 的校验</td>
+<td>"用不了"可能是<strong>安装包本身装不上</strong>，而不是功能有问题</td>
+<td>解析 crx 文件头 + 按 Chrome 规则验签</td>
 </tr>
 <tr>
 <td>2</td>
-<td>"上传不成功" = 页面上找不到元素，或者按钮点不动却没报错</td>
-<td>检查选择器是否写死绝对路径、点确定前有没有校验按钮状态</td>
+<td>"上传不成功"是页面上找不到元素，或按钮点不动却没报错</td>
+<td>查选择器是否写死、点确定前有没有校验</td>
 </tr>
 <tr>
 <td>3</td>
-<td>"第二遍识别不到" = 失败的单被误标成"已完成"，之后永久跳过</td>
-<td>找"完成记录"的写入条件和过滤逻辑</td>
+<td>"第二遍识别不到"是失败的单被误标成"已完成"，之后永久跳过</td>
+<td>查完成记录的写入条件与过滤逻辑</td>
 </tr>
 </tbody></table>
-<p><strong>第 2 轮是最容易被忽略、但收益最高的一轮。</strong> 它把一次"感觉驱动"的 debug，变成了三道有明确判定标准的判断题。</p>
-<h3>第 3 轮：找真凶（这一轮直接破案）</h3>
+<h3>第 3 轮｜找证据（这一轮直接破案）</h3>
 <blockquote>
-<p>请写一个 Node 脚本 <code>verify-crx3.mjs</code>，输入一个 .crx 文件，输出：</p>
-<ol>
-<li>CRX 版本号、头部长度、zip 起始偏移；</li>
-<li>从头部里解析出公钥（SPKI）和签名；</li>
-<li>计算 crx_id = SHA256(公钥)[0:16]，并换算成 Chrome 的 32 位扩展 ID；</li>
-<li><strong>用 Chromium 的规则验签</strong>（<code>components/crx_file/crx_verifier.cc</code> 的 VerifyCrx3：载荷 = <code>"CRX3 SignedData\0"</code> + LE32(signed_header_data 长度) + signed_header_data + zip），输出验签结果。</li>
-</ol>
-<p>然后分别跑这三个文件，把结果做成一张对照表。</p>
+<p>写一个 Node 脚本解析 crx 文件头、按 Chromium 的规则验签（注意签名载荷的长度定义），然后跑这几个包，把结果做成对照表。</p>
 </blockquote>
-<p>跑出来的结果（这就是"一眼破案"）：</p>
-<table>
-<thead>
-<tr>
-<th>安装包</th>
-<th>CRX 版本</th>
-<th>验签</th>
-<th>结论</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>用户手上的旧版（内部版本 1.2.5）</td>
-<td>3</td>
-<td>✅ 通过</td>
-<td><strong>这个包是好的，能装</strong></td>
-</tr>
-<tr>
-<td>对外发布的第一个"新版"（<code>v1.3.1-360.crx</code>）</td>
-<td><strong>2</strong></td>
-<td>—</td>
-<td>❌ <strong>Chrome 只接受 version 3，这个包必然安装失败</strong></td>
-</tr>
-<tr>
-<td>对外发布的第二个"新版"（<code>v1.3.1-360-signed-v2.crx</code>）</td>
-<td>3</td>
-<td>❌ 失败</td>
-<td>❌ <strong>签名载荷长度算错，照样装不上</strong></td>
-</tr>
-<tr>
-<td>修复后重新打的 1.4.0</td>
-<td>3</td>
-<td>✅ 通过</td>
-<td>可以发</td>
-</tr>
-</tbody></table>
-<p>第一个包的头部，字节级长这样：</p>
-<pre><code class="language-text">43 72 32 34  02 00 00 00  00 00 00 00  50 4b 03 04 ...
- C  r  2  4   version=2    两个长度全0    PK..  (zip 从这里开始)
-</code></pre>
-<p>顺着这条线索回发布脚本一看，凶手自己招了：</p>
-<pre><code class="language-js">// 旧版 publish-extension.mjs ：签名失败/找不到私钥时的"兜底"
+<p><img src="/assets/uploads/2026/09/dsh-guide-06-bytes.thumb.webp" alt="新版用不了的字节级真凶" width="1872" height="427" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-06-bytes.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-06-bytes.thumb.webp" class="progressive-img"></p>
+<p><img src="/assets/uploads/2026/09/dsh-guide-07-verify.thumb.webp" alt="四个安装包的验签结果" width="1872" height="565" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/dsh-guide-07-verify.webp" data-thumb="/assets/uploads/2026/09/dsh-guide-07-verify.thumb.webp" class="progressive-img"></p>
+<p>顺着线索回发布脚本一看，凶手自己招了：</p>
+<pre><code class="language-js">// 旧版发布脚本里"签名失败就降级"的兜底
 const crx = Buffer.concat([Buffer.from('Cr24'), Buffer.from([2,0,0,0,0,0,0,0]), zipBuf]);
+// → CRX version=2 + 长度全 0 的伪头部，Chrome 第一步校验就拒绝
 </code></pre>
-<p><strong>注释写着"退回无签名"，实际上是造了一个 Chromium 根本不认的伪格式。</strong> 这就是"新版用不了"四个字的全部真相——功能可能是好的，但<strong>包根本没装上</strong>。</p>
-<p>而第二个包更冤：它动了手想修，注释还写着「参考 chromium 源码」，但把长度写成了<strong>整个 CrxFileHeader 的长度</strong>：</p>
-<pre><code class="language-js">// ❌ 错误（1.3.1 的 utils/crx-pack.js）
-new DataView(headerSizeLE.buffer).setUint32(0, placeholderHeader.length, true);
-const signPayload = concatChunks([SIGNATURE_CONTEXT, headerSizeLE, signedData, zipBytes]);
-</code></pre>
-<p>正确写法是拿 <strong><code>signed_header_data</code> 自己的长度</strong>（这里 18 字节，而不是 header 的 581 字节）：</p>
-<pre><code class="language-js">// ✅ 正确
-const headerSizeOctets = new Uint8Array(4);
-new DataView(headerSizeOctets.buffer).setUint32(0, signedData.length, true);
-const payload = concatChunks([SIGNATURE_CONTEXT, headerSizeOctets, signedData, zipBytes]);
-</code></pre>
-<p>长度差 563 个字节，签名自然验不过——<strong>"以为修好了"，比没修还危险</strong>。</p>
-<blockquote>
-<p>这一轮我最想让你学到的不是 CRX 格式，而是：<strong>"装不上"和"功能坏了"是两类完全不同的问题</strong>。
-用户说"用不了"，团队一直以为是功能没做好，其实连门都没进去。</p>
-</blockquote>
-<h3>第 4 轮：修（外加自检）</h3>
-<blockquote>
-<p>根据上面的结论，请：</p>
-<ol>
-<li>修正 <code>utils/crx-pack.js</code> 的签名载荷，并<strong>在打包函数内部加自检</strong>：签完立刻按 Chromium 规则验一遍，验不过就抛错，不许产出废包；</li>
-<li>修改发布脚本：<strong>删掉"退回无签名"的回退分支</strong>，签名失败就整轮发布失败退出（宁可这版不发，也不要发一个装不上的包）；</li>
-<li>针对另外两个功能问题，先给修复方案再改，每条都说明"改哪里、为什么、怎么验证"；</li>
-<li>每改一处，都在同一轮里写一个不依赖浏览器、不依赖淘宝的<strong>自检用例</strong>。</li>
-</ol>
-</blockquote>
-<p>它交回来的修复清单（对应三个抱怨）：</p>
-<p><strong>（1）"跳过之后第二遍识别不到"</strong> —— 根因是完成记录的判定太宽：</p>
-<pre><code class="language-js">// ❌ 旧：只要有一条记录就当"做过"
-if (records[key]) { skipped.push(...); } else { pending.push(...); }
+<p>第二个包更冤：它想修，注释还写着「参考 chromium 源码」，但把长度取错了——</p>
+<pre><code class="language-js">// ❌ 错的：用了整个 CrxFileHeader 的长度（581）
+new DataView(size.buffer).setUint32(0, placeholderHeader.length, true);
 
-// ✅ 新：只有"没跳过 + 没失败 + 至少成功一个证书"才算真的完成
-function tcbIsCompletedShipRecord(record) {
-  if (!record) return false;
-  if (Number(record.certFailed) &gt; 0) return false;
+// ✅ 对的：用 signed_header_data 自己的长度（18）
+new DataView(size.buffer).setUint32(0, signedData.length, true);
+</code></pre>
+<h3>第 4 轮｜修 + 自检</h3>
+<blockquote>
+<p>修上面三处，每改一处都在同一轮里配一个<strong>不依赖浏览器、不依赖淘宝</strong>的测试用例。</p>
+</blockquote>
+<ul>
+<li><strong>跳过不重试</strong> → 完成判定收敛成一个函数：</li>
+</ul>
+<pre><code class="language-js">function tcbIsCompletedShipRecord(record) {
+  if (Number(record.certFailed) &gt; 0) return false;           // 有失败 → 必须重试
   if (record.skipReason === 'heartbeat-timeout') return false;
-  if (record.skipReason === 'batch-consign') return true;   // 批量发货页确实没法处理
-  if (record.noCertButtons) return false;                   // "没找到按钮" ≠ "没有证书"
-  return Number(record.certUploaded) &gt; 0 || Number(record.certSkipped) &gt; 0;
+  if (record.noCertButtons) return false;                    // "没扫到按钮" ≠ "没有证书"
+  return record.certUploaded &gt; 0 || record.certSkipped &gt; 0;  // 至少成功一个才算完成
 }
 </code></pre>
-<p>外加一个<strong>一次性数据迁移</strong>：升级后自动把旧版写下的"假完成"记录清掉（不然那些单永远躺在黑名单里）。这比让人手工去点「清理异常记录」靠谱。</p>
-<p><strong>（2）"证书上传不成功"</strong> —— 加固三处：</p>
 <ul>
-<li>上传控件选择器原来是<strong>一条十几层 <code>nth-child</code> 的绝对路径</strong>，弹窗改版必挂。现在按「精确 → 放宽」四级兜底，全都不中就直接抛错说明尝试过哪些选择器。</li>
-<li>填完证书编号<strong>回读校验</strong>，注入图片后<strong>检查 <code>input.files</code> 长度</strong>——以前填失败也照样往下点「确定」。</li>
-<li>点「确定」前<strong>等按钮变成可点击</strong>；如果一直是禁用的，抛错并直接点名缺了什么：</li>
+<li><strong>上传不成功</strong> → 上传控件加 4 级兜底选择器；证书编号填入后<strong>回读校验</strong>；注入图片后检查 <code>input.files</code>；点「确定」前<strong>等按钮变成可点击</strong>，一直是禁用就直接报清楚缺了哪一项（证书编号为空 / 检测机构未选择）</li>
+<li><strong>新版装不上</strong> → 修正签名载荷 + 打包时自检，验不过就抛错；发布脚本删掉"伪格式兜底"，改成直接失败退出</li>
 </ul>
-<pre><code class="language-js">throw new Error(`确定按钮不可点击：${reason}`);
-// reason 例：'证书编号为空、检测机构未选择'
+<p>自检跑出来是这样（17 项全过，其中两条是这么写的）：</p>
+<pre><code class="language-text">✅ 正解：LE32(len(signed_header_data)) + signed_header_data + archive → 验签通过
+✅ ❌ 1.3.1 的错误写法：LE32(整个 header 长度) → 验签失败（Chrome 拒绝安装）
 </code></pre>
-<p><strong>（3）"新版用不了"</strong> —— 修 <code>crx-pack.js</code> + 删掉发布脚本里的伪格式回退 + 加发布前门禁。</p>
-<p>然后它写了自检脚本，跑出来是这样（<strong>这一段是真的跑过，不是示意</strong>）：</p>
-<pre><code class="language-text">1) 完成记录判定 tcbIsCompletedShipRecord()  —— 「跳过之后第二遍识别不到」的根因
-   ✅ 正常上传完成的记录 → 算完成
-   ✅ 证书本来就都在（全部跳过）→ 算完成
-   ✅ 【旧版 bug】本页没扫到证书按钮 → 不算完成，必须重试
-   ✅ 有失败证书 → 不算完成，必须重试
-   ✅ 心跳超时跳过 → 不算完成，必须重试
-   ✅ 批量发货页跳过 → 算完成（确实没法处理，不用反复重试）
-   ✅ 没有任何记录 → 不算完成
-2) CRX3 签名（按 Chromium crx_verifier.cc 的规则）
-   ✅ zip 本地文件头 = PK\x03\x04
-   ✅ crx 魔数 = Cr24
-   ✅ crx version = 3
-   ✅ header 里声明的 crx_id = sha256(公钥 SPKI)[0:16]
-   ✅ ✅ 正解：LE32(len(signed_header_data)) + signed_header_data + archive → 验签通过
-   ✅ ❌ 1.3.1 的错误写法：LE32(整个 header 长度) → 验签失败（Chrome 拒绝安装）
-   ✅ 篡改 archive 后验签失败
-
-🎉 自检完成：通过 17 项，失败 0 项
-</code></pre>
-<p>注意第 8、9 行：<strong>它把"错误写法"也写成了一个用例</strong>。这样以后谁再手贱改回去，一跑测试就红了。这叫"把踩过的坑变成防线"。</p>
-<h3>第 5 轮：打包 + 发布前门禁</h3>
+<p><strong>把踩过的坑写成"必须失败"的用例</strong>——以后谁手贱改回去，一跑测试就红了。</p>
+<h3>第 5 轮｜打包 + 发布前门禁</h3>
 <blockquote>
-<p>请再给我一个命令行打包脚本 <code>tools/pack.mjs</code>：</p>
+<p>给我 <code>tools/pack.mjs</code>：打出 zip 和签名 crx；<strong>复用插件自己的打包代码</strong>，不要在脚本里另写一份；打完自动解包、对所有 js 做语法检查、验签；私钥只从仓库外读、<strong>绝不进安装包</strong>；任何一步失败就直接退出，不要"降级继续"。</p>
+</blockquote>
+<pre><code class="language-text">✅ taobao-cert-uploader-v1.4.0-chrome.zip (87613 bytes)
+✅ taobao-cert-uploader-v1.4.0-360-signed.crx (88206 bytes, 扩展ID jkmkapiplbcmnoghdphbbcbfebjdlbib)
+🔎 ✅ PASS  version=3 签名=有效 ｜ 解包成功，14 个 js 语法检查通过
+</code></pre>
+<h3>第 6 轮｜让它交代边界</h3>
+<blockquote>
+<p>列出：哪些结论是真机验证过的、哪些只是代码推理；用户升级要注意什么；还有什么风险没排除。</p>
+</blockquote>
+<p>这一轮它给出三个我没注意到、但必须转达给用户的点：</p>
 <ol>
-<li>打包出 zip（给解压安装用）和签名 crx（给一键安装用）；</li>
-<li><strong>复用插件自己的 <code>utils/zip-store.js</code> 和 <code>utils/crx-pack.js</code></strong>，不要在脚本里另写一份打包逻辑（两份实现必然分叉）；</li>
-<li>打包完自动跑校验：解压 → 所有 js 做语法检查 → manifest 能不能解析 → crx 验签；</li>
-<li>私钥从 <code>../tcb-keys/</code> 或 <code>TCB_SIGN_KEY</code> 读，<strong>永远不要打进安装包里</strong>。</li>
-<li>任何一步失败就直接退出，不要"降级继续"。</li>
+<li><strong>升级前先卸载旧版</strong>。两个安装包的签名私钥不同 → 扩展 ID 不同 → 浏览器眼里是<strong>两个不同的插件</strong>，会同时往页面里注入按钮、互相打架；而且新插件的本地记录（已完成订单、证书自增序号）是空的。</li>
+<li><strong>私钥不该随包分发</strong>。旧版把签名私钥 <code>export-key.dat</code> 打进了 CRX 发给所有人——等于把公章复印给每个用户。</li>
+<li><strong>诚实交代</strong>：上传那三处加固只到「代码推理 + 单元自检」，<strong>没在真实淘宝卖家页面上跑过端到端</strong>（要登录卖家账号 + 真实订单）。所以发布后要先小批量试，出问题用插件自带的「📦 导出日志包」把现场发回来。</li>
 </ol>
-</blockquote>
-<p>关键输出：</p>
-<pre><code class="language-text">📦 打包 v1.4.0
-   key: D:\work\dsh_work\tcb-keys\taobao-cert-sign-key.pem
-   清单引用文件 19 个，全部存在
-   ✅ taobao-cert-uploader-v1.4.0-chrome.zip (87613 bytes, 22 个条目)
-   ✅ taobao-cert-uploader-v1.4.0-360-signed.crx (88206 bytes, 扩展ID jkmkapiplbcmnoghdphbbcbfebjdlbib)
-🔎 发布前校验
-✅ PASS  ...v1.4.0-360-signed.crx
-     version=3 archive=87613B 扩展ID=jkmkapiplbcmnoghdphbbcbfebjdlbib 签名=有效
-   ✅ 解包成功，14 个 js 语法检查通过，manifest.json 可解析
-🎉 打包完成 v1.4.0
-</code></pre>
-<p>那个 80 行的 <code>verify-crx.mjs</code> 后来还被塞进了发布脚本里当门禁——<strong>上传前先验签，验不过就不许发</strong>。经验教训就一句话：</p>
-<blockquote>
-<p><strong>不要相信"我以为签好了"，要让机器验一遍。</strong></p>
-</blockquote>
-<h3>第 6 轮：让它自己交代"没验证的部分"</h3>
-<blockquote>
-<p>请给我一份收尾报告，必须包含：</p>
-<ol>
-<li>三个抱怨各自对应"改了什么文件、第几行"；</li>
-<li><strong>哪些结论是真机验证过的（附命令与输出）</strong>，哪些只是代码推理；</li>
-<li>用户升级时的注意事项（比如旧版要不要先卸载）；</li>
-<li>还有什么风险没排除。</li>
-</ol>
-</blockquote>
-<p>这一轮它给出了两个我必须转达给用户的点，都是<strong>不看代码就想不到</strong>的：</p>
-<p><strong>⚠️ 一：升级前必须先卸载旧版。</strong> 因为两个安装包用的是<strong>不同的签名私钥</strong>，扩展 ID 就不一样：</p>
-<pre><code class="language-text">用户手上的旧版：9aca0f8fb12cde673f7112154193b181  → 扩展ID jkmkapiplbcmnoghdphbbcbfebjdlbib
-对外发布的 1.3.1：065958202bcd28ca5dd35b88d426a902 → 扩展ID agfjficaclmncimkfnndfliinecgkjac
-</code></pre>
-<p><strong>ID 不同 = 浏览器眼里它是两个不同的插件</strong>，不是"版本更新"。结果就是：新旧两个同时存在、同时往页面里加按钮和面板，互相打架。而且新插件的本地记录是空的（已完成订单、证书自增序号、白名单注入全部归零）。</p>
-<p>所以修复版的签名策略是：<strong>用回旧版那把钥匙</strong>，这样老用户装上就是"同一个插件的升级"，记录都在。</p>
-<p><strong>⚠️ 二：私钥不该出现在安装包里。</strong> 旧版把签名私钥 <code>utils/export-key.dat</code> 直接打进 CRX 分发给所有人——<strong>等于把公章复印给每个用户</strong>。1.4.0 起不再随包分发，改用发布脚本在本地签名。</p>
-<p><strong>⚠️ 三（诚实交代）：</strong> 上传相关的三处加固是<strong>代码推理 + 单元自检级别</strong>的验证，<strong>没有在真实淘宝卖家页面上跑过端到端</strong>——因为那需要登录卖家和真实订单。所以 1.4.0 的第一件事是「小批量试」，并且出问题就用插件自带的「📦 导出日志包」把现场发回来。</p>
-<blockquote>
-<p><strong>这一点非常重要：一个靠谱的 AI 会明确告诉你它验证到哪一步了。</strong>
-如果它拍着胸脯说"全部修好、保证没问题"，你反而要警惕。</p>
-</blockquote>
 <hr>
-<h1>第四部分：交付了什么</h1>
-<h2>1.4.0 的修复清单</h2>
+<h1>四、结果</h1>
 <table>
 <thead>
 <tr>
-<th>类别</th>
-<th>具体改动</th>
+<th>抱怨</th>
+<th>真因</th>
+<th>状态</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>🔴 打包（要命的那条）</td>
-<td>修正 CRX3 签名载荷长度；打包时<strong>自检签名</strong>，验不过就抛错</td>
+<td>新版用不了</td>
+<td>发布的 crx 是 version=2 的伪头部，Chrome 直接拒装</td>
+<td>✅ 修好</td>
 </tr>
 <tr>
-<td>🔴 发布流程</td>
-<td>删掉"签名失败 → 造伪 CRX2"的回退分支，改成<strong>直接失败退出</strong>；新增 <code>verify-crx.mjs</code> 发布前门禁</td>
+<td>旧版也出问题</td>
+<td>后来那个"签名修好了"的包，签名载荷长度算错，照样装不上</td>
+<td>✅ 修好</td>
 </tr>
 <tr>
-<td>🟠 跳过不重试</td>
-<td>完成判定收敛为 <code>tcbIsCompletedShipRecord()</code>；<code>noCertButtons</code> 不再算完成；升级后一次性清理历史脏记录</td>
+<td>证书上传不成功</td>
+<td>上传控件选择器写死绝对路径、点确定前不校验按钮和编号</td>
+<td>✅ 加兜底 + 回读校验</td>
 </tr>
 <tr>
-<td>🟠 上传不成功</td>
-<td>上传控件四级兜底选择器；证书编号回读校验；<code>input.files</code> 注入校验；点确定前等按钮可点击、并说明缺了什么</td>
-</tr>
-<tr>
-<td>🔵 安全</td>
-<td>安装包不再携带签名私钥</td>
-</tr>
-<tr>
-<td>🔵 工程</td>
-<td>新增 <code>tools/pack.mjs</code>（打包）、<code>tools/verify-crx.mjs</code>（校验）、<code>tools/selftest.mjs</code>（17 项自检）</td>
+<td>第二遍识别不到</td>
+<td>失败单被误记为已完成，之后永久跳过</td>
+<td>✅ 判定收敛 + 清理历史脏记录</td>
 </tr>
 </tbody></table>
-<h2>用户怎么装</h2>
-<table>
-<thead>
-<tr>
-<th>场景</th>
-<th>做法</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>装新版（Chrome / 360）</td>
-<td>下载 <code>...-360-signed.crx</code>，拖到 <code>chrome://extensions/</code> 页面，点「添加」</td>
-</tr>
-<tr>
-<td>装新版（其他 Chromium 内核浏览器）</td>
-<td>下载 <code>...-chrome.zip</code>，解压到固定目录 → 开发者模式 → 加载已解压的扩展程序</td>
-</tr>
-<tr>
-<td>从旧版升级</td>
-<td><strong>先卸载旧版</strong>，再按上面任一方式安装</td>
-</tr>
-<tr>
-<td>出问题</td>
-<td>在「已卖出」页面的监控面板点「📦 导出日志包」，把 zip 发回来</td>
-</tr>
-</tbody></table>
-<h2>发布（给维护者）</h2>
-<p>包已经放在站点的 <code>cloudbase/static/packages/</code> 下，跑这一条就走完上传 + 静态托管 + 更新版本记录：</p>
+<p>新包已经放进 <code>cloudbase/static/packages/</code>，发到下载页只要一条命令：</p>
 <pre><code class="language-bash">node cloudbase/publish-extension.mjs --version 1.4.0
 </code></pre>
-<p>它现在自带门禁：<strong>签名不对，这一步会直接失败，不会再发出去一个装不上的包。</strong></p>
+<p>它自带门禁：<strong>签名不对会直接失败退出，不会再发出去一个装不上的包。</strong></p>
 <hr>
-<h1>第五部分：小白避坑清单（建议收藏）</h1>
-<h2>关于 DeepSeek Harness</h2>
+<h1>五、小白避坑清单</h1>
+<p><strong>用 DSH 的时候</strong></p>
 <ol>
-<li><strong>没选工作区，输入框是灰的</strong> —— 不是坏了。</li>
-<li><strong>一个任务一个会话</strong> —— 别把不相干的事混在一起。</li>
-<li><strong>新任务先只读</strong> —— 第一句永远加"不要修改任何文件"。</li>
-<li><strong>权限弹窗要看清楚</strong> —— 那是安全阀，不是烦人的广告。</li>
-<li><strong>模型先用 <code>deepseek-flash</code></strong> —— 便宜、够用、上下文 1M。贵的不一定更适合你的活。</li>
-<li><strong>想省钱就挑空闲时段跑</strong> —— 避开工作日 9:00–12:00、14:00–18:00，价格直接打五折。</li>
+<li>没选工作区，输入框是灰的 —— 不是坏了</li>
+<li>一个任务一个会话</li>
+<li>新任务先只读，加一句"不要修改任何文件"</li>
+<li>权限弹窗看清楚再点，那是安全阀</li>
+<li>模型先用 <code>deepseek-flash</code>，便宜且够用</li>
+<li>想省钱就避开工作日 9–12、14–18</li>
 </ol>
-<h2>关于 API Key</h2>
+<p><strong>关于 API Key</strong></p>
 <ol start="7">
-<li><strong>Key 只显示一次</strong>，创建后立刻复制。</li>
-<li><strong>别往聊天窗口、代码、GitHub 里粘 Key</strong>，泄露了立刻去平台删掉重建。</li>
-<li><strong>第一次充 ¥20</strong> 就够跑很久，别一次充几百。</li>
+<li>Key 只显示一次，创建后立刻复制</li>
+<li>别往聊天框、代码、GitHub 里粘；泄露立刻删掉重建</li>
+<li>第一次充 ¥20 就够跑很久</li>
 </ol>
-<h2>关于"让 AI 干活"</h2>
+<p><strong>让 AI 干活</strong></p>
 <ol start="10">
-<li><strong>分轮次</strong>：读懂 → 定位 → 修 → 打包 → 验证，别一口气全交给它。</li>
-<li><strong>要证据</strong>：文件 + 行号 + 可复现命令，缺一不可。</li>
-<li><strong>要自检</strong>：让它写能跑的测试，别接受"我改好了"。</li>
-<li><strong>要它自己说边界</strong>：哪些验证过、哪些没验证。</li>
-<li><strong>拿不准就问"有没有更简单/更稳妥的方案"</strong>，它经常能给你省掉一半工作。</li>
-<li><strong>改完一定留一份"坑的测试"</strong> —— 把踩过的坑写成用例，下次谁改回去谁红。</li>
+<li>分轮次：读懂 → 定位 → 修 → 打包 → 验证</li>
+<li>要证据（文件 + 行号 + 可复现命令），不要"我觉得"</li>
+<li>要自检脚本，不要"我改好了"</li>
+<li>要它自己说清楚"哪些没验证过"</li>
+<li>把踩过的坑写成测试用例</li>
 </ol>
-<h2>关于发给自己用户的东西（血泪）</h2>
-<ol start="16">
-<li><strong>"我能打开"不等于"用户能安装"</strong>。这次的教训是：<strong>先验证产物本身合法，再去 debug 功能</strong>。顺序反了，团队会花几天去修一个根本没被运行过的代码。</li>
-<li><strong>不要写"失败就降级成另一个格式"的兜底</strong>。伪格式比明确报错糟糕一百倍——它把"打包失败"变成了一次静默的、面向所有用户的故障。</li>
-<li><strong>尽量别换签名私钥</strong>。换了 = 换了扩展 ID = 对浏览器来说是新插件，老用户的本地数据全部丢失。</li>
-<li><strong>私钥是公章，不要随包分发。</strong></li>
+<p><strong>发给用户的东西</strong></p>
+<ol start="15">
+<li>"我能打开" ≠ "用户能安装"：<strong>先验证产物合法，再去 debug 功能</strong>，顺序反了会白干几天</li>
+<li>不要写"失败就降级成另一个格式"的兜底 —— 伪格式比明确报错糟糕一百倍</li>
+<li>尽量别换签名私钥，换了等于换了个新插件</li>
+<li>私钥是公章，不要随包分发</li>
 </ol>
 <hr>
-<h1>写在最后</h1>
-<h2>附：修插件的过程中，顺手修掉的两个博客构建脚本坑</h2>
-<p>这两个不在需求里，是 AI 为了"能把自己的活验证完"而被迫发现的——<strong>这也是我把这类工具当日用工具的原因：它会把挡路的坑一起填了。</strong></p>
-<ol>
-<li><p><strong><code>scripts/cloudbase-build-stats.mjs</code> 在 Windows 上读不到本地数据。</strong>
-代码用 <code>new URL('..', import.meta.url).pathname</code> 取项目根目录，Windows 上会得到 <code>/D:/work/blog/</code> 这种带前导斜杠的路径，于是 <code>existsSync</code> 永远为 false，本地构建<strong>静默丢掉全站 PV 和评论数据</strong>（页面上那些「👀 24」「💬 1」会变成占位符）。改成 <code>fileURLToPath</code> 后，本地构建也能正确复用 <code>data/cloudbase-backup/latest.json</code>。</p>
-</li>
-<li><p><strong>同一天多篇文章的 urlKey 会随机器变化（<code>localeCompare</code> 的坑）。</strong>
-文章 URL 是 <code>/post/YYYYMMDD/</code>，同一天的第二篇起叫 <code>YYYYMMDD-2</code>、<code>-3</code>……而决定"谁是第一篇"的那句排序用了 <code>localeCompare</code>。<strong>这个函数的结果跟运行机器的系统语言有关</strong>：中文 locale 按拼音排（谙 ān → 记 jì → 生 shēng），英文 locale 按码点排（生 U+751F → 记 U+8BB0 → 谙 U+8C19）。结果就是同一份代码在不同机器上构建，那几篇文章的网址会<strong>互换</strong>——对已有文章等于换了网址，SEO 和外部链接全废。改成码点比较后构建结果与机器无关（我用脚本对比了新旧映射表，<strong>旧文章 URL 变化数 = 0</strong>）。</p>
-</li>
-</ol>
+<h2>附：顺手修掉的两个博客构建脚本坑</h2>
+<p>这两个不在需求里，是 AI 为了能验证自己的改动而被迫发现的：</p>
+<ul>
+<li><strong>Windows 上读不到本地统计数据</strong>：代码用 <code>new URL('..', import.meta.url).pathname</code> 取项目根目录，在 Windows 上会得到 <code>/D:/work/blog/</code> 这种带前导斜杠的路径，<code>existsSync</code> 恒为 false → 本地构建<strong>静默丢掉全站 PV 和评论数据</strong>。改用 <code>fileURLToPath</code>。</li>
+<li><strong>同一天多篇文章的网址会随机器变化</strong>：决定 <code>YYYYMMDD-2</code>、<code>-3</code> 顺序的排序用了 <code>localeCompare</code>，它的结果跟<strong>系统语言</strong>有关（中文按拼音、英文按码点），同一份代码在不同机器上会把已有文章的网址互换。改成码点比较后，实测旧文章 URL 变化数为 0。</li>
+</ul>
 <blockquote>
-<p>顺带一条经验：<strong>凡是"排序 + 生成 ID/URL"的地方，都要警惕 locale、时区、文件系统返回顺序这三件事。</strong> 它们会让"同一份代码"在不同机器上产出不同结果，而且是静默的。</p>
+<p>一条经验：<strong>凡是"排序 + 生成 ID/URL"的地方，都要警惕 locale、时区、文件系统返回顺序这三件事。</strong></p>
 </blockquote>
 <hr>
-<p>这篇文章里没有任何"魔法"。AI 做的事情，本质上是三件我们本来也要做的事，只不过它做得更快、更细、更不容易偷懒：</p>
-<ol>
-<li><strong>把抱怨变成假设</strong>（人容易跳过这一步，直接开始瞎试）</li>
-<li><strong>把假设变成可执行、可复现的证据</strong>（写脚本、解析字节、验签）</li>
-<li><strong>把结论变成不会再犯的防线</strong>（自检脚本 + 发布门禁）</li>
-</ol>
-<p>所以哪怕你一句代码都不会写，你也能用这套方法：<strong>你负责"提出好问题、检查结论靠不靠谱"，它负责"读、算、改、验"。</strong></p>
-<p>最后再重复一遍那句最关键的：</p>
 <blockquote>
-<p>让 AI 明确告诉你——<strong>哪些它验证过了，哪些它只是在猜。</strong></p>
-</blockquote>
-<p>这句话，比任何 prompt 技巧都值钱。</p>
-<hr>
-<blockquote>
-<p>附：本文涉及的文件都在两个地方——
-插件源码 + 打包/校验/自检脚本：<code>taobao-cert-uploader/</code>（含 <code>tools/pack.mjs</code>、<code>tools/verify-crx.mjs</code>、<code>tools/selftest.mjs</code>）
-发布脚本 + 门禁：<code>cloudbase/publish-extension.mjs</code>、<code>cloudbase/verify-crx.mjs</code></p>
+<p>全文最重要的一句：让 AI 明确告诉你 —— <strong>哪些它验证过了，哪些它只是在猜。</strong></p>
 </blockquote>
 </div>
     <footer class="article-footer"><div class="article-tags"><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E6%95%99%E7%A8%8B">教程</a><a class="tag tag-colored" style="--tag-bg:#E6FAFA;--tag-text:#167A7F;--tag-border:#B8E7E8;--tag-dark-bg:#123638;--tag-dark-text:#8EE2E5;--tag-dark-border:#2B6E72;" href="/tags.html#AI%20%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD">AI 基础设施</a></div></footer>
