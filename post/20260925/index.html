@@ -37,11 +37,11 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="article:published_time" content="2026-09-25T22:30:00+08:00">
-  <meta property="article:modified_time" content="2026-09-25T22:30:00+08:00">
+  <meta property="article:modified_time" content="2026-09-28T11:30:00+08:00">
   <meta property="article:author" content="Jimmy">
   <meta property="article:tag" content="教程">
   <meta property="article:tag" content="AI 基础设施">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件","description":"一篇写给\"完全没用过 AI 编程工具\"的人的实操教程。前半部分是 DeepSeek Harness 的下载安装、DeepSeek 开放平台注册充值拿 Key；后半部分是一次真实交付：把淘宝证书上传插件的三个用户抱怨，一步步逼到\"新版根本装不上\"的字节级真凶，修好、重新签名打包，并用一个 80 行的校验脚本证明新包能装、旧包不能装。","image":"https://gitpull.cn/assets/uploads/2026/06/covers/deepseek-harness-beginner-to-crx-fix.webp","datePublished":"2026-09-25T22:30:00+08:00","dateModified":"2026-09-25T22:30:00+08:00","author":{"@type":"Person","name":"Jimmy"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260925/","keywords":"教程,AI 基础设施"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件","description":"一篇写给\"完全没用过 AI 编程工具\"的人的实操教程。前半部分是 DeepSeek Harness 的下载安装、DeepSeek 开放平台注册充值拿 Key；后半部分是一次真实交付：把淘宝证书上传插件的三个用户抱怨，一步步逼到\"新版根本装不上\"的字节级真凶，修好、重新签名打包，并用一个 80 行的校验脚本证明新包能装、旧包不能装。","image":"https://gitpull.cn/assets/uploads/2026/06/covers/deepseek-harness-beginner-to-crx-fix.webp","datePublished":"2026-09-25T22:30:00+08:00","dateModified":"2026-09-28T11:30:00+08:00","author":{"@type":"Person","name":"Jimmy"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260925/","keywords":"教程,AI 基础设施"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://gitpull.cn/"},{"@type":"ListItem","position":2,"name":"教程","item":"https://gitpull.cn/tags.html#%E6%95%99%E7%A8%8B"},{"@type":"ListItem","position":3,"name":"从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件","item":"https://gitpull.cn/post/20260925/"}]}</script>
   <meta name="mobile-web-app-capable" content="yes">
 </head>
@@ -60,11 +60,11 @@
           <div class="name">Jimmy</div>
           <div class="meta">
             <span>2026-09-25</span>
-            
+            <span class="dot"></span><span>更新于 2026-09-28</span>
             <span class="dot"></span>
-            <span>17040 字</span>
+            <span>16412 字</span>
             <span class="dot"></span>
-            <span class="meta-read-mins">约 25 分钟</span>
+            <span class="meta-read-mins">约 23 分钟</span>
             <span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">阅读 </span><span id="gitblog_page_pv">…</span><span class="gitblog-pv-suffix"> 次</span></span>
           </div>
         </div>
@@ -77,38 +77,6 @@
 后半段是一次真实交付——用这个工具把「淘宝证书自动上传」插件的三个用户抱怨，一路挖到字节级的真凶，修好并重新打包发布。</p>
 <p>官方资料：<a href="https://deepseek-harness.github.io/deepseek-harness/guide/quickstart">DeepSeek Harness 文档</a> · <a href="https://api-docs.deepseek.com/zh-cn/">DeepSeek API 文档</a> · <a href="https://platform.deepseek.com/">开放平台</a></p>
 </blockquote>
-<p>先说结论，免得你看到一半才发现值不值：</p>
-<p><strong>用户报的三句话，最后查出四类问题，其中最关键的一条是——"新版"从头到尾就没装上过。</strong></p>
-<table>
-<thead>
-<tr>
-<th>用户原话</th>
-<th>真实原因</th>
-<th>是否修好</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>上次那个新版他们说用不了</td>
-<td>发布的 360 版 CRX 文件头是 <strong>CRX version = 2</strong> 的伪格式，Chromium 校验第一步就拒绝，用户点安装只会提示「无法安装」</td>
-<td>✅ 修好（不再产出这种包，且加了发布前验签门禁）</td>
-</tr>
-<tr>
-<td>还有旧版也出一些问题</td>
-<td>后来那个"签名修好了"的 v1.3.1，<strong>签名载荷长度算错了</strong>，其实照样装不上</td>
-<td>✅ 修好（改回 Chromium 的算法，打包时自检）</td>
-</tr>
-<tr>
-<td>证书上传不成功</td>
-<td>上传控件选择器是一条十几层 <code>nth-child</code> 的绝对路径，弹窗一改版就失配；点「确定」前不检查按钮是否可用，填编号失败也不报错</td>
-<td>✅ 加兜底 + 回读校验 + 按钮可点击校验</td>
-</tr>
-<tr>
-<td>跳过之后第二遍再上传识别不到原来上传失败的</td>
-<td>「本页 15 秒没扫到证书按钮」被当成"这单做完了"写进完成记录，之后永久被过滤，再也不会重扫</td>
-<td>✅ 完成判定收敛为一个函数，并一次性清理历史脏记录</td>
-</tr>
-</tbody></table>
-<p>而这一整套排查、修复、打包、验证的动作，<strong>我没打开过淘宝，也没有浏览器能登录卖家账号</strong>——全部靠读代码 + 写脚本自证完成。这就是"会干活的 AI"和"会聊天的 AI"的区别。</p>
 <hr>
 <h1>第一部分：把 DeepSeek Harness 装上</h1>
 <h2>它到底是什么</h2>
