@@ -62,7 +62,7 @@
             <span>2026-09-25</span>
             <span class="dot"></span><span>更新于 2026-09-28</span>
             <span class="dot"></span>
-            <span>4501 字</span>
+            <span>4377 字</span>
             <span class="dot"></span>
             <span class="meta-read-mins">约 6 分钟</span>
             <span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">阅读 </span><span id="gitblog_page_pv">…</span><span class="gitblog-pv-suffix"> 次</span></span>
@@ -174,10 +174,10 @@
 <p>报错对照：<code>401</code> = Key 不对（检查空格）；<code>Insufficient Balance</code> = 该充值了；<code>MISSING_CREDENTIAL</code> = 回设置里重新保存一次。</p>
 <hr>
 <h1>三、直接抄的 prompt</h1>
-<p><strong>它最容易犯的错是"你一句话交代完、它就开始瞎改"。</strong> 下面这段就是本文那个真实案例里实际发出去的（只是把长对话压成了一段），<strong>整体复制</strong>给 AI 就行：</p>
+<p><strong>它最容易犯的错是"你一句话交代完、它就开始瞎改"。</strong> 下面这段<strong>整体复制</strong>给 AI 就行（开头两句换成你自己的事）：</p>
 <blockquote>
-<p>我要处理的是：<code>「明 上次那个新版他们说用不了 还有旧版也出一些问题 证书上传不成功，或者跳过之后第二遍再上传识别不到原来上传失败的好像」</code>
-相关目录或文件：<code>C:\Users\jimmy\Downloads\淘宝证书自动上传2.0.crx</code> 和 <code>cloudbase\static\packages\taobao-cert-uploader-v1.3.1-360-signed-v2.crx</code>（两个安装包要对比）</p>
+<p>我要处理的是：<strong>我们发布的一个 Chrome 插件（给淘宝卖家批量上传证书用的）被用户反馈"新版装不上、旧版也有问题"，请帮我定位到底哪里出了问题，修好并重新打包。</strong>
+相关文件：<strong>插件源码目录，以及新旧两个版本的安装包</strong>（两个包需要对比）。</p>
 <ol>
 <li>先<strong>只读</strong>，不要修改任何文件；用大白话告诉我这个插件是什么、文件结构是什么、用户点一下之后关键流程怎么走。</li>
 <li>把上面那段抱怨拆成 <strong>3 条能用命令验证的技术假设</strong>：假设是什么、在哪个文件哪一行能看到证据、用什么命令能证实或推翻。先不要下结论。</li>
@@ -187,7 +187,7 @@
 <li>收尾时列清楚：<strong>哪些你验证过了（附命令和输出），哪些只是推理</strong>，以及升级、使用要注意什么。</li>
 </ol>
 </blockquote>
-<p>换成你自己的活，只需要改前面三处：<strong>① 抱怨/需求原文</strong>（越原话越好，别替它总结）；<strong>② 文件或目录路径</strong>；<strong>③ 要对比/特别留意的对象</strong>（比如"两个安装包要对比"）。后面 6 条原样保留——那是让 AI 别偷懒的部分。</p>
+<p>换成你自己的活，只要改前面两句：<strong>① 一句话说清"谁反馈了什么"</strong>（不用贴聊天记录，讲清现象就行）；<strong>② 源码和文件放在哪</strong>。后面 6 条原样保留——那是让 AI 别偷懒的部分。</p>
 <p>第一次用可以先只发第 1 条，确认它真的懂了、没瞎猜，再把整段发过去。</p>
 <blockquote>
 <p>全文最重要的一句：让 AI 明确告诉你 —— <strong>哪些它验证过了，哪些它只是在猜。</strong></p>
