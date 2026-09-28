@@ -296,7 +296,12 @@ function assignPostUrlKeys(entries) {
       const ta = new Date(a.date || 0).getTime();
       const tb = new Date(b.date || 0).getTime();
       if (ta !== tb) return ta - tb;
-      return String(a.slug).localeCompare(String(b.slug));
+      // 同一天多篇文章靠 slug 决定 -2 / -3 后缀：必须用码点比较。
+      // localeCompare 会随机器 locale 变化（中文 locale 按拼音排、英文 locale 按码点排），
+      // 会导致同一天文章的 urlKey 在不同机器上互换 —— URL 会变，对已有文章是灾难。
+      const sa = String(a.slug);
+      const sb = String(b.slug);
+      return sa < sb ? -1 : sa > sb ? 1 : 0;
     });
     arr.forEach((p, i) => {
       p.urlKey = i === 0 ? day : `${day}-${i + 1}`;

@@ -21,6 +21,7 @@ import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { verifyCrx } from './verify-crx.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.dirname(__dir); // 插件项目根
@@ -29,6 +30,19 @@ const HOSTING_STATIC = path.join(__dir, 'static', 'packages');
 const CLOUDBASE_DIR = __dir;
 const ENV_ID = process.env.TCB_ENV_ID || 'gitbolg-d7gmnsrw46e011706';
 const UPLOAD_API = 'https://gitbolg-d7gmnsrw46e011706-1256429518.ap-shanghai.app.tcloudbase.com/tcb-upload';
+
+/** 发布前门禁：crx 必须能被 Chromium 的规则验过，否则直接终止发布 */
+function verifyCrxOrThrow(crxPath) {
+  const r = verifyCrx(crxPath);
+  if (r.ok) {
+    console.log(`   ✅ CRX3 校验通过，扩展ID=${r.info.extensionId}，archive=${r.info.archiveLen}B`);
+    return;
+  }
+  throw new Error(
+    `CRX3 校验未通过，已终止发布（这种包用户装不上）:\n` +
+      r.problems.map((p) => `   - ${p}`).join('\n')
+  );
+}
 
 function getVersion() {
   const argIdx = process.argv.indexOf('--version');
@@ -55,31 +69,48 @@ async function main() {
     fs.cpSync(src, path.join(pkgDir, item), { recursive: true });
   }
   run(`cd ${pkgDir} && zip -r ../taobao-cert-uploader-v${version}-chrome.zip . > /dev/null`, pkgDir);
-  // 生成签名 CRX3（用备份私钥；无私钥则退回无签名，仅 Chrome 解压加载可用）
+  // 生成签名 CRX3（用备份私钥）
+  //
+  // ⚠️ 血泪教训：这里以前在「签名失败 / 找不到私钥」时会回退成手工拼的头
+  //      Buffer.from('Cr24') + [2,0,0,0,0,0,0,0] + zip
+  //    那个文件的 CRX version = 2（key/signature 长度全 0），Chromium 校验第一步就
+  //    ERROR_HEADER_INVALID，Chrome / 360 只会提示「无法安装」，
+  //    用户侧表现就是「新版用不了」。所以现在：签不出来就**直接失败退出**，
+  //    宁可这轮不发版，也绝不产出一个装不上的 crx。
   const zipBuf = fs.readFileSync(path.join(DIST, `taobao-cert-uploader-v${version}-chrome.zip`));
   const keyPath = process.env.TCB_SIGN_KEY || path.join(ROOT, '..', 'tcb-keys', 'taobao-cert-sign-key.pem');
   const crxOut = path.join(DIST, `taobao-cert-uploader-v${version}-360-signed.crx`);
-  if (fs.existsSync(keyPath)) {
-    try {
-      const vm = await import('node:vm');
-      const { webcrypto } = await import('node:crypto');
-      const sandbox = { crypto: webcrypto, TextEncoder, Uint8Array, console };
-      const crxPackSrc = fs.readFileSync(path.join(ROOT, 'utils', 'crx-pack.js'), 'utf8');
-      vm.runInNewContext(crxPackSrc, sandbox);
-      const pem = fs.readFileSync(keyPath, 'utf8');
-      const crx = await sandbox.TCBCrxPack.packCrx3(new Uint8Array(zipBuf), pem);
-      fs.writeFileSync(crxOut, Buffer.from(crx));
-      console.log('   已生成签名 CRX3:', path.basename(crxOut));
-    } catch (e) {
-      console.warn('   ⚠️ CRX3 签名失败(退回无签名):', e.message);
-      const crx = Buffer.concat([Buffer.from('Cr24'), Buffer.from([2,0,0,0,0,0,0,0]), zipBuf]);
-      fs.writeFileSync(crxOut, crx);
-    }
-  } else {
-    console.warn('   ⚠️ 未找到签名私钥，生成无签名 CRX（仅 360 拖拽可能被拒，建议配置 TCB_SIGN_KEY）');
-    const crx = Buffer.concat([Buffer.from('Cr24'), Buffer.from([2,0,0,0,0,0,0,0]), zipBuf]);
-    fs.writeFileSync(crxOut, crx);
+  if (!fs.existsSync(keyPath)) {
+    throw new Error(
+      `未找到签名私钥: ${keyPath}\n` +
+        '  签名私钥不进 git、也不随包分发；请放到 ../tcb-keys/ 或用 TCB_SIGN_KEY 指定。\n' +
+        '  没有私钥时不要产出 crx：无签名/伪签名的 crx 用户根本装不上（只有解压 zip 才能装）。'
+    );
   }
+  {
+    const vm = await import('node:vm');
+    const { webcrypto } = await import('node:crypto');
+    const sandbox = {
+      crypto: webcrypto,
+      TextEncoder,
+      TextDecoder,
+      Uint8Array,
+      DataView,
+      ArrayBuffer,
+      atob,
+      btoa,
+      console,
+    };
+    sandbox.self = sandbox;
+    const crxPackSrc = fs.readFileSync(path.join(ROOT, 'utils', 'crx-pack.js'), 'utf8');
+    vm.runInNewContext(crxPackSrc, sandbox, { filename: 'utils/crx-pack.js' });
+    const pem = fs.readFileSync(keyPath, 'utf8');
+    const crx = await sandbox.TCBCrxPack.packCrx3(new Uint8Array(zipBuf), pem);
+    fs.writeFileSync(crxOut, Buffer.from(crx));
+    console.log('   已生成签名 CRX3:', path.basename(crxOut));
+  }
+  // 发布前门禁：把刚生成的 crx 按 Chromium 的规则重新解析 + 验签，不过就不许发
+  verifyCrxOrThrow(crxOut);
   console.log('   打包完成:', fs.readdirSync(DIST).filter((f) => f.endsWith('.zip') || f.endsWith('.crx')).join(', '));
 
   // 2. 上传 COS

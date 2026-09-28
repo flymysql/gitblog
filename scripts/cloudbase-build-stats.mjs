@@ -1,13 +1,17 @@
 // 构建期加载 CloudBase 统计：优先在线拉取，失败则读本地 latest.json
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   fetchCloudbaseBackupPayload,
   hasCloudbaseFetchCredentials,
 } from './cloudbase-fetch-backup.mjs';
 import { indexCloudbaseBackup } from './cloudbase-stats-lib.mjs';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+// 注意：不能用 new URL('..', import.meta.url).pathname
+// 在 Windows 上它会得到 "/D:/work/blog/" 这种带前导斜杠的路径，
+// existsSync 永远为 false —— 本地 Windows 构建会静默丢掉 PV / 评论数据。
+const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..');
 const BACKUP_DIR = join(ROOT, 'data/cloudbase-backup');
 const LATEST_PATH = join(BACKUP_DIR, 'latest.json');
 
