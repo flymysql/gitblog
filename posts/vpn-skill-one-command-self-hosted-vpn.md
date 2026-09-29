@@ -1,24 +1,24 @@
 ---
 title: vpn-skill：对 AI 说一句话，帮你把自建 VPN 装好并连上
-date: 2026-09-29T14:20:00+08:00
+date: 2026-09-29T15:30:00+08:00
 author: Jimmy
 tags: [项目介绍, 教程]
 carousel: true
-summary: 先把 skill 装上，然后对 AI 说一句「我的服务器是 1.2.3.4，密码 xxxx，帮我搭个 VPN 并连上」，它会自己在你服务器上装服务端、在你电脑上装客户端、连上并验证出口 IP。也附了更多一句话指令和不用 AI 的命令行用法。
+summary: 复制一句话给 AI，把服务器登录方式写进去，它连 skill 一起装上，然后在你服务器上装服务端、在你电脑上装客户端、连上并告诉你出口 IP。也附了后续更多一句话指令和不用 AI 的命令行用法。
 cover: ../assets/uploads/2026/09/vpn-skill-cover.svg
 ---
 
 > 仓库：[github.com/flymysql/vpn-skill](https://github.com/flymysql/vpn-skill)
-> 你需要的：一台**自己买的**海外服务器（IP + 密码或私钥）+ 一个能装 skill 的 AI（DeepSeek Harness / CodeBuddy / Claude Code 等）。
+> 你需要的：一台**自己买的**海外服务器（IP + 密码或私钥）+ 一个能执行命令、能装 skill 的 AI（DeepSeek Harness / CodeBuddy / Claude Code 等）。
 > 你不需要：会 Linux、会配代理、会装客户端、会排查端口。
 
-![说一句话，剩下的交给它](assets/uploads/2026/09/vpn-skill-flow.svg)
+![复制一句话，剩下的交给它](assets/uploads/2026/09/vpn-skill-flow.svg)
 
 ---
 
 # 它能做什么
 
-**一句话：你告诉 AI 你的服务器登录方式，它把服务端和你电脑都配好，让你直接能上外网。**
+**一句话：你把服务器登录方式告诉 AI，它把服务端和你电脑都配好，让你直接能上外网。**
 
 | | |
 |---|---|
@@ -40,30 +40,19 @@ cover: ../assets/uploads/2026/09/vpn-skill-cover.svg
 
 ---
 
-# 怎么用：给 AI 说一句话
+# 怎么用：复制一句话给 AI
 
-## 第一步：装上 skill
+**就这一步。** 把下面这段话复制给 AI，把 IP、用户名、密码换成你买服务器时拿到的：
 
-复制这一行，在你的 AI 里执行（或者直接让 AI 帮你装）：
+> **帮我装一下 https://github.com/flymysql/vpn-skill 这个 skill，然后用我的服务器搭个 VPN 并且让这台电脑连上：服务器 1.2.3.4，用户 root，密码 xxxx。装完告诉我出口 IP 是多少。**
 
-```bash
-git clone https://github.com/flymysql/vpn-skill.git ~/vpn-skill
-ln -s ~/vpn-skill ~/.dsh/skills/vpn-skill      # DeepSeek Harness 的 skill 目录
-```
+这句话里包含三件事，AI 会依次做完：
 
-> 其他 agent 把软链换到对应的 skills 目录即可（CodeBuddy / Claude Code 同理）。
+1. 把这个 skill 装到本地（`git clone` + 软链到 skills 目录）
+2. 拿你的登录方式去部署服务端
+3. 装本机客户端、连上、验证，然后告诉你结果
 
-## 第二步：对 AI 说这句话
-
-把 IP、用户名、密码换成你买服务器时拿到的：
-
-> **我的海外服务器是 1.2.3.4，用户 root，密码 xxxx。帮我用 vpn-skill 搭个 VPN，并且让这台电脑连上，装完告诉我出口 IP 是多少。**
-
-就这一句。它会自己把上面表格里的活干完，一两分钟。
-
-## 第三步：等它汇报
-
-成功时你会看到类似这样的结果（**最后一行说通了，你电脑就已经能上外网了**，浏览器直接开就行）：
+成功了你会看到类似这样的输出，**最后一行说通了，你电脑就已经能上外网了**，浏览器直接开就行：
 
 ```
 [ ok ] Hysteria2 部署完成
@@ -77,23 +66,24 @@ ln -s ~/vpn-skill ~/.dsh/skills/vpn-skill      # DeepSeek Harness 的 skill 目�
 [ ok ] 全部完成 ✅
 ```
 
+> 如果 AI 问你要用哪个协议，直接说「默认的就行」；想要抗封锁就说「要不容易被封的」。
+
 ---
 
 # 更多「一句话指令」
 
-装上之后，日常操作都只需要对 AI 说一句：
+装好之后，日常操作都只需要再说一句：
 
 | 你想干什么 | 对 AI 说 |
 |---|---|
-| 默认方案（最快） | 「帮我搭个 VPN 并连上」 |
-| 怕被封、要隐蔽 | 「换一个不容易被封的方案，然后连上」 |
 | 要最稳、最兼容 | 「换成 Shadowsocks，然后连上」 |
+| 怕被封、要隐蔽 | 「换一个不容易被封的方案，然后连上」 |
 | 手机也要用 | 「把手机能用的配置链接给我」 |
 | 现在到底连上没有 | 「看看我的 VPN 现在是什么状态」 |
 | 再验证一次 | 「验证一下现在能不能上外网」 |
+| 换个端口 | 「换个端口重新部署一下」 |
 | 今天先不用了 | 「把 VPN 断开」 |
 | 明天继续用 | 「把 VPN 打开」 |
-| 换个端口 | 「换个端口重新部署一下」 |
 | 彻底卸载 | 「把服务器上的和本机的都卸载掉」 |
 
 AI 会自己判断该跑哪条命令、该带什么参数，你说人话就行。

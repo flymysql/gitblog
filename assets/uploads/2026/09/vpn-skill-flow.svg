@@ -2,52 +2,53 @@
   <rect width="960" height="420" fill="#ffffff"/>
 
   <!-- 1. 你说一句话 -->
-  <rect x="24" y="24" width="300" height="372" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
-  <text x="48" y="64" font-family="system-ui,sans-serif" font-size="20" fill="#0f172a" font-weight="700">你只需要说一句</text>
+  <rect x="24" y="24" width="350" height="372" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="48" y="64" font-family="system-ui,sans-serif" font-size="20" fill="#0f172a" font-weight="700">你只需要说一句话</text>
 
   <!-- 气泡 -->
-  <rect x="48" y="92" width="252" height="132" rx="12" fill="#2563eb"/>
-  <text x="66" y="124" font-family="system-ui,sans-serif" font-size="15" fill="#ffffff">我的服务器是</text>
-  <text x="66" y="148" font-family="system-ui,sans-serif" font-size="15" fill="#ffffff">1.2.3.4，root / 密码</text>
-  <text x="66" y="172" font-family="system-ui,sans-serif" font-size="15" fill="#ffffff">xxxx，帮我搭个</text>
-  <text x="66" y="196" font-family="system-ui,sans-serif" font-size="15" fill="#ffffff">VPN 并连上</text>
-  <polygon points="80,224 100,224 88,240" fill="#2563eb"/>
+  <rect x="48" y="88" width="302" height="150" rx="12" fill="#2563eb"/>
+  <text x="66" y="120" font-family="system-ui,sans-serif" font-size="14" fill="#ffffff">帮我装一下 vpn-skill 这个 skill，</text>
+  <text x="66" y="146" font-family="system-ui,sans-serif" font-size="14" fill="#ffffff">再用我的服务器搭个 VPN 并连上：</text>
+  <text x="66" y="172" font-family="system-ui,sans-serif" font-size="14" fill="#ffffff">1.2.3.4 / root / 密码 xxxx，</text>
+  <text x="66" y="198" font-family="system-ui,sans-serif" font-size="14" fill="#ffffff">装完告诉我出口 IP 是多少</text>
+  <polygon points="80,238 100,238 88,254" fill="#2563eb"/>
 
-  <text x="48" y="278" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">不用会 Linux</text>
-  <text x="48" y="302" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">不用选协议（可交给 AI）</text>
-  <text x="48" y="326" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">不用配代理、不用装客户端</text>
-  <text x="48" y="364" font-family="system-ui,sans-serif" font-size="13" fill="#94a3b8">（也支持自己敲命令行，见文章末尾）</text>
+  <text x="48" y="288" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">不用会 Linux</text>
+  <text x="48" y="312" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">不用选协议（可以交给 AI 决定）</text>
+  <text x="48" y="336" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">不用配代理、不用装客户端</text>
+  <text x="48" y="372" font-family="system-ui,sans-serif" font-size="13" fill="#94a3b8">（也可以自己敲命令行，见文末）</text>
 
   <!-- 箭头 -->
-  <line x1="334" y1="210" x2="374" y2="210" stroke="#2563eb" stroke-width="3"/>
-  <polygon points="374,200 396,210 374,220" fill="#2563eb"/>
+  <line x1="374" y1="210" x2="414" y2="210" stroke="#2563eb" stroke-width="3"/>
+  <polygon points="414,200 436,210 414,220" fill="#2563eb"/>
 
   <!-- 2. AI 自动完成 -->
-  <rect x="406" y="24" width="280" height="372" rx="14" fill="#eff6ff" stroke="#bfdbfe"/>
-  <text x="430" y="64" font-family="system-ui,sans-serif" font-size="20" fill="#1d4ed8" font-weight="700">AI 自动完成</text>
-  <text x="430" y="106" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">1. 在服务器上装好服务端</text>
-  <text x="430" y="140" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">2. 开好端口和防火墙</text>
-  <text x="430" y="174" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">3. 在你电脑上装好客户端</text>
-  <text x="430" y="208" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">4. 连上，并真的验证能出去</text>
-  <rect x="430" y="240" width="232" height="120" rx="10" fill="#ffffff" stroke="#bfdbfe"/>
-  <text x="448" y="270" font-family="system-ui,sans-serif" font-size="14" fill="#1e3a8a">全程只在你自己的</text>
-  <text x="448" y="294" font-family="system-ui,sans-serif" font-size="14" fill="#1e3a8a">服务器和电脑上动手</text>
-  <text x="448" y="326" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">改过的设置都会备份，</text>
-  <text x="448" y="348" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">说一声就能还原</text>
+  <rect x="446" y="24" width="280" height="372" rx="14" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="470" y="64" font-family="system-ui,sans-serif" font-size="20" fill="#1d4ed8" font-weight="700">AI 自动完成</text>
+  <text x="470" y="106" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">0. 装好这个 skill</text>
+  <text x="470" y="140" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">1. 在服务器上装好服务端</text>
+  <text x="470" y="174" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">2. 开好端口和防火墙</text>
+  <text x="470" y="208" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">3. 在你电脑上装好客户端</text>
+  <text x="470" y="242" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">4. 连上，并真的验证能出去</text>
+  <rect x="470" y="268" width="232" height="104" rx="10" fill="#ffffff" stroke="#bfdbfe"/>
+  <text x="488" y="296" font-family="system-ui,sans-serif" font-size="14" fill="#1e3a8a">全程只在你自己的</text>
+  <text x="488" y="320" font-family="system-ui,sans-serif" font-size="14" fill="#1e3a8a">服务器和电脑上动手；</text>
+  <text x="488" y="344" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">改过的设置会备份，</text>
+  <text x="488" y="364" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">说一声就能还原</text>
 
   <!-- 箭头 -->
-  <line x1="706" y1="210" x2="746" y2="210" stroke="#2563eb" stroke-width="3"/>
-  <polygon points="746,200 768,210 746,220" fill="#2563eb"/>
+  <line x1="726" y1="210" x2="766" y2="210" stroke="#2563eb" stroke-width="3"/>
+  <polygon points="766,200 788,210 766,220" fill="#2563eb"/>
 
   <!-- 3. 你得到 -->
-  <rect x="778" y="24" width="158" height="372" rx="14" fill="#0f172a"/>
-  <text x="802" y="64" font-family="system-ui,sans-serif" font-size="20" fill="#93c5fd" font-weight="700">你得到</text>
-  <circle cx="808" cy="104" r="6" fill="#22c55e"/>
-  <text x="824" y="110" font-family="system-ui,sans-serif" font-size="15" fill="#f8fafc">电脑能上外网</text>
-  <circle cx="808" cy="146" r="6" fill="#22c55e"/>
-  <text x="824" y="152" font-family="system-ui,sans-serif" font-size="15" fill="#f8fafc">手机也能用</text>
-  <text x="824" y="174" font-family="system-ui,sans-serif" font-size="13" fill="#94a3b8">（一条链接）</text>
-  <text x="802" y="222" font-family="system-ui,sans-serif" font-size="14" fill="#94a3b8">不想用了：</text>
-  <text x="802" y="248" font-family="system-ui,sans-serif" font-size="15" fill="#f8fafc">再跟 AI 说</text>
-  <text x="802" y="272" font-family="system-ui,sans-serif" font-size="15" fill="#f8fafc">「断开」就行</text>
+  <rect x="798" y="24" width="138" height="372" rx="14" fill="#0f172a"/>
+  <text x="820" y="64" font-family="system-ui,sans-serif" font-size="20" fill="#93c5fd" font-weight="700">你得到</text>
+  <circle cx="826" cy="104" r="6" fill="#22c55e"/>
+  <text x="842" y="110" font-family="system-ui,sans-serif" font-size="15" fill="#f8fafc">电脑能上外网</text>
+  <circle cx="826" cy="146" r="6" fill="#22c55e"/>
+  <text x="842" y="152" font-family="system-ui,sans-serif" font-size="15" fill="#f8fafc">手机也能用</text>
+  <text x="842" y="174" font-family="system-ui,sans-serif" font-size="13" fill="#94a3b8">（一条链接）</text>
+  <text x="820" y="222" font-family="system-ui,sans-serif" font-size="14" fill="#94a3b8">不想用了：</text>
+  <text x="820" y="248" font-family="system-ui,sans-serif" font-size="15" fill="#f8fafc">再跟 AI 说</text>
+  <text x="820" y="272" font-family="system-ui,sans-serif" font-size="15" fill="#f8fafc">「断开」就行</text>
 </svg>
