@@ -9,7 +9,7 @@
   <link rel="prefetch" href="https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com/pv-beacon.html?env=gitbolg-d7gmnsrw46e011706&amp;region=ap-shanghai&amp;fn=gitblog-comments&amp;v=20260627010000" as="document">
 
 
-<title>一条命令搭好自建 VPN：我把 8 个交互式脚本改造成了能给 agent 用的能力 · 小红鸡</title>
+<title>vpn-skill：给个服务器登录方式，帮你把自建 VPN 装好并连上 · 小红鸡</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
   <link rel="stylesheet" href="/assets/dist/common.min.css?v=20260627010000">
   <link rel="stylesheet" href="/assets/dist/post.min.css?v=20260627010000">
@@ -19,30 +19,30 @@
   <link rel="icon" href="/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="description" content="自建代理原本要手工走六步。我把它压成一个命令——只给服务器登录方式，自动部署服务端、装本机客户端、连上并验证出网。这篇文章讲清六个设计决策，以及测试帮我抓出的 12 个真实缺陷，其中三个会直接让功能不可用。">
+  <meta name="description" content="一条命令：在你自己的海外服务器上装好代理服务，在你电脑上装好客户端并连上，最后验证真的能出去。全自动、只读不改你的东西、不想用了能一键还原。">
   <meta name="author" content="Jimmy">
   <meta name="robots" content="index, follow">
-  <meta property="og:title" content="一条命令搭好自建 VPN：我把 8 个交互式脚本改造成了能给 agent 用的能力">
-  <meta property="og:description" content="自建代理原本要手工走六步。我把它压成一个命令——只给服务器登录方式，自动部署服务端、装本机客户端、连上并验证出网。这篇文章讲清六个设计决策，以及测试帮我抓出的 12 个真实缺陷，其中三个会直接让功能不可用。">
+  <meta property="og:title" content="vpn-skill：给个服务器登录方式，帮你把自建 VPN 装好并连上">
+  <meta property="og:description" content="一条命令：在你自己的海外服务器上装好代理服务，在你电脑上装好客户端并连上，最后验证真的能出去。全自动、只读不改你的东西、不想用了能一键还原。">
   <meta property="og:image" content="https://gitpull.cn/assets/uploads/2026/09/vpn-skill-cover.svg">
   <meta property="og:url" content="https://gitpull.cn/post/20260929/">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="小红鸡">
   <meta property="og:locale" content="zh-CN">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="一条命令搭好自建 VPN：我把 8 个交互式脚本改造成了能给 agent 用的能力">
-  <meta name="twitter:description" content="自建代理原本要手工走六步。我把它压成一个命令——只给服务器登录方式，自动部署服务端、装本机客户端、连上并验证出网。这篇文章讲清六个设计决策，以及测试帮我抓出的 12 个真实缺陷，其中三个会直接让功能不可用。">
+  <meta name="twitter:title" content="vpn-skill：给个服务器登录方式，帮你把自建 VPN 装好并连上">
+  <meta name="twitter:description" content="一条命令：在你自己的海外服务器上装好代理服务，在你电脑上装好客户端并连上，最后验证真的能出去。全自动、只读不改你的东西、不想用了能一键还原。">
   <meta name="twitter:image" content="https://gitpull.cn/assets/uploads/2026/09/vpn-skill-cover.svg">
   <link rel="canonical" href="https://gitpull.cn/post/20260929/">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="article:published_time" content="2026-09-29T11:40:00+08:00">
-  <meta property="article:modified_time" content="2026-09-29T11:40:00+08:00">
+  <meta property="article:published_time" content="2026-09-29T13:10:00+08:00">
+  <meta property="article:modified_time" content="2026-09-29T13:10:00+08:00">
   <meta property="article:author" content="Jimmy">
   <meta property="article:tag" content="项目介绍">
   <meta property="article:tag" content="教程">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"一条命令搭好自建 VPN：我把 8 个交互式脚本改造成了能给 agent 用的能力","description":"自建代理原本要手工走六步。我把它压成一个命令——只给服务器登录方式，自动部署服务端、装本机客户端、连上并验证出网。这篇文章讲清六个设计决策，以及测试帮我抓出的 12 个真实缺陷，其中三个会直接让功能不可用。","image":"https://gitpull.cn/assets/uploads/2026/09/vpn-skill-cover.svg","datePublished":"2026-09-29T11:40:00+08:00","dateModified":"2026-09-29T11:40:00+08:00","author":{"@type":"Person","name":"Jimmy"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260929/","keywords":"项目介绍,教程"}</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://gitpull.cn/"},{"@type":"ListItem","position":2,"name":"项目介绍","item":"https://gitpull.cn/tags.html#%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D"},{"@type":"ListItem","position":3,"name":"一条命令搭好自建 VPN：我把 8 个交互式脚本改造成了能给 agent 用的能力","item":"https://gitpull.cn/post/20260929/"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"vpn-skill：给个服务器登录方式，帮你把自建 VPN 装好并连上","description":"一条命令：在你自己的海外服务器上装好代理服务，在你电脑上装好客户端并连上，最后验证真的能出去。全自动、只读不改你的东西、不想用了能一键还原。","image":"https://gitpull.cn/assets/uploads/2026/09/vpn-skill-cover.svg","datePublished":"2026-09-29T13:10:00+08:00","dateModified":"2026-09-29T13:10:00+08:00","author":{"@type":"Person","name":"Jimmy"},"publisher":{"@type":"Organization","name":"小红鸡","logo":{"@type":"ImageObject","url":"/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg"}},"mainEntityOfPage":"https://gitpull.cn/post/20260929/","keywords":"项目介绍,教程"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://gitpull.cn/"},{"@type":"ListItem","position":2,"name":"项目介绍","item":"https://gitpull.cn/tags.html#%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D"},{"@type":"ListItem","position":3,"name":"vpn-skill：给个服务器登录方式，帮你把自建 VPN 装好并连上","item":"https://gitpull.cn/post/20260929/"}]}</script>
   <meta name="mobile-web-app-capable" content="yes">
 </head>
 <body>
@@ -53,7 +53,7 @@
     <article class="article is-prerendered" id="article" data-prerendered="1" data-slug="vpn-skill-one-command-self-hosted-vpn" data-url-key="20260929">
       <header class="article-header">
       <div class="article-tags-top"><a class="tag tag-colored" style="--tag-bg:#EEF0F3;--tag-text:#4B5563;--tag-border:#D5DAE1;--tag-dark-bg:#252A33;--tag-dark-text:#CBD5E1;--tag-dark-border:#47515F;" href="/tags.html#%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D">项目介绍</a><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E6%95%99%E7%A8%8B">教程</a></div>
-      <h1 class="article-title">一条命令搭好自建 VPN：我把 8 个交互式脚本改造成了能给 agent 用的能力</h1>
+      <h1 class="article-title">vpn-skill：给个服务器登录方式，帮你把自建 VPN 装好并连上</h1>
       <div class="article-author">
         <div class="avatar" style="background-image:url(https://gitpull.cn/assets/uploads/2026/05/touxiang.webp)"></div>
         <div class="info">
@@ -62,9 +62,9 @@
             <span>2026-09-29</span>
             
             <span class="dot"></span>
-            <span>9543 字</span>
+            <span>3129 字</span>
             <span class="dot"></span>
-            <span class="meta-read-mins">约 12 分钟</span>
+            <span class="meta-read-mins">约 4 分钟</span>
             <span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">阅读 </span><span id="gitblog_page_pv">…</span><span class="gitblog-pv-suffix"> 次</span></span>
           </div>
         </div>
@@ -72,371 +72,143 @@
       </div>
     </header>
     <div class="article-body"><blockquote>
-<p>仓库：<a href="https://github.com/flymysql/vpn-skill">github.com/flymysql/vpn-skill</a>（Apache-2.0）
-上游：<a href="https://github.com/chugzb/VPN">chugzb/VPN</a>，本文是把它<strong>工程化</strong>的记录，不是另起炉灶。</p>
-<p>⚠️ 先说边界：这个工具是给你<strong>自己买的海外服务器</strong>和<strong>个人设备</strong>用的。别在公司机器 / 内网环境部署或使用，那很可能违反你的组织规定；服务本身的合规性请按你所在地的法律来。</p>
+<p>仓库：<a href="https://github.com/flymysql/vpn-skill">github.com/flymysql/vpn-skill</a>
+你需要的：一台<strong>自己买的</strong>海外服务器（IP + 密码或私钥）+ 电脑上装了 Node 18 以上。
+你不需要：会 Linux、会配代理、会装客户端、会排查端口。</p>
 </blockquote>
+<p><img src="/assets/uploads/2026/09/vpn-skill-flow.svg" alt="它替你做的事" width="960" height="420" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/vpn-skill-flow.svg" class="progressive-img"></p>
 <hr>
-<h1>一、先看结果</h1>
-<pre><code class="language-bash">npx github:flymysql/vpn-skill setup --host 1.2.3.4 --user root --password '你的密码'
+<h1>它能做什么</h1>
+<p><strong>一句话：你给服务器登录方式，它把服务端和你的电脑都配好，让你直接能上外网。</strong></p>
+<p>具体替你干这些活：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>装服务端</td>
+<td>SSH 上你的服务器，装好代理服务并设为开机自启</td>
+</tr>
+<tr>
+<td>开端口</td>
+<td>自动放行本机防火墙，并提醒你去云控制台开安全组</td>
+</tr>
+<tr>
+<td>装客户端</td>
+<td>在你电脑上下载客户端内核、生成配置、启动它</td>
+</tr>
+<tr>
+<td>设代理</td>
+<td>自动打开系统代理（Windows/macOS/Linux 都支持）</td>
+</tr>
+<tr>
+<td>验证</td>
+<td>真的连一次外网，告诉你出口 IP 是多少，确认不是假的</td>
+</tr>
+<tr>
+<td>给手机用</td>
+<td>生成一条分享链接，手机客户端粘进去就能用</td>
+</tr>
+<tr>
+<td>不想用了</td>
+<td>一条命令停掉并<strong>把系统代理设置原样还回去</strong></td>
+</tr>
+</tbody></table>
+<p>支持三种协议，装哪种都能用同一个客户端，不用换软件：</p>
+<table>
+<thead>
+<tr>
+<th>协议</th>
+<th>什么时候选它</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Hysteria2</strong>（默认）</td>
+<td>不知道选啥就选它：最快、打游戏延迟最低</td>
+</tr>
+<tr>
+<td><strong>Shadowsocks</strong></td>
+<td>想要最稳、最兼容（有些客户端很老，只认它）</td>
+</tr>
+<tr>
+<td><strong>VLESS + Reality</strong></td>
+<td>想要最不容易被封（伪装成正常网站访问）</td>
+</tr>
+</tbody></table>
+<hr>
+<h1>怎么用</h1>
+<h3>第一步：跑一条命令</h3>
+<pre><code class="language-bash">npx github:flymysql/vpn-skill setup --host 1.2.3.4 --user root --password '你的服务器密码'
 </code></pre>
-<p>跑完是这样：</p>
-<pre><code>[ ok ] 目标机: TencentOS Server 3.2 / x86_64 / user=jimmycppliu / systemd=yes
-[ ok ] 已上传脚本到 /tmp/vpn-skill-upload-xxxxx
-[ ok ] Hysteria2 部署完成
+<p>把 <code>1.2.3.4</code> 换成你的服务器 IP，<code>root</code> 和密码换成你买服务器时拿到的。</p>
+<p>就这么一条。它会自己把上面表格里的活干完，大概一两分钟。</p>
+<p>跑完看到这样就是成功了：</p>
+<pre><code>[ ok ] Hysteria2 部署完成
+  服务器 : 203.0.113.10
   端口   : 31949/UDP
-  链接   : hysteria2://xxxx@203.0.113.10:31949/?insecure=1&amp;sni=bing.com#vpn-skill-hy2
-[ ok ] mihomo 安装完成: Mihomo Meta v1.19.31 windows amd64
-[ ok ] mihomo 已启动 (pid 64028, 混合端口 7890)
+  分享链接: hysteria2://xxxx@203.0.113.10:31949/?insecure=1&amp;sni=bing.com#vpn-skill-hy2
+[ ok ] mihomo 已启动 (混合端口 7890)
 [ ok ] 系统代理已设置为 127.0.0.1:7890
 [ ok ] HTTPS 隧道 (gstatic/generate_204): HTTP 204 · 137ms
 [ ok ] 出口 IP: 43.132.141.21  ·  直连 IP: 12.34.56.78
 [ ok ] 全部完成 ✅
 </code></pre>
-<p>它做完了九件事：解析登录方式 → 探测目标机 → 上传部署脚本 → 装协议后端并起服务（含防火墙与 BBR）→ 读回状态 → 下载客户端内核 → 生成配置与分享链接 → 启动内核并设系统代理 → 验证出网。</p>
-<p>支持三种协议，用同一个本地内核（mihomo）通吃，不用按协议换客户端：</p>
-<table>
-<thead>
-<tr>
-<th><code>--protocol</code></th>
-<th>协议</th>
-<th>适合</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>hy2</code>（默认）</td>
-<td>Hysteria2（QUIC/TLS）</td>
-<td>最快、延迟最低、抗封锁好</td>
-</tr>
-<tr>
-<td><code>ss</code></td>
-<td>Shadowsocks-Rust</td>
-<td>TCP 最稳、客户端兼容性最好</td>
-</tr>
-<tr>
-<td><code>reality</code></td>
-<td>VLESS + XTLS-Reality</td>
-<td>隐蔽性最强，握手伪装成真实 TLS</td>
-</tr>
-</tbody></table>
+<p>看到最后一行，<strong>你电脑已经能上外网了</strong>，浏览器直接开就行，不用再做别的。</p>
+<h3>第二步（可选）：让手机也能用</h3>
+<p>上面输出里的那条 <code>分享链接</code> 就是手机要的东西。没存下来也没关系：</p>
+<pre><code class="language-bash">npx github:flymysql/vpn-skill link
+</code></pre>
+<p>再打印一次。复制它，粘进手机的代理客户端（Shadowrocket / v2rayN / NekoBox / Clash Verge 都行）。</p>
+<h3>常用命令</h3>
+<pre><code class="language-bash">npx github:flymysql/vpn-skill status    # 看现在还连着没、走的哪个服务器
+npx github:flymysql/vpn-skill verify    # 再验证一次能不能出外网
+npx github:flymysql/vpn-skill down      # 用完关掉（系统代理会还原成原来的样子）
+npx github:flymysql/vpn-skill up        # 下次要用，再打开
+</code></pre>
+<p><code>down</code> 之后想再用，<code>up</code> 一下就行，不用重新装。</p>
+<h3>换协议</h3>
+<p>比如想把默认的 Hysteria2 换成更抗封锁的 Reality：</p>
+<pre><code class="language-bash">npx github:flymysql/vpn-skill setup --host 1.2.3.4 --user root --password '密码' --protocol reality
+</code></pre>
+<p>端口和密码会自动沿用，不会白装一遍。</p>
 <hr>
-<h1>二、为什么值得自动化</h1>
-<p>自建代理的手工流程，任何教程都会给你这六步：</p>
-<ol>
-<li>买服务器、记下 IP 和密码</li>
-<li>SSH 上去，从 GitHub 拉一个安装脚本</li>
-<li>脚本问你端口，回车选随机</li>
-<li>等它装完，把屏幕上打印的配置<strong>抄下来</strong></li>
-<li>在手机/电脑上装客户端，把配置<strong>填进去</strong></li>
-<li>连不上，回去排查——大概率是云安全组没放行端口</li>
-</ol>
-<p>这六步里有大量"可以机器做但因为在屏幕上所以只能人做"的动作。更要紧的是：<strong>第 4 步的输出是给人看的</strong>，没有程序接口。于是这件事既没法重跑（重跑会换端口、换密码），也没法校验（你不知道自己抄错没有），更没法交给 agent。</p>
-<p>所以目标形态很明确：<strong>只给登录方式，其余零输入</strong>。</p>
-<hr>
-<h1>三、架构：服务端留在 bash，编排层换成 Node</h1>
-<p><img src="/assets/uploads/2026/09/vpn-skill-flow.svg" alt="vpn-skill 的执行流程" width="960" height="560" loading="lazy" decoding="async" data-full-src="/assets/uploads/2026/09/vpn-skill-flow.svg" class="progressive-img"></p>
-<p>两个刻意的选择：</p>
-<p><strong>服务端继续用 bash。</strong> 目标机只保证有 bash 和 coreutils，不能假设有 Node/Python。所以服务端退化成纯粹的"执行 + 回传状态"，不做任何决策。</p>
-<p><strong>编排层用 Node。</strong> 要同时覆盖 Windows/macOS/Linux 本机、要支持密码 SSH（Windows 上没有 <code>sshpass</code>）、要无依赖解压 zip、要写 Windows 注册表、要手工实现 <code>.gz</code> 解压——这些用 shell 做会变成三套互不相干的脚本。Node 是三端都现成可用的运行时。</p>
-<p>目录结构因此长这样：</p>
-<pre><code>bin/vpn.mjs            CLI：参数 → 命令分发 → 人话输出
-  ├─ src/deploy.mjs    传输编排：上传 → 提权执行 → 回读状态
-  │    └─ src/ssh.mjs  ssh2 封装 + ~/.ssh/config 解析 + sudo 提权 + SFTP
-  ├─ src/protocols.mjs state → mihomo 配置 / 分享链接 / Clash 订阅
-  ├─ src/client.mjs    下载内核 / 生成配置 / 托管进程 / 系统代理 / 验证
-  └─ src/util.mjs      参数解析 / 平台路径 / 终端输出
-server/common.sh       服务端共享库：日志、依赖、端口、防火墙、BBR、状态
-server/{hy2,ss-rust,reality}.sh    三种协议的非交互部署
-</code></pre>
-<hr>
-<h1>四、六个关键设计决策</h1>
-<h2>1. stdout 只放数据，日志一律走 stderr</h2>
-<p>这不是审美问题，是踩出来的。</p>
-<p>我在服务端写了个 <code>resolve_port()</code>，它内部用 <code>info()</code> 打了一句"复用已有端口 8378"。然后我这样取值：</p>
-<pre><code class="language-bash">VPN_PORT="$(resolve_port udp)"
-</code></pre>
-<p>结果端口值变成了：</p>
-<pre><code>[ .. ] 复用已有端口 8378（幂等）
-8378
-</code></pre>
-<p>日志被一起捕获了。后面写 <code>state.env</code> 时安全字符集校验拦下了它，报"状态字段 <code>VPN_PORT</code> 含不安全字符"——否则会生成一个<strong>看起来正常但端口是垃圾字符串</strong>的配置。</p>
-<p>修法是把 <code>log/info/ok/warn/die</code> 全部重定向到 stderr，并在测试里加了一条断言：<strong>stdout 里不允许出现日志标记</strong>，防止回归。</p>
-<p>同一条契约也定义了服务端怎么回传状态：机器可读的东西走 stdout——</p>
-<pre><code>##VPN_SKILL_STATE_FILE=/etc/vpn-skill/state.env##
-##VPN_SKILL_STATE_BEGIN##
-{ "VPN_PROTOCOL": "hy2", "VPN_PORT": "31949", ... }
-##VPN_SKILL_STATE_END##
-</code></pre>
-<p><strong>永远不要用正则去抠中文日志。</strong></p>
-<h2>2. 幂等：不许作废已经发到手机上的配置</h2>
-<p>重跑是常态（换协议、改端口、修配置）。如果每次重跑都新生成一套密码，那手机上那份配置就废了；如果每次重跑都重启服务，在线连接就断了。</p>
-<p>所以：</p>
-<pre><code class="language-bash">载入 /etc/vpn-skill/state.env（若存在）
-  → 端口：命令行 &gt; 历史状态 &gt; 随机空闲
-  → 密码/UUID：历史状态 &gt; 新生成
-  → 渲染配置到临时文件，与现有文件逐字节 cmp
-      ├─ 相同 → 不落盘、不重启
-      └─ 不同 → 落盘 + 重启
-</code></pre>
-<p>这里踩过一个很隐蔽的坑：我在 hy2 的配置头写了 <code># 自动生成于 2026-09-29T02:22:03Z</code>。<strong>时间戳让每次渲染的字节都不同</strong>，于是每次都判定"配置已变更"、每次都重启服务——幂等设计当场失效，而表面上看一切正常。<strong>写进配置的内容不能含易变信息。</strong></p>
-<p>关联的一条：Reality 的私钥<strong>不回传本机</strong>，只留在服务端的 xray 配置里；重跑时从那份配置里读回私钥、从 <code>state.env</code> 复用公钥。这样"本机不持有服务端私钥"和"重跑不作废客户端"两件事同时成立。</p>
-<p><code>--force</code> 的语义也刻意区分开：<strong>只重写配置并重启，绝不重置凭据</strong>。</p>
-<h2>3. 三级下载降级：把你的海外服务器当下载代理</h2>
-<p>墙内直连 GitHub Release 基本不通。所以本机下载内核的梯度是：</p>
-<pre><code>1. github.com 直连
-2. 内置镜像（ghproxy.net / gh-proxy.com / ghfast.top …）或 VPN_MIRRORS
-3. 把服务器当下载代理：远端 curl 下来 → SFTP 拉回本机
-</code></pre>
-<p>第 3 级是整个"客户端自动化"能成立的前提——你的服务器在海外，它下载 GitHub 是通的，用它的带宽把 21MB 的内核搬回来即可。</p>
-<h2>4. SSH 层要像 <code>ssh</code> 一样</h2>
-<p>第一版我硬编码默认用户名 <code>root</code>、默认去猜 <code>~/.ssh/id_ed25519</code>。结果在编译机上直接认证失败——那台机器在 <code>~/.ssh/config</code> 里配的是 <code>id_rsa</code> 和端口 36000。</p>
-<p>于是补上两件事：</p>
+<h1>常见问题</h1>
+<p><strong>连不上 / 验证失败怎么办？</strong></p>
+<p>九成是云服务器的<strong>安全组没放行端口</strong>。去你买服务器的网站控制台，把上面输出的那个端口放行：</p>
 <ul>
-<li><strong>解析 <code>~/.ssh/config</code></strong>（<code>HostName</code>/<code>User</code>/<code>Port</code>/<code>IdentityFile</code>，含 <code>Include</code>、glob 匹配、按文件顺序首个命中优先）。平时 <code>ssh myhost</code> 能通的，这里 <code>--host myhost</code> 就能通。</li>
-<li><strong>多凭据依次尝试</strong>：显式给的 <code>--key</code> 失败后，继续试 config 里的和默认私钥。用户很可能给了错的那个，而对的就在 config 里。</li>
+<li>Hysteria2 → 放行 <strong>UDP</strong></li>
+<li>Shadowsocks → <strong>TCP 和 UDP 都要放</strong></li>
+<li>Reality → 放行 <strong>TCP</strong></li>
 </ul>
-<h2>5. 提权的副作用要收尾</h2>
-<p>这是最坑的一个 bug，因为它<strong>让成功的部署看起来是失败的</strong>。</p>
-<p>场景：用非 root 账号登录，但 sudo 免密。这时脚本以 root 运行，<code>state.env</code> 是 <code>root:600</code>。本机 CLI 用普通账号去读——Permission denied。用户看到的是"部署失败"，实际上服务端已经装好了。</p>
-<p>两处一起修：</p>
-<ul>
-<li>服务端：以 sudo 执行时把 <code>state.env</code> 的属主让回调用者（<code>chown $SUDO_UID</code>）</li>
-<li>客户端：回读状态走同一提权通道（先 <code>cat</code>，失败再 <code>sudo cat</code>）</li>
-</ul>
-<p>并且加了回归断言：提权执行后，状态文件属主必须等于登录用户且权限仍是 600。</p>
-<h2>6. dry-run 必须对宿主零副作用</h2>
-<p>我写了个 <code>VPN_DRY_RUN=1</code> 模式，用来在没有 Linux 机器的环境下验证脚本逻辑。第一版它虽然跳过了下载和起服务，<strong>却仍然把 systemd 单元文件写进了宿主的 <code>/etc/systemd/system/</code></strong>——"演练"污染了开发机。</p>
-<p>改成新增一个 <code>apply_unit()</code>：dry-run 时单元文件落到 <code>$WORKDIR/units/</code>，只有真跑才装到 <code>/etc</code>。</p>
-<p>没有这一条，后面那张四层测试表里的一半都做不出来。</p>
-<hr>
-<h1>五、测试：在没有海外机器的情况下做出可信证据</h1>
-<p>我没有海外服务器可用。但"没有环境"不该等于"没有验证"。最后做出四层：</p>
-<table>
-<thead>
-<tr>
-<th>层</th>
-<th>命令</th>
-<th>项数</th>
-<th>覆盖</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>单元 + 字节不变量</td>
-<td><code>npm test</code></td>
-<td>22</td>
-<td>YAML 发射/转义、三种协议配置、分享链接、参数解析、env 注入转义、<strong>文件换行/BOM/许可/frontmatter 不变量</strong></td>
-</tr>
-<tr>
-<td>服务端脚本</td>
-<td><code>npm run test:bash</code></td>
-<td>32</td>
-<td>dry-run 真跑 bash：状态输出、配置生成、幂等、<code>--force</code> 语义、命令行覆盖历史、非法值拒绝、stdout 纯净性</td>
-</tr>
-<tr>
-<td><strong>本机真实端到端</strong></td>
-<td><code>npm run test:e2e</code></td>
-<td>18</td>
-<td><strong>真实代理链</strong>（见下）</td>
-</tr>
-<tr>
-<td>SSH 集成</td>
-<td><code>npm run test:ssh</code></td>
-<td>11</td>
-<td>ssh2 + <code>~/.ssh/config</code>、SFTP 上传、提权执行、状态回读、客户端装配</td>
-</tr>
-</tbody></table>
-<p><code>test:e2e</code> 是这里面最有意思的一层：它<strong>不是 mock</strong>。它在本机拉一个真正的 <code>ssserver</code>（shadowsocks-rust 的 Windows 版）当服务端，把 <code>mihomo</code> 真启动起来，然后：</p>
-<ul>
-<li>经 <code>本地混合端口 → mihomo → ssserver → 公网</code> 请求 <code>https://www.gstatic.com/generate_204</code>，<strong>断言返回 204</strong></li>
-<li>用 mihomo 的控制器 API 触发一次节点延迟探测，<strong>断言拿到真实延迟</strong>（实测 ~52ms）</li>
-<li>经代理查询出口 IP，<strong>断言拿到真实公网 IP</strong></li>
-<li>打开系统代理、读回注册表值、再关闭，<strong>断言精确还原到操作前的值</strong></li>
-</ul>
-<p>也就是说：除了"服务端装在别人的机器上"这一点，客户端侧全部走真实代码路径。这是我能在没有海外机器的前提下给出的最强证据。</p>
-<hr>
-<h1>六、测试帮我抓出的 12 个缺陷</h1>
-<p>这些都是<strong>写下测试之后</strong>才暴露的，不是事后补记的清单：</p>
-<table>
-<thead>
-<tr>
-<th>#</th>
-<th>缺陷</th>
-<th>后果</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td><code>resolve_port()</code> 在命令替换里打日志</td>
-<td>端口值被日志污染</td>
-</tr>
-<tr>
-<td>2</td>
-<td>hy2 配置头带生成时间戳</td>
-<td>每次重跑都重启服务，幂等失效</td>
-</tr>
-<tr>
-<td>3</td>
-<td>dry-run 仍往宿主 <code>/etc/systemd/system</code> 写单元文件</td>
-<td>"演练"污染宿主</td>
-</tr>
-<tr>
-<td>4</td>
-<td>无 BOM 的 UTF-8 <code>.ps1</code> 被 PowerShell 5.1 按 ANSI 解析</td>
-<td><strong>Windows 系统代理功能整体不可用</strong></td>
-</tr>
-<tr>
-<td>5</td>
-<td>出口 IP 只查 <code>ip-api.com</code></td>
-<td>该服务在部分网络不可达 ⇒ 验证误报失败</td>
-</tr>
-<tr>
-<td>6</td>
-<td>非 root + 免密 sudo 时 <code>state.env</code> 属 root:600</td>
-<td><strong>部署成功却报失败</strong></td>
-</tr>
-<tr>
-<td>7</td>
-<td>显式 <code>--key</code> 失败就放弃</td>
-<td>config 里明明有能用的 key 却连不上</td>
-</tr>
-<tr>
-<td>8</td>
-<td>未解析 <code>~/.ssh/config</code></td>
-<td>用户得把配好的 User/Port/IdentityFile 再抄一遍</td>
-</tr>
-<tr>
-<td>9</td>
-<td><code>vendor/upstream/*.sh</code> 工作树是 CRLF（索引是 LF）</td>
-<td>执行时报 <code>
-    <aside class="toc-sidebar" id="tocSidebar" hidden></aside>
-  </main>
-
-  <div id="site-footer"></div>
-  <div id="site-overlays"></div>
-
-  <script type="module" src="/assets/dist/post.min.js?v=20260627010000"></script>
-</body>
-</html>
-\r': command not found</code></td>
-</tr>
-<tr>
-<td>10</td>
-<td>测试脚本找不到 bash 时只打印一句就 <code>exit 0</code></td>
-<td><strong>假绿</strong></td>
-</tr>
-<tr>
-<td>11</td>
-<td><code>npm test</code> 用带引号 glob，Node 20 不支持</td>
-<td>CI 矩阵里 Node 20 变成 0 用例（<strong>假绿</strong>）</td>
-</tr>
-<tr>
-<td>12</td>
-<td>缺陷 #6 修完只写在文档里</td>
-<td>未来容易回归</td>
-</tr>
-</tbody></table>
-<p>挑三个讲讲。</p>
-<p><strong>#4 最贵。</strong> <code>src/win/systemproxy.ps1</code> 里有中文注释，文件是 UTF-8 无 BOM。Windows PowerShell 5.1 会把无 BOM 的 UTF-8 当 ANSI 读——中文注释的字节被解成乱码，其中一个字节恰好破坏了字符串引号，于是整个脚本<strong>语法错误</strong>：</p>
-<pre><code>Unexpected token ')' in expression or statement.
+<p>放行后再跑一次 <code>npx github:flymysql/vpn-skill up</code>。</p>
+<p><strong>不想每次都写密码？</strong></p>
+<p>用私钥：</p>
+<pre><code class="language-bash">npx github:flymysql/vpn-skill setup --host 1.2.3.4 --key ~/.ssh/id_ed25519
 </code></pre>
-<p>也就是说：系统代理这个功能在 Windows 上是完全不可用的，而在我的编辑器里打开文件一切正常。修法是写入时加 UTF-8 BOM，并加了字节级断言常驻看守。</p>
-<p><strong>#9 是被新加的测试当场抓到的。</strong> 我给仓库加了"字节不变量测试"（<code>.sh</code> 必须 LF、<code>.ps1</code> 必须带 BOM、不许有 NUL 字节、frontmatter/许可/<code>.gitignore</code> 必须齐），第一次运行就失败了——<code>vendor/upstream/</code> 下的 8 个上游脚本在工作树里是 CRLF（git 索引里已经是 LF，但工作树没重写）。这意味着"我看到的"和"提交上去的"不是同一个东西。</p>
-<p><strong>#10 和 #11 是同一类问题</strong>，也是我认为最值得记住的一点。</p>
-<hr>
-<h1>七、假绿比没有测试更危险</h1>
-<p><code>npm run test:bash</code> 在找不到 bash 时的第一版实现：</p>
-<pre><code class="language-js">if (!BASH) {
-  console.log('未找到可用的 bash，跳过服务端脚本自测');
-  return;   // ← 退出码 0
-}
+<p>如果你平时 <code>ssh 我的服务器</code> 就能连上，那更简单——<code>~/.ssh/config</code> 里配好的用户、端口、私钥它都会自动读，只要写 <code>--host 名字</code> 就够了。</p>
+<p><strong>想彻底删掉？</strong></p>
+<pre><code class="language-bash">npx github:flymysql/vpn-skill down                              # 关掉本机的代理
+npx github:flymysql/vpn-skill server uninstall --host 1.2.3.4 --password '密码'   # 卸载服务器上的
 </code></pre>
-<p>看起来是"优雅降级"，实际是<strong>假绿</strong>：本地和 CI 都显示测试通过，而一条断言都没跑。没有测试时你至少知道自己没有测试。</p>
-<p><code>npm test</code> 同理：<code>node --test "tests/unit/*.test.mjs"</code> 在 Node 24 上正常，但 Node 20 不支持 <code>--test</code> 的 glob 参数——CI 矩阵里的 Node 20 会安静地跑 0 个用例然后通过。</p>
-<p>修法都很小：</p>
-<ul>
-<li>缺依赖 → <strong>非 0 退出</strong>，并给出明确出路（<code>VPNSKILL_BASH=&lt;path&gt;</code> / <code>VPNSKILL_ALLOW_NO_BASH=1</code> 才允许跳过）</li>
-<li>用裸 <code>node --test</code>，让 Node 按内置规则发现测试文件（实测只命中 <code>tests/unit/</code>，不会误跑 e2e）</li>
-<li>把"仓库级不变量"也变成断言，而不是写进文档让人记住</li>
-</ul>
-<p>一句话：<strong>"测试通过"本身也需要被测。</strong></p>
+<p><strong>会不会动我别的东西？</strong></p>
+<p>不会。它只写自己的目录（服务器上是 <code>/etc/vpn-skill</code> 和对应服务的配置，本机是一个独立文件夹），系统的代理设置改了会备份，<code>down</code> 的时候<strong>精确还原</strong>。</p>
 <hr>
-<h1>八、Windows 上顺带踩的几个坑</h1>
-<p>如果你是 Windows 上做跨平台工具，这几条能直接抄：</p>
-<table>
-<thead>
-<tr>
-<th>坑</th>
-<th>正确姿势</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>.ps1</code> 脚本里中文变乱码甚至语法错误</td>
-<td>写入 UTF-8 <strong>BOM</strong>；Windows PowerShell 5.1 不认无 BOM 的 UTF-8</td>
-</tr>
-<tr>
-<td><code>git</code> 上检出的 <code>.sh</code> 变成 CRLF，到 Linux 就报 <code>
-    <aside class="toc-sidebar" id="tocSidebar" hidden></aside>
-  </main>
-
-  <div id="site-footer"></div>
-  <div id="site-overlays"></div>
-
-  <script type="module" src="/assets/dist/post.min.js?v=20260627010000"></script>
-</body>
-</html>
-\r': command not found</code></td>
-<td><code>.gitattributes</code> 里 <code>*.sh text eol=lf</code>；<code>.ps1</code> 用 <code>-text</code> 保字节</td>
-</tr>
-<tr>
-<td>pwsh 的 <code>.NET</code> 静态调用与进程 cwd 可能不一致，相对路径静默失效</td>
-<td>文件 API 一律绝对路径</td>
-</tr>
-<tr>
-<td><code>Out-String</code> / <code>Set-Content</code> / <code>&gt;</code> 会自己重写换行和编码</td>
-<td>判字节用 <code>fs.readFileSync()</code> 或 <code>[IO.File]::ReadAllBytes()</code>，别过文本管线</td>
-</tr>
-<tr>
-<td>bash 的 <code>case</code> 里 <code>[!A-Za-z=...]</code> 这种方括号模式有词法歧义</td>
-<td>字符集校验改用 <code>grep -E</code></td>
-</tr>
-<tr>
-<td>Windows 没有系统 bash</td>
-<td>用 Git 的 <code>bash.exe</code>；找不到要<strong>失败</strong>而不是跳过</td>
-</tr>
-</tbody></table>
-<p>最后一条特别值得说：我用 <code>Out-String</code> 去检查"提交里的文件是不是 CRLF"，它返回了 <code>True</code>——一度让我以为 git 把换行搞坏了。其实 <code>Out-String</code> <strong>自己就会把行尾变成 CRLF</strong>，我在测量仪器的噪声。换成在 Node 里读原始字节才看到真相。<strong>测量工具本身会污染测量结果。</strong></p>
-<hr>
-<h1>九、已知边界（诚实清单）</h1>
-<ul>
-<li>客户端侧（Windows）是<strong>真机验证</strong>的：下载、解压、配置、起进程、过代理、系统代理开关往返，全部真跑。</li>
-<li>SSH 传输层是<strong>真机验证</strong>的：连了一台真实 Linux（TencentOS）跑 dry-run，验证上传/提权/状态回读。</li>
-<li><strong>服务端"在真实海外机器上完整安装"这一步我没有跑过</strong>——因为手头没有海外服务器。脚本逻辑本身经过了 dry-run 全路径覆盖，但 <code>apt install</code>、下载二进制、<code>systemctl</code>、真实防火墙这几步的端到端，要等你给一台机器才能闭环。</li>
-<li>macOS / Linux 客户端脚本只做了语法与配置生成校验，没有真机验证。</li>
-</ul>
-<p>我把这段话也写进了仓库的 <code>docs/DESIGN.md</code>——<strong>没验证的部分要说清楚是没验证，而不是含糊过去</strong>。</p>
-<hr>
-<h1>十、用法速查</h1>
-<pre><code class="language-bash"># 全自动（推荐）
-npx github:flymysql/vpn-skill setup --host 1.2.3.4 --user root --password 'pwd'
-
-# 隐蔽性优先
-npx github:flymysql/vpn-skill setup --host 1.2.3.4 --key ~/.ssh/id_ed25519 --protocol reality
-
-# 之后
-npx github:flymysql/vpn-skill status     # 状态
-npx github:flymysql/vpn-skill verify     # 验证出网
-npx github:flymysql/vpn-skill link       # 拿分享链接（导到手机）
-npx github:flymysql/vpn-skill down       # 断开（还原系统代理）
-npx github:flymysql/vpn-skill server logs --host 1.2.3.4 --password 'pwd'
-</code></pre>
-<p>也把它做成了 agent skill：装上之后直接说"我的服务器是 1.2.3.4，帮我搭个 VPN 并连上"，剩下的交给它。</p>
+<h1>也可以直接交给 AI 用</h1>
+<p>装上 skill 之后，你只要说一句话：</p>
+<blockquote>
+<p>我的服务器是 1.2.3.4，root / 密码 xxxx，帮我搭个 VPN 并连上。</p>
+</blockquote>
 <pre><code class="language-bash">git clone https://github.com/flymysql/vpn-skill.git ~/vpn-skill
-ln -s ~/vpn-skill ~/.dsh/skills/vpn-skill
+ln -s ~/vpn-skill ~/.dsh/skills/vpn-skill      # DeepSeek Harness 用户
 </code></pre>
 <hr>
-<p><strong>仓库</strong>：<a href="https://github.com/flymysql/vpn-skill">github.com/flymysql/vpn-skill</a>
-<strong>上游</strong>：<a href="https://github.com/chugzb/VPN">github.com/chugzb/VPN</a>（Apache-2.0，上游脚本原件完整保留在 <code>vendor/upstream/</code> 便于溯源）</p>
-<p>如果这篇里有一条能带走，我希望是第七条：<strong>先确认你的测试真的在跑。</strong></p>
+<h1>一句提醒</h1>
+<p>这是给你<strong>自己买的服务器</strong>和<strong>个人电脑</strong>用的。别在公司机器或公司内网里用，那多半违反你公司的规定；服务本身的合规性也请按你所在地的法律来。</p>
+<hr>
+<p><strong>仓库</strong>：<a href="https://github.com/flymysql/vpn-skill">github.com/flymysql/vpn-skill</a> · 用法细节见里面的 <code>README.md</code>，连不上见 <code>docs/TROUBLESHOOTING.md</code>。</p>
 </div>
     <footer class="article-footer"><div class="article-tags"><a class="tag tag-colored" style="--tag-bg:#EEF0F3;--tag-text:#4B5563;--tag-border:#D5DAE1;--tag-dark-bg:#252A33;--tag-dark-text:#CBD5E1;--tag-dark-border:#47515F;" href="/tags.html#%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D">项目介绍</a><a class="tag tag-colored" style="--tag-bg:#E8F8EE;--tag-text:#1E7A43;--tag-border:#BDE8CC;--tag-dark-bg:#153321;--tag-dark-text:#91E4AE;--tag-dark-border:#2F6A43;" href="/tags.html#%E6%95%99%E7%A8%8B">教程</a></div></footer>
     
