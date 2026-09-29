@@ -1,73 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560">
-  <rect width="960" height="560" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
+  <rect width="960" height="420" fill="#ffffff"/>
 
-  <!-- 列头 -->
-  <rect x="24" y="18" width="430" height="40" rx="10" fill="#eff6ff" stroke="#bfdbfe"/>
-  <text x="239" y="45" font-family="system-ui,sans-serif" font-size="18" fill="#1d4ed8" font-weight="700" text-anchor="middle">本机（Node CLI）</text>
-  <rect x="506" y="18" width="430" height="40" rx="10" fill="#f5f3ff" stroke="#ddd6fe"/>
-  <text x="721" y="45" font-family="system-ui,sans-serif" font-size="18" fill="#6d28d9" font-weight="700" text-anchor="middle">你的海外服务器（bash）</text>
-
-  <!-- 本机步骤 -->
-  <g font-family="system-ui,sans-serif" font-size="15" fill="#0f172a">
-    <rect x="24" y="76" width="430" height="46" rx="9" fill="#f8fafc" stroke="#e2e8f0"/>
-    <text x="42" y="105">1. 解析登录方式（优先读 ~/.ssh/config）</text>
-
-    <rect x="24" y="132" width="430" height="46" rx="9" fill="#f8fafc" stroke="#e2e8f0"/>
-    <text x="42" y="161">3. 上传 server/*.sh（零交互 + 幂等 + 可 dry-run）</text>
-
-    <rect x="24" y="188" width="430" height="46" rx="9" fill="#f8fafc" stroke="#e2e8f0"/>
-    <text x="42" y="217">5. 读回 state.env（必要时 sudo cat 提权读）</text>
-
-    <rect x="24" y="244" width="430" height="46" rx="9" fill="#f8fafc" stroke="#e2e8f0"/>
-    <text x="42" y="273">6. 下载 mihomo 内核（直连 → 镜像 → 服务器中转）</text>
-
-    <rect x="24" y="300" width="430" height="46" rx="9" fill="#f8fafc" stroke="#e2e8f0"/>
-    <text x="42" y="329">7. 生成 config.yaml / 分享链接 / Clash 订阅</text>
-
-    <rect x="24" y="356" width="430" height="46" rx="9" fill="#f8fafc" stroke="#e2e8f0"/>
-    <text x="42" y="385">8. 启动 mihomo + 设置系统代理（可精确还原）</text>
-
-    <rect x="24" y="412" width="430" height="46" rx="9" fill="#f0fdf4" stroke="#bbf7d0"/>
-    <text x="42" y="441" fill="#166534">9. 验证：204 + 出口 IP + 直连对照</text>
-  </g>
-
-  <!-- 服务器步骤 -->
-  <g font-family="system-ui,sans-serif" font-size="15" fill="#0f172a">
-    <rect x="506" y="132" width="430" height="46" rx="9" fill="#faf5ff" stroke="#e9d5ff"/>
-    <text x="524" y="161">4. 装协议后端 → 起服务 → 开防火墙 → 开 BBR</text>
-
-    <rect x="506" y="188" width="430" height="46" rx="9" fill="#faf5ff" stroke="#e9d5ff"/>
-    <text x="524" y="217">   并把结果写成 /etc/vpn-skill/state.env</text>
-
-    <rect x="506" y="76" width="430" height="46" rx="9" fill="#f8fafc" stroke="#e2e8f0"/>
-    <text x="524" y="105">2. 探测 OS / 架构 / 是否 root / 有无 systemd</text>
-  </g>
+  <!-- 1. 你提供 -->
+  <rect x="24" y="24" width="280" height="372" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="48" y="64" font-family="system-ui,sans-serif" font-size="20" fill="#0f172a" font-weight="700">你只需要给</text>
+  <circle cx="52" cy="100" r="4" fill="#2563eb"/>
+  <text x="68" y="106" font-family="system-ui,sans-serif" font-size="16" fill="#334155">服务器 IP</text>
+  <circle cx="52" cy="136" r="4" fill="#2563eb"/>
+  <text x="68" y="142" font-family="system-ui,sans-serif" font-size="16" fill="#334155">登录密码 或 私钥</text>
+  <circle cx="52" cy="172" r="4" fill="#cbd5e1"/>
+  <text x="68" y="178" font-family="system-ui,sans-serif" font-size="16" fill="#64748b">用哪种协议（可选）</text>
+  <text x="48" y="228" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">不用会 Linux</text>
+  <text x="48" y="252" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">不用配代理</text>
+  <text x="48" y="276" font-family="system-ui,sans-serif" font-size="14" fill="#64748b">不用装客户端</text>
 
   <!-- 箭头 -->
-  <g stroke="#94a3b8" stroke-width="2" fill="none">
-    <line x1="454" y1="99" x2="500" y2="99"/>
-    <line x1="500" y1="155" x2="454" y2="155"/>
-    <line x1="454" y1="211" x2="500" y2="211"/>
-    <line x1="454" y1="267" x2="500" y2="267" stroke="#cbd5e1" stroke-dasharray="4 4"/>
-    <line x1="454" y1="323" x2="500" y2="323" stroke="#cbd5e1" stroke-dasharray="4 4"/>
-    <line x1="454" y1="379" x2="500" y2="379" stroke="#cbd5e1" stroke-dasharray="4 4"/>
-    <line x1="454" y1="435" x2="500" y2="435" stroke="#cbd5e1" stroke-dasharray="4 4"/>
-  </g>
-  <g fill="#94a3b8">
-    <polygon points="500,93 512,99 500,105"/>
-    <polygon points="454,149 442,155 454,161"/>
-    <polygon points="500,205 512,211 500,217"/>
-  </g>
+  <line x1="314" y1="210" x2="354" y2="210" stroke="#2563eb" stroke-width="3"/>
+  <polygon points="354,200 376,210 354,220" fill="#2563eb"/>
 
-  <!-- 图例 -->
-  <g font-family="system-ui,sans-serif" font-size="14" fill="#64748b">
-    <line x1="24" y1="492" x2="70" y2="492" stroke="#94a3b8" stroke-width="2"/>
-    <text x="80" y="497">SSH/SFTP 往返</text>
-    <line x1="230" y1="492" x2="276" y2="492" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4 4"/>
-    <text x="286" y="497">本机内部步骤</text>
-  </g>
+  <!-- 2. 它自动完成 -->
+  <rect x="386" y="24" width="280" height="372" rx="14" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="410" y="64" font-family="system-ui,sans-serif" font-size="20" fill="#1d4ed8" font-weight="700">它自动完成</text>
+  <text x="410" y="106" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">1. 在服务器上装好服务端</text>
+  <text x="410" y="140" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">2. 开好端口和防火墙</text>
+  <text x="410" y="174" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">3. 在你电脑上装好客户端</text>
+  <text x="410" y="208" font-family="system-ui,sans-serif" font-size="16" fill="#1e3a8a">4. 连上，并验证真的能出去</text>
+  <rect x="410" y="240" width="232" height="120" rx="10" fill="#ffffff" stroke="#bfdbfe"/>
+  <text x="428" y="268" font-family="ui-monospace,Consolas,monospace" font-size="14" fill="#1e3a8a">$ vpn-skill setup</text>
+  <text x="428" y="294" font-family="ui-monospace,Consolas,monospace" font-size="14" fill="#1e3a8a">    --host 1.2.3.4</text>
+  <text x="428" y="320" font-family="ui-monospace,Consolas,monospace" font-size="14" fill="#1e3a8a">    --user root</text>
+  <text x="428" y="346" font-family="ui-monospace,Consolas,monospace" font-size="14" fill="#1e3a8a">    --password '***'</text>
 
-  <!-- 高亮说明 -->
-  <rect x="24" y="510" width="912" height="34" rx="8" fill="#fffbeb" stroke="#fde68a"/>
-  <text x="42" y="533" font-family="system-ui,sans-serif" font-size="15" fill="#92400e">关键：stdout 只放机器可读数据、日志一律走 stderr —— 否则命令替换会把日志当成返回值</text>
+  <!-- 箭头 -->
+  <line x1="676" y1="210" x2="716" y2="210" stroke="#2563eb" stroke-width="3"/>
+  <polygon points="716,200 738,210 716,220" fill="#2563eb"/>
+
+  <!-- 3. 你得到 -->
+  <rect x="748" y="24" width="188" height="372" rx="14" fill="#0f172a"/>
+  <text x="772" y="64" font-family="system-ui,sans-serif" font-size="20" fill="#93c5fd" font-weight="700">你得到</text>
+  <circle cx="778" cy="104" r="6" fill="#22c55e"/>
+  <text x="794" y="110" font-family="system-ui,sans-serif" font-size="15" fill="#f8fafc">电脑能上外网</text>
+  <circle cx="778" cy="146" r="6" fill="#22c55e"/>
+  <text x="794" y="152" font-family="system-ui,sans-serif" font-size="15" fill="#f8fafc">一条分享链接</text>
+  <text x="794" y="174" font-family="system-ui,sans-serif" font-size="13" fill="#94a3b8">（手机扫码即用）</text>
+  <text x="772" y="222" font-family="system-ui,sans-serif" font-size="14" fill="#94a3b8">不想用了：</text>
+  <text x="772" y="246" font-family="ui-monospace,Consolas,monospace" font-size="14" fill="#f8fafc">vpn-skill down</text>
+  <text x="772" y="270" font-family="system-ui,sans-serif" font-size="13" fill="#94a3b8">代理设置原样还回去</text>
 </svg>
