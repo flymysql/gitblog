@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#eef2f7"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1200" height="6" fill="url(#accent)"/>
+
+  <text x="90" y="150" font-family="system-ui,-apple-system,'Segoe UI',sans-serif" font-size="30" fill="#64748b" font-weight="600">vpn-skill</text>
+  <text x="90" y="222" font-family="system-ui,-apple-system,'Segoe UI',sans-serif" font-size="54" fill="#0f172a" font-weight="700">一条命令搭好自建 VPN</text>
+  <text x="90" y="282" font-family="system-ui,-apple-system,'Segoe UI',sans-serif" font-size="26" fill="#475569">把 8 个交互式脚本改造成能交给 agent 的能力</text>
+
+  <!-- 左侧：本机 -->
+  <rect x="90" y="352" width="330" height="176" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="118" y="392" font-family="system-ui,sans-serif" font-size="22" fill="#0f172a" font-weight="700">本机</text>
+  <text x="118" y="428" font-family="ui-monospace,Consolas,monospace" font-size="17" fill="#334155">$ vpn-skill setup</text>
+  <text x="118" y="458" font-family="ui-monospace,Consolas,monospace" font-size="17" fill="#334155">    --host 1.2.3.4</text>
+  <text x="118" y="488" font-family="ui-monospace,Consolas,monospace" font-size="17" fill="#334155">    --user root -p ***</text>
+  <circle cx="378" cy="392" r="7" fill="#22c55e"/>
+
+  <!-- 中间箭头 -->
+  <line x1="436" y1="440" x2="524" y2="440" stroke="#2563eb" stroke-width="3"/>
+  <polygon points="524,430 546,440 524,450" fill="#2563eb"/>
+  <text x="440" y="418" font-family="system-ui,sans-serif" font-size="16" fill="#64748b">SSH + SFTP</text>
+
+  <!-- 右侧：海外服务器 -->
+  <rect x="566" y="352" width="330" height="176" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="594" y="392" font-family="system-ui,sans-serif" font-size="22" fill="#0f172a" font-weight="700">海外服务器</text>
+  <text x="594" y="428" font-family="ui-monospace,Consolas,monospace" font-size="17" fill="#334155">Hysteria2 (默认)</text>
+  <text x="594" y="458" font-family="ui-monospace,Consolas,monospace" font-size="17" fill="#334155">Shadowsocks</text>
+  <text x="594" y="488" font-family="ui-monospace,Consolas,monospace" font-size="17" fill="#334155">VLESS + Reality</text>
+  <circle cx="854" cy="392" r="7" fill="#22c55e"/>
+
+  <!-- 底部：结果 -->
+  <rect x="920" y="352" width="190" height="176" rx="14" fill="#0f172a"/>
+  <text x="948" y="398" font-family="system-ui,sans-serif" font-size="19" fill="#93c5fd" font-weight="700">出口 IP</text>
+  <text x="948" y="440" font-family="ui-monospace,Consolas,monospace" font-size="20" fill="#f8fafc">203.0.113.10</text>
+  <rect x="948" y="462" width="88" height="30" rx="15" fill="#22c55e"/>
+  <text x="992" y="482" font-family="system-ui,sans-serif" font-size="16" fill="#ffffff" font-weight="700" text-anchor="middle">204</text>
+  <text x="1046" y="482" font-family="system-ui,sans-serif" font-size="16" fill="#94a3b8">已连通</text>
+</svg>
