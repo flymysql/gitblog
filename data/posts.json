@@ -1,6 +1,22 @@
 {
   "posts": [
     {
+      "slug": "vpn-skill-one-command-self-hosted-vpn",
+      "title": "一条命令搭好自建 VPN：我把 8 个交互式脚本改造成了能给 agent 用的能力",
+      "date": "2026-09-29T11:40:00+08:00",
+      "updated": "2026-09-29T11:40:00+08:00",
+      "author": "Jimmy",
+      "summary": "自建代理原本要手工走六步。我把它压成一个命令——只给服务器登录方式，自动部署服务端、装本机客户端、连上并验证出网。这篇文章讲清六个设计决策，以及测试帮我抓出的 12 个真实缺陷，其中三个会直接让功能不可用。",
+      "tags": [
+        "项目介绍",
+        "教程"
+      ],
+      "cover": "../assets/uploads/2026/09/vpn-skill-cover.svg",
+      "carousel": true,
+      "path": "posts/vpn-skill-one-command-self-hosted-vpn.md",
+      "urlKey": "20260929"
+    },
+    {
       "slug": "deepseek-harness-beginner-to-crx-fix",
       "title": "从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件",
       "date": "2026-09-25T22:30:00+08:00",
