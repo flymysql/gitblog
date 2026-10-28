@@ -5,7 +5,7 @@
  *
  * 用法（在 cloudbase/ 目录）：
  *   node deploy-comments-fn.mjs
- *   node deploy-comments-fn.mjs -e gitbolg-d7gmnsrw46e011706
+ *   node deploy-comments-fn.mjs -e slippery-iguana-d1fhb1xmd469ee8c
  */
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';

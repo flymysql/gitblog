@@ -29,7 +29,7 @@ const app = cloudbase.init({ env: cloudbase.SYMBOL_CURRENT_ENV });
 const db = app.database();
 const _ = db.command;
 
-const ENV_ID = String(process.env.TCB_ENV_ID || '').trim() || 'gitbolg-d7gmnsrw46e011706';
+const ENV_ID = String(process.env.TCB_ENV_ID || '').trim() || 'slippery-iguana-d1fhb1xmd469ee8c';
 const STORAGE_BUCKET_ID = `6769-${ENV_ID}-1256429518`;
 
 // 动态生成 COS 临时签名 URL（兜底用）
@@ -51,7 +51,7 @@ async function freshFileUrl(cloudPath) {
 // 下载 URL 解析：
 // 1) 优先返回 CloudBase 静态托管永久 URL（无签名、永久有效）
 // 2) 兜底：COS 临时签名 URL
-const HOSTING_BASE = 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com';
+const HOSTING_BASE = 'https://slippery-iguana-d1fhb1xmd469ee8c-1256429518.tcloudbaseapp.com';
 async function resolveDownloadUrl(f) {
   const filename = f.filename || (f.cloudPath || '').split('/').pop() || '';
   // 安装包走静态托管 packages/（永久 URL，发布流程保证文件已部署）
@@ -142,7 +142,7 @@ async function triggerAlert(shopName, reason, detail) {
     <p><b>异常类型:</b> ${reason || '未知'}</p>
     <p><b>详情:</b> ${String(detail || '').slice(0, 500)}</p>
     <p><b>时间:</b> ${new Date().toLocaleString('zh-CN')}</p>
-    <p><a href="https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com/admin.html">前往后台查看 →</a></p>
+    <p><a href="https://slippery-iguana-d1fhb1xmd469ee8c-1256429518.tcloudbaseapp.com/admin.html">前往后台查看 →</a></p>
   `;
   return await sendAlertEmail(subject, html);
 }

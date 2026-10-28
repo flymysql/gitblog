@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- 由 cloudbase/publish-tcb.mjs 自动生成，请勿手工改版本号 -->
+<gupdate xmlns='http://www.google.com/update2/response' protocol='2.0'>
+  <app appid='jkmkapiplbcmnoghdphbbcbfebjdlbib'>
+    <updatecheck codebase='https://slippery-iguana-d1fhb1xmd469ee8c-1256429518.tcloudbaseapp.com/packages/taobao-cert-uploader-v1.4.2-360-signed.crx' version='1.4.2' />
+  </app>
+</gupdate>

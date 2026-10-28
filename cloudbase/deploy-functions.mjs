@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url';
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const rcPath = path.join(__dir, 'cloudbaserc.json');
 const privateEnvPath = path.join(__dir, '.env.private');
-const ENV_ID = process.env.TCB_ENV_ID || 'gitbolg-d7gmnsrw46e011706';
+const ENV_ID = process.env.TCB_ENV_ID || 'slippery-iguana-d1fhb1xmd469ee8c';
 
 function parseEnv(content) {
   const out = {};

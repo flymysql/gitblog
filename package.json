@@ -19,8 +19,8 @@
     "release": "node scripts/make-release.mjs",
     "release:push": "node scripts/make-release.mjs --push",
     "tools:pages": "node scripts/generate-tool-pages.mjs",
-    "cloudbase:deploy-comments": "node cloudbase/deploy-comments-fn.mjs -e gitbolg-d7gmnsrw46e011706",
-    "cloudbase:deploy-embed": "node cloudbase/deploy-static-embed.mjs -e gitbolg-d7gmnsrw46e011706",
+    "cloudbase:deploy-comments": "node cloudbase/deploy-comments-fn.mjs -e slippery-iguana-d1fhb1xmd469ee8c",
+    "cloudbase:deploy-embed": "node cloudbase/deploy-static-embed.mjs -e slippery-iguana-d1fhb1xmd469ee8c",
     "import:pageviews": "node scripts/import-pageview-stats.mjs",
     "backup:cloudbase": "node scripts/backup-cloudbase-data.mjs"
   },

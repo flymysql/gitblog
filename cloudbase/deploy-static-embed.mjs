@@ -9,7 +9,7 @@
  *
  * 用法：
  *   node cloudbase/deploy-static-embed.mjs
- *   node cloudbase/deploy-static-embed.mjs -e gitbolg-d7gmnsrw46e011706
+ *   node cloudbase/deploy-static-embed.mjs -e slippery-iguana-d1fhb1xmd469ee8c
  */
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';

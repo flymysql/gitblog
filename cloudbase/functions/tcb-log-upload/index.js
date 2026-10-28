@@ -20,7 +20,7 @@ const app = cloudbase.init({ env: cloudbase.SYMBOL_CURRENT_ENV });
 
 // 当前环境 ID（SYMBOL_CURRENT_ENV 是 Symbol，不能拼字符串，用 process.env 读取）
 const ENV_ID = String(process.env.TCB_ENV_ID || process.env.SCF_NAMESPACE || process.env.TENCENTCLOUD_ENV || '').trim()
-  || 'gitbolg-d7gmnsrw46e011706';
+  || 'slippery-iguana-d1fhb1xmd469ee8c';
 const STORAGE_BUCKET_ID = `6769-${ENV_ID}-1256429518`;
 
 // 上传校验令牌（环境变量配置；扩展内置，用于阻止匿名刷量）

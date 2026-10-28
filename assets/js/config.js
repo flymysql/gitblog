@@ -61,12 +61,12 @@ export const CONFIG = {
   },
   cloudbase: {
     enabled: true,
-    envId: "gitbolg-d7gmnsrw46e011706",
+    envId: "slippery-iguana-d1fhb1xmd469ee8c",
     region: "ap-shanghai",
     functionName: "gitblog-comments",
     accessMode: "embed",
     httpUrl: "",
-    embedBaseUrl: "https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com",
+    embedBaseUrl: "https://slippery-iguana-d1fhb1xmd469ee8c-1256429518.tcloudbaseapp.com",
     embedPage: "comments-embed.html",
     /** 嵌入页静态资源版本；更新 cloudbase/static 后递增，并重新 hosting deploy */
     embedAssetVersion: "20260627010000",

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>隐私政策 · 淘宝发货证书自动上传</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg:#0b1120; --card:#131c31; --border:#233046; --text:#e2e8f0; --muted:#8fa3bf; --primary:#3b82f6; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg); color:var(--text); line-height:1.8; -webkit-font-smoothing:antialiased; }
+  body::before { content:''; position:fixed; inset:0; background:radial-gradient(800px 400px at 15% -10%, rgba(59,130,246,.12), transparent 60%); pointer-events:none; }
+  .wrap { max-width:860px; margin:0 auto; padding:48px 20px 80px; position:relative; }
+  nav { display:flex; gap:18px; flex-wrap:wrap; margin-bottom:36px; font-size:14px; }
+  nav a { color:var(--muted); text-decoration:none; }
+  nav a:hover, nav a.active { color:var(--primary); }
+  h1 { font-size:26px; margin-bottom:8px; }
+  h2 { font-size:17px; margin:30px 0 10px; padding-left:10px; border-left:3px solid var(--primary); }
+  p, li { color:#cbd5e1; font-size:14.5px; }
+  ul { padding-left:22px; margin:8px 0; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:22px; margin-bottom:18px; }
+  .muted { color:var(--muted); font-size:13px; }
+  code { background:#0f172a; border:1px solid var(--border); border-radius:6px; padding:1px 6px; font-size:13px; }
+  a { color:var(--primary); }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:13.5px; }
+  th, td { border-bottom:1px solid var(--border); padding:8px 6px; text-align:left; color:#cbd5e1; }
+  th { color:var(--muted); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a href="/index.html">🏠 首页</a>
+    <a href="/downloads.html">⬇ 下载</a>
+    <a href="/feedback.html">💬 反馈</a>
+    <a href="/privacy.html" class="active">🔒 隐私政策</a>
+  </nav>
+
+  <h1>隐私政策</h1>
+  <p class="muted">适用于浏览器扩展「淘宝发货证书自动上传」（Chrome / Edge / 360 极速浏览器版本）<br>最近更新：2026-09-28</p>
+
+  <div class="card">
+    <p>本扩展是淘宝卖家自用的批量发货工具：在卖家自己的「已卖出 / 待发货」页面里，
+    自动识别待发货订单、生成证书图片并上传到卖家的证书交付页。我们只在实现这一个功能所必需的范围内处理数据。</p>
+  </div>
+
+  <h2>1. 我们处理哪些数据</h2>
+  <table>
+    <tr><th>数据类型</th><th>具体内容</th><th>用途 / 去向</th></tr>
+    <tr>
+      <td>卖家中心页面内容</td>
+      <td>待发货订单列表（订单号、发货页链接）、证书交付页中的证书编号、当前店铺名称</td>
+      <td>仅用于识别订单、生成并上传证书；在浏览器本地处理，保存在 <code>chrome.storage.local</code></td>
+    </tr>
+    <tr>
+      <td>运行日志与处理结果</td>
+      <td>处理了哪个订单、成功/失败数量、错误信息、页面 URL、（仅在出错时）现场快照</td>
+      <td>用于批量任务续跑与故障排查。会在本机保留最近 7 天；<b>仅在出现异常时</b>自动上传到开发者自有的云服务（腾讯云 CloudBase）</td>
+    </tr>
+    <tr>
+      <td>匿名使用统计</td>
+      <td>店铺名称、订单处理数量、证书上传/失败数量、插件心跳</td>
+      <td>上传到上述自有云服务，用于了解工具是否正常工作（不包含买家个人信息）</td>
+    </tr>
+    <tr>
+      <td>店铺白名单、管理密码哈希</td>
+      <td>允许使用本工具的店铺名单；管理密码的哈希值（不可逆）</td>
+      <td>仅保存在本机，用于限制只有授权店铺可使用本工具</td>
+    </tr>
+  </table>
+
+  <h2>2. 我们不收集什么</h2>
+  <ul>
+    <li>不收集、不读取淘宝账号密码，不读取或篡改 Cookie；</li>
+    <li>不读取与本工具无关的任何网站内容；</li>
+    <li>不收集买家姓名、电话、地址等买家个人信息；</li>
+    <li>不收集精确位置、健康信息、金融/支付信息；</li>
+    <li>不投放广告，不出售、不向第三方转让任何数据。</li>
+  </ul>
+
+  <h2>3. 权限用途说明</h2>
+  <ul>
+    <li><code>storage</code>：保存任务进度、完成记录、证书自增序号与白名单，供断点续跑使用。</li>
+    <li><code>tabs</code>：批量打开各订单的发货页、在页面间同步进度、处理完后关闭这些标签页。</li>
+    <li><code>downloads</code>：导出日志包（用于排障）时保存文件。</li>
+    <li>站点访问权限：仅限 <code>myseller.taobao.com</code>、<code>qn.taobao.com</code>、<code>web.m.taobao.com</code>（卖家中心与证书交付页），不涉及其它网站。</li>
+  </ul>
+
+  <h2>4. 数据存储与保留</h2>
+  <ul>
+    <li>本地：日志默认滚动保留最近 7 天；完成记录、证书序号长期保留在本机，可随时在扩展页面清理或卸载扩展删除。</li>
+    <li>云端：仅在出现异常时上传的日志包，用于定位问题，问题处理后即清理（一般不超过 90 天）。</li>
+    <li>所有传输均使用 HTTPS。</li>
+  </ul>
+
+  <h2>5. 第三方</h2>
+  <p>除承载自有云服务的云厂商（腾讯云）外，我们不会把数据提供给任何第三方，
+  也不会把数据用于与「批量上传发货证书」无关的目的。</p>
+
+  <h2>6. 你的控制权</h2>
+  <ul>
+    <li>可随时在扩展的监控面板点击「清理异常记录」清除本地记录；</li>
+    <li>卸载扩展即删除全部本地数据；</li>
+    <li>可联系我们删除已上传的日志包。</li>
+  </ul>
+
+  <h2>7. 联系方式</h2>
+  <p>如对本政策或数据处理有疑问，请通过 <a href="/feedback.html">反馈中心</a> 留言，
+  或邮件联系 <a href="mailto:jimmycppliu@tencent.com">jimmycppliu@tencent.com</a>。</p>
+
+  <h2>8. 政策更新</h2>
+  <p>本政策如有变更，会在本页更新并修改「最近更新」日期。</p>
+
+  <p class="muted" style="margin-top:30px">本扩展仅供卖家在自己账号下使用，与淘宝/阿里巴巴集团无隶属关系。</p>
+</div>
+</body>
+</html>

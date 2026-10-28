@@ -562,7 +562,7 @@ function settingsContentHtml() {
         <div class="settings-grid">
           <label class="settings-check"><input type="checkbox" name="cloudbase.enabled"> 启用评论区</label>
           <label class="span-2">环境 ID（envId）
-            <input name="cloudbase.envId" placeholder="gitbolg-d7gmnsrw46e011706">
+            <input name="cloudbase.envId" placeholder="slippery-iguana-d1fhb1xmd469ee8c">
           </label>
           <label>访问方式
             <select name="cloudbase.accessMode">

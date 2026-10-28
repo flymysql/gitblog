@@ -28,8 +28,8 @@ const ROOT = path.dirname(__dir); // 插件项目根
 const DIST = path.join(ROOT, 'dist');
 const HOSTING_STATIC = path.join(__dir, 'static', 'packages');
 const CLOUDBASE_DIR = __dir;
-const ENV_ID = process.env.TCB_ENV_ID || 'gitbolg-d7gmnsrw46e011706';
-const UPLOAD_API = 'https://gitbolg-d7gmnsrw46e011706-1256429518.ap-shanghai.app.tcloudbase.com/tcb-upload';
+const ENV_ID = process.env.TCB_ENV_ID || 'slippery-iguana-d1fhb1xmd469ee8c';
+const UPLOAD_API = 'https://slippery-iguana-d1fhb1xmd469ee8c-1256429518.ap-shanghai.app.tcloudbase.com/tcb-upload';
 
 /** 发布前门禁：crx 必须能被 Chromium 的规则验过，否则直接终止发布 */
 function verifyCrxOrThrow(crxPath) {
@@ -144,7 +144,7 @@ async function main() {
   console.log('   旧包已清理');
 
   console.log(`\n🎉 发布完成 v${version}`);
-  console.log(`下载页: https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com/downloads.html`);
+  console.log(`下载页: https://slippery-iguana-d1fhb1xmd469ee8c-1256429518.tcloudbaseapp.com/downloads.html`);
   console.log(`最新接口: /tcb-admin/public-latest → v${version}`);
 }
 

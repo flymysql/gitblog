@@ -16,7 +16,7 @@ GitBlog 的 CloudBase 评论由云函数 `gitblog-comments` 提供 API。博客�
 
 1. 打开 [腾讯云 CloudBase 控制台](https://console.cloud.tencent.com/tcb)
 2. 新建环境（建议选上海 `ap-shanghai`）
-3. 记录 **环境 ID**（如 `gitbolg-d7gmnsrw46e011706`）
+3. 记录 **环境 ID**（如 `slippery-iguana-d1fhb1xmd469ee8c`）
 
 ## 2. 部署云函数
 
@@ -31,7 +31,7 @@ tcb login
 
 ```bash
 cd cloudbase
-tcb fn deploy gitblog-comments -e gitbolg-d7gmnsrw46e011706
+tcb fn deploy gitblog-comments -e slippery-iguana-d1fhb1xmd469ee8c
 ```
 
 ## 3. 云函数权限与匿名登录（embed 模式必做）
@@ -65,7 +65,7 @@ SDK 失败时嵌入页会尝试 HTTP。控制台 → 云函数 → **HTTP 访问
 
 ```bash
 cd cloudbase
-tcb fn deploy gitblog-comments -e gitbolg-d7gmnsrw46e011706
+tcb fn deploy gitblog-comments -e slippery-iguana-d1fhb1xmd469ee8c
 ```
 
 ## 4. 部署评论嵌入页（免费版必做）
@@ -74,24 +74,24 @@ tcb fn deploy gitblog-comments -e gitbolg-d7gmnsrw46e011706
 
 ```bash
 cd cloudbase
-tcb hosting deploy ./static -e gitbolg-d7gmnsrw46e011706
+tcb hosting deploy ./static -e slippery-iguana-d1fhb1xmd469ee8c
 ```
 
 部署后 CLI 会输出实际访问地址，形如：
 
-`https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com`
+`https://slippery-iguana-d1fhb1xmd469ee8c-1256429518.tcloudbaseapp.com`
 
 **注意：** 托管域名是 `{envId}-{应用ID}.tcloudbaseapp.com`，**不是** `{envId}.tcloudbaseapp.com`。若填错，博客页 iframe 会 404。
 
 将该域名填入 `config.js` 的 `embedBaseUrl`（或后台设置的「托管域名」）：
 
 ```js
-embedBaseUrl: 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com',
+embedBaseUrl: 'https://slippery-iguana-d1fhb1xmd469ee8c-1256429518.tcloudbaseapp.com',
 ```
 
 验证：浏览器打开
 
-`https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com/comments-embed.html?path=test&env=gitbolg-d7gmnsrw46e011706`
+`https://slippery-iguana-d1fhb1xmd469ee8c-1256429518.tcloudbaseapp.com/comments-embed.html?path=test&env=slippery-iguana-d1fhb1xmd469ee8c`
 
 应能看到评论加载界面。
 
@@ -221,7 +221,7 @@ npm run cloudbase:deploy-embed
 ```bash
 cp secrets.env.example secrets.env
 # 编辑 secrets.env，把 SMTP_PASS 改成你的授权码
-node deploy-comments-fn.mjs -e gitbolg-d7gmnsrw46e011706
+node deploy-comments-fn.mjs -e slippery-iguana-d1fhb1xmd469ee8c
 ```
 
 `secrets.env` 已加入 `.gitignore`，部署脚本会临时注入环境变量，**部署后自动从 cloudbaserc.json 清除授权码**。
@@ -252,11 +252,11 @@ node deploy-comments-fn.mjs -e gitbolg-d7gmnsrw46e011706
 ```js
 cloudbase: {
   enabled: true,
-  envId: 'gitbolg-d7gmnsrw46e011706',
+  envId: 'slippery-iguana-d1fhb1xmd469ee8c',
   region: 'ap-shanghai',
   functionName: 'gitblog-comments',
   accessMode: 'embed',           // 免费版推荐
-  embedBaseUrl: 'https://gitbolg-d7gmnsrw46e011706-1256429518.tcloudbaseapp.com', // hosting deploy 输出的域名
+  embedBaseUrl: 'https://slippery-iguana-d1fhb1xmd469ee8c-1256429518.tcloudbaseapp.com', // hosting deploy 输出的域名
   embedPage: 'comments-embed.html',
   placeholderNick: '访客',
   moderation: false,
@@ -280,7 +280,7 @@ cloudbase: {
 升级个人版后，若希望评论 UI 直接嵌在博客页（非 iframe）：
 
 1. 控制台 → **环境配置** → **安全来源**，添加 `gitpull.cn`、`www.gitpull.cn`
-2. 或 CLI：`tcb cors add gitpull.cn,www.gitpull.cn -e gitbolg-d7gmnsrw46e011706`
+2. 或 CLI：`tcb cors add gitpull.cn,www.gitpull.cn -e slippery-iguana-d1fhb1xmd469ee8c`
 3. 云函数 → `gitblog-comments` → 开启 **HTTP 访问**
 4. 将 `accessMode` 改为 `http` 或 `sdk`
 

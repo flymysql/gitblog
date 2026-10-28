@@ -161,6 +161,7 @@ body::before { content:''; position: fixed; inset: 0; background:
       <a href="/index.html" class="active">🏠 首页</a>
       <a href="/downloads.html">⬇ 下载</a>
       <a href="/feedback.html">💬 反馈</a>
+      <a href="/privacy.html">🔒 隐私</a>
       <a href="/admin.html">🔐 后台</a>
     </div>
   </nav>
@@ -269,7 +270,7 @@ body::before { content:''; position: fixed; inset: 0; background:
 </div>
 
 <script>
-const API = 'https://gitbolg-d7gmnsrw46e011706-1256429518.ap-shanghai.app.tcloudbase.com/tcb-admin';
+const API = 'https://slippery-iguana-d1fhb1xmd469ee8c-1256429518.ap-shanghai.app.tcloudbase.com/tcb-admin';
 
 // 移动端菜单
 document.getElementById('menu-btn').addEventListener('click', () => {
@@ -294,8 +295,15 @@ async function loadBuilds() {
     document.getElementById('dl-ver').textContent = ver;
     const zip = latest.find((f) => /\.zip$/i.test(f.filename));
     const zipEl = document.getElementById('dl-zip');
-    if (zip) {
-      zipEl.innerHTML = `<span class="version-tag">v${ver}</span><div style="margin-bottom:14px"></div><a class="dl-btn" href="${zip.url}" download>⬇ 下载安装包</a><div class="dl-meta">${zip.size ? (zip.size/1024).toFixed(0)+' KB' : ''} · 解压加载</div>`;
+    // crx 与 zip 同版本同目录、命名固定：探测后再决定是否给 crx 入口（运维装的就是 crx）
+    const crxUrl = `/packages/taobao-cert-uploader-v${ver}-360-signed.crx`;
+    let crxOk = false;
+    try { const r = await fetch(crxUrl, { method: 'HEAD' }); crxOk = r.ok; } catch (e) { crxOk = false; }
+    if (crxOk || zip) {
+      zipEl.innerHTML =
+        `<span class="version-tag">v${ver}</span><div style="margin-bottom:14px"></div>` +
+        (crxOk ? `<a class="dl-btn" href="${crxUrl}" download>⬇ 下载 CRX 安装包</a><div class="dl-meta">Chrome / 360 拖进扩展页即可安装</div>` : '') +
+        (zip ? `<a class="dl-btn" href="${zip.url}" download style="margin-top:10px;opacity:.85">⬇ 下载 zip 安装包</a><div class="dl-meta">${zip.size ? (zip.size/1024).toFixed(0)+' KB' : ''} · 解压加载（通用）</div>` : '');
     } else {
       zipEl.innerHTML = '<span class="version-tag">暂无</span>';
     }

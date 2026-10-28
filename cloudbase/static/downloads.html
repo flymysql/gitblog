@@ -70,6 +70,7 @@ tr:hover td { background: rgba(255,255,255,.03); }
       <a href="/index.html">🏠 首页</a>
       <a href="/downloads.html" class="active">⬇ 下载</a>
       <a href="/feedback.html">💬 反馈</a>
+      <a href="/privacy.html">🔒 隐私</a>
       <a href="/admin.html">🔐 后台</a>
     </div>
   </nav>
@@ -93,7 +94,13 @@ tr:hover td { background: rgba(255,255,255,.03); }
   <div class="card">
     <h2>📖 安装说明</h2>
     <div class="install-steps">
-      <b>📦 解压安装（Chrome / Edge / 360 通用）</b><br>
+      <b>✅ 方式一：CRX 一键安装（Chrome / 360 极速浏览器，推荐）</b><br>
+      1. 下载 <b>.crx</b> 安装包<br>
+      2. 打开扩展管理页：Chrome <code>chrome://extensions/</code>、360 <code>se://extensions/</code>、Edge <code>edge://extensions/</code><br>
+      3. 把下载好的 <b>.crx 文件拖进这个页面</b>，弹窗里点「添加」即可<br>
+      <span class="muted">⚠️ 若提示「程序包无效 / 无法安装」，说明拿到的是坏包（v1.3.1 那个签名有问题的 crx 就是这种情况），
+      请改用下面的方式二，或联系管理员重新下载最新包。</span><br><br>
+      <b>📦 方式二：解压安装（任何 Chromium 内核浏览器通用）</b><br>
       1. 下载 <b>.zip</b> 安装包<br>
       2. 将 zip <b>解压</b>到固定文件夹（如 <code>D:\taobao-cert</code> 或 <code>~/taobao-cert</code>），解压后应能看到 <code>manifest.json</code><br>
       3. 打开你的浏览器扩展管理页：<br>
@@ -110,7 +117,7 @@ tr:hover td { background: rgba(255,255,255,.03); }
 </div>
 
 <script>
-const API = 'https://gitbolg-d7gmnsrw46e011706-1256429518.ap-shanghai.app.tcloudbase.com/tcb-admin';
+const API = 'https://slippery-iguana-d1fhb1xmd469ee8c-1256429518.ap-shanghai.app.tcloudbase.com/tcb-admin';
 document.getElementById('menu-btn').addEventListener('click', () => document.getElementById('nav-links').classList.toggle('open'));
 
 async function load() {
@@ -129,16 +136,23 @@ async function load() {
     const latestVer = verKeys[0];
     const latestFiles = byVer[latestVer];
     const zipFile = latestFiles.find((f) => /\.zip$/i.test(f.filename));
+    // 后端只对外暴露 zip；crx 与 zip 同版本同目录、命名固定，这里探测一下再决定是否提供。
+    // 运维装的就是 crx（拖拽安装），所以发布页必须给 crx 入口。
+    const crxUrl = `/packages/taobao-cert-uploader-v${latestVer}-360-signed.crx`;
+    let crxOk = false;
+    try { const r = await fetch(crxUrl, { method: 'HEAD' }); crxOk = r.ok; } catch (e) { crxOk = false; }
     document.getElementById('latest-version').innerHTML = `
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px">
         <span class="version-tag">v${latestVer}</span>
         <span class="muted">更新时间 ${fmtTime(latestFiles[0].ts)}</span>
       </div>
-      ${zipFile ? `<div style="text-align:center;padding:20px 0">
+      ${(crxOk || zipFile) ? `<div style="text-align:center;padding:20px 0">
         <div style="font-size:40px;margin-bottom:10px">📦</div>
         <h4 style="margin-bottom:6px">淘宝证书自动上传 v${latestVer}</h4>
-        <p class="muted" style="margin-bottom:16px">${zipFile.size ? (zipFile.size/1024).toFixed(0) + ' KB' : ''} · zip 安装包(所有浏览器通用)</p>
-        <a class="dl-btn" href="${zipFile.url}" download style="font-size:16px;padding:13px 36px">⬇ 下载安装包</a>
+        ${crxOk ? `<p class="muted" style="margin-bottom:10px">CRX 一键安装（Chrome / 360，拖进扩展页即可）</p>
+        <a class="dl-btn" href="${crxUrl}" download style="font-size:16px;padding:13px 36px">⬇ 下载 CRX 安装包</a>` : ''}
+        ${zipFile ? `<p class="muted" style="margin:${crxOk ? '18px' : '0'} 0 10px">${zipFile.size ? (zipFile.size/1024).toFixed(0) + ' KB' : ''} · zip 解压安装（所有浏览器通用）</p>
+        <a class="dl-btn" href="${zipFile.url}" download style="font-size:16px;padding:13px 36px${crxOk ? ';opacity:.85' : ''}">⬇ 下载 zip 安装包</a>` : ''}
       </div>` : '<p class="empty">暂无安装包</p>'}
       ${latestFiles[0].note ? `<p class="muted" style="margin-top:12px;text-align:center">${latestFiles[0].note}</p>` : ''}`;
 
