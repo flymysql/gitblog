@@ -27,7 +27,7 @@ summary: 一个让 Agent 在多台 SSH 机器上「选目录即工作」的插�
 
 设置页就是一个多机 registry：增删改、设「当前」，每台记录 `host / port / user / 私钥或密码`。密码只存在本地（`~/.dsh/remote-workspaces/machines.json`），界面回显的是 `🔒` 表示已设，不回明文。
 
-![设置页——多机 SSH 列表](https://raw.githubusercontent.com/flymysql/dsh-remote/main/docs/ui-settings.svg)
+![设置页——多机 SSH 列表](https://raw.githubusercontent.com/flymysql/dsh-remote/main/docs/shots/settings-panel.png)
 
 ### 2. 双模式工作区选择器
 
@@ -36,7 +36,7 @@ summary: 一个让 Agent 在多台 SSH 机器上「选目录即工作」的插�
 - **本机**：走**系统文件夹选择器**（host 端的原生 `directoryPicker`），或直接输入本地路径 → 直接就是普通 DSH 本地工作区（和本地工作区共存）。
 - **远程**：先选**机器**，再浏览它的目录（可点进子目录），或直接输入 `/绝对路径` → 确定后把它 mirror 成本地镜像工作区。
 
-![选工作区——本机 / 远程 双 tab](https://raw.githubusercontent.com/flymysql/dsh-remote/main/docs/ui-picker.svg)
+![选工作区——本机 / 远程 双 tab](https://raw.githubusercontent.com/flymysql/dsh-remote/main/docs/shots/picker-dialog.png)
 
 ### 3. 远程工作区 = 本地镜像 + 双向同步
 
