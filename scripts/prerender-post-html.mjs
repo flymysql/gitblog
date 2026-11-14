@@ -392,6 +392,8 @@ export async function buildPrerenderedPostHtml({
   postShellTemplate,
   buildStatsIndex = null,
   resolvePostPath = null,
+  navigationHtml = '',
+  discoveryHtml = '',
 }) {
   const slug = post.slug;
   const title = post.title || fmData.title || '无标题';
@@ -451,8 +453,9 @@ export async function buildPrerenderedPostHtml({
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(`${title} · ${site.title}`)}</title>`)
     .replace(
       /<article class="article" id="article">[\s\S]*?<\/article>/,
-      `<article class="article is-prerendered" id="article" data-prerendered="1" data-slug="${escapeHtml(slug)}" data-url-key="${escapeHtml(String(post.urlKey || '').trim())}">\n      ${articleInner}\n    </article>`
+      `<article class="article is-prerendered" id="article" data-prerendered="1" data-slug="${escapeHtml(slug)}" data-url-key="${escapeHtml(String(post.urlKey || '').trim())}">\n      ${articleInner}\n      ${discoveryHtml}\n    </article>`
     );
+  if (navigationHtml) html = html.replace(/<div id="site-nav">\s*<\/div>/, `<div id="site-nav">${navigationHtml}</div>`);
 
   // 移除壳里的 noindex（post.html fallback 专用），预渲染产物用 buildMetaHead 的 index,follow
   html = html.replace(/<meta\s+name="robots"\s+content="noindex">\s*\n?\s*/g, '');

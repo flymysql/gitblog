@@ -50,17 +50,20 @@ function renderArchive(groups) {
 
 (async function init() {
   initSite({ active: 'archives.html' });
-  setMeta({ title: '归档', description: '所有文章按时间归档' });
+  const canonical = document.querySelector('link[rel="canonical"]');
+  setMeta({ title: '归档', description: '所有文章按时间归档', url: canonical ? canonical.href : window.location.href.replace(/[?#].*$/, '') });
 
   let posts = [];
   try {
     const data = await fetchIndexPublic();
     posts = (data.posts || []).filter(p => !p.draft && p.type !== 'note');
   } catch (e) {
+    if ($('#archiveList').querySelector('.archive-item')) return;
     $('#archiveList').innerHTML = `<div class="error">加载失败：${escapeHtml(e.message)}</div>`;
     return;
   }
   const groups = groupByYearMonth(posts);
+  if (!groups.length && $('#archiveList').querySelector('.archive-item')) return;
   $('#archiveDesc').textContent = `共 ${posts.length} 篇文章，跨 ${groups.length} 年`;
   renderArchive(groups);
 })();

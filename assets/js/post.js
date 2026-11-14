@@ -374,6 +374,8 @@ function rewriteLegacyPostLinks(article, allPosts = []) {
 
 // ---------- 上一篇 / 下一篇 + 相关文章 ----------
 function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
+  // Keep the crawlable build output if the optional index request failed.
+  if (!(allPosts || []).some(p => p.slug === currentSlug)) return;
   const visible = (allPosts || []).filter(p => !p.draft && p.slug !== currentSlug);
   // 上下篇：基于"全部已发布按时间升序"找当前文章相邻位置
   const allByDateAsc = [...(allPosts || []).filter(p => !p.draft)]
@@ -399,6 +401,8 @@ function renderNeighborsAndRelated(allPosts, currentSlug, currentTags) {
 
   const article = $('#article');
   if (!article) return;
+
+  article.querySelectorAll(':scope > .post-neighbors, :scope > .post-related').forEach(el => el.remove());
 
   const mobile = isMobilePostViewport();
 

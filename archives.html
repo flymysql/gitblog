@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+<!DOCTYPE html><html lang="zh-CN"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer-when-downgrade">
-  <title>归档 · 加载中…</title>
+  <title>归档 · 小红鸡</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="rss.xml">
-  <link rel="stylesheet" href="assets/dist/common.min.css?v=20260627010000">
-  <link rel="stylesheet" href="assets/dist/home.min.css?v=20260627010000">
+  <link rel="stylesheet" href="assets/dist/common.min.css?v=20261115000100">
+  <link rel="stylesheet" href="assets/dist/home.min.css?v=20261115000100">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
   <style>
     .archive-page { max-width: var(--content-max); margin: 28px auto; padding: 0 24px; }
@@ -57,19 +55,463 @@
   <meta name="theme-color" content="#ea6f5a">
   <link rel="apple-touch-icon" href="assets/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
-</head>
+
+
+<meta name="description" content="共 70 篇文章，跨 6 年">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://gitpull.cn/archives.html"></head>
 <body>
-  <div id="site-nav"></div>
+  <div id="site-nav"><nav class="nav">
+      <div class="nav-inner">
+        <button id="navMenuBtn" class="icon-btn nav-menu-btn" type="button" aria-label="菜单">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <a class="nav-logo" href="/">
+          <img class="nav-logo-img" src="/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg" alt="小红鸡">
+          <span>小红鸡</span>
+        </a>
+        <div class="nav-links"><a class="nav-link" href="/">首页</a><a class="nav-link active" href="/archives.html">归档</a><a class="nav-link" href="/series.html">系列</a><a class="nav-link" href="/tools/">工具</a><a class="nav-link" href="/notes.html">留言板</a><a class="nav-link" href="/post/about/">关于</a><a class="nav-link" href="https://yuanqi.tencent.com/webim/#/chat/RhQLBj?appid=2068988279428657408" target="_blank" rel="noopener noreferrer">小助手</a></div>
+        <div class="nav-spacer"></div>
+        <button id="searchBtn" class="icon-btn" title="搜索" aria-label="搜索">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+
+    <button id="themeToggle" class="icon-btn" title="切换日 / 月 / 自动" aria-label="切换日 / 月 / 自动">
+      <svg class="icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+      </svg>
+      <svg class="icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <svg class="icon-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M12 3v18M3 12a9 9 0 0 1 9-9v18a9 9 0 0 1-9-9z" fill="currentColor" stroke="none"></path>
+      </svg>
+    </button>
+    <button id="presetToggle" class="icon-btn" title="选择主题" aria-label="选择主题">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M12 21a9 9 0 1 0-9-9c0 5 4 5 6 4s2-2 1-3-1-2 1-2 4 0 4-3" fill="currentColor" stroke="none" opacity="0.85"></path>
+      </svg>
+    </button>
+        <a class="btn-write" href="/admin/" title="进入创作后台">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          <span class="btn-write-label">创作</span>
+        </a>
+      </div>
+    </nav>
+    <div id="navDrawer" class="nav-drawer is-hidden" aria-hidden="true">
+      <div class="nav-drawer-panel">
+        <div class="nav-drawer-header">
+          <span>导航</span>
+          <button id="navDrawerClose" class="icon-btn" type="button" aria-label="关闭">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div class="nav-drawer-links"><a class="nav-drawer-link" href="/">首页</a><a class="nav-drawer-link active" href="/archives.html">归档</a><a class="nav-drawer-link" href="/series.html">系列</a><a class="nav-drawer-link" href="/tools/">工具</a><a class="nav-drawer-link" href="/notes.html">留言板</a><a class="nav-drawer-link" href="/post/about/">关于</a><a class="nav-drawer-link" href="https://yuanqi.tencent.com/webim/#/chat/RhQLBj?appid=2068988279428657408" target="_blank" rel="noopener noreferrer">小助手</a></div>
+        <a class="nav-drawer-cta" href="/admin/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          进入创作后台
+        </a>
+      </div>
+    </div></div>
 
   <main class="archive-page">
     <h1>归档</h1>
-    <p class="desc" id="archiveDesc">所有文章按时间倒序排列</p>
-    <div id="archiveList"></div>
+    <p class="desc" id="archiveDesc">共 70 篇文章，跨 6 年</p>
+    <div id="archiveList">
+    <section class="year-group">
+      <div class="year-title">2026 <span style="font-size:13px;color:var(--text-tertiary);font-weight:400">· 14 篇</span></div>
+      <ul class="archive-list">
+        <li class="archive-item">
+          <span class="date">09-29</span>
+          <a class="title" href="/post/20260929/">vpn-skill：对 AI 说一句话，帮你把自建 VPN 装好并连上</a>
+          <span class="tags">#项目介绍 #教程</span>
+        </li>
+<li class="archive-item">
+          <span class="date">09-25</span>
+          <a class="title" href="/post/20260925/">从零开始：装上 DeepSeek Harness，让 AI 帮我修好一个装不上的浏览器插件</a>
+          <span class="tags">#教程 #AI 基础设施</span>
+        </li>
+<li class="archive-item">
+          <span class="date">08-14</span>
+          <a class="title" href="/post/20260814/">dsh-remote——给 DeepSeek Harness 的多机远程工作区</a>
+          <span class="tags">#AI 基础设施 #教程</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-18</span>
+          <a class="title" href="/post/20260618/">海门回声 | 黑鬼</a>
+          <span class="tags">#海门回声 #随想</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-17</span>
+          <a class="title" href="/post/20260617/">QQ 经典农场辅助：挂机收菜、种菜、偷菜的一键工具</a>
+          <span class="tags">#杂七杂八</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-16</span>
+          <a class="title" href="/post/20260616/">海门回声 | 静谧的生日夜晚</a>
+          <span class="tags">#海门回声 #随想</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-15</span>
+          <a class="title" href="/post/20260615/">用 AI 做好软件项目：上下文工程实践指南</a>
+          <span class="tags">#AI 基础设施</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-01</span>
+          <a class="title" href="/post/20260601/">PeerCache：一个去中心化的 RDMA 零拷贝 KV 缓存后端</a>
+          <span class="tags">#分布式存储 #AI 基础设施 #项目介绍</span>
+        </li>
+<li class="archive-item">
+          <span class="date">05-29</span>
+          <a class="title" href="/post/20260529/">大模型推理的 PD 分离：原理、动机与 Mooncake 的实现</a>
+          <span class="tags">#算法 #分布式存储</span>
+        </li>
+<li class="archive-item">
+          <span class="date">05-14</span>
+          <a class="title" href="/post/20260514/">CPTI：手机上就能玩的恋爱人格小测验</a>
+          <span class="tags">#杂七杂八 #前端</span>
+        </li>
+<li class="archive-item">
+          <span class="date">05-11</span>
+          <a class="title" href="/post/welcome/">GitBlog：一个带伪后台的博客站点</a>
+          <span class="tags">#博客建站 #教程 #项目介绍</span>
+        </li>
+<li class="archive-item">
+          <span class="date">05-11</span>
+          <a class="title" href="/post/about/">关于小红鸡</a>
+          <span class="tags">#杂七杂八</span>
+        </li>
+<li class="archive-item">
+          <span class="date">04-15</span>
+          <a class="title" href="/post/20260415/">Smallpond 源码走读：DuckDB × 3FS × Ray 是如何拼成一台分布式数据处理机的</a>
+          <span class="tags">#分布式存储 #AI 基础设施 #python</span>
+        </li>
+<li class="archive-item">
+          <span class="date">03-11</span>
+          <a class="title" href="/post/20260311/">3FS 的零拷贝之路：USRBIO 是怎么把存储吞吐推到 6.6 TiB/s 的</a>
+          <span class="tags">#分布式存储 #AI 基础设施 #C++</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="year-group">
+      <div class="year-title">2022 <span style="font-size:13px;color:var(--text-tertiary);font-weight:400">· 5 篇</span></div>
+      <ul class="archive-list">
+        <li class="archive-item">
+          <span class="date">03-13</span>
+          <a class="title" href="/post/20220313/">多维数组的索引方案与内存设计</a>
+          <span class="tags"></span>
+        </li>
+<li class="archive-item">
+          <span class="date">03-12</span>
+          <a class="title" href="/post/20220312/">推荐系统——推荐引擎的架构</a>
+          <span class="tags"></span>
+        </li>
+<li class="archive-item">
+          <span class="date">03-11</span>
+          <a class="title" href="/post/20220311/">nebula graph 图计算数据库</a>
+          <span class="tags"></span>
+        </li>
+<li class="archive-item">
+          <span class="date">03-10</span>
+          <a class="title" href="/post/20220310/">nebula代码走读——从Validator到Executor</a>
+          <span class="tags">#图数据库</span>
+        </li>
+<li class="archive-item">
+          <span class="date">03-09</span>
+          <a class="title" href="/post/20220309/">推荐召回-向量召回之U2I学习总结</a>
+          <span class="tags">#推荐 #推荐算法</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="year-group">
+      <div class="year-title">2020 <span style="font-size:13px;color:var(--text-tertiary);font-weight:400">· 1 篇</span></div>
+      <ul class="archive-list">
+        <li class="archive-item">
+          <span class="date">01-01</span>
+          <a class="title" href="/post/20200101/">随笔杂谈</a>
+          <span class="tags">#杂七杂八</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="year-group">
+      <div class="year-title">2019 <span style="font-size:13px;color:var(--text-tertiary);font-weight:400">· 6 篇</span></div>
+      <ul class="archive-list">
+        <li class="archive-item">
+          <span class="date">06-05</span>
+          <a class="title" href="/post/20190605/">生如夏花般绚烂 死如秋叶般静美</a>
+          <span class="tags">#谙风 #随想</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-05</span>
+          <a class="title" href="/post/20190605-2/">记忆的种子·一</a>
+          <span class="tags">#谙风 #随想</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-05</span>
+          <a class="title" href="/post/20190605-3/">记忆的种子·二</a>
+          <span class="tags">#谙风 #随想</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-05</span>
+          <a class="title" href="/post/20190605-4/">谙风 | 小城中学</a>
+          <span class="tags">#谙风 #随想</span>
+        </li>
+<li class="archive-item">
+          <span class="date">01-01</span>
+          <a class="title" href="/post/20190101/">【PCC】一个用python写的ｃ语言编译器</a>
+          <span class="tags">#杂七杂八 #编译器 #python</span>
+        </li>
+<li class="archive-item">
+          <span class="date">01-01</span>
+          <a class="title" href="/post/20190101-2/">桃李春风一杯酒，江湖夜雨十年灯</a>
+          <span class="tags">#杂七杂八</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="year-group">
+      <div class="year-title">2018 <span style="font-size:13px;color:var(--text-tertiary);font-weight:400">· 30 篇</span></div>
+      <ul class="archive-list">
+        <li class="archive-item">
+          <span class="date">12-16</span>
+          <a class="title" href="/post/20181216/">模仿知乎的链接卡片</a>
+          <span class="tags">#教程 #前端</span>
+        </li>
+<li class="archive-item">
+          <span class="date">12-14</span>
+          <a class="title" href="/post/20181214/">Windows下的终端折腾——弃坑msys2，开始用wsl</a>
+          <span class="tags">#教程</span>
+        </li>
+<li class="archive-item">
+          <span class="date">12-06</span>
+          <a class="title" href="/post/20181206/">12月6日杂谈</a>
+          <span class="tags">#随想</span>
+        </li>
+<li class="archive-item">
+          <span class="date">12-03</span>
+          <a class="title" href="/post/20181203/">小程序开发之接入Bmob后端云作为后端数据库</a>
+          <span class="tags">#教程 #微信小程序</span>
+        </li>
+<li class="archive-item">
+          <span class="date">12-02</span>
+          <a class="title" href="/post/20181202/">使用vue.js制作carousel跑马灯组件</a>
+          <span class="tags">#前端</span>
+        </li>
+<li class="archive-item">
+          <span class="date">11-23</span>
+          <a class="title" href="/post/20181123/">Dijkstra单源最短路径算法</a>
+          <span class="tags">#前端 #算法 #C++</span>
+        </li>
+<li class="archive-item">
+          <span class="date">11-22</span>
+          <a class="title" href="/post/20181122/">使用腾讯云cdn加速博客</a>
+          <span class="tags">#教程 #博客建站</span>
+        </li>
+<li class="archive-item">
+          <span class="date">11-14</span>
+          <a class="title" href="/post/20181114/">hexo建站笔记之首页文章轮播图</a>
+          <span class="tags">#教程 #前端 #博客建站</span>
+        </li>
+<li class="archive-item">
+          <span class="date">11-11</span>
+          <a class="title" href="/post/20181111/">将公众号文章爬到hexo博客</a>
+          <span class="tags"></span>
+        </li>
+<li class="archive-item">
+          <span class="date">11-07</span>
+          <a class="title" href="/post/20181107/">hexo建站笔记之彩色标签云</a>
+          <span class="tags">#教程 #前端 #博客建站</span>
+        </li>
+<li class="archive-item">
+          <span class="date">11-01</span>
+          <a class="title" href="/post/20181101/">用回valine评论系统,valine评论框样式美化</a>
+          <span class="tags">#教程 #博客建站</span>
+        </li>
+<li class="archive-item">
+          <span class="date">10-30</span>
+          <a class="title" href="/post/20181030/">sql学习笔记2</a>
+          <span class="tags">#sql</span>
+        </li>
+<li class="archive-item">
+          <span class="date">10-29</span>
+          <a class="title" href="/post/20181029/">手动修改博客css样式，打造属于自己的博客样式</a>
+          <span class="tags">#教程 #博客建站</span>
+        </li>
+<li class="archive-item">
+          <span class="date">10-25</span>
+          <a class="title" href="/post/20181025/">服务端搭建ssr教程</a>
+          <span class="tags">#教程 #前端</span>
+        </li>
+<li class="archive-item">
+          <span class="date">10-13</span>
+          <a class="title" href="/post/20181013/">解决来必力评论系统加载慢的问题</a>
+          <span class="tags">#教程 #博客建站</span>
+        </li>
+<li class="archive-item">
+          <span class="date">10-10</span>
+          <a class="title" href="/post/20181010/">hexo博客搭建以及next美化教程</a>
+          <span class="tags">#教程 #博客建站</span>
+        </li>
+<li class="archive-item">
+          <span class="date">10-08</span>
+          <a class="title" href="/post/20181008/">sql语言学习笔记</a>
+          <span class="tags">#sql</span>
+        </li>
+<li class="archive-item">
+          <span class="date">10-07</span>
+          <a class="title" href="/post/20181007/">假期最后一天</a>
+          <span class="tags">#随想</span>
+        </li>
+<li class="archive-item">
+          <span class="date">10-06</span>
+          <a class="title" href="/post/20181006/">MarkDown的用法学习笔记</a>
+          <span class="tags">#前端</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-21</span>
+          <a class="title" href="/post/20180621/">windows上的vim配置，打造超级舒心又有逼格的编辑器</a>
+          <span class="tags">#教程 #前端</span>
+        </li>
+<li class="archive-item">
+          <span class="date">05-14</span>
+          <a class="title" href="/post/20180514/">挣钱要比想象的难</a>
+          <span class="tags">#随想</span>
+        </li>
+<li class="archive-item">
+          <span class="date">05-01</span>
+          <a class="title" href="/post/20180501-3/">微信小程序加载游戏排名/好友/全球</a>
+          <span class="tags">#微信小程序 #前端 #算法</span>
+        </li>
+<li class="archive-item">
+          <span class="date">05-01</span>
+          <a class="title" href="/post/20180501-2/">微信小程序/小鸡单词/单词书选择</a>
+          <span class="tags">#微信小程序</span>
+        </li>
+<li class="archive-item">
+          <span class="date">05-01</span>
+          <a class="title" href="/post/20180501/">微信小程序/小鸡单词/单词测试功能</a>
+          <span class="tags">#微信小程序 #前端</span>
+        </li>
+<li class="archive-item">
+          <span class="date">04-27</span>
+          <a class="title" href="/post/20180427/">微信背单词小程序/小鸡单词</a>
+          <span class="tags">#微信小程序 #前端</span>
+        </li>
+<li class="archive-item">
+          <span class="date">04-26</span>
+          <a class="title" href="/post/20180426/">2018刑侦推理题c++暴力破解</a>
+          <span class="tags"></span>
+        </li>
+<li class="archive-item">
+          <span class="date">04-23</span>
+          <a class="title" href="/post/20180423-2/">wordpress建站可能遇到一些小问题</a>
+          <span class="tags">#博客建站 #教程</span>
+        </li>
+<li class="archive-item">
+          <span class="date">04-23</span>
+          <a class="title" href="/post/20180423/">pat乙级试题，C++算法题训练</a>
+          <span class="tags">#算法 #C++</span>
+        </li>
+<li class="archive-item">
+          <span class="date">04-21</span>
+          <a class="title" href="/post/20180421/">在阿里云服务器一键搭建web服务器+wordprss安装</a>
+          <span class="tags">#博客建站</span>
+        </li>
+<li class="archive-item">
+          <span class="date">01-01</span>
+          <a class="title" href="/post/20180101/">Flybook-用node.js从零开始搭一个简约而不简单的博客站点</a>
+          <span class="tags">#杂七杂八</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="year-group">
+      <div class="year-title">2017 <span style="font-size:13px;color:var(--text-tertiary);font-weight:400">· 14 篇</span></div>
+      <ul class="archive-list">
+        <li class="archive-item">
+          <span class="date">07-05</span>
+          <a class="title" href="/post/20170705/">兰州，时间还长，故事还很多</a>
+          <span class="tags">#随想 #邻家酒肆</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-22</span>
+          <a class="title" href="/post/20170622/">青梅不在，竹马老去，从此我爱上的每一个人都很像你</a>
+          <span class="tags">#随想 #邻家酒肆</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-18</span>
+          <a class="title" href="/post/20170618/">喜欢一个人，就是想和她说好多好多话。</a>
+          <span class="tags">#随想 #邻家酒肆</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-17</span>
+          <a class="title" href="/post/20170617/">爱而不得人那么多，为什么非你不可</a>
+          <span class="tags">#随想 #邻家酒肆</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-14</span>
+          <a class="title" href="/post/20170614/">然而青春啊 却在最酣畅淋漓时戛然而止</a>
+          <span class="tags">#随想 #邻家酒肆</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-13</span>
+          <a class="title" href="/post/20170613/">写给发小：一个童年的长度</a>
+          <span class="tags">#随想 #邻家酒肆</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-12</span>
+          <a class="title" href="/post/20170612/">谙风 | 小城青旅</a>
+          <span class="tags">#随想 #邻家酒肆</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-11</span>
+          <a class="title" href="/post/20170611/">十月不远，青海湖不远</a>
+          <span class="tags">#随想 #邻家酒肆</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-10</span>
+          <a class="title" href="/post/20170610/">大学生，你凭什么创业？</a>
+          <span class="tags">#随想 #邻家酒肆</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-09</span>
+          <a class="title" href="/post/20170609/">所有的日子，都是在等待一份久别的重逢。</a>
+          <span class="tags">#随想 #邻家酒肆</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-08</span>
+          <a class="title" href="/post/20170608/">未来的年月希望可以让我来温暖你们。</a>
+          <span class="tags">#随想 #邻家酒肆</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-07</span>
+          <a class="title" href="/post/20170607/">人生在世如春梦</a>
+          <span class="tags">#随想 #邻家酒肆</span>
+        </li>
+<li class="archive-item">
+          <span class="date">06-06</span>
+          <a class="title" href="/post/20170606/">那些在苦难中艰难生活的人。</a>
+          <span class="tags"></span>
+        </li>
+<li class="archive-item">
+          <span class="date">01-01</span>
+          <a class="title" href="/post/20170101/">用python做一个C类编译器——语法翻译器</a>
+          <span class="tags"></span>
+        </li>
+      </ul>
+    </section></div>
   </main>
 
   <div id="site-footer"></div>
   <div id="site-overlays"></div>
 
-  <script type="module" src="assets/dist/archives.min.js?v=20260627010000"></script>
-</body>
-</html>
+  <script type="module" src="assets/dist/archives.min.js?v=20261115000100"></script>
+
+
+</body></html>

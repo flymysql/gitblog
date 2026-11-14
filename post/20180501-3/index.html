@@ -11,8 +11,8 @@
 
 <title>微信小程序加载游戏排名/好友/全球 · 小红鸡</title>
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
-  <link rel="stylesheet" href="/assets/dist/common.min.css?v=20260627010000">
-  <link rel="stylesheet" href="/assets/dist/post.min.css?v=20260627010000">
+  <link rel="stylesheet" href="/assets/dist/common.min.css?v=20261115000100">
+  <link rel="stylesheet" href="/assets/dist/post.min.css?v=20261115000100">
   <script>(function(){var s=localStorage;var t=s.getItem('blog_theme')||'auto';var d=t==='auto'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t;var p=s.getItem('blog_preset')||'jianshu';var h=document.documentElement;h.setAttribute('data-preset',p);h.setAttribute('data-mode',d);h.setAttribute('data-theme',d);h.dataset.themeChoice=t;})();</script>
   <link rel="manifest" href="/manifest.webmanifest">
   <meta name="theme-color" content="#ea6f5a">
@@ -48,7 +48,61 @@
 </head>
 <body>
   <a href="#article" class="skip-to-content">跳到内容</a>
-  <div id="site-nav"></div>
+  <div id="site-nav"><nav class="nav">
+      <div class="nav-inner">
+        <button id="navMenuBtn" class="icon-btn nav-menu-btn" type="button" aria-label="菜单">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <a class="nav-logo" href="/">
+          <img class="nav-logo-img" src="/assets/%E7%BA%B8%E9%A3%9E%E6%9C%BA.svg" alt="小红鸡">
+          <span>小红鸡</span>
+        </a>
+        <div class="nav-links"><a class="nav-link" href="/">首页</a><a class="nav-link" href="/archives.html">归档</a><a class="nav-link" href="/series.html">系列</a><a class="nav-link" href="/tools/">工具</a><a class="nav-link" href="/notes.html">留言板</a><a class="nav-link" href="/post/about/">关于</a><a class="nav-link" href="https://yuanqi.tencent.com/webim/#/chat/RhQLBj?appid=2068988279428657408" target="_blank" rel="noopener noreferrer">小助手</a></div>
+        <div class="nav-spacer"></div>
+        <button id="searchBtn" class="icon-btn" title="搜索" aria-label="搜索">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+
+    <button id="themeToggle" class="icon-btn" title="切换日 / 月 / 自动" aria-label="切换日 / 月 / 自动">
+      <svg class="icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      <svg class="icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <svg class="icon-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 3v18M3 12a9 9 0 0 1 9-9v18a9 9 0 0 1-9-9z" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
+    <button id="presetToggle" class="icon-btn" title="选择主题" aria-label="选择主题">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 21a9 9 0 1 0-9-9c0 5 4 5 6 4s2-2 1-3-1-2 1-2 4 0 4-3" fill="currentColor" stroke="none" opacity="0.85"/>
+      </svg>
+    </button>
+        <a class="btn-write" href="/admin/" title="进入创作后台">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          <span class="btn-write-label">创作</span>
+        </a>
+      </div>
+    </nav>
+    <div id="navDrawer" class="nav-drawer is-hidden" aria-hidden="true">
+      <div class="nav-drawer-panel">
+        <div class="nav-drawer-header">
+          <span>导航</span>
+          <button id="navDrawerClose" class="icon-btn" type="button" aria-label="关闭">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="nav-drawer-links"><a class="nav-drawer-link" href="/">首页</a><a class="nav-drawer-link" href="/archives.html">归档</a><a class="nav-drawer-link" href="/series.html">系列</a><a class="nav-drawer-link" href="/tools/">工具</a><a class="nav-drawer-link" href="/notes.html">留言板</a><a class="nav-drawer-link" href="/post/about/">关于</a><a class="nav-drawer-link" href="https://yuanqi.tencent.com/webim/#/chat/RhQLBj?appid=2068988279428657408" target="_blank" rel="noopener noreferrer">小助手</a></div>
+        <a class="nav-drawer-cta" href="/admin/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          进入创作后台
+        </a>
+      </div>
+    </div></div>
 
   <main class="article-layout">
     <article class="article is-prerendered" id="article" data-prerendered="1" data-slug="微信小程序加载游戏排名好友全球-6d6da729" data-url-key="20180501-3">
@@ -63,7 +117,7 @@
             <span>2018-05-01</span>
             
             <span class="dot"></span>
-            <span>1456 字</span>
+            <span>1520 字</span>
             <span class="dot"></span>
             <span class="meta-read-mins">约 1 分钟</span>
             <span class="dot"></span><span class="gitblog-pv-inline"><span class="gitblog-pv-prefix">阅读 </span><span id="gitblog_page_pv" data-build-pv="497">497</span><span class="gitblog-pv-suffix"> 次</span></span>
@@ -141,6 +195,28 @@ swichNav(e) {
       <div id="commentsRoot"></div>
       <p class="comments-end-hint" hidden aria-hidden="true"></p>
     </section>
+      <nav class="post-neighbors" aria-label="相邻文章" data-discovery-prerendered>
+    <a class="post-neighbor prev" href="/post/20180501-2/"><span class="label">← 上一篇</span><span class="title">微信小程序/小鸡单词/单词书选择</span></a>
+    <a class="post-neighbor next" href="/post/20180514/"><span class="label">下一篇 →</span><span class="title">挣钱要比想象的难</span></a>
+  </nav><section class="post-related" data-discovery-prerendered>
+    <div class="post-related-title">相关文章</div>
+    <ul class="post-related-list"><li><a href="/post/20181123/">
+      <span class="t">Dijkstra单源最短路径算法</span>
+      <span class="meta">2018-11-23 · #前端 #算法 #C++</span>
+    </a></li>
+<li><a href="/post/20180501/">
+      <span class="t">微信小程序/小鸡单词/单词测试功能</span>
+      <span class="meta">2018-05-01 · #微信小程序 #前端</span>
+    </a></li>
+<li><a href="/post/20180427/">
+      <span class="t">微信背单词小程序/小鸡单词</span>
+      <span class="meta">2018-04-27 · #微信小程序 #前端</span>
+    </a></li>
+<li><a href="/post/20260529/">
+      <span class="t">大模型推理的 PD 分离：原理、动机与 Mooncake 的实现</span>
+      <span class="meta">2026-05-29 · #算法 #分布式存储</span>
+    </a></li></ul>
+  </section>
     </article>
     <aside class="toc-sidebar" id="tocSidebar" hidden></aside>
   </main>
@@ -148,6 +224,6 @@ swichNav(e) {
   <div id="site-footer"></div>
   <div id="site-overlays"></div>
 
-  <script type="module" src="/assets/dist/post.min.js?v=20260627010000"></script>
+  <script type="module" src="/assets/dist/post.min.js?v=20261115000100"></script>
 </body>
 </html>

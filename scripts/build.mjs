@@ -2,7 +2,9 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { join, basename, extname } from 'node:path';
 import sharp from 'sharp';
+import { load as loadHtml } from 'cheerio';
 import { buildPrerenderedPostHtml } from './prerender-post-html.mjs';
+import { buildArchiveHtml, buildPostDiscoveryHtml } from './static-discovery-html.mjs';
 import { TOOL_HTML_FILES } from './generate-tool-pages.mjs';
 import {
   parseNavItems,
@@ -400,9 +402,8 @@ function xmlEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => 
 const baseUrl = SITE_URL || '';
 const today = new Date().toISOString();
 // 首页 lastmod 取最新文章的更新时间（比构建时间戳更能反映内容变化）
-const latestPostDate = visiblePosts.length
-  ? new Date(visiblePosts[0].date || today).toISOString()
-  : today;
+const latestPostTimestamp = Math.max(0, ...visiblePosts.map(p => Date.parse(p.updated || p.date) || 0));
+const latestPostDate = latestPostTimestamp ? new Date(latestPostTimestamp).toISOString() : today;
 
 const TOOL_SITEMAP_PAGES = [
   'tools/tool-age.html',
@@ -421,9 +422,9 @@ const TOOL_SITEMAP_PAGES = [
 
 const urls = [
   { loc: baseUrl + '/', lastmod: latestPostDate, changefreq: 'daily', priority: '1.0' },
-  { loc: baseUrl + '/tags.html', lastmod: today, changefreq: 'weekly', priority: '0.8' },
-  { loc: baseUrl + '/archives.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
-  { loc: baseUrl + '/series.html', lastmod: today, changefreq: 'weekly', priority: '0.7' },
+  { loc: baseUrl + '/tags.html', lastmod: latestPostDate, changefreq: 'weekly', priority: '0.8' },
+  { loc: baseUrl + '/archives.html', lastmod: latestPostDate, changefreq: 'weekly', priority: '0.7' },
+  { loc: baseUrl + '/series.html', lastmod: latestPostDate, changefreq: 'weekly', priority: '0.7' },
   { loc: baseUrl + '/tools/', lastmod: today, changefreq: 'monthly', priority: '0.7' },
   ...TOOL_SITEMAP_PAGES.map(p => ({
     loc: baseUrl + '/' + p,
@@ -729,6 +730,14 @@ if (existsSync(POST_ROOT)) rmSync(POST_ROOT, { recursive: true, force: true });
 mkdirSync(POST_ROOT, { recursive: true });
 const postsBySlug = new Map(postEntries.filter(p => p && p.slug).map(p => [p.slug, p]));
 const resolvePostPath = (slug) => postPathFromSlugForPrerender(slug, postsBySlug);
+const publicPostHref = p => new URL(postPublicAbsUrl(p)).pathname;
+const readerNav = active => buildNavShell({
+  siteTitle: SITE_TITLE,
+  siteLogo: SITE_LOGO,
+  navItems: parseNavItems(cfgRaw),
+  pathPrefix: SITE_PATH_PREFIX,
+  active,
+}).replace(/[ \t]+$/gm, '');
 let postShellCount = 0;
 for (const p of postEntries) {
   const dirKey = safePostUrlKeyDir(p);
@@ -756,11 +765,36 @@ for (const p of postEntries) {
     postShellTemplate: POST_SHELL,
     buildStatsIndex: BUILD_STATS_INDEX,
     resolvePostPath,
+    navigationHtml: readerNav(''),
+    discoveryHtml: buildPostDiscoveryHtml(visiblePosts, p, publicPostHref),
   });
   writeFileSync(join(dir, 'index.html'), prerendered);
   postShellCount++;
 }
 console.log(`post/{{urlKey}}/ 已生成（${postShellCount} 篇预渲染 HTML）`);
+
+// The archive is the complete, crawlable fallback for the infinite home list.
+// Replace existing contents so repeated builds never duplicate groups or links.
+{
+  const $ = loadHtml(readFileSync('archives.html', 'utf8'));
+  const archive = buildArchiveHtml(visiblePosts, publicPostHref);
+  $('#archiveList').html(archive.html);
+  $('#archiveDesc').text(archive.description);
+  $('#site-nav').html(readerNav('archives.html'));
+  $('title').text(`归档 · ${SITE_TITLE}`);
+  for (const [selector, tag, attrs] of [
+    ['meta[name="description"]', 'meta', { name: 'description', content: archive.description }],
+    ['meta[name="robots"]', 'meta', { name: 'robots', content: 'index, follow' }],
+    ['link[rel="canonical"]', 'link', { rel: 'canonical', href: baseUrl + '/archives.html' }],
+  ]) {
+    let node = $(selector).first();
+    if (!node.length) node = $(`<${tag}>`).appendTo('head');
+    node.attr(attrs);
+    $(selector).slice(1).remove();
+  }
+  writeFileSync('archives.html', $.html());
+  console.log(`archives.html 已预渲染（${visiblePosts.length} 篇完整文章链接）`);
+}
 
 function stripUndefinedBuild(value) {
   if (Array.isArray(value)) return value.map(stripUndefinedBuild).filter(v => v !== undefined);
